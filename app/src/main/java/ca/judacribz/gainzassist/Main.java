@@ -1,79 +1,92 @@
 package ca.judacribz.gainzassist;
 
-import android.support.annotation.NonNull;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import ca.judacribz.gainzassist.Login;
 
-public class Main extends AppCompatActivity {
-    private FirebaseAuth mAuth;
+import static ca.judacribz.gainzassist.util.Helper.*;
 
+public class Main extends AppCompatActivity implements View.OnClickListener {
+
+    // Constants
+    // --------------------------------------------------------------------------------------------
+    public static final String EXTRA_LOGOUT_USER = "ca.judacribz.gainzassist.EXTRA_LOGOUT_USER";
+    // --------------------------------------------------------------------------------------------
+
+
+    @BindView(R.id.btn_resume_workout) Button btnResumeWorkout;
+    @BindView(R.id.btn_workouts) Button btnWorkouts;
+    @BindView(R.id.btn_step_counter) Button btnStepCounter;
+
+    // AppCompatActivity Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+        setToolbar(this, R.string.app_name, false);
 
-        mAuth = FirebaseAuth.getInstance();
-
-
-        String email = "sheron.balas@gmail.com";
-        String password = "hello123";
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            Toast.makeText(Main.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-                    }
-                });
-//
-//        mAuth.signInWithEmailAndPassword(email, password)
-//                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if (task.isSuccessful()) {
-//                            // Sign in success, update UI with the signed-in user's information
-//                            Log.d(TAG, "signInWithEmail:success");
-//                            FirebaseUser user = mAuth.getCurrentUser();
-//                            updateUI(user);
-//                        } else {
-//                            // If sign in fails, display a message to the user.
-//                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-//                            Toast.makeText(Main.this, "Authentication failed.",
-//                                    Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
-//                        }
-//
-//                        // ...
-//                    }
-//                });
+        btnWorkouts.setOnClickListener(this);
+        btnStepCounter.setOnClickListener(this);
     }
-
-
-
 
     @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+    public void onBackPressed() {
+        handleBackButton(this);
     }
 
-    private void updateUI(FirebaseUser currentUser) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+
+        return super.onCreateOptionsMenu(menu);
     }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // Click Handling
+    // ============================================================================================
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        handleClick(item.getItemId());
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        handleClick(v.getId());
+    }
+
+    /* Handles all clicks in activity */
+    public void handleClick(int id) {
+        switch (id) {
+            case R.id.btn_workouts:
+//                startActivity(new Intent(this, WorkoutsList.class));
+                break;
+
+            case R.id.btn_step_counter:
+//                startActivity(new Intent(this, HowToVideos.class));
+                break;
+
+            case R.id.act_settings:
+                break;
+
+            case R.id.act_logout:
+                Intent logoutIntent = new Intent(this, Login.class);
+                logoutIntent.putExtra(EXTRA_LOGOUT_USER, true);
+                startActivity(logoutIntent);
+                finish();
+                break;
+        }
+    }
+    //=Click=Handling==============================================================================
 }
-

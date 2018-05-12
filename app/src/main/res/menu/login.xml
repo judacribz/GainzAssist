@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="ca.judacribz.gainzassist.Login">
+    <item
+        android:id="@+id/action_how_to_videos"
+        android:orderInCategory="100"
+        android:title="@string/how_to_videos"
+        app:showAsAction="never" />
+</menu>

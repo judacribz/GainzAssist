@@ -1,3 +1,69 @@
 <resources>
-    <string name="app_name">GainzAssist</string>
+
+    <!-- Titles -->
+    <string name="app_name">Gainz Assist</string>
+    <string name="create_account">Create Account</string>
+
+    <!--TODO remove-->
+    <string name="how_to_squat">How To Squat</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_login_img">Main image in the login screen</string>
+    <string name="cd_play_video_btn">Play button for YouTube video</string>
+    <string name="cd_sign_up_img">Main image in the sign up screen</string>
+
+
+    <!-- Menu Items -->
+    <string name="act_settings">Settings</string>
+    <!--TODO remove-->
+    <string name="how_to_videos">How To Videos</string>
+
+    <!-- Error Msgs -->
+    <string name="err_invalid_email">Invalid Email</string>
+    <string name="err_invalid_password">Invalid Password</string>
+    <string name="err_msg">Error: %s</string>
+    <string name="err_required">Required</string>
+    <string name="err_required_email_format">Email Format Required</string>
+    <string name="err_required_password_min">Minimum 6 Characters Required</string>
+
+    <!-- Success Msgs -->
+    <string name="sign_up_success">Sign Up Success!</string>
+
+    <!-- EditText Hints -->
+    <string name="hint_email"><i>Email</i></string>
+    <string name="hint_password"><i>Password</i></string>
+    <string name="hint_search_workouts"><i>Search Workouts</i></string>
+    <string name="hint_workout_name"><i>Workout Name</i></string>
+    <string name="hint_exercise_name"><i>Exercise Name</i></string>
+
+    <!-- Facebook Login Config -->
+    <string name="fb_app_id">529898790716957</string>
+    <string name="fb_login_protocol_scheme">fb529898790716957</string>
+
+    <!-- Phrases -->
+    <string name="txt_no_account">Don\'t have an account?\ </string>
+    <string name="txt_sign_up_here">Sign up here!</string>
+    <string name="txt_yes_account">Already have an account?\ </string>
+    <string name="txt_login_here">Login here!</string>
+    <string name="txt_email_registered">Email is already registered</string>
+    <string name="txt_network_needed">Internet connection required</string>
+    <string name="txt_logged_in">Logged in with %s</string>
+
+    <!-- General -->
+    <string name="exercises">Exercises</string>
+    <string name="login">Login</string>
+    <string name="resume_workout">Resume Workout</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="step_counter">Step Counter</string>
+    <string name="warmups">Warmups</string>
+    <string name="workout">Workout</string>
+    <string name="workouts">Workouts</string>
+    <string name="num_sets"># of Sets</string>
+    <string name="num_reps"># of Reps</string>
+    <string name="weight_lbs">Weight (lbs)</string>
+    <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
+    <string name="add_workout">Add Workout</string>
+    <string name="create_workout">Create Workout</string>
+    <string name="add_exercise">Add Exercise</string>
 </resources>
