@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.utilities;
+package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -19,7 +19,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activity_authentication.Login;
+import ca.judacribz.gainzassist.activities.authentication.Login;
 
 public class Authentication {
 

@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_how_to_videos;
+package ca.judacribz.gainzassist.activities.how_to_videos;
 
 import android.os.AsyncTask;
 import org.json.JSONArray;

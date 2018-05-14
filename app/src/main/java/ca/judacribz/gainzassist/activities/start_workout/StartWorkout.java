@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_start_workout;
+package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -10,8 +10,8 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 
 import ca.judacribz.gainzassist.R;
-import static ca.judacribz.gainzassist.activity_workouts_list.WorkoutsList.EXTRA_WORKOUT_NAME;
-import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
+import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT_NAME;
+import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class StartWorkout extends AppCompatActivity {
 

@@ -10,11 +10,11 @@ import android.widget.Button;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ca.judacribz.gainzassist.activity_authentication.Login;
-import ca.judacribz.gainzassist.activity_how_to_videos.HowToVideos;
-import ca.judacribz.gainzassist.activity_workouts_list.WorkoutsList;
-import static ca.judacribz.gainzassist.utilities.UserInterface.handleBackButton;
-import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
+import ca.judacribz.gainzassist.activities.authentication.Login;
+import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
+import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
+import static ca.judacribz.gainzassist.util.UI.handleBackButton;
+import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class Main extends AppCompatActivity implements View.OnClickListener {
 

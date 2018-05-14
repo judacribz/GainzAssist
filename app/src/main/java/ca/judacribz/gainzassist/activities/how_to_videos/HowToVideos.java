@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_how_to_videos;
+package ca.judacribz.gainzassist.activities.how_to_videos;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -12,7 +12,7 @@ import com.google.android.youtube.player.YouTubePlayerFragment;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
-import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
+import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class HowToVideos extends AppCompatActivity
         implements SearchVideosTask.YouTubeSearchObserver,

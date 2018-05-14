@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
 
         <!-- Login Activity -->
-        <activity android:name=".activity_authentication.Login">
+        <activity android:name=".activities.authentication.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,18 +53,18 @@
         <activity android:name=".Main" />
 
         <!-- HowToVideos Activity -->
-        <activity android:name=".activity_how_to_videos.HowToVideos" />
+        <activity android:name=".activities.how_to_videos.HowToVideos" />
 
         <!-- WorkoutsList Activity -->
-        <activity android:name=".activity_workouts_list.WorkoutsList"
+        <activity android:name=".activities.workouts_list.WorkoutsList"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- StartWorkout Activity -->
-        <activity android:name=".activity_start_workout.StartWorkout" />
+        <activity android:name=".activities.start_workout.StartWorkout" />
 
         <!-- AddWorkout Activity -->
         <activity
-            android:name=".activity_add_workout.AddWorkout"
+            android:name=".activities.add_workout.AddWorkout"
             android:windowSoftInputMode="adjustPan|stateHidden" />
     </application>
 

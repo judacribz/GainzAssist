@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_workouts_list;
+package ca.judacribz.gainzassist.activities.workouts_list;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +16,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activity_add_workout.AddWorkout;
-import ca.judacribz.gainzassist.activity_start_workout.StartWorkout;
+import ca.judacribz.gainzassist.activities.add_workout.AddWorkout;
+import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.User;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
-import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
+import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.WorkoutClickObserver,
                                                                TextWatcher {

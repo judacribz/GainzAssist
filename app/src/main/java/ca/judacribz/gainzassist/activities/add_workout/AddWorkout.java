@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_add_workout;
+package ca.judacribz.gainzassist.activities.add_workout;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,7 +14,7 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
-import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
+import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class AddWorkout extends AppCompatActivity implements View.OnClickListener {
 

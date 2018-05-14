@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity_how_to_videos.HowToVideos">
+    tools:context=".activities.how_to_videos.HowToVideos">
 
     <include
         android:id="@+id/toolbar"

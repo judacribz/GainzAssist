@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_start_workout.fragments;
+package ca.judacribz.gainzassist.activities.start_workout.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import ca.judacribz.gainzassist.R;
 
-public class WarmupExercises extends Fragment {
+public class CurrExercises extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -19,14 +19,14 @@ public class WarmupExercises extends Fragment {
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // WarmupExercises Constructor/Instance                                                      //
+    // CurrExercises Constructor/Instance                                                        //
     // ######################################################################################### //
-    public WarmupExercises() {
+    public CurrExercises() {
         // Required empty public constructor
     }
 
-    public static WarmupExercises newInstance() {
-        return new WarmupExercises();
+    public static CurrExercises newInstance() {
+        return new CurrExercises();
     }
     // ######################################################################################### //
 
@@ -42,7 +42,10 @@ public class WarmupExercises extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_warmup_exercises, container, false);
+       View view =  inflater.inflate(R.layout.fragment_main_exercises, container, false);
+
+
+        return view;
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_start_workout.fragments;
+package ca.judacribz.gainzassist.activities.start_workout.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import ca.judacribz.gainzassist.R;
 
-public class MainExercises extends Fragment {
+public class CurrWorkout extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -19,14 +19,14 @@ public class MainExercises extends Fragment {
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // MainExercises Constructor/Instance                                                        //
+    // CurrWorkout Constructor/Instance                                                          //
     // ######################################################################################### //
-    public MainExercises() {
+    public CurrWorkout() {
         // Required empty public constructor
     }
 
-    public static MainExercises newInstance() {
-        return new MainExercises();
+    public static CurrWorkout newInstance() {
+        return new CurrWorkout();
     }
     // ######################################################################################### //
 
@@ -42,10 +42,7 @@ public class MainExercises extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-       View view =  inflater.inflate(R.layout.fragment_main_exercises, container, false);
-
-
-        return view;
+        return inflater.inflate(R.layout.fragment_main_workout, container, false);
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

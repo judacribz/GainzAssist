@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_authentication;
+package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
 import android.content.Intent;
@@ -17,7 +17,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.facebook.CallbackManager;
@@ -53,9 +52,9 @@ import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.*;
 import ca.judacribz.gainzassist.models.*;
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
-import static ca.judacribz.gainzassist.utilities.Authentication.*;
-import static ca.judacribz.gainzassist.utilities.FirebaseDb.*;
-import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
+import static ca.judacribz.gainzassist.firebase.Authentication.*;
+import static ca.judacribz.gainzassist.firebase.Database.*;
+import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class Login extends AppCompatActivity implements FacebookCallback<LoginResult>,
                                                         FirebaseAuth.AuthStateListener,

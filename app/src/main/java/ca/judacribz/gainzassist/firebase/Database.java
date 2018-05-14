@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.utilities;
+package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
-public class FirebaseDb {
+public class Database {
 
     // Constants
     // --------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activity_how_to_videos;
+package ca.judacribz.gainzassist.activities.how_to_videos;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

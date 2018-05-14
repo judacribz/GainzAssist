@@ -1,10 +1,10 @@
-package ca.judacribz.gainzassist.activity_start_workout;
+package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import ca.judacribz.gainzassist.activity_start_workout.fragments.*;
+import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
 
 public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
@@ -39,11 +39,11 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return WarmupExercises.newInstance();
+                return CurrWarmups.newInstance();
             case 1:
-                return MainWorkout.newInstance();
+                return CurrWorkout.newInstance();
             case 2:
-                return MainExercises.newInstance();
+                return CurrExercises.newInstance();
             default:
                 return null;
         }

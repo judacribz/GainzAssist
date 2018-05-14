@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".activity_authentication.Login">
+    tools:context=".activities.authentication.Login">
 
     <!-- Resources:
          https://thenounproject.com/term/muscle/15255/ -->
