@@ -10,9 +10,11 @@ import android.widget.Button;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ca.judacribz.gainzassist.Login;
-
-import static ca.judacribz.gainzassist.util.Helper.*;
+import ca.judacribz.gainzassist.activity_authentication.Login;
+import ca.judacribz.gainzassist.activity_how_to_videos.HowToVideos;
+import ca.judacribz.gainzassist.activity_workouts_list.WorkoutsList;
+import static ca.judacribz.gainzassist.utilities.UserInterface.handleBackButton;
+import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
 
 public class Main extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,7 +48,7 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -70,11 +72,11 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
     public void handleClick(int id) {
         switch (id) {
             case R.id.btn_workouts:
-//                startActivity(new Intent(this, WorkoutsList.class));
+                startActivity(new Intent(this, WorkoutsList.class));
                 break;
 
             case R.id.btn_step_counter:
-//                startActivity(new Intent(this, HowToVideos.class));
+                startActivity(new Intent(this, HowToVideos.class));
                 break;
 
             case R.id.act_settings:

@@ -1,0 +1,19 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:toolbarStyle">@style/ToolBarStyle</item>
+        <item name="android:windowExitTransition">@transition/grid_exit</item>
+    </style>
+
+    <style name="ToolBarStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColorSecondary">@color/colorText</item>
+        <item name="android:background">@color/colorBg</item>
+    </style>
+</resources>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activity_start_workout.StartWorkout">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_fmt_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/appbar"
+        android:layout_below="@id/toolbar"/>
+
+    <!-- Naviagtion Tabs -->
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tlay_navbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabBackground="@drawable/touch_anim_ripple"
+            app:tabIndicatorColor="@color/colorTitle"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="@color/colorTitle"
+            app:tabTextColor="@color/colorText">
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tab_warmups"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_warmups"
+                android:text="@string/warmups" />
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tab_workout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_workout"
+                android:text="@string/workout"/>
+
+            <android.support.design.widget.TabItem
+                android:id="@+id/tab_exercises"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_exercises"
+                android:text="@string/exercises" />
+        </android.support.design.widget.TabLayout>
+    </android.support.design.widget.AppBarLayout>
+
+
+</RelativeLayout>

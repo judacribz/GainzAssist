@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.util;
+package ca.judacribz.gainzassist.utilities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import ca.judacribz.gainzassist.R;
 
-public class Helper {
+public class UserInterface {
 
     // Constants
     // --------------------------------------------------------------------------------------------

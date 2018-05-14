@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/touch_anim_ripple"
+    tools:context=".activity_workouts_list.WorkoutsList">
+
+    <!-- Resources:
+         https://www.freepik.com/free-icon/add-button-with-plus-symbol-in-a-black-circle_735567.htm -->
+
+    <item
+        android:id="@+id/act_add_workout"
+        android:icon="@drawable/ic_plus"
+        android:title="@string/add_workout"
+        app:showAsAction="always"/>
+</menu>

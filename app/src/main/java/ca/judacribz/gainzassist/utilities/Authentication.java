@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.firebase;
+package ca.judacribz.gainzassist.utilities;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -6,8 +6,6 @@ import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Toast;
 
-//import com.facebook.login.LoginManager;
-//import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,8 +19,10 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.activity_authentication.Login;
 
-public class Auth {
+public class Authentication {
+
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -49,13 +49,16 @@ public class Auth {
                             userCreated = true;
                             msg = act.getString(R.string.sign_up_success);
 
-                            // Sign up fail
+                        // Sign up fail
                         } else {
                             userCreated = false;
                             msg = getExceptionMsg(act, task.getException());
                         }
 
                         Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
+                        if (msg.equals(act.getString(R.string.txt_email_registered))) {
+                            ((Login)act).googleSignIn(true);
+                        }
                     }
                 });
 
@@ -72,6 +75,10 @@ public class Auth {
                         // If sign in successful, handle in AuthStateListener in the activity
                         if (!task.isSuccessful()) {
                             String msg = getExceptionMsg(act, task.getException());
+
+                            if (msg.equals(act.getString(R.string.txt_email_registered))) {
+                                ((Login)act).googleSignIn(true);
+                            }
 
 
                             Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
@@ -104,23 +111,23 @@ public class Auth {
             try {
                 throw taskEx;
 
-                // No internet connection
+            // No internet connection
             } catch (FirebaseNetworkException ex) {
                 msg = act.getString(R.string.txt_network_needed);
 
-                // Password does not meet minimum requirements
+            // Password does not meet minimum requirements
             } catch (FirebaseAuthWeakPasswordException ex) {
                 msg = act.getString(R.string.err_invalid_password);
 
-                // Email is already registered
+            // Email is already registered
             } catch (FirebaseAuthUserCollisionException ex) {
                 msg = act.getString(R.string.txt_email_registered);
 
-                // Email format is invalid
+            // Email format is invalid
             } catch (FirebaseAuthInvalidCredentialsException ex) {
                 msg = act.getString(R.string.err_invalid_email);
 
-                // Other exceptions
+            // Other exceptions
             } catch (Exception ex) {
                 msg = ex.toString();
             }
@@ -163,5 +170,4 @@ public class Auth {
 
         return formIsValid;
     }
-
 }

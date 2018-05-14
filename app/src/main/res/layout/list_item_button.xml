@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btnListItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
+    android:padding="50dp"
+    android:background="@drawable/touch_anim_ripple"
+    android:textColor="@drawable/selector_btn_text_default"/>

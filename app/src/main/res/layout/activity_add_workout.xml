@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity_add_workout.AddWorkout">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+
+    <!-- Workout Name EditText -->
+    <!--========================================================================================-->
+    <EditText
+        android:id="@+id/et_workout_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:backgroundTint="@color/colorLightAccent"
+        android:hint="@string/hint_workout_name"
+        android:inputType="text"
+        android:textColorHint="@color/colorLightAccent" />
+    <!--Workout=Name============================================================================-->
+
+
+    <!-- View for Exercise Details Input -->
+    <!--========================================================================================-->
+    <RelativeLayout
+        android:id="@+id/rlay_add_exercise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_workout_name"
+        android:background="@color/colorAccent">
+
+
+        <!-- Exercise Name EditText -->
+        <!--====================================================================================-->
+        <EditText
+            android:id="@+id/et_exercise_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/colorLightAccent"
+            android:hint="@string/hint_exercise_name"
+            android:inputType="text"
+            android:textColor="@color/colorText"
+            android:textColorHint="@color/colorLightAccent" />
+        <!--Exercise=Name=======================================================================-->
+
+
+        <!-- Exercise Type/Equipment Spinners -->
+        <!--====================================================================================-->
+        <LinearLayout
+            android:id="@+id/llay_type_equipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_exercise_name"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:orientation="horizontal">
+
+            <!-- Exercise Type spinner -->
+            <Spinner
+                android:id="@+id/spr_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorText" />
+
+            <!-- Exercise equipment spinner -->
+            <Spinner
+                android:id="@+id/spr_equipment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorText" />
+        </LinearLayout>
+
+
+        <!-- Number of Sets label/textbox and inc/dec btns -->
+        <!--====================================================================================-->
+        <TextView
+            android:id="@+id/tv_sets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/et_sets"
+            android:layout_alignStart="@id/et_sets"
+            android:layout_below="@id/llay_type_equipment"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:labelFor="@id/et_sets"
+            android:text="@string/num_sets"
+            android:textColor="@color/colorText" />
+
+        <EditText
+            android:id="@+id/et_sets"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_sets"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/colorLightAccent"
+            android:ems="5"
+            android:inputType="number"
+            android:textColor="@color/colorText" />
+
+        <ImageButton
+            android:id="@+id/btn_inc_sets"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignStart="@id/et_sets"
+            android:layout_below="@id/et_sets"
+            android:background="@drawable/touch_anim_ripple"
+            android:src="@drawable/ic_plus"/>
+
+        <ImageButton
+            android:id="@+id/btn_dec_sets"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignEnd="@id/et_sets"
+            android:layout_below="@id/et_sets"
+            android:background="@drawable/touch_anim_ripple"
+            android:src="@drawable/ic_minus"/>
+        <!--Number=of=Sets======================================================================-->
+
+
+        <!-- Weight label/textbox and inc/dec btns -->
+        <!--====================================================================================-->
+        <TextView
+            android:id="@+id/tv_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/et_weight"
+            android:layout_alignStart="@id/et_weight"
+            android:layout_below="@id/llay_type_equipment"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:labelFor="@id/et_weight"
+            android:text="@string/weight_lbs"
+            android:textColor="@color/colorText" />
+
+        <EditText
+            android:id="@+id/et_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_weight"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/colorLightAccent"
+            android:ems="5"
+            android:inputType="numberDecimal"
+            android:textColor="@color/colorText" />
+
+        <ImageButton
+            android:id="@+id/btn_inc_weight"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignStart="@id/et_weight"
+            android:layout_below="@id/et_weight"
+            android:background="@drawable/touch_anim_ripple"
+            android:src="@drawable/ic_plus"/>
+
+        <ImageButton
+            android:id="@+id/btn_dec_weight"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignEnd="@id/et_weight"
+            android:layout_below="@id/et_weight"
+            android:background="@drawable/touch_anim_ripple"
+            android:src="@drawable/ic_minus"/>
+        <!--Weight==============================================================================-->
+
+
+        <!-- Number of Reps label/textbox and inc/dec btns -->
+        <!--====================================================================================-->
+        <TextView
+            android:id="@+id/tv_reps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/et_reps"
+            android:layout_alignStart="@id/et_reps"
+            android:layout_below="@id/llay_type_equipment"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:labelFor="@id/et_reps"
+            android:text="@string/num_reps"
+            android:textColor="@color/colorText" />
+
+        <EditText
+            android:id="@+id/et_reps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tv_reps"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:backgroundTint="@color/colorLightAccent"
+            android:ems="5"
+            android:inputType="number"
+            android:textColor="@color/colorText" />
+
+        <ImageButton
+            android:id="@+id/btn_inc_reps"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignStart="@id/et_reps"
+            android:layout_below="@id/et_reps"
+            android:background="@drawable/touch_anim_ripple"
+            android:src="@drawable/ic_plus"/>
+
+        <ImageButton
+            android:id="@+id/btn_dec_reps"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignEnd="@id/et_reps"
+            android:layout_below="@id/et_reps"
+            android:background="@drawable/touch_anim_ripple"
+            android:src="@drawable/ic_minus"/>
+        <!--Number=of=Reps======================================================================-->
+
+
+        <!-- Exercise Discard/Add Buttons -->
+        <!--====================================================================================-->
+        <Button
+            android:id="@+id/btn_discard_exercise"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/btn_inc_sets"
+            android:background="@drawable/touch_anim_ripple"
+            android:text="@string/discard"
+            android:textColor="@color/colorText"/>
+
+        <Button
+            android:id="@+id/btn_add_exercise"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/btn_dec_reps"
+            android:background="@drawable/touch_anim_ripple"
+            android:text="@string/add_exercise"
+            android:textColor="@color/colorText"/>
+        <!--Exercise=Discard/Add=Buttons========================================================-->
+    </RelativeLayout>
+    <!--View=for=Exercise=Details=Input=========================================================-->
+
+
+    <!-- List of Added Exercises -->
+    <!--========================================================================================-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_exercise_btns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btn_discard_workout"
+        android:layout_below="@id/rlay_add_exercise"/>
+    <!--List=of=Added=Exercises=================================================================-->
+
+
+    <!-- Workout Discard/Add Buttons -->
+    <!--========================================================================================-->
+    <Button
+        android:id="@+id/btn_discard_workout"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/touch_anim_ripple"
+        android:text="@string/discard"
+        android:textColor="@color/colorText"/>
+
+    <Button
+        android:id="@+id/btn_add_workout"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/touch_anim_ripple"
+        android:text="@string/add_workout"
+        android:textColor="@color/colorText"/>
+    <!--Workout=Discard/Add=Buttons=============================================================-->
+</RelativeLayout>

@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist;
+package ca.judacribz.gainzassist.activity_authentication;
 
 import android.animation.Animator;
 import android.content.Intent;
@@ -50,14 +50,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
+import ca.judacribz.gainzassist.*;
+import ca.judacribz.gainzassist.models.*;
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
-import static ca.judacribz.gainzassist.firebase.Auth.*;
-import static ca.judacribz.gainzassist.util.Helper.setToolbar;
+import static ca.judacribz.gainzassist.utilities.Authentication.*;
+import static ca.judacribz.gainzassist.utilities.FirebaseDb.*;
+import static ca.judacribz.gainzassist.utilities.UserInterface.setToolbar;
 
 public class Login extends AppCompatActivity implements FacebookCallback<LoginResult>,
-        FirebaseAuth.AuthStateListener,
-        View.OnClickListener {
+                                                        FirebaseAuth.AuthStateListener,
+                                                        View.OnClickListener {
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final int RC_SIGN_IN = 9001;
@@ -79,6 +81,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     String email, password;
     Animation slide_end;
 
+    WorkoutHelper workoutHelper;
     boolean linkGoogle;
 
     @BindView(R.id.tv_sign_up_here) TextView tvSignUpHere;
@@ -248,42 +251,42 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
                     String.format(getString(R.string.txt_logged_in), email),
                     Toast.LENGTH_SHORT).show();
 
-//            // Set email for singleton User
-//            User user = User.getInstance();
-//            user.setEmail(email);
-//            user.setUid(uid);
-//
-//            // Get local db instance
-//            workoutHelper = new WorkoutHelper(getApplicationContext());
-//
-//            /* If the db doesn't exist, or the users email does not exist in the db then get
-//             * reference to the default workouts from firebase and create the local db using
-//             * these values */
-//            if (!workoutHelper.exists() || !workoutHelper.emailExists()) {
-//
-//                DatabaseReference userRef =
-//                        FirebaseDatabase.getInstance().getReference(String.format(USER_PATH, uid));
-//
-//                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//                        // FIREBASE: if user does not exist copy default workouts to under user and
-//                        // into local db
-//                        if (dataSnapshot.getValue() == null) {
-//                            setFirebaseWorkouts(Login.this, DEFAULT_WORKOUTS);
-//
-//                            // FIREBASE: if user exists, use users workouts to save in database
-//                        } else {
-//                            setFirebaseWorkouts(Login.this, String.format(USER_WORKOUTS_PATH, uid));
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//                    }
-//                });
-//            }
+            // Set email for singleton User
+            User user = User.getInstance();
+            user.setEmail(email);
+            user.setUid(uid);
+
+            // Get local db instance
+            workoutHelper = new WorkoutHelper(getApplicationContext());
+
+            /* If the db doesn't exist, or the users email does not exist in the db then get
+             * reference to the default workouts from firebase and create the local db using
+             * these values */
+            if (!workoutHelper.exists() || !workoutHelper.emailExists()) {
+
+                DatabaseReference userRef =
+                        FirebaseDatabase.getInstance().getReference(String.format(USER_PATH, uid));
+
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        // FIREBASE: if user does not exist copy default workouts to under user and
+                        // into local db
+                        if (dataSnapshot.getValue() == null) {
+                            setFirebaseWorkouts(Login.this, DEFAULT_WORKOUTS);
+
+                            // FIREBASE: if user exists, use users workouts to save in database
+                        } else {
+                            setFirebaseWorkouts(Login.this, String.format(USER_WORKOUTS_PATH, uid));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
 
             startActivity(new Intent(this, Main.class));
             finish();

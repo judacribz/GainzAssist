@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="exerciseEquipment">
+        <item>Barbell</item>
+        <item>Dumbbell</item>
+        <item>N/A</item>
+    </string-array>
+
+    <string-array name="exerciseType">
+        <item>Strength</item>
+        <item>Cardiovascular</item>
+        <item>Plyometrics</item>
+    </string-array>
+</resources>
