@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +74,32 @@ public class UI {
 
         return title;
     }
+
+    /* Sets the spinner with the given array resource in the Activity */
+    public static void setSpinnerWithArray(Activity act, int arrResId, Spinner spr) {
+
+        ArrayAdapter<CharSequence> adapter =
+                ArrayAdapter.createFromResource(act,
+                                                arrResId,
+                                                android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spr.setAdapter(adapter);
+    }
+
+
+    public static String getText(TextView tv) {
+        return tv.getText().toString();
+    }
+
+    public static int getInt(TextView tv) {
+        return Integer.valueOf(getText(tv));
+    }
+
+    public static float getFloat(TextView tv) {
+        return Float.valueOf(getText(tv));
+    }
+
+
 
 //        /* Checks to see if the database exists */
 //        public static boolean exists(Context context) {

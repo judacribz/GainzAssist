@@ -108,13 +108,15 @@
             android:backgroundTint="@color/colorLightAccent"
             android:ems="5"
             android:inputType="number"
+            android:text="@string/initial_num_sets"
+            android:textAlignment="center"
             android:textColor="@color/colorText" />
 
         <ImageButton
             android:id="@+id/btn_inc_sets"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignStart="@id/et_sets"
+            android:layout_alignEnd="@id/et_sets"
             android:layout_below="@id/et_sets"
             android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_plus"/>
@@ -123,7 +125,7 @@
             android:id="@+id/btn_dec_sets"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignEnd="@id/et_sets"
+            android:layout_alignStart="@id/et_sets"
             android:layout_below="@id/et_sets"
             android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_minus"/>
@@ -156,13 +158,15 @@
             android:backgroundTint="@color/colorLightAccent"
             android:ems="5"
             android:inputType="numberDecimal"
+            android:text="@string/initial_weight"
+            android:textAlignment="center"
             android:textColor="@color/colorText" />
 
         <ImageButton
             android:id="@+id/btn_inc_weight"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignStart="@id/et_weight"
+            android:layout_alignEnd="@id/et_weight"
             android:layout_below="@id/et_weight"
             android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_plus"/>
@@ -171,7 +175,7 @@
             android:id="@+id/btn_dec_weight"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignEnd="@id/et_weight"
+            android:layout_alignStart="@id/et_weight"
             android:layout_below="@id/et_weight"
             android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_minus"/>
@@ -204,13 +208,15 @@
             android:backgroundTint="@color/colorLightAccent"
             android:ems="5"
             android:inputType="number"
+            android:text="@string/initial_num_reps"
+            android:textAlignment="center"
             android:textColor="@color/colorText" />
 
         <ImageButton
             android:id="@+id/btn_inc_reps"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignStart="@id/et_reps"
+            android:layout_alignEnd="@id/et_reps"
             android:layout_below="@id/et_reps"
             android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_plus"/>
@@ -219,7 +225,7 @@
             android:id="@+id/btn_dec_reps"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignEnd="@id/et_reps"
+            android:layout_alignStart="@id/et_reps"
             android:layout_below="@id/et_reps"
             android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_minus"/>
