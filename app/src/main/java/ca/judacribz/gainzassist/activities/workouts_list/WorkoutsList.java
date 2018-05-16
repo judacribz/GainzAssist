@@ -18,19 +18,19 @@ import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.AddWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
-import ca.judacribz.gainzassist.models.User;
+import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
-public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.WorkoutClickObserver,
+public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
                                                                TextWatcher {
 
     public static final String EXTRA_WORKOUT_NAME
             = "ca.judacribz.gainzassist.activity_workouts_list.EXTRA_WORKOUT_NAME";
     // Global Variables
     // ============================================================================================
-    ButtonAdapter workoutAdapter;
+    SingleItemAdapter workoutAdapter;
     LinearLayoutManager layoutManager;
 
     ArrayList<String> workoutNames;
@@ -38,7 +38,7 @@ public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.Wor
     WorkoutHelper workoutHelper;
 
     @BindView(R.id.rv_workout_btns) RecyclerView workoutsList;
-    @BindView(R.id.et_workouts_search) EditText searchBar;;
+    @BindView(R.id.et_workouts_search) EditText searchBar;
     // ============================================================================================
 
     // WorkoutsList Override
@@ -50,7 +50,6 @@ public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.Wor
         ButterKnife.bind(this);
         setToolbar(this, R.string.workouts, true);
 
-        String email = User.getInstance().getEmail();
         workoutNames = new ArrayList<>();
 
         // Set the layout manager for the localWorkouts
@@ -82,8 +81,8 @@ public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.Wor
     // Displays button list of workouts
     void displayBtnList(ArrayList<String> workouts) {
         filteredWorkouts = workouts;
-        workoutAdapter = new ButtonAdapter(workouts);
-        workoutAdapter.setVideoClickObserver(this);
+        workoutAdapter = new SingleItemAdapter(this, workouts, R.layout.list_item_button, R.id.btnListItem);
+        workoutAdapter.setItemClickObserver(this);
         workoutsList.setAdapter(workoutAdapter);
 
         // Add the text watcher to the search bar
@@ -109,8 +108,8 @@ public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.Wor
         }
 
         if (filteredWorkouts != null) {
-            workoutAdapter = new ButtonAdapter(filteredWorkouts);
-            workoutAdapter.setVideoClickObserver(this);
+            workoutAdapter = new SingleItemAdapter(this, filteredWorkouts, R.layout.list_item_button, R.id.btnListItem);
+            workoutAdapter.setItemClickObserver(this);
             workoutsList.setAdapter(workoutAdapter);
         }
     }
@@ -121,9 +120,9 @@ public class WorkoutsList extends AppCompatActivity implements ButtonAdapter.Wor
     //TextWatcher//Override////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void onWorkoutClick(String workoutName) {
+    public void onWorkoutClick(String name) {
         Intent startWorkoutIntent = new Intent(this, StartWorkout.class);
-        startWorkoutIntent.putExtra(EXTRA_WORKOUT_NAME, workoutName);
+        startWorkoutIntent.putExtra(EXTRA_WORKOUT_NAME, name);
         startActivity(startWorkoutIntent);
     }
 

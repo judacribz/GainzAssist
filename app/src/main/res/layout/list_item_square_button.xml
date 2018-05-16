@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Button
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/sqrBtnListItem"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_margin="1dp"
+    android:gravity="center"
+    android:background="@drawable/touch_anim_ripple"
+    android:textColor="@drawable/selector_btn_text_default"/>

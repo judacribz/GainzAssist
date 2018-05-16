@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.how_to_videos;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +35,7 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
     // ######################################################################################### //
     // ThumbnailAdapter Constructor                                                              //
     // ######################################################################################### //
-    public ThumbnailAdapter(ArrayList<String> videoIds, ArrayList<String> videoTitles) {
+    ThumbnailAdapter(ArrayList<String> videoIds, ArrayList<String> videoTitles) {
         this.numItems = videoIds.size();
         this.videoIds = videoIds;
         this.videoTitles = videoTitles;
@@ -44,8 +45,9 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
 
     // RecyclerView.Adapter<ThumbnailViewHolder> Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    @NonNull
     @Override
-    public ThumbnailViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ThumbnailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.list_item_thumbnail, parent, false);
 
@@ -56,7 +58,7 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
     }
 
     @Override
-    public void onBindViewHolder(ThumbnailViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ThumbnailViewHolder holder, int position) {
         holder.bind(videoIds.get(position), videoTitles.get(position));
     }
 

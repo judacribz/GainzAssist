@@ -264,6 +264,7 @@
         android:id="@+id/rv_exercise_btns"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="1dp"
         android:layout_above="@id/btn_discard_workout"
         android:layout_below="@id/rlay_add_exercise"/>
     <!--List=of=Added=Exercises=================================================================-->
