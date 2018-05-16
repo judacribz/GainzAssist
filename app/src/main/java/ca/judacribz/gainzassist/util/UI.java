@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,7 +88,7 @@ public class UI {
     }
 
 
-    public static String getText(TextView tv) {
+    private static String getText(TextView tv) {
         return tv.getText().toString();
     }
 
@@ -97,6 +98,23 @@ public class UI {
 
     public static float getFloat(TextView tv) {
         return Float.valueOf(getText(tv));
+    }
+
+
+    public static boolean validateForm(Activity act, EditText[] ets) {
+        boolean isValid = true;
+        String text;
+
+        for (EditText et : ets) {
+            text = et.getText().toString().trim();
+
+            if (text.isEmpty()) {
+                et.setError(act.getString(R.string.err_required));
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
 

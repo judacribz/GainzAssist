@@ -13,6 +13,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.*;
@@ -27,8 +28,8 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    private static final int MIN_INT = 0;
-    private static final float MIN_FLOAT = 0.0f;
+    private static final int MIN_INT = 1;
+    private static final float MIN_FLOAT = 5.0f;
 
     // --------------------------------------------------------------------------------------------
 
@@ -42,7 +43,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     ArrayList<String> workoutNames;
     ArrayList<String> filteredWorkouts;
     WorkoutHelper workoutHelper;
-
+    EditText[] forms = new EditText[5];
 
     @BindView(R.id.et_workout_name) EditText etWorkoutName;
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
@@ -68,6 +69,8 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
         setContentView(R.layout.activity_add_workout);
         ButterKnife.bind(this);
         setToolbar(this, R.string.create_workout, true);
+
+        forms = new EditText[]{etWorkoutName, etExerciseName, etReps, etWeight, etSets};
 
         setTextWatcher(etSets, btnDecSets, true);
         setTextWatcher(etReps, btnDecReps, true);
@@ -133,7 +136,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                     }
 
                 } else {
-                    et.setText("0");
+                    et.setText(String.valueOf(MIN_INT));
                 }
             }
 
@@ -154,54 +157,42 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
 
     // Click Handling
     // ============================================================================================
-    @OnClick({R.id.btn_inc_reps, R.id.btn_dec_reps, R.id.btn_inc_sets, R.id.btn_dec_sets})
-    public void changeInt(ImageButton iBtn) {
-        int intChange = 0;
-
-        switch(iBtn.getId()) {
-            case R.id.btn_inc_sets:
-                intChange = 1;
-                etTmp = etSets;
-                break;
-
-            case R.id.btn_dec_sets:
-                intChange = -1;
-                etTmp = etSets;
-                break;
-
-            case R.id.btn_inc_reps:
-                intChange = 1;
-                etTmp = etReps;
-                break;
-
-            case R.id.btn_dec_reps:
-                intChange = -1;
-                etTmp = etReps;
-                break;
-        }
-
-        int tmpInt = Math.max(getInt(etTmp) + intChange, MIN_INT);
-        etTmp.setText(String.valueOf(tmpInt));
+    @OnClick(R.id.btn_inc_reps)
+    public void incReps() {
+        etReps.setText(String.valueOf(getInt(etReps) + 1));
     }
 
-    @OnClick({R.id.btn_inc_weight, R.id.btn_dec_weight})
-    public void changeFloat(ImageButton iBtn) {
-        float floatChange = 5.0f;
-
-        etTmp = etWeight;
-        switch(iBtn.getId()) {
-            case R.id.btn_inc_weight:
-                floatChange = 5.0f;
-                break;
-
-            case R.id.btn_dec_weight:
-                floatChange = -5.0f;
-                break;
-        }
-        float tmpFloat = Math.max(getFloat(etTmp) + floatChange, MIN_FLOAT);
-        etTmp.setText(String.valueOf(tmpFloat));
+    @OnClick(R.id.btn_dec_reps)
+    public void decReps() {
+        etReps.setText(String.valueOf(Math.max(getInt(etReps) - 1, MIN_INT)));
     }
 
+    @OnClick(R.id.btn_inc_sets)
+    public void incSets() {
+        etSets.setText(String.valueOf(getInt(etSets) + 1));
+    }
+
+    @OnClick(R.id.btn_dec_sets)
+    public void decSets() {
+        etSets.setText(String.valueOf(Math.max(getInt(etSets) - 1, MIN_INT)));
+    }
+
+    @OnClick(R.id.btn_inc_weight)
+    public void incWeight() {
+        etWeight.setText(String.valueOf(getFloat(etWeight) + 1));
+    }
+
+    @OnClick(R.id.btn_dec_weight)
+    public void decWeight() {
+        etWeight.setText(String.valueOf(Math.max(getFloat(etWeight) - 1, MIN_FLOAT)));
+    }
+
+    @OnClick(R.id.btn_add_exercise)
+    public void addExercise() {
+        if (validateForm(this, new EditText[]{etExerciseName})) {
+
+        }
+    }
 
     @OnClick({R.id.btn_discard_exercise, R.id.btn_add_exercise, R.id.btn_discard_workout, R.id.btn_add_workout})
     public void discSets() {

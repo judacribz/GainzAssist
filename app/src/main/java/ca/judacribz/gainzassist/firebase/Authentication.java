@@ -136,38 +136,38 @@ public class Authentication {
         return msg;
     }
 
-    /* Validates login and sign up forms using email and password combination */
-    public static boolean validateForm(Activity activity, EditText txtEmail, EditText txtPassword) {
-        boolean formIsValid = false;
-        String email = txtEmail.getText().toString().trim();
-        String password = txtPassword.getText().toString().trim();
-
-        if (!email.isEmpty() && !password.isEmpty()) {
-            formIsValid = true;
-        } else {
-            if (email.isEmpty()) {
-                txtEmail.setError(activity.getString(R.string.err_required));
-            }
-
-            if (password.isEmpty()) {
-                txtPassword.setError(activity.getString(R.string.err_required));
-            }
-        }
-
-        if (formIsValid) {
-            // Check to see email is in the correct format
-            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                txtEmail.setError(activity.getString(R.string.err_required_email_format));
-                formIsValid = false;
-            }
-
-            // Check for password at min length
-            if (password.length() < MIN_PASSWORD_LEN) {
-                txtPassword.setError(activity.getString(R.string.err_required_password_min));
-                formIsValid = false;
-            }
-        }
-
-        return formIsValid;
-    }
+//    /* Validates login and sign up forms using email and password combination */
+//    public static boolean validateForm(Activity activity, EditText txtEmail, EditText txtPassword) {
+//        boolean formIsValid = false;
+//        String email = txtEmail.getText().toString().trim();
+//        String password = txtPassword.getText().toString().trim();
+//
+//        if (!email.isEmpty() && !password.isEmpty()) {
+//            formIsValid = true;
+//        } else {
+//            if (email.isEmpty()) {
+//                txtEmail.setError(activity.getString(R.string.err_required));
+//            }
+//
+//            if (password.isEmpty()) {
+//                txtPassword.setError(activity.getString(R.string.err_required));
+//            }
+//        }
+//
+//        if (formIsValid) {
+//            // Check to see email is in the correct format
+//            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//                txtEmail.setError(activity.getString(R.string.err_required_email_format));
+//                formIsValid = false;
+//            }
+//
+//            // Check for password at min length
+//            if (password.length() < MIN_PASSWORD_LEN) {
+//                txtPassword.setError(activity.getString(R.string.err_required_password_min));
+//                formIsValid = false;
+//            }
+//        }
+//
+//        return formIsValid;
+//    }
 }
