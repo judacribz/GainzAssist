@@ -47,14 +47,14 @@ public class UI {
         }
     }
 
-    /* Sets the title toolbar using a string id */
+    /* Sets the title partial_titlebar using a string id */
     public static String setToolbar(Activity activity, int titleId, boolean setBackArrow) {
         return setToolbar(activity, activity.getResources().getString(titleId), setBackArrow);
     }
 
-    /* Sets the title toolbar for the Activity */
+    /* Sets the title partial_titlebar for the Activity */
     public static String setToolbar(Activity activity, String title, boolean setBackArrow) {
-        // Set the toolbar to the activity
+        // Set the partial_titlebar to the activity
         ((AppCompatActivity) activity).setSupportActionBar(
                 (Toolbar) activity.findViewById(R.id.toolbar));
 
@@ -69,7 +69,7 @@ public class UI {
             }
         }
 
-        // Set the title for the toolbar
+        // Set the title for the partial_titlebar
         ((TextView) activity.findViewById(R.id.title)).setText(title);
 
         return title;

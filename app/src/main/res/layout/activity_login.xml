@@ -11,7 +11,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
+        layout="@layout/partial_titlebar" />
 
     <!-- Google Sign-In Button-->
     <com.google.android.gms.common.SignInButton

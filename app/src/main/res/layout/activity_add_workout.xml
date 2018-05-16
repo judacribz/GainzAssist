@@ -9,7 +9,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
+        layout="@layout/partial_titlebar" />
 
 
     <!-- Workout Name EditText -->
