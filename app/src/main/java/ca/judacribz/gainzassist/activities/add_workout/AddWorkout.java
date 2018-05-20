@@ -33,6 +33,11 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     // --------------------------------------------------------------------------------------------
     private static final int MIN_INT = 1;
     private static final float MIN_FLOAT = 5.0f;
+
+    private static final int POS_STREN = 0;
+    private static final int POS_CARDIO = 1;
+
+    private static final int POS_NA = 2;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -163,37 +168,43 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
 
     // Click Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    /* Increase number of reps */
     @OnClick(R.id.btn_inc_reps)
     public void incReps() {
         etReps.setText(String.valueOf(getTextInt(etReps) + MIN_INT));
     }
 
+    /* Decrease number of reps */
     @OnClick(R.id.btn_dec_reps)
     public void decReps() {
         etReps.setText(String.valueOf(Math.max(getTextInt(etReps) - MIN_INT, MIN_INT)));
     }
 
+    /* Increase number of sets */
     @OnClick(R.id.btn_inc_sets)
     public void incSets() {
         etSets.setText(String.valueOf(getTextInt(etSets) + MIN_INT));
     }
 
+    /* Decrease number of sets */
     @OnClick(R.id.btn_dec_sets)
     public void decSets() {
         etSets.setText(String.valueOf(Math.max(getTextInt(etSets) - MIN_INT, MIN_INT)));
     }
 
+    /* Increase weight */
     @OnClick(R.id.btn_inc_weight)
     public void incWeight() {
         etWeight.setText(String.valueOf(getTextFloat(etWeight) + MIN_FLOAT));
     }
 
+    /* Decrease weight*/
     @OnClick(R.id.btn_dec_weight)
     public void decWeight() {
         etWeight.setText(String.valueOf(Math.max(getTextFloat(etWeight) - MIN_FLOAT, MIN_FLOAT)));
     }
 
-    /* Adds exercise to exercises ArrayList and updates exercises GridLayout display */
+    /* Adds exercise to exercises ArrayList and updates the exercises GridLayout display */
     @OnClick(R.id.btn_add_exercise)
     public void addExercise() {
         if (validateForm(this, forms)) {
@@ -214,6 +225,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                 ));
             }
 
+            // add exercise to list
             exercises.add(new Exercise(
                     exName,
                     sprType.getSelectedItem().toString(),
@@ -223,6 +235,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
         }
     }
 
+    /* Helper function to update the GridLayout exercises display */
     public void updateAdapter() {
         exerciseAdapter = new SingleItemAdapter(
                 this,
@@ -264,6 +277,24 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     public void discardWorkout() {
         workoutHelper.close();
         finish();
+    }
+
+    @OnItemSelected(R.id.spr_type)
+    public void changeSprEquipment(Spinner spr) {
+        if (spr.getSelectedItemPosition() == POS_CARDIO) {
+            sprEquipment.setSelection(POS_NA);
+        }
+    }
+
+    @OnItemSelected(R.id.spr_equipment)
+    public void changeSprType(Spinner spr) {
+        Toast.makeText(this, spr.getItemAtPosition(POS_NA).toString(), Toast.LENGTH_SHORT).show();
+
+        if (spr.getSelectedItemPosition() != POS_NA) {
+            if (sprType.getSelectedItemPosition() == POS_CARDIO) {
+                sprType.setSelection(POS_STREN);
+            }
+        }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 }

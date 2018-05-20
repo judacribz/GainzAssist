@@ -10,11 +10,13 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnItemSelected;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.AddWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
@@ -63,8 +65,21 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
         // Get all workouts from database
         workoutHelper = new WorkoutHelper(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         workoutNames = workoutHelper.getAllWorkoutNames();
         displayWorkoutList(workoutNames);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        workoutHelper.close();
     }
 
     @Override
@@ -81,11 +96,6 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         return super.onCreateOptionsMenu(menu);
     }
 
-    //TODO: update list/sqlite/firebase on AddWorkout return if successful
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     /* Helper function to display button list of workouts */
@@ -150,17 +160,13 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     // ============================================================================================
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        handleClick(item.getItemId());
-        return super.onOptionsItemSelected(item);
-    }
-
-    /* Handles all clicks in activity */
-    public void handleClick(int id) {
-        switch (id) {
+        switch (item.getItemId()) {
             case R.id.act_add_workout:
                 startActivity(new Intent(this, AddWorkout.class));
-            break;
+                break;
         }
+
+        return super.onOptionsItemSelected(item);
     }
     // ============================================================================================
 }
