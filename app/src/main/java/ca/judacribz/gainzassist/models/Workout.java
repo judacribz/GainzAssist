@@ -32,7 +32,6 @@ public class Workout {
     }
     // ============================================================================================
 
-
     /* Helper function used to store Workout information in the firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();

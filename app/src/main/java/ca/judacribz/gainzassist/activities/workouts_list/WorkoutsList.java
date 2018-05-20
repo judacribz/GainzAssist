@@ -28,18 +28,22 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
     public static final String EXTRA_WORKOUT_NAME
             = "ca.judacribz.gainzassist.activity_workouts_list.EXTRA_WORKOUT_NAME";
+
     // Global Variables
-    // ============================================================================================
+    // --------------------------------------------------------------------------------------------
     SingleItemAdapter workoutAdapter;
     LinearLayoutManager layoutManager;
 
     ArrayList<String> workoutNames;
     ArrayList<String> filteredWorkouts;
     WorkoutHelper workoutHelper;
+    // --------------------------------------------------------------------------------------------
 
+    // ButterKnife Injections
+    // --------------------------------------------------------------------------------------------
     @BindView(R.id.rv_workout_btns) RecyclerView workoutsList;
     @BindView(R.id.et_workouts_search) EditText searchBar;
-    // ============================================================================================
+    // --------------------------------------------------------------------------------------------
 
     // WorkoutsList Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +64,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         // Get all workouts from database
         workoutHelper = new WorkoutHelper(this);
         workoutNames = workoutHelper.getAllWorkoutNames();
-        displayBtnList(workoutNames);
+        displayWorkoutList(workoutNames);
     }
 
     @Override
@@ -76,12 +80,23 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
         return super.onCreateOptionsMenu(menu);
     }
+
+    //TODO: update list/sqlite/firebase on AddWorkout return if successful
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Displays button list of workouts
-    void displayBtnList(ArrayList<String> workouts) {
+    /* Helper function to display button list of workouts */
+    void displayWorkoutList(ArrayList<String> workouts) {
         filteredWorkouts = workouts;
-        workoutAdapter = new SingleItemAdapter(this, workouts, R.layout.list_item_button, R.id.btnListItem);
+        workoutAdapter = new SingleItemAdapter(
+                this,
+                workouts,
+                R.layout.list_item_button,
+                R.id.btnListItem
+        );
         workoutAdapter.setItemClickObserver(this);
         workoutsList.setAdapter(workoutAdapter);
 
@@ -119,12 +134,16 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     }
     //TextWatcher//Override////////////////////////////////////////////////////////////////////////
 
+
+    // SingleItemAdapter.ItemClickObserver Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onWorkoutClick(String name) {
         Intent startWorkoutIntent = new Intent(this, StartWorkout.class);
         startWorkoutIntent.putExtra(EXTRA_WORKOUT_NAME, name);
         startActivity(startWorkoutIntent);
     }
+    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 
 
     // Click Handling

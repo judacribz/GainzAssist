@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -26,7 +25,6 @@ public class UI {
     // --------------------------------------------------------------------------------------------
     private static boolean backPressedTwice = false;
     // --------------------------------------------------------------------------------------------
-
 
     /* Exits app and goes to home screen if back pressed twice from this screen */
     public static void handleBackButton(Context context) {
@@ -87,20 +85,22 @@ public class UI {
         spr.setAdapter(adapter);
     }
 
-
-    private static String getText(TextView tv) {
-        return tv.getText().toString();
+    /* Gets string value from EditText element */
+    public static String getTextString(EditText et) {
+        return et.getText().toString().trim();
     }
 
-    public static int getInt(TextView tv) {
-        return Integer.valueOf(getText(tv));
+    /* Gets integer value of text from EditText element */
+    public static int getTextInt(EditText et) {
+        return Integer.valueOf(getTextString(et));
     }
 
-    public static float getFloat(TextView tv) {
-        return Float.valueOf(getText(tv));
+    /* Gets float value of text from EditText element */
+    public static float getTextFloat(EditText et) {
+        return Float.valueOf(getTextString(et));
     }
 
-
+    /* Validates a EditTexts to be non-empty or else an error is set */
     public static boolean validateForm(Activity act, EditText[] ets) {
         boolean isValid = true;
         String text;
@@ -117,6 +117,11 @@ public class UI {
         return isValid;
     }
 
+    public static void clearForm(EditText[] ets) {
+        for (EditText et : ets) {
+            et.setText("");
+        }
+    }
 
 
 //        /* Checks to see if the database exists */

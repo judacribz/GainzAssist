@@ -234,14 +234,14 @@
         <!-- Exercise Discard/Add Buttons -->
         <!--====================================================================================-->
         <Button
-            android:id="@+id/btn_discard_exercise"
+            android:id="@+id/btn_clear_exercise"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_below="@id/btn_inc_sets"
             android:layout_marginTop="5dp"
             android:background="@drawable/touch_anim_ripple"
-            android:text="@string/discard"
+            android:text="@string/clear"
             android:textColor="@color/colorText"/>
 
         <Button

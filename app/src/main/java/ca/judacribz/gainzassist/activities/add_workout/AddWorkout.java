@@ -13,39 +13,47 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.Workout;
+import ca.judacribz.gainzassist.models.WorkoutHelper;
 
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
 
-public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver{
+public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver {
 
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final int MIN_INT = 1;
     private static final float MIN_FLOAT = 5.0f;
-
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    EditText etTmp;
-
     SingleItemAdapter exerciseAdapter;
-    LinearLayoutManager layoutManager;
-
     ArrayList<String> exerciseNames;
-    ArrayList<String> filteredWorkouts;
-    EditText[] forms = new EditText[5];
-    ArrayList<Exercise> exercises;
 
+    ArrayList<Exercise> exercises;
+    ArrayList<Set> exSets;
+
+    EditText[] forms;
+    WorkoutHelper workoutHelper;
+    // --------------------------------------------------------------------------------------------
+
+    // ButterKnife Injections
+    // --------------------------------------------------------------------------------------------
     @BindView(R.id.et_workout_name) EditText etWorkoutName;
+
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
+    @BindView(R.id.spr_type) Spinner sprType;
+    @BindView(R.id.spr_equipment) Spinner sprEquipment;
     @BindView(R.id.et_reps) EditText etReps;
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_sets) EditText etSets;
@@ -54,8 +62,6 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
     @BindView(R.id.btn_dec_sets) ImageButton btnDecSets;
 
-    @BindView(R.id.spr_type) Spinner sprExerciseType;
-    @BindView(R.id.spr_equipment) Spinner sprEquipmentUsed;
     @BindView(R.id.rv_exercise_btns) RecyclerView rvExerciseList;
     // --------------------------------------------------------------------------------------------
 
@@ -69,27 +75,26 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
         ButterKnife.bind(this);
         setToolbar(this, R.string.create_workout, true);
 
-        forms = new EditText[]{etWorkoutName, etExerciseName, etReps, etWeight, etSets};
+        setSpinnerWithArray(this, R.array.exerciseType, sprType);
+        setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
         setTextWatcher(etSets, btnDecSets, true);
         setTextWatcher(etReps, btnDecReps, true);
         setTextWatcher(etWeight, btnDecWeight, false);
 
-
-        setSpinnerWithArray(this, R.array.exerciseType, sprExerciseType);
-        setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipmentUsed);
-
-        // Set the layout manager for the localWorkouts
-        exerciseNames = new ArrayList<>();
-
-        // Set the layout manager for the localWorkouts
-        layoutManager = new LinearLayoutManager(this);
-
-        rvExerciseList.setLayoutManager(new GridLayoutManager(this, getNumColumns(this), GridLayoutManager.HORIZONTAL, false));
+        // Set the layout manager
+        rvExerciseList.setLayoutManager(new GridLayoutManager(
+                this,
+                getNumColumns(this),
+                GridLayoutManager.HORIZONTAL,
+                false
+        ));
         rvExerciseList.setHasFixedSize(true);
 
-        // Get all workouts from database
+        forms = new EditText[]{etExerciseName, etReps, etWeight, etSets};
         exerciseNames = new ArrayList<>();
+        exercises = new ArrayList<>();
+        workoutHelper = new WorkoutHelper(this);
     }
 
     /* Disables decrease ImageButtons when EditText value is at 0 (for reps or sets) */
@@ -102,10 +107,9 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String strTmp = s.toString();
+                boolean isZero = false;
+
                 if (!strTmp.isEmpty()) {
-
-                    boolean isZero = false;
-
                     if (isInt) {
                         if (Integer.valueOf(strTmp) == MIN_INT) {
                             isZero = true;
@@ -125,7 +129,11 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                     }
 
                 } else {
-                    et.setText(String.valueOf(MIN_INT));
+                    if (isInt) {
+                        et.setText(String.valueOf(MIN_INT));
+                    } else {
+                        et.setText(String.valueOf(MIN_FLOAT));
+                    }
                 }
             }
 
@@ -144,60 +152,118 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
-    // Click Handling
-    // ============================================================================================
-    @OnClick(R.id.btn_inc_reps)
-    public void incReps() {
-        etReps.setText(String.valueOf(getInt(etReps) + MIN_INT));
-    }
-
-    @OnClick(R.id.btn_dec_reps)
-    public void decReps() {
-        etReps.setText(String.valueOf(Math.max(getInt(etReps) - MIN_INT, MIN_INT)));
-    }
-
-    @OnClick(R.id.btn_inc_sets)
-    public void incSets() {
-        etSets.setText(String.valueOf(getInt(etSets) + MIN_INT));
-    }
-
-    @OnClick(R.id.btn_dec_sets)
-    public void decSets() {
-        etSets.setText(String.valueOf(Math.max(getInt(etSets) - MIN_INT, MIN_INT)));
-    }
-
-    @OnClick(R.id.btn_inc_weight)
-    public void incWeight() {
-        etWeight.setText(String.valueOf(getFloat(etWeight) + MIN_FLOAT));
-    }
-
-    @OnClick(R.id.btn_dec_weight)
-    public void decWeight() {
-        etWeight.setText(String.valueOf(Math.max(getFloat(etWeight) - MIN_FLOAT, MIN_FLOAT)));
-    }
-
-    @OnClick(R.id.btn_add_exercise)
-    public void addExercise() {
-        if (validateForm(this, new EditText[]{etExerciseName})) {
-            exerciseNames.add(etExerciseName.getText().toString().trim());
-            updateAdapter();
-        }
-    }
-
-    public void updateAdapter() {
-        exerciseAdapter = new SingleItemAdapter(this, exerciseNames, R.layout.list_item_square_button, R.id.sqrBtnListItem);
-        exerciseAdapter.setItemClickObserver(this);
-        rvExerciseList.setAdapter(exerciseAdapter);
-    }
-
-    @OnClick({R.id.btn_discard_exercise, R.id.btn_add_exercise, R.id.btn_discard_workout, R.id.btn_add_workout})
-    public void discSets() {
-        Toast.makeText(this, "yo", Toast.LENGTH_SHORT).show();
-    }
-
+    // SingleItemAdapter.ItemClickObserver override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onWorkoutClick(String name) {
         Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
     }
-    // ============================================================================================
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // Click Handling
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    @OnClick(R.id.btn_inc_reps)
+    public void incReps() {
+        etReps.setText(String.valueOf(getTextInt(etReps) + MIN_INT));
+    }
+
+    @OnClick(R.id.btn_dec_reps)
+    public void decReps() {
+        etReps.setText(String.valueOf(Math.max(getTextInt(etReps) - MIN_INT, MIN_INT)));
+    }
+
+    @OnClick(R.id.btn_inc_sets)
+    public void incSets() {
+        etSets.setText(String.valueOf(getTextInt(etSets) + MIN_INT));
+    }
+
+    @OnClick(R.id.btn_dec_sets)
+    public void decSets() {
+        etSets.setText(String.valueOf(Math.max(getTextInt(etSets) - MIN_INT, MIN_INT)));
+    }
+
+    @OnClick(R.id.btn_inc_weight)
+    public void incWeight() {
+        etWeight.setText(String.valueOf(getTextFloat(etWeight) + MIN_FLOAT));
+    }
+
+    @OnClick(R.id.btn_dec_weight)
+    public void decWeight() {
+        etWeight.setText(String.valueOf(Math.max(getTextFloat(etWeight) - MIN_FLOAT, MIN_FLOAT)));
+    }
+
+    /* Adds exercise to exercises ArrayList and updates exercises GridLayout display */
+    @OnClick(R.id.btn_add_exercise)
+    public void addExercise() {
+        if (validateForm(this, forms)) {
+            exSets = new ArrayList<>();
+
+            String exName = getTextString(etExerciseName);
+            int numSets = getTextInt(etSets);
+
+            exerciseNames.add(exName);
+            updateAdapter();
+
+            // add set objects matching the number of sets user chose
+            for (int i = 1; i <= numSets; i++) {
+                exSets.add(new Set(
+                        i,
+                        getTextInt(etReps),
+                        getTextFloat(etWeight)
+                ));
+            }
+
+            exercises.add(new Exercise(
+                    exName,
+                    sprType.getSelectedItem().toString(),
+                    sprEquipment.getSelectedItem().toString(),
+                    exSets
+            ));
+        }
+    }
+
+    public void updateAdapter() {
+        exerciseAdapter = new SingleItemAdapter(
+                this,
+                exerciseNames,
+                R.layout.list_item_square_button,
+                R.id.sqrBtnListItem
+        );
+        exerciseAdapter.setItemClickObserver(this);
+        rvExerciseList.setAdapter(exerciseAdapter);
+    }
+
+
+    /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
+    @OnClick(R.id.btn_add_workout)
+    public void addWorkout() {
+        if (validateForm(this, new EditText[]{etWorkoutName})) {
+
+            if (exercises.isEmpty()) {
+                Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show();
+            } else {
+                workoutHelper.addWorkout(new Workout(
+                        getTextString(etWorkoutName),
+                        exercises
+                ));
+
+                discardWorkout();
+            }
+        }
+    }
+
+    /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
+    @OnClick(R.id.btn_clear_exercise)
+    public void clearExercise() {
+        clearForm(forms);
+    }
+
+    /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
+    @OnClick(R.id.btn_discard_workout)
+    public void discardWorkout() {
+        workoutHelper.close();
+        finish();
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 }
