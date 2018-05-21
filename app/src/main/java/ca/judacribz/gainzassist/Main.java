@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
@@ -72,7 +73,6 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
     public void handleClick(int id) {
         switch (id) {
             case R.id.btn_workouts:
-                startActivity(new Intent(this, WorkoutsList.class));
                 break;
 
             case R.id.btn_step_counter:

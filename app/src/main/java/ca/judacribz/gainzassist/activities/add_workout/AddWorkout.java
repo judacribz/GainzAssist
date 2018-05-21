@@ -99,6 +99,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
         forms = new EditText[]{etExerciseName, etReps, etWeight, etSets};
         exerciseNames = new ArrayList<>();
         exercises = new ArrayList<>();
+        exSets = new ArrayList<>();
         workoutHelper = new WorkoutHelper(this);
     }
 
@@ -208,7 +209,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     @OnClick(R.id.btn_add_exercise)
     public void addExercise() {
         if (validateForm(this, forms)) {
-            exSets = new ArrayList<>();
+            exSets.clear();
 
             String exName = getTextString(etExerciseName);
             int numSets = getTextInt(etSets);
@@ -256,11 +257,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
             if (exercises.isEmpty()) {
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show();
             } else {
-                workoutHelper.addWorkout(new Workout(
-                        getTextString(etWorkoutName),
-                        exercises
-                ));
-
+                workoutHelper.addWorkout(new Workout(getTextString(etWorkoutName), exercises));
                 discardWorkout();
             }
         }

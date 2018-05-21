@@ -23,6 +23,7 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
+import static ca.judacribz.gainzassist.util.UI.getTextString;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
@@ -75,6 +76,22 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         displayWorkoutList(workoutNames);
     }
 
+    /* Helper function to display button list of workouts */
+    void displayWorkoutList(ArrayList<String> workouts) {
+        filteredWorkouts = workouts;
+        workoutAdapter = new SingleItemAdapter(
+                this,
+                workouts,
+                R.layout.list_item_button,
+                R.id.btnListItem
+        );
+        workoutAdapter.setItemClickObserver(this);
+        workoutsList.setAdapter(workoutAdapter);
+
+        // Add the text watcher to the search bar
+        searchBar.addTextChangedListener(this);
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -98,49 +115,35 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    /* Helper function to display button list of workouts */
-    void displayWorkoutList(ArrayList<String> workouts) {
-        filteredWorkouts = workouts;
-        workoutAdapter = new SingleItemAdapter(
-                this,
-                workouts,
-                R.layout.list_item_button,
-                R.id.btnListItem
-        );
-        workoutAdapter.setItemClickObserver(this);
-        workoutsList.setAdapter(workoutAdapter);
-
-        // Add the text watcher to the search bar
-        searchBar.addTextChangedListener(this);
-    }
-
 
     // TextWatcher Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        filteredWorkouts = new ArrayList<>();
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        filteredWorkouts = new ArrayList<>();
-        String filter = (searchBar.getText().toString().trim()).toLowerCase();
+        String filterWord = s.toString().toLowerCase();
 
         for (String workoutName : workoutNames) {
-            if (workoutName.toLowerCase().contains(filter)) {
+            if (workoutName.toLowerCase().contains(filterWord)) {
                 filteredWorkouts.add(workoutName);
             }
-        }
-
-        if (filteredWorkouts != null) {
-            workoutAdapter = new SingleItemAdapter(this, filteredWorkouts, R.layout.list_item_button, R.id.btnListItem);
-            workoutAdapter.setItemClickObserver(this);
-            workoutsList.setAdapter(workoutAdapter);
         }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
+        workoutAdapter = new SingleItemAdapter(
+                this,
+                filteredWorkouts,
+                R.layout.list_item_button,
+                R.id.btnListItem
+        );
+        workoutAdapter.setItemClickObserver(this);
+        workoutsList.setAdapter(workoutAdapter);
     }
     //TextWatcher//Override////////////////////////////////////////////////////////////////////////
 
