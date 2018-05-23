@@ -32,7 +32,7 @@ public class Database {
 
 
     /* Adds data in firebase under "default_workouts/" to "users/<uid>/workouts/" */
-    private static void addDefaultsToFirebase(final Activity activity) {
+    public static void addDefaultsToFirebase(final Activity activity, final ArrayList<Workout> workouts) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final WorkoutHelper workoutHelper = new WorkoutHelper(activity);
 
@@ -51,7 +51,7 @@ public class Database {
                     userRef.child(USERNAME);
 
                     // FIREBASE: add workouts under user/uid/workouts/
-                    for (Workout workout : workoutHelper.getAllWorkouts()) {
+                    for (Workout workout : workouts) {
                         userRef.child(WORKOUTS)
                                .child(workout.getName())
                                .setValue(workout.toMap());
@@ -126,7 +126,7 @@ public class Database {
 
                     // FIREBASE: Add default workouts and user data
                     if (reference.equals(DEFAULT_WORKOUTS)) {
-                        addDefaultsToFirebase(activity);
+                        addDefaultsToFirebase(activity, workouts);
                     }
 
                     workoutHelper.close();
