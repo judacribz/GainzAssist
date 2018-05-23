@@ -24,6 +24,7 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
+import static ca.judacribz.gainzassist.firebase.Database.addDefaultsToFirebase;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
 
@@ -243,10 +244,14 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
             if (exercises.isEmpty()) {
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show();
             } else {
-                workoutHelper.addWorkout(new Workout(
+                Workout workout = new Workout(
                         getTextString(etWorkoutName),
                         exercises
-                ));
+                );
+                ArrayList<Workout> workouts = new ArrayList<>();
+                workouts.add(workout);
+                workoutHelper.addWorkout(workout);
+                addDefaultsToFirebase(this, workouts);
 
                 discardWorkout();
             }
