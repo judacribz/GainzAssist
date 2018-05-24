@@ -159,7 +159,23 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         return emailExists;
     }
 
-    /* Gets all exercises for a workout
+    /* Check if a workout exists in the database
+     */
+    public boolean workoutExists(String workoutName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Workout workout = null;
+
+        String[] columns   = new String[] {EXERCISES};
+        String where       = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
+        String[] whereArgs = new String[] {workoutName, email};
+
+        Cursor cursor = db.query(TABLE_WORKOUTS, columns, where, whereArgs, "", "", "");
+
+        return (cursor.getCount() >= 1);
+    }
+
+
+    /* Get a Workout object using the workout name
      */
     public Workout getWorkout(String workoutName) {
         SQLiteDatabase db = this.getReadableDatabase();

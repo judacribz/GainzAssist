@@ -3,7 +3,6 @@ package ca.judacribz.gainzassist.activities.add_workout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,11 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import butterknife.BindView;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
@@ -24,7 +19,7 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
-import static ca.judacribz.gainzassist.firebase.Database.addDefaultsToFirebase;
+import static ca.judacribz.gainzassist.firebase.Database.addWorkoutToFirebase;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
 
@@ -48,6 +43,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
 
     ArrayList<Exercise> exercises;
     ArrayList<Set> exSets;
+    Workout workout;
 
     EditText[] forms;
     WorkoutHelper workoutHelper;
@@ -210,30 +206,35 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     @OnClick(R.id.btn_add_exercise)
     public void addExercise() {
         if (validateForm(this, forms)) {
-            exSets.clear();
 
             String exName = getTextString(etExerciseName);
-            int numSets = getTextInt(etSets);
 
-            exerciseNames.add(exName);
-            updateAdapter();
+            if (exerciseNames.contains(exName)) {
+                etExerciseName.setError(getString(R.string.err_exercise_exists));
+            } else {
+                exerciseNames.add(exName);
+                updateAdapter();
 
-            // add set objects matching the number of sets user chose
-            for (int i = 1; i <= numSets; i++) {
-                exSets.add(new Set(
-                        i,
-                        getTextInt(etReps),
-                        getTextFloat(etWeight)
+                // add set objects matching the number of sets user chose
+                for (int i = 1; i <= getTextInt(etSets); i++) {
+                    exSets.add(new Set(
+                            i,
+                            getTextInt(etReps),
+                            getTextFloat(etWeight)
+                    ));
+                }
+
+                // add exercise to list
+                exercises.add(new Exercise(
+                        exName,
+                        sprType.getSelectedItem().toString(),
+                        sprEquipment.getSelectedItem().toString(),
+                        exSets
                 ));
-            }
 
-            // add exercise to list
-            exercises.add(new Exercise(
-                    exName,
-                    sprType.getSelectedItem().toString(),
-                    sprEquipment.getSelectedItem().toString(),
-                    exSets
-            ));
+                exSets.clear();
+                etExerciseName.setText("");
+            }
         }
     }
 
@@ -259,14 +260,10 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show();
             } else {
 
-                Workout workout = new Workout(
-                        getTextString(etWorkoutName),
-                        exercises
-                );
-                ArrayList<Workout> workouts = new ArrayList<>();
-                workouts.add(workout);
+                workout = new Workout(getTextString(etWorkoutName), exercises);
+
                 workoutHelper.addWorkout(workout);
-                addDefaultsToFirebase(this, workouts);
+                addWorkoutToFirebase(workout);
 
                 discardWorkout();
             }

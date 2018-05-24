@@ -41,6 +41,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.io.IOException;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -240,7 +241,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
                         });
             }
             for (UserInfo profile : fbUser.getProviderData()) {
-                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
             }
 
 
@@ -261,10 +262,10 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
             /* If the db doesn't exist, or the users email does not exist in the db then get
              * reference to the default workouts from firebase and create the local db using
              * these values */
-            if (!workoutHelper.exists() || !workoutHelper.emailExists()) {
+            DatabaseReference userRef =
+                    FirebaseDatabase.getInstance().getReference(String.format(USER_PATH, uid));
 
-                DatabaseReference userRef =
-                        FirebaseDatabase.getInstance().getReference(String.format(USER_PATH, uid));
+            if (!workoutHelper.exists() || !workoutHelper.emailExists()) {
 
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -285,6 +286,8 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
+            } else if (workoutHelper.exists()) {
+                addWorkoutsListener(this, user.getUid());
             }
 
             startActivity(new Intent(this, Main.class));

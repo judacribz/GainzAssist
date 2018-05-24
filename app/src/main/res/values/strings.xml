@@ -24,6 +24,7 @@
     <string name="err_required">Required</string>
     <string name="err_required_email_format">Email Format Required</string>
     <string name="err_required_password_min">Minimum 6 Characters Required</string>
+    <string name="err_exercise_exists">Exercise Already Added</string>
 
     <!-- Success Msgs -->
     <string name="sign_up_success">Sign Up Success!</string>

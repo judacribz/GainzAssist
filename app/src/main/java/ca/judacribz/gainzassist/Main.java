@@ -17,7 +17,7 @@ import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import static ca.judacribz.gainzassist.util.UI.handleBackButton;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
-public class Main extends AppCompatActivity implements View.OnClickListener {
+public class Main extends AppCompatActivity {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -37,9 +37,6 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setToolbar(this, R.string.app_name, false);
-
-        btnWorkouts.setOnClickListener(this);
-        btnStepCounter.setOnClickListener(this);
     }
 
     @Override
@@ -60,25 +57,8 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
     // ============================================================================================
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        handleClick(item.getItemId());
-        return super.onOptionsItemSelected(item);
-    }
 
-    @Override
-    public void onClick(View v) {
-        handleClick(v.getId());
-    }
-
-    /* Handles all clicks in activity */
-    public void handleClick(int id) {
-        switch (id) {
-            case R.id.btn_workouts:
-                break;
-
-            case R.id.btn_step_counter:
-                startActivity(new Intent(this, HowToVideos.class));
-                break;
-
+        switch (item.getItemId()) {
             case R.id.act_settings:
                 break;
 
@@ -89,6 +69,13 @@ public class Main extends AppCompatActivity implements View.OnClickListener {
                 finish();
                 break;
         }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.btn_workouts)
+    public void startWorkoutsList() {
+        startActivity(new Intent(this, WorkoutsList.class));
+
     }
     //=Click=Handling==============================================================================
 }
