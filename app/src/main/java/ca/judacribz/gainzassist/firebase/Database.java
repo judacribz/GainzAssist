@@ -119,9 +119,12 @@ public class Database {
 
             @Override
             public void onChildAdded(DataSnapshot workoutShot, String s) {
+
+                exercises.clear();
                 for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
 
                     // Add set to sets list
+                    sets.clear();
                     for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
                         set = setShot.getValue(Set.class);
 
@@ -140,12 +143,12 @@ public class Database {
 
                         exercises.add(exercise);
                     }
-                    sets.clear();
                 }
 
+
+                Workout workout = new Workout(workoutShot.getKey(), exercises);
                 // Add workout name and exercises list to workouts list
-                workoutHelper.addWorkout(new Workout(workoutShot.getKey(), exercises));
-                exercises.clear();
+                workoutHelper.addWorkout(workout);
             }
 
             @Override
@@ -199,9 +202,7 @@ public class Database {
     /* Adds a workout under "users/<uid>/workouts/" */
     public static void addWorkoutFirebase(Workout workout) {
 
-        getWorkoutsRef()
-                .child(workout.getName()).setValue(workout.toMap())
-        ;
+        getUserRef().child(WORKOUTS).child(workout.getName()).setValue(workout.toMap());
 
 
     }
