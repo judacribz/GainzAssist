@@ -96,7 +96,6 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
         forms = new EditText[]{etExerciseName, etReps, etWeight, etSets};
         exerciseNames = new ArrayList<>();
         exercises = new ArrayList<>();
-        exSets = new ArrayList<>();
         workoutHelper = new WorkoutHelper(this);
     }
 
@@ -216,6 +215,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                 updateAdapter();
 
                 // add set objects matching the number of sets user chose
+                exSets = new ArrayList<>();
                 for (int i = 1; i <= getTextInt(etSets); i++) {
                     exSets.add(new Set(
                             i,
@@ -232,7 +232,6 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                         exSets
                 ));
 
-                exSets.clear();
                 etExerciseName.setText("");
             }
         }
