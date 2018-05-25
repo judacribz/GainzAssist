@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -33,7 +34,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
                     "PRIMARY KEY (" + WORKOUT_NAME + ", " + EMAIL + ")" +
             ")";
 
-    private static final String DROP_STATEMENT = "DROP TABLE_WORKOUTS workouts";
+    private static final String DROP_STATEMENT = "DROP TABLE" + TABLE_WORKOUTS;
     // ============================================================================================
 
     // Global Vars
@@ -89,7 +90,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     }
 
     /* Checks to see if the database exists */
-    public boolean exists() {
+    private boolean exists() {
         return (new File(context.getDatabasePath(TABLE_WORKOUTS).toString())).exists();
     }
 
@@ -134,28 +135,34 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Checks if user's email exists in db
      */
     public boolean emailExists() {
-        SQLiteDatabase db = this.getReadableDatabase();
         boolean emailExists = false;
 
-        // Get unique workout names
-        String[] column      = new String[] {EMAIL};
-        String where         = EMAIL + " = ?";
-        String[] whereArgs   = new String[] {email};
-        Cursor workoutCursor = db.query(true, // true for unique
-                TABLE_WORKOUTS,
-                column,
-                where,
-                whereArgs,
-                EMAIL,
-                null,
-                null,
-                null);
+        if (exists()) {
+            SQLiteDatabase db = this.getReadableDatabase();
 
-        if (workoutCursor.getCount() == 1) {
-            emailExists = true;
+            // Get unique workout names
+            String[] column = new String[]{EMAIL};
+            String where = EMAIL + " = ?";
+            String[] whereArgs = new String[]{email};
+
+            Cursor workoutCursor = db.query(
+                    true, // true for unique
+                    TABLE_WORKOUTS,
+                    column,
+                    where,
+                    whereArgs,
+                    EMAIL,
+                    null,
+                    null,
+                    null
+            );
+
+            if (workoutCursor.getCount() == 1) {
+                emailExists = true;
+            }
+            workoutCursor.close();
         }
 
-        workoutCursor.close();
         return emailExists;
     }
 
@@ -170,6 +177,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         String[] whereArgs = new String[] {workoutName, email};
 
         Cursor cursor = db.query(TABLE_WORKOUTS, columns, where, whereArgs, "", "", "");
+        cursor.close();
 
         return (cursor.getCount() >= 1);
     }
@@ -190,8 +198,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             workout = new Workout(workoutName, getExercisesFromBlob(cursor.getBlob(0)));
         }
-
         cursor.close();
+
         return workout;
     }
 
@@ -213,8 +221,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
                                          getExercisesFromBlob(cursor.getBlob(1))));
             } while (cursor.moveToNext());
         }
-
         cursor.close();
+
         return workouts;
     }
 
@@ -236,8 +244,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
                 workoutNames.add(cursor.getString(0));
             } while (cursor.moveToNext());
         }
-
         cursor.close();
+
         return workoutNames;
     }
 

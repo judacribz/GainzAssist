@@ -75,7 +75,6 @@ public class Main extends AppCompatActivity {
     @OnClick(R.id.btn_workouts)
     public void startWorkoutsList() {
         startActivity(new Intent(this, WorkoutsList.class));
-
     }
     //=Click=Handling==============================================================================
 }

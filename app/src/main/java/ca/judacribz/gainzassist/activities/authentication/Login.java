@@ -81,7 +81,6 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     String email, password;
     Animation slide_end;
 
-    WorkoutHelper workoutHelper;
     boolean linkGoogle;
 
     @BindView(R.id.tv_sign_up_here) TextView tvSignUpHere;
@@ -231,64 +230,27 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
         // User is signed in
         if (fbUser != null) {
+            Toast.makeText(
+                    this,
+                    String.format(getString(R.string.txt_logged_in), fbUser.getEmail()),
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            setUserInfo(this);
+
 
             if (linkGoogle) {
-                fbUser.linkWithCredential(credential)
+                fbUser
+                        .linkWithCredential(credential)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                             }
                         });
             }
-            for (UserInfo profile : fbUser.getProviderData()) {
+//            for (UserInfo profile : fbUser.getProviderData()) {
 //                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
-            }
-
-
-            final String email = fbUser.getEmail();
-            final String uid = fbUser.getUid();
-            Toast.makeText(this,
-                    String.format(getString(R.string.txt_logged_in), email),
-                    Toast.LENGTH_SHORT).show();
-
-            // Set email for singleton User
-            User user = User.getInstance();
-            user.setEmail(email);
-            user.setUid(uid);
-
-            // Get local db instance
-            workoutHelper = new WorkoutHelper(getApplicationContext());
-
-            /* If the db doesn't exist, or the users email does not exist in the db then get
-             * reference to the default workouts from firebase and create the local db using
-             * these values */
-            DatabaseReference userRef =
-                    FirebaseDatabase.getInstance().getReference(String.format(USER_PATH, uid));
-
-            if (!workoutHelper.exists() || !workoutHelper.emailExists()) {
-
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        // FIREBASE: if user does not exist copy default workouts to under user and
-                        // into local db
-                        if (dataSnapshot.getValue() == null) {
-                            setFirebaseWorkouts(Login.this, DEFAULT_WORKOUTS);
-
-                            // FIREBASE: if user exists, use users workouts to save in database
-                        } else {
-                            setFirebaseWorkouts(Login.this, String.format(USER_WORKOUTS_PATH, uid));
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-            } else if (workoutHelper.exists()) {
-                addWorkoutsListener(this, user.getUid());
-            }
+//            }
 
             startActivity(new Intent(this, Main.class));
             finish();
@@ -345,7 +307,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     }
 
     public void googleSignIn(boolean linkAccount) {
-        this.linkGoogle = linkAccount;
+        linkGoogle = linkAccount;
         Intent signInIntent = signInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }

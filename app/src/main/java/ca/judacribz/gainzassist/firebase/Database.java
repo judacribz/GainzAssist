@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.User;
@@ -24,207 +24,185 @@ public class Database {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    public final static String DEFAULT_WORKOUTS = "default_workouts";
-
     private final static String EMAIL = "email";
     private final static String USERNAME = "username";
     private final static String WORKOUTS = "workouts";
     private final static String SETS = "sets";
 
+    public final static String DEFAULT_WORKOUTS_PATH = "default_workouts";
     public static final String USER_PATH = "users/%s";
-    public static final String USER_WORKOUTS_PATH = "users/%s/workouts";
+    public static final String WORKOUTS_PATH = "users/%s/workouts";
+
     // --------------------------------------------------------------------------------------------
 
 
-    /* Adds data in firebase under "default_workouts/" to "users/<uid>/workouts/" */
-    private static void addWorkoutsToFirebase(final ArrayList<Workout> workouts) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    /* Gets firebase db reference for 'users/<uid>/' */
+    public static DatabaseReference getUserRef() {
+        DatabaseReference userRef = null;
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            final String email = user.getEmail();
-            final String uid = user.getUid();
-            final DatabaseReference userRef =
-                    FirebaseDatabase.getInstance().getReference(String.format(USER_PATH, uid));
+            userRef = FirebaseDatabase.getInstance().getReference(
+                    String.format(USER_PATH, user.getUid())
+            );
+        }
+
+        return userRef;
+    }
+
+    /* Gets firebase db reference for 'users/<uid>/workouts/' */
+    public static DatabaseReference getWorkoutsRef() {
+
+
+
+        return getUserRef().child(WORKOUTS);
+    }
+
+
+    /* Sets the user email in firebase db under 'users/<uid>/email' */
+    public static void setUserInfo(final Activity act) {
+        final FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        // FIREBASE: add user data
+        if (fbUser != null) {
+            final DatabaseReference userRef = getUserRef();
 
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    String email = fbUser.getEmail();
+                    String uid = fbUser.getUid();
 
-                    // FIREBASE: add user data
-                    userRef.child(EMAIL).setValue(email);
-                    userRef.child(USERNAME);
+                    // Sets singleton User Instance variables
+                    User user = User.getInstance();
+                    user.setEmail(email);
+                    user.setUid(uid);
 
-                    // FIREBASE: add workouts under user/uid/workouts/
-                    for (Workout workout : workouts) {
-                        addWorkoutToFirebase(workout);
+                    // If newly added user
+                    if (!dataSnapshot.hasChildren()) {
+                        userRef
+                            .child(EMAIL)
+                            .setValue(email);
+
+                        // Add default workouts under 'user/<uid>/workouts/'
+                        addDefaultWorkoutsFirebase(act);
                     }
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+
                 }
             });
         }
     }
 
+    /* Gets all workouts from firebase db from 'users/<uid>/workouts/' or from func arg 'ref' if
+     * provided */
+    public static void getWorkoutsFirebase(final Activity act, @Nullable String ref) {
+        DatabaseReference workoutRef;
 
-    public static void addWorkoutToFirebase(Workout workout) {
-        final String uid = User.getInstance().getUid();
+        if (ref == null) {
+            workoutRef = getWorkoutsRef();
+        } else {
+            workoutRef = FirebaseDatabase.getInstance().getReference(ref);
+        }
 
-        final DatabaseReference userRef =
-                FirebaseDatabase.getInstance().getReference(String.format(USER_WORKOUTS_PATH, uid));
+        workoutRef.addChildEventListener(new ChildEventListener() {
+            WorkoutHelper workoutHelper = new WorkoutHelper(act);
+            ArrayList<Exercise> exercises = new ArrayList<>();
+            ArrayList<Set> sets = new ArrayList<>();
+            Exercise exercise;
+            Set set;
 
-        userRef.child(workout.getName())
-                .setValue(workout.toMap());
-    }
-
-    public static void addWorkoutsListener(final Activity act, String uid) {
-
-        final DatabaseReference userRef =
-                FirebaseDatabase.getInstance().getReference(String.format(USER_WORKOUTS_PATH, uid));
-
-        userRef.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot workoutShot, String prevChildKey) {
-                WorkoutHelper workoutHelper = new WorkoutHelper(act);
-                ArrayList<Workout> workouts = new ArrayList<>();
-                ArrayList<Exercise> exercises = new ArrayList<>();
-                ArrayList<Set> sets = new ArrayList<>();
-                Set set;
-                Exercise exercise;
-                String workoutName;
-
-
-                // get each workout in default_workouts in firebase
-                    workoutName = workoutShot.getKey();
-
-                    if (!workoutHelper.workoutExists(workoutName)) {
-
-                        Toast.makeText(act, "" + workoutName, Toast.LENGTH_SHORT).show();
-//                        // Get exercises from each workout in firebase
-//                        for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
-//
-//                            // Add sets
-//                            for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
-//                                set = setShot.getValue(Set.class);
-//                                if (set != null) {
-//                                    set.setSetNumber(Integer.valueOf(setShot.getKey()));
-//                                    sets.add(set);
-//                                }
-//                            }
-//
-//                            // Adds sets to exercise, and add exercises list
-//                            exercise = exerciseShot.getValue(Exercise.class);
-//                            if (exercise != null) {
-//                                exercise.setName(exerciseShot.getKey());
-//                                exercise.setSets(sets);
-//                                exercises.add(exercise);
-//                            }
-//
-//                            sets.clear();
-//                        }
-
-                        // Add workout name and exercises list to workouts list
-                        workouts.add(new Workout(workoutName, exercises));
-                        exercises.clear();
-                    }
-
-                    // Add workouts to WorkoutHelper db
-                    workoutHelper.addWorkouts(workouts);
-                    workoutHelper.close();
-                }
 
             @Override
-            public void onChildChanged(DataSnapshot workoutsShot, String s) {
-            }
+            public void onChildAdded(DataSnapshot workoutShot, String s) {
+                for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
 
-            @Override
-            public void onChildRemoved(DataSnapshot workoutsShot) {
+                    // Add set to sets list
+                    for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
+                        set = setShot.getValue(Set.class);
 
-            }
+                        if (set != null) {
+                            set.setSetNumber(Integer.valueOf(setShot.getKey()));
 
-            @Override
-            public void onChildMoved(DataSnapshot workoutsShot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-
-    /* Adds data under "default_workouts/" in firebase to local db. Used with reference String
-     * equal to "default_workouts" to call addDefaultsToFirebase function */
-    public static void setFirebaseWorkouts(final Activity activity, final String reference) {
-
-        // FIREBASE: Get reference to default_workouts
-        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference(reference);
-
-        // Listener for default_workouts object in firebase
-        myRef.addValueEventListener(new ValueEventListener() {
-
-            // Saves data to file
-            @Override
-            public void onDataChange(DataSnapshot workoutsShot) {
-                if (workoutsShot != null) {
-
-                    WorkoutHelper workoutHelper = new WorkoutHelper(activity);
-                    ArrayList<Exercise> exercises;
-                    Exercise exercise;
-                    ArrayList<Set> sets;
-                    Set set;
-                    String workoutName;
-                    ArrayList<Workout> workouts = new ArrayList<>();
-
-
-                    // get each workout in default_workouts in firebase
-                    for (DataSnapshot workoutShot : workoutsShot.getChildren()) {
-                        workoutName = workoutShot.getKey();
-                        exercises = new ArrayList<>();
-
-                        // Get exercises from each workout in firebase
-                        for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
-
-                            // Add sets
-                            sets = new ArrayList<>();
-                            for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
-                                set = setShot.getValue(Set.class);
-                                if (set != null) {
-                                    set.setSetNumber(Integer.valueOf(setShot.getKey()));
-                                    sets.add(set);
-                                }
-                            }
-
-                            // Adds sets to exercise, and add exercises list
-                            exercise = exerciseShot.getValue(Exercise.class);
-                            if (exercise != null) {
-                                exercise.setName(exerciseShot.getKey());
-                                exercise.setSets(sets);
-                                exercises.add(exercise);
-                            }
+                            sets.add(set);
                         }
-
-                        // Add workout name and exercises list to workouts list
-                        workouts.add(new Workout(workoutName, exercises));
                     }
 
-                    // Add workouts to WorkoutHelper db
-                    workoutHelper.addWorkouts(workouts);
-                    workoutHelper.close();
+                    // Adds sets to exercise object, and add exercise to exercises list
+                    exercise = exerciseShot.getValue(Exercise.class);
+                    if (exercise != null) {
+                        exercise.setName(exerciseShot.getKey());
+                        exercise.setSets(sets);
 
-                    // FIREBASE: Add default workouts and user data
-                    if (reference.equals(DEFAULT_WORKOUTS)) {
-                        addWorkoutsToFirebase(workouts);
+                        exercises.add(exercise);
                     }
+                    sets.clear();
                 }
+
+                // Add workout name and exercises list to workouts list
+                workoutHelper.addWorkout(new Workout(workoutShot.getKey(), exercises));
+                exercises.clear();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+    }
+
+    /* Gets workouts from firebase db under 'default_workouts/' and adds it to
+     * 'users/<uid>/workouts/' */
+    public static void addDefaultWorkoutsFirebase(Activity act) {
+        getWorkoutsFirebase(act, DEFAULT_WORKOUTS_PATH);
+
+        addWorkoutsFirebase(act, null);
+    }
+
+    /* Adds provided workouts under "users/<uid>/workouts/" and adds missing workouts in local db */
+    public static void addWorkoutsFirebase(Activity act,@Nullable ArrayList<Workout> workouts) {
+        WorkoutHelper workoutHelper = new WorkoutHelper(act);
+        ArrayList<String> workoutNames = workoutHelper.getAllWorkoutNames();
+        ArrayList<Workout> workoutsToAdd = new ArrayList<>();
+
+        if (workouts == null) {
+            workouts = workoutHelper.getAllWorkouts();
+        }
+
+        for (Workout workout : workouts) {
+            addWorkoutFirebase(workout);
+            if (!workoutNames.contains(workout.getName())) {
+                workoutsToAdd.add(workout);
+            }
+        }
+
+        if (!workoutsToAdd.isEmpty()) {
+            workoutHelper.addWorkouts(workoutsToAdd);
+        }
+    }
+
+    /* Adds a workout under "users/<uid>/workouts/" */
+    public static void addWorkoutFirebase(Workout workout) {
+
+        getWorkoutsRef()
+                .child(workout.getName()).setValue(workout.toMap())
+        ;
+
+
     }
 }

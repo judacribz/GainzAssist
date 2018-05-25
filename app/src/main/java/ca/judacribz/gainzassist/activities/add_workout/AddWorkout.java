@@ -19,7 +19,7 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
-import static ca.judacribz.gainzassist.firebase.Database.addWorkoutToFirebase;
+import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
 
@@ -263,7 +263,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
                 workout = new Workout(getTextString(etWorkoutName), exercises);
 
                 workoutHelper.addWorkout(workout);
-                addWorkoutToFirebase(workout);
+                addWorkoutFirebase(workout);
 
                 discardWorkout();
             }
