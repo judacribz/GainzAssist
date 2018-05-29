@@ -58,7 +58,7 @@ public class Authentication {
 
                         Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
                         if (msg.equals(act.getString(R.string.txt_email_registered))) {
-                            ((Login) act).googleSignIn(true);
+                            ((Login) act).googleSignIn();
                         }
                     }
                 });
@@ -70,15 +70,15 @@ public class Authentication {
     public static void signIn(final Activity act, AuthCredential cred) {
         mAuth.signInWithCredential(cred)
                 .addOnCompleteListener(act, new OnCompleteListener<AuthResult>() {
+
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-
                         // If sign in successful, handle in AuthStateListener in the activity
                         if (!task.isSuccessful()) {
                             String msg = getExceptionMsg(act, task.getException());
 
                             if (msg.equals(act.getString(R.string.txt_email_registered))) {
-                                ((Login)act).googleSignIn(true);
+                                ((Login) act).googleSignIn();
                             }
 
 

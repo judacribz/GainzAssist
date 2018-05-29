@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import butterknife.ButterKnife;
 
 import ca.judacribz.gainzassist.R;
 
@@ -25,6 +26,23 @@ public class UI {
     // --------------------------------------------------------------------------------------------
     private static boolean backPressedTwice = false;
     // --------------------------------------------------------------------------------------------
+
+    /* Sets the content view, title bar and ButterKnife for the given activity
+     *
+     * (REQUIRED) Include following as top element in activity layout file:
+     *
+    <include
+       android:id="@id/toolbar"
+       layout="@layout/partial_titlebar"/>
+     */
+    public static void setInitView(Activity act, int layoutId, int titleId, boolean setBackArrow) {
+        setInitView(act, layoutId, act.getResources().getString(titleId), setBackArrow);
+    }
+    public static void setInitView(Activity act, int layoutId, String title, boolean setBackArrow) {
+        act.setContentView(layoutId);
+        ButterKnife.bind(act);
+        setToolbar((AppCompatActivity) act, title, setBackArrow);
+    }
 
     /* Exits app and goes to home screen if back pressed twice from this screen */
     public static void handleBackButton(Context context) {
@@ -46,22 +64,20 @@ public class UI {
         }
     }
 
-    /* Sets the title partial_titlebar using a string id */
-    public static String setToolbar(Activity activity, int titleId, boolean setBackArrow) {
-        return setToolbar(activity, activity.getResources().getString(titleId), setBackArrow);
+    /* Sets up the title bar */
+    public static String setToolbar(AppCompatActivity act, int titleId, boolean setBackArrow) {
+        return setToolbar(act, act.getResources().getString(titleId), setBackArrow);
     }
-
-    /* Sets the title partial_titlebar for the Activity */
-    public static String setToolbar(Activity activity, String title, boolean setBackArrow) {
+    public static String setToolbar(AppCompatActivity act, String title, boolean setBackArrow) {
         // Set the partial_titlebar to the activity
-        ((AppCompatActivity) activity).setSupportActionBar(
-                (Toolbar) activity.findViewById(R.id.toolbar));
+        act.setSupportActionBar((Toolbar) act.findViewById(R.id.toolbar));
 
 
-        ActionBar actionBar = ((AppCompatActivity) activity).getSupportActionBar();
+        ActionBar actionBar = act.getSupportActionBar();
         if (actionBar != null) {
 
             actionBar.setDisplayShowTitleEnabled(false);
+
             if (setBackArrow) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
                 actionBar.setDisplayShowHomeEnabled(true);
@@ -69,7 +85,7 @@ public class UI {
         }
 
         // Set the title for the partial_titlebar
-        ((TextView) activity.findViewById(R.id.title)).setText(title);
+        ((TextView) act.findViewById(R.id.title)).setText(title);
 
         return title;
     }
@@ -123,7 +139,6 @@ public class UI {
         }
     }
 
-
 //        /* Checks to see if the database exists */
 //        public static boolean exists(Context context) {
 //            File dbFile = new File(context.getDatabasePath(
@@ -134,5 +149,4 @@ public class UI {
 //
 //            return dbFile.exists();
 //        }
-
 }

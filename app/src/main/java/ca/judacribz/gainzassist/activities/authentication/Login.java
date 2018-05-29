@@ -50,6 +50,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ca.judacribz.gainzassist.*;
 import ca.judacribz.gainzassist.models.*;
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
@@ -267,13 +268,15 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         handleClick(v.getId());
     }
 
+    @OnClick(R.id.btn_google_sign_in)
+    public void googleSignIn() {
+        Intent signInIntent = signInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
     /* Handles all clicks in activity */
     public void handleClick(int id) {
         switch (id) {
-            case R.id.btn_google_sign_in:
-                googleSignIn(false);
-                break;
-
             case R.id.btn_login:
                 email = etEmail.getText().toString().trim();
                 password = etPassword.getText().toString().trim();
@@ -306,11 +309,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         }
     }
 
-    public void googleSignIn(boolean linkAccount) {
-        linkGoogle = linkAccount;
-        Intent signInIntent = signInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
+
 
     /* Validates login and sign up forms using email and password combination */
     public boolean validateForm(String email, String password) {

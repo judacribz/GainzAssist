@@ -7,51 +7,28 @@
     tools:context=".Main">
 
     <include
-        android:id="@id/toolbar"
+        android:id="@+id/toolbar"
         layout="@layout/partial_titlebar"/>
 
     <LinearLayout
-        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="15dp"
+        android:layout_below="@id/toolbar"
+        android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp">
+        android:layout_marginTop="15dp"
+        android:orientation="vertical">
 
-        <!-- TODO: need to start saved workout if last quit app without finishing started workout
-        -->
-        <Button
+        <include
             android:id="@+id/btn_resume_workout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/touch_anim_ripple"
-            android:padding="50dp"
-            android:text="@string/resume_workout"
-            android:textColor="@drawable/selector_btn_text_default"/>
+            layout="@layout/list_item_button" />
 
-        <Button
+        <include
             android:id="@+id/btn_workouts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/touch_anim_ripple"
-            android:padding="50dp"
-            android:text="@string/workouts"
-            android:textColor="@drawable/selector_btn_text_default"/>
+            layout="@layout/list_item_button" />
 
-        <Button
+        <include
             android:id="@+id/btn_step_counter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/touch_anim_ripple"
-            android:padding="50dp"
-            android:text="@string/step_counter"
-            android:textColor="@drawable/selector_btn_text_default"/>
+            layout="@layout/list_item_button" />
     </LinearLayout>
 </RelativeLayout>

@@ -7,15 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import butterknife.*;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
-import static ca.judacribz.gainzassist.util.UI.handleBackButton;
-import static ca.judacribz.gainzassist.util.UI.setToolbar;
+
+import static ca.judacribz.gainzassist.util.UI.*;
 
 public class Main extends AppCompatActivity {
 
@@ -24,19 +22,25 @@ public class Main extends AppCompatActivity {
     public static final String EXTRA_LOGOUT_USER = "ca.judacribz.gainzassist.EXTRA_LOGOUT_USER";
     // --------------------------------------------------------------------------------------------
 
+    // Global Vars
+    // --------------------------------------------------------------------------------------------
 
+    // UI Elements
     @BindView(R.id.btn_resume_workout) Button btnResumeWorkout;
     @BindView(R.id.btn_workouts) Button btnWorkouts;
     @BindView(R.id.btn_step_counter) Button btnStepCounter;
+    // --------------------------------------------------------------------------------------------
 
     // AppCompatActivity Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-        setToolbar(this, R.string.app_name, false);
+        setInitView(this, R.layout.activity_main, R.string.app_name, false);
+
+        btnResumeWorkout.setText(R.string.resume_workout);
+        btnWorkouts.setText(R.string.workouts);
+        btnStepCounter.setText(R.string.step_counter);
     }
 
     @Override
@@ -45,10 +49,10 @@ public class Main extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+    public boolean onCreateOptionsMenu(Menu mainMenu) {
+        getMenuInflater().inflate(R.menu.menu_main, mainMenu);
 
-        return super.onCreateOptionsMenu(menu);
+        return super.onCreateOptionsMenu(mainMenu);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 

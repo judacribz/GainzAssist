@@ -47,10 +47,8 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
 
     EditText[] forms;
     WorkoutHelper workoutHelper;
-    // --------------------------------------------------------------------------------------------
 
-    // ButterKnife Injections
-    // --------------------------------------------------------------------------------------------
+    // UI Elements
     @BindView(R.id.et_workout_name) EditText etWorkoutName;
 
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
