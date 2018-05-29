@@ -240,7 +240,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
         exerciseAdapter = new SingleItemAdapter(
                 this,
                 exerciseNames,
-                R.layout.list_item_square_button,
+                R.layout.part_square_button,
                 R.id.sqrBtnListItem
         );
         exerciseAdapter.setItemClickObserver(this);

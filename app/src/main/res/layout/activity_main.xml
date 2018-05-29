@@ -21,14 +21,14 @@
 
         <include
             android:id="@+id/btn_resume_workout"
-            layout="@layout/list_item_button" />
+            layout="@layout/part_button" />
 
         <include
             android:id="@+id/btn_workouts"
-            layout="@layout/list_item_button" />
+            layout="@layout/part_button" />
 
         <include
             android:id="@+id/btn_step_counter"
-            layout="@layout/list_item_button" />
+            layout="@layout/part_button" />
     </LinearLayout>
 </RelativeLayout>

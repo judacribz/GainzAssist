@@ -10,20 +10,17 @@ import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.AddWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
-import static ca.judacribz.gainzassist.util.UI.getTextString;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
@@ -82,7 +79,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         workoutAdapter = new SingleItemAdapter(
                 this,
                 workouts,
-                R.layout.list_item_button,
+                R.layout.part_button,
                 R.id.btnListItem
         );
         workoutAdapter.setItemClickObserver(this);
@@ -139,7 +136,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         workoutAdapter = new SingleItemAdapter(
                 this,
                 filteredWorkouts,
-                R.layout.list_item_button,
+                R.layout.part_button,
                 R.id.btnListItem
         );
         workoutAdapter.setItemClickObserver(this);

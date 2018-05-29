@@ -49,7 +49,7 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
     @Override
     public ThumbnailViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.list_item_thumbnail, parent, false);
+        View view = inflater.inflate(R.layout.part_thumbnail, parent, false);
 
         ThumbnailViewHolder thumbnailViewHolder = new ThumbnailViewHolder(view, videoIds);
         thumbnailViewHolder.setVideoClickObserver(this);
