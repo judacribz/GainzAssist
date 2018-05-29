@@ -8,12 +8,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import butterknife.*;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT_NAME;
-import static ca.judacribz.gainzassist.util.UI.setToolbar;
+import static ca.judacribz.gainzassist.util.UI.*;
 
 public class StartWorkout extends AppCompatActivity {
 
@@ -32,9 +31,7 @@ public class StartWorkout extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start_workout);
-        ButterKnife.bind(this);
-        setToolbar(this, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
+        setInitView(this, R.layout.activity_start_workout, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {

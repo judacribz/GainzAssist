@@ -10,7 +10,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    final private static int NUM_ITEMS = 3;
+    final private static int NUM_PAGES = 3;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -25,13 +25,12 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     }
     // ######################################################################################### //
 
-
     // FragmentPagerAdapter Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /* Returns total number of pages */
     @Override
     public int getCount() {
-        return NUM_ITEMS;
+        return NUM_PAGES;
     }
 
     /* Returns the fragment to display for that page */
