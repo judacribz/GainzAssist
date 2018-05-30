@@ -6,7 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.Workout;
 
 public class CurrWarmups extends Fragment {
 
@@ -41,8 +44,8 @@ public class CurrWarmups extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_warmup_exercises, container, false);
+        // Inflate the layout for this` fragment
+        return inflater.inflate(R.layout.fragment_curr_warmups, container, false);
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

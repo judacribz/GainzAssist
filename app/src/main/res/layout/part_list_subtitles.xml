@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/colorBg">
+
+    <TextView
+        android:id="@+id/tv_blank"
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:background="@color/colorBg"/>
+
+    <TextView
+        android:id="@+id/tv_sets"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_blank"
+        android:layout_alignStart="@id/tv_weight"
+        android:layout_alignEnd="@id/tv_weight"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/set_num"/>
+
+    <TextView
+        android:id="@+id/tv_reps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/tv_weight"
+        android:layout_alignStart="@id/tv_weight"
+        android:layout_below="@id/tv_sets"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:text="@string/reps"/>
+
+    <TextView
+        android:id="@+id/tv_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_reps"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:text="@string/weight_lbs"/>
+</RelativeLayout>

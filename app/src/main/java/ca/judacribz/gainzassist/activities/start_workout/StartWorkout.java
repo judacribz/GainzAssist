@@ -11,6 +11,9 @@ import android.os.Bundle;
 import butterknife.*;
 
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.Workout;
+import ca.judacribz.gainzassist.models.WorkoutHelper;
+
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT_NAME;
 import static ca.judacribz.gainzassist.util.UI.*;
 
@@ -22,6 +25,9 @@ public class StartWorkout extends AppCompatActivity {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    public WorkoutHelper workoutHelper;
+    public Workout workout;
+
     @BindView(R.id.tlay_navbar) TabLayout tabLayout;
     @BindView(R.id.vp_fmt_container) ViewPager viewPager;
     // --------------------------------------------------------------------------------------------
@@ -33,6 +39,13 @@ public class StartWorkout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_start_workout, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
 
+        workoutHelper = new WorkoutHelper(this);
+        workout = workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
+
+        setupPager();
+    }
+
+    private void setupPager() {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
@@ -40,7 +53,6 @@ public class StartWorkout extends AppCompatActivity {
             @Override
             public void onTabSelected(Tab tab) {
                 super.onTabSelected(tab);
-
                 icon = tab.getIcon();
                 if (icon != null) {
                     icon.setColorFilter(
@@ -71,7 +83,6 @@ public class StartWorkout extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         finish();
-
         return super.onSupportNavigateUp();
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
