@@ -76,4 +76,5 @@
     <string name="initial_weight">45.0</string>
     <string name="reps">Reps</string>
     <string name="set_num">Set #</string>
+    <string name="barbell">barbell</string>
 </resources>

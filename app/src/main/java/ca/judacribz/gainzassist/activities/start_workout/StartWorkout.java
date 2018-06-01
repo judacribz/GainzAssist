@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import butterknife.*;
 
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
@@ -110,14 +112,14 @@ public class StartWorkout extends AppCompatActivity {
 
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds
      * dynamically to the view.
-     * Called in ExercisesFragment and WarmupsFragment
+     * Called in CurrExercises and CurrWarmups
      */
     @SuppressLint("InflateParams")
     public void displaySets(int id,
                             String exerciseName,
                             ArrayList<Set> sets,
-                            ViewGroup vgSubtitle,
-                            ViewGroup vgSets) {
+                            LinearLayout vgSubtitle,
+                            LinearLayout vgSets) {
 
         // Add subtitle layout which includes "Set #", "Reps" and "Weight"
         setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
@@ -141,5 +143,4 @@ public class StartWorkout extends AppCompatActivity {
                 false));
         setList.setAdapter(new SetsAdapter(sets));
     }
-
 }

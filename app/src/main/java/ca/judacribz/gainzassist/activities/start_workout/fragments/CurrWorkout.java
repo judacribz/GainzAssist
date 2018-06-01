@@ -6,9 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ca.judacribz.gainzassist.R;
+import java.util.ArrayList;
 
-public class CurrWorkout extends Fragment {
+import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.Exercise;
+
+public class CurrWorkout extends Fragment{
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -36,13 +39,17 @@ public class CurrWorkout extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_curr_workout, container, false);
+        View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
+        return view;
     }
+
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

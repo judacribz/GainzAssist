@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class CurrExercises extends Fragment {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
-    ViewGroup vgSets, vgSubtitle;
+    LinearLayout vgSets, vgSubtitle;
 
     // --------------------------------------------------------------------------------------------
 
@@ -62,8 +63,8 @@ public class CurrExercises extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
        View view =  inflater.inflate(R.layout.fragment_curr_exercises, container, false);
-       vgSubtitle = (ViewGroup) view.findViewById(R.id.ll_exercise_attr_insert);
-       vgSets = (ViewGroup) view.findViewById(R.id.ll_exercise_sets_insert);
+       vgSubtitle = (LinearLayout) view.findViewById(R.id.ll_exercise_attr_insert);
+       vgSets = (LinearLayout) view.findViewById(R.id.ll_exercise_sets_insert);
 
        return view;
     }
