@@ -6,7 +6,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
         <item name="android:toolbarStyle">@style/ToolBarStyle</item>
         <item name="android:windowExitTransition">@transition/grid_exit</item>
     </style>
@@ -15,5 +14,20 @@
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textColorSecondary">@color/colorText</item>
         <item name="android:background">@color/colorBg</item>
+    </style>
+
+    <style name="TextViewStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/text_view_box</item>
+        <item name="android:focusable">false</item>
+        <item name="android:inputType">textNoSuggestions</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/edit_text_box</item>
+        <item name="android:inputType">textNoSuggestions</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textCursorDrawable">@null</item>
     </style>
 </resources>

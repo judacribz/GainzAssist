@@ -26,6 +26,7 @@ public class CurrExercises extends Fragment {
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
     ViewGroup vgSets, vgSubtitle;
+
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -61,7 +62,8 @@ public class CurrExercises extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
        View view =  inflater.inflate(R.layout.fragment_curr_exercises, container, false);
-
+       vgSubtitle = (ViewGroup) view.findViewById(R.id.ll_exercise_attr_insert);
+       vgSets = (ViewGroup) view.findViewById(R.id.ll_exercise_sets_insert);
 
        return view;
     }
@@ -73,21 +75,17 @@ public class CurrExercises extends Fragment {
 
         Workout workout = act.workout;
         ArrayList<Exercise> exercises = workout.getExercises();
-        int exIndex     = exercises.size();
+        int exIndex = exercises.size();
 
         Toast.makeText(act, "" + exIndex, Toast.LENGTH_SHORT).show();
-//
-//        // Set up the custom view (EquipmentView) to display the equipment. View added dynamically
-//        // to trigger onDraw method
-//        equipmentView = new EquipmentView(act);
-//        equipmentView.setLayoutParams(
-//                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-//                        ViewGroup.LayoutParams.MATCH_PARENT)
-//        );
-//        vgEquipment.addView(equipmentView, 0);
-//
-//        // Set up the first workout set information
-//        setupNextSetInfo();
+
+        Exercise exercise;
+        for (int i = 0; i < exercises.size(); i++) {
+            exercise = exercises.get(i);
+
+            act.displaySets(100 + i, exercise.getName(), exercise.getSets(), vgSubtitle, vgSets);
+
+        }
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

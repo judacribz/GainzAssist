@@ -6,7 +6,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
         <item name="android:toolbarStyle">@style/ToolBarStyle</item>
     </style>
 
@@ -14,5 +13,41 @@
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textColorSecondary">@color/colorText</item>
         <item name="android:background">@color/colorBg</item>
+    </style>
+
+    <style name="WorkoutTheme" parent="AppTheme">
+        <item name="editTextStyle">@style/EditTextStyle</item>
+        <item name="android:textViewStyle">@style/TextViewStyle</item>
+        <item name="android:buttonStyle">@style/ButtonStyle</item>
+        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
+    </style>
+
+    <style name="ImageButtonStyle" parent="Base.Widget.AppCompat.ImageButton">
+        <item name="android:background">@drawable/button_box</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Base.TextAppearance.AppCompat.Widget.Button">
+        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:background">@drawable/button_box</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingTop">10dp</item>
+    </style>
+
+    <style name="TextViewStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/text_view_box</item>
+        <item name="android:focusable">false</item>
+        <item name="android:inputType">textNoSuggestions</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/edit_text_box</item>
+        <item name="android:inputType">textNoSuggestions</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textCursorDrawable">@null</item>
     </style>
 </resources>

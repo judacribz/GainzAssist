@@ -10,7 +10,11 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    final private static int NUM_PAGES = 3;
+    final private static Fragment[] FMTS = new Fragment[] {
+            CurrWarmups.newInstance(),
+            CurrWorkout.newInstance(),
+            CurrExercises.newInstance()
+    };
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -30,22 +34,13 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     /* Returns total number of pages */
     @Override
     public int getCount() {
-        return NUM_PAGES;
+        return FMTS.length;
     }
 
     /* Returns the fragment to display for that page */
     @Override
     public Fragment getItem(int position) {
-        switch (position) {
-            case 0:
-                return CurrWarmups.newInstance();
-            case 1:
-                return CurrWorkout.newInstance();
-            case 2:
-                return CurrExercises.newInstance();
-            default:
-                return null;
-        }
+        return FMTS[position];
     }
     //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
 }
