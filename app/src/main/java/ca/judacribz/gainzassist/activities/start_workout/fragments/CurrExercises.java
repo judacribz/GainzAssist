@@ -77,7 +77,7 @@ public class CurrExercises extends Fragment {
         ArrayList<Exercise> exercises = workout.getExercises();
         int exIndex = exercises.size();
 
-        Toast.makeText(act, "" + exIndex, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(act, "" + exIndex, Toast.LENGTH_SHORT).show();
 
         Exercise exercise;
         for (int i = 0; i < exercises.size(); i++) {

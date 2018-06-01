@@ -98,6 +98,7 @@ public class StartWorkout extends AppCompatActivity {
 
         viewPager.setAdapter(new WorkoutPagerAdapter(getSupportFragmentManager()));
         viewPager.setCurrentItem(1);
+        viewPager.setOffscreenPageLimit(3);
     }
 
     @Override

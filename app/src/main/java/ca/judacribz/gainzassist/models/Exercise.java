@@ -61,6 +61,28 @@ public class Exercise {
     public void setSets(ArrayList<Set> sets) {
         this.sets = sets;
     }
+
+    public int getNumSets() {
+        return sets.size();
+    }
+
+    public float getAvgWeight() {
+        float weight = 0.0f;
+        for (Set set : sets) {
+            weight += set.getWeight();
+        }
+
+        return weight / (float) getNumSets();
+    }
+
+    public int getAvgReps() {
+        int reps = 0;
+        for (Set set : sets) {
+            reps += set.getReps();
+        }
+
+        return reps / getNumSets();
+    }
     // ============================================================================================
 
 
