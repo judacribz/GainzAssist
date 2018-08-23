@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
+import android.util.AttributeSet;
+import android.view.SurfaceView;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ import ca.judacribz.gainzassist.R;
  * amount to the weight displayed).
  *
  **************************************************************************************************/
-public class EquipmentView extends View {
+public class EquipmentView extends View{
 
     // Constants
     // ============================================================================================
@@ -62,9 +64,24 @@ public class EquipmentView extends View {
     // ============================================================================================
 
 
-    // Constructor
+    // Constructors
     public EquipmentView(Context context) {
         super(context);
+
+        init(context);
+    }
+
+    public EquipmentView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    public EquipmentView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context);
+    }
+
+    private void init(Context context) {
         this.context = context;
 
         paint = new Paint();
@@ -163,4 +180,6 @@ public class EquipmentView extends View {
         // Invalidate to redraw view
         invalidate();
     }
+
+
 }

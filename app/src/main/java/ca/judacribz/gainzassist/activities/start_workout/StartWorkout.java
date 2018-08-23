@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
@@ -38,8 +39,9 @@ public class StartWorkout extends AppCompatActivity {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    public static Activity act;
     public WorkoutHelper workoutHelper;
-    public Workout workout;
+    public static Workout workout;
     View setsView;
     LayoutInflater layInflater;
 
@@ -57,6 +59,8 @@ public class StartWorkout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_start_workout, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
         setTheme(R.style.WorkoutTheme);
+
+        act = this;
 
         workoutHelper = new WorkoutHelper(this);
         workout = workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));

@@ -77,4 +77,7 @@
     <string name="reps">Reps</string>
     <string name="set_num">Set #</string>
     <string name="barbell">barbell</string>
+    <string name="cancel_set">Cancel Set</string>
+    <string name="finish_set">Finish Set</string>
+    <string name="finish_workout">Finish Workout</string>
 </resources>

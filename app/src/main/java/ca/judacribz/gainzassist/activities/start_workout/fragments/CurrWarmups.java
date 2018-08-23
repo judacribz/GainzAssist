@@ -52,7 +52,6 @@ public class CurrWarmups extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) getActivity();
-
     }
 
     @Override
@@ -75,7 +74,6 @@ public class CurrWarmups extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         Workout workout = act.workout;
         ArrayList<Exercise> exercises = workout.getExercises();
         warmups = new ArrayList<>();

@@ -1,13 +1,156 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ca.judacribz.gainzassist.activity_start_workout.MainWorkout">
+    android:orientation="vertical"
+    tools:context=".activities.start_workout.fragments.CurrWorkout">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!--Resources:
+        http://www.fontspace.com/category/athletic -->
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="0dp"
+        android:background="@color/colorAccent"
+        android:layout_weight="5">
 
-</FrameLayout>
+        <!-- Exercise name -->
+        <TextView
+            android:id="@+id/lblExerciseTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@id/btnHowTo"
+            android:background="@color/colorAccent"
+            android:fontFamily="@font/fnl"
+            android:textSize="40sp"/>
+
+        <!-- How to do exercise button-->
+        <Button
+            android:id="@+id/btnHowTo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:maxWidth="120dp"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Button"/>
+
+        <!-- Exercise set number -->
+        <TextView
+            android:id="@+id/lblSetInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lblExerciseTitle"
+            android:background="@color/colorAccent"
+            android:textAllCaps="true"/>
+    </RelativeLayout>
+
+    <!-- Equipment graphics -->
+    <RelativeLayout
+        android:id="@+id/rlEquipmentDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:background="@color/colorText">
+    </RelativeLayout>
+
+    <!-- Exercise reps and weight control -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:background="@color/colorAccent">
+
+        <EditText
+            android:id="@+id/txtReps"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:background="@color/colorBg"
+            android:inputType="number"
+            android:minWidth="100dp"
+            android:textColor="@color/colorText"/>
+
+        <ImageButton
+            android:id="@+id/btnDecReps"
+            android:layout_width="50dp"
+            android:layout_height="100dp"
+            android:layout_alignTop="@id/txtReps"
+            android:layout_alignBottom="@id/txtReps"
+            android:layout_toStartOf="@id/txtReps"
+            android:src="@drawable/ic_minus"/>
+
+        <ImageButton
+            android:id="@+id/btnIncReps"
+            android:layout_width="50dp"
+            android:layout_height="100dp"
+            android:layout_alignTop="@id/txtReps"
+            android:layout_alignBottom="@id/txtReps"
+            android:layout_toEndOf="@id/txtReps"
+            android:src="@drawable/ic_plus"/>
+
+        <EditText
+            android:id="@+id/txtWeight"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_below="@id/txtReps"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:background="@color/colorBg"
+            android:inputType="number"
+            android:minWidth="100dp"
+            android:textColor="@color/colorText"/>
+
+        <ImageButton
+            android:id="@+id/btnDecWeight"
+            android:layout_width="50dp"
+            android:layout_height="100dp"
+            android:layout_alignTop="@id/txtWeight"
+            android:layout_alignBottom="@id/txtWeight"
+            android:layout_toStartOf="@id/txtWeight"
+            android:src="@drawable/ic_minus"/>
+
+        <ImageButton
+            android:id="@+id/btnIncWeight"
+            android:layout_width="50dp"
+            android:layout_height="100dp"
+            android:layout_alignTop="@id/txtWeight"
+            android:layout_alignBottom="@id/txtWeight"
+            android:layout_toEndOf="@id/txtWeight"
+            android:src="@drawable/ic_plus"/>
+    </RelativeLayout>
+
+    <!-- Exercise set control -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:background="@color/colorAccent">
+
+        <Button
+            android:id="@+id/btnCancelSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:text="@string/cancel_set"/>
+
+        <Button
+            android:id="@+id/btnFinishSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/finish_set"/>
+
+        <Button
+            android:id="@+id/btnFinishWorkout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:text="@string/finish_workout"
+            android:visibility="gone"/>
+    </RelativeLayout>
+</LinearLayout>

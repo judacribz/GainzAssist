@@ -109,7 +109,13 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 
         // Setup main images
         setupMainImages();
-        loginScreen();
+
+        tvSignUpHere.post(new Runnable() {
+            @Override
+            public void run() {
+                loginScreen();
+            }
+        });
     }
 
     private void setupSignInMethods() {
