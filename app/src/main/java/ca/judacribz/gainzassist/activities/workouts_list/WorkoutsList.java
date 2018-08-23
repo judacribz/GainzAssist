@@ -1,15 +1,25 @@
 package ca.judacribz.gainzassist.activities.workouts_list;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -155,6 +165,33 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 
+    // SingleItemAdapter.ItemLongClickObserver Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onWorkoutLongClick(View anch, String name) {
+        View popupView = getLayoutInflater().inflate(R.layout.part_confirm_popup, null);
+
+        PopupWindow popupWindow = new PopupWindow(popupView,
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        TextView textView = popupView.findViewById(R.id.tv_workout_name);
+        textView.setText(name);
+        // If the PopupWindow should be focusable
+        popupWindow.setFocusable(true);
+
+        // If you need the PopupWindow to dismiss when when touched outside
+//        popupWindow.setBackgroundDrawable(new ColorDrawable());
+        // Get the View's(the one that was clicked in the Fragment) location
+        int location[] = new int[2];
+        anch.getLocationOnScreen(location);
+
+        popupWindow.setHeight(anch.getHeight()*2);
+        // Using location, the PopupWindow will be displayed right under anchorView
+        popupWindow.showAtLocation(anch, Gravity.NO_GRAVITY,
+                location[0], location[1]);
+    }
+    //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////
 
     // Click Handling
     // ============================================================================================

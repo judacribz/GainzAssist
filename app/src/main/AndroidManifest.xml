@@ -62,7 +62,7 @@
         <!-- StartWorkout Activity -->
         <activity
             android:name=".activities.start_workout.StartWorkout"
-            android:windowSoftInputMode="stateVisible|adjustPan"/>
+            android:windowSoftInputMode="adjustPan|stateHidden"/>
 
         <!-- AddWorkout Activity -->
         <activity

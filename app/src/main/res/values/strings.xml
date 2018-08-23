@@ -80,4 +80,6 @@
     <string name="cancel_set">Cancel Set</string>
     <string name="finish_set">Finish Set</string>
     <string name="finish_workout">Finish Workout</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 </resources>

@@ -17,11 +17,13 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
 
     public interface ItemClickObserver {
         void onWorkoutClick(String name);
+        void onWorkoutLongClick(View anchor, String name);
     }
 
     public void setItemClickObserver(ItemClickObserver itemClickObserver) {
         this.itemClickObserver = itemClickObserver;
     }
+
     // --------------------------------------------------------------------------------------------
 
     private int numItems, listItemLayout, listItemId;
@@ -61,7 +63,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
 
     // Custom ViewHolder class for the recyclerView
     // ============================================================================================
-    class ButtonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ButtonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
 
         private Button listItemButtonView;
 
@@ -71,6 +73,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
 
             listItemButtonView = (Button) itemView.findViewById(listItemId);
             listItemButtonView.setOnClickListener(this);
+            listItemButtonView.setOnLongClickListener(this);
         }
 
         // Sets the text for each button item
@@ -81,6 +84,12 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
         @Override
         public void onClick(View v) {
             itemClickObserver.onWorkoutClick(listItemButtonView.getText().toString());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            itemClickObserver.onWorkoutLongClick(v, listItemButtonView.getText().toString());
+            return false;
         }
     }
     // ============================================================================================

@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -157,6 +158,11 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     @Override
     public void onWorkoutClick(String name) {
         Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onWorkoutLongClick(View anchor, String name) {
+
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
