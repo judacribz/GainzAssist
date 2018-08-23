@@ -31,6 +31,7 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
+import static ca.judacribz.gainzassist.firebase.Database.deleteWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
@@ -169,14 +170,25 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void onWorkoutLongClick(View anch, String name) {
+    public void onWorkoutLongClick(View anch, final String name) {
         View popupView = getLayoutInflater().inflate(R.layout.part_confirm_popup, null);
 
-        PopupWindow popupWindow = new PopupWindow(popupView,
+        final PopupWindow popupWindow = new PopupWindow(popupView,
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         TextView textView = popupView.findViewById(R.id.tv_workout_name);
         textView.setText(name);
+
+        popupView.findViewById(R.id.btn_delete_workout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                workoutHelper.deleteWorkout(name);
+                deleteWorkoutFirebase(name);
+                popupWindow.dismiss();
+                workoutNames = workoutHelper.getAllWorkoutNames();
+                displayWorkoutList(workoutNames);
+            }
+        });
         // If the PopupWindow should be focusable
         popupWindow.setFocusable(true);
 

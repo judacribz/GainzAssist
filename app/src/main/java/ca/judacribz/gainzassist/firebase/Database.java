@@ -189,4 +189,8 @@ public class Database {
     public static void addWorkoutFirebase(Workout workout) {
         getWorkoutsRef().child(workout.getName()).setValue(workout.toMap());
     }
+
+    public static void deleteWorkoutFirebase(String workoutName) {
+        getWorkoutsRef().child(workoutName).setValue(null);
+    }
 }
