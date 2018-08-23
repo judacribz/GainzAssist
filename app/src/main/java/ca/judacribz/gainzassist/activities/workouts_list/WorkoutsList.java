@@ -186,10 +186,11 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         int location[] = new int[2];
         anch.getLocationOnScreen(location);
 
-        popupWindow.setHeight(anch.getHeight()*2);
+        popupWindow.setHeight((anch.getHeight() - anch.getPaddingTop())*2 );
+        popupWindow.setWidth(anch.getWidth() - anch.getPaddingStart());
         // Using location, the PopupWindow will be displayed right under anchorView
         popupWindow.showAtLocation(anch, Gravity.NO_GRAVITY,
-                location[0], location[1]);
+                location[0] + anch.getPaddingStart()/2, location[1]);
     }
     //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////
 
