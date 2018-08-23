@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Patterns;
 import android.widget.EditText;
@@ -28,6 +29,7 @@ public class Authentication {
     // --------------------------------------------------------------------------------------------
     private static final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static final int MIN_PASSWORD_LEN = 6;
+    public static final int RC_SIGN_IN = 9001;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -37,7 +39,7 @@ public class Authentication {
 
 
     /* Wrapper function to create an user in Firebase */
-    public static boolean createUser(final Activity act, String email, String password) {
+    public static boolean createUser(final Activity act, String email, String password, final GoogleSignInClient signInClient) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(act, new OnCompleteListener<AuthResult>() {
 
@@ -50,7 +52,7 @@ public class Authentication {
                             userCreated = true;
                             msg = act.getString(R.string.sign_up_success);
 
-                        // Sign up fail
+                            // Sign up fail
                         } else {
                             userCreated = false;
                             msg = getExceptionMsg(act, task.getException());
@@ -58,7 +60,8 @@ public class Authentication {
 
                         Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
                         if (msg.equals(act.getString(R.string.txt_email_registered))) {
-                            ((Login) act).googleSignIn();
+                            googleSignIn(act, signInClient);
+                            ((Login) act).linkGoogle = true;
                         }
                     }
                 });
@@ -67,7 +70,7 @@ public class Authentication {
     }
 
     /* Wrapper function to log in an user using a firebase credential */
-    public static void signIn(final Activity act, AuthCredential cred) {
+    public static void signIn(final Activity act, AuthCredential cred, final GoogleSignInClient signInClient) {
         mAuth.signInWithCredential(cred)
                 .addOnCompleteListener(act, new OnCompleteListener<AuthResult>() {
 
@@ -76,16 +79,22 @@ public class Authentication {
                         // If sign in successful, handle in AuthStateListener in the activity
                         if (!task.isSuccessful()) {
                             String msg = getExceptionMsg(act, task.getException());
-
-                            if (msg.equals(act.getString(R.string.txt_email_registered))) {
-                                ((Login) act).googleSignIn();
-                            }
+//
+//                            if (msg.equals(act.getString(R.string.txt_email_registered))) {
+//                                googleSignIn(act, signInClient);
+//                            }
 
 
                             Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+    }
+
+
+    public static void googleSignIn(Activity act, GoogleSignInClient signInClient) {
+        Intent signInIntent = signInClient.getSignInIntent();
+        act.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     /* Wrapper function to sign out user */

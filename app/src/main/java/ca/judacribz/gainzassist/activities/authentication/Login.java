@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
@@ -40,27 +41,21 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.io.IOException;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserInfo;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
+
 import ca.judacribz.gainzassist.*;
-import ca.judacribz.gainzassist.models.*;
-import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
+
+import static ca.judacribz.gainzassist.R.layout.activity_login;
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
 import static ca.judacribz.gainzassist.firebase.Database.*;
-import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
-public class Login extends AppCompatActivity implements FacebookCallback<LoginResult>,
-                                                        FirebaseAuth.AuthStateListener,
-                                                        View.OnClickListener {
+import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
+import static ca.judacribz.gainzassist.util.UI.setInitView;
+
+public class Login extends AppCompatActivity implements /*FacebookCallback<LoginResult>,*/
+                                                        FirebaseAuth.AuthStateListener {
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final int RC_SIGN_IN = 9001;
@@ -82,7 +77,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     String email, password;
     Animation slide_end;
 
-    boolean linkGoogle;
+    public boolean linkGoogle;
 
     @BindView(R.id.tv_sign_up_here) TextView tvSignUpHere;
     @BindView(R.id.tv_login_here) TextView tvLoginHere;
@@ -96,7 +91,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     @BindView(R.id.iv_sign_up_image) ImageView ivSignUpImg;
 
     @BindView(R.id.btn_google_sign_in) SignInButton btnGoogle;
-    @BindView(R.id.btn_facebook_login) LoginButton btnFacebook;
+//    @BindView(R.id.btn_facebook_login) LoginButton btnFacebook;
     @BindView(R.id.btn_login) Button btnLogin;
     @BindView(R.id.btn_sign_up) Button btnSignUp;
     // --------------------------------------------------------------------------------------------
@@ -107,22 +102,14 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
-        setToolbar(this, R.string.app_name, false);
-
-        tvSignUpHere.setOnClickListener(this);
-        tvLoginHere.setOnClickListener(this);
-        btnGoogle.setOnClickListener(this);
-        btnFacebook.setOnClickListener(this);
-        btnLogin.setOnClickListener(this);
-        btnSignUp.setOnClickListener(this);
+        setInitView(this, activity_login, R.string.app_name,  false);
 
         // Get firebase instance and setup google and facebook sign in
         setupSignInMethods();
 
         // Setup main images
         setupMainImages();
+        loginScreen();
     }
 
     private void setupSignInMethods() {
@@ -135,10 +122,10 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
                 .build();
         signInClient = GoogleSignIn.getClient(this, signInOptions);
 
-        // Configure Facebook Login
-        callBackManager = CallbackManager.Factory.create();
-        btnFacebook.setReadPermissions("email");
-        btnFacebook.registerCallback(callBackManager, this);
+//        // Configure Facebook Login
+//        callBackManager = CallbackManager.Factory.create();
+//        btnFacebook.setReadPermissions("email");
+//        btnFacebook.registerCallback(callBackManager, this);
     }
 
     private void setupMainImages() {
@@ -181,16 +168,15 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
                         googleCred = GoogleAuthProvider.getCredential(account.getIdToken(), null);
 
 
-                        signIn(this, googleCred);
+                        signIn(this, googleCred, signInClient);
 
                     } catch (ApiException ex) {
                         ex.printStackTrace();
                     }
                     break;
-
-                default:
-                    callBackManager.onActivityResult(requestCode, resultCode, data);
-                    break;
+//                default:
+//                    callBackManager.onActivityResult(requestCode, resultCode, data);
+//                    break;
             }
         }
     }
@@ -205,20 +191,20 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
     // FacebookCallback Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onSuccess(LoginResult loginResult) {
-        credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
-        signIn(this, credential);
-    }
-
-    @Override
-    public void onCancel() {
-    }
-
-    @Override
-    public void onError(FacebookException ex) {
-        ex.printStackTrace();
-    }
+//    @Override
+//    public void onSuccess(LoginResult loginResult) {
+//        credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
+//        signIn(this, credential);
+//    }
+//
+//    @Override
+//    public void onCancel() {
+//    }
+//
+//    @Override
+//    public void onError(FacebookException ex) {
+//        ex.printStackTrace();
+//    }
     //FacebookCallback//Override///////////////////////////////////////////////////////////////////
 
 
@@ -239,13 +225,15 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
             setUserInfo(this);
 
-
             if (linkGoogle) {
                 fbUser
                         .linkWithCredential(credential)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(Login.this, "Linked!", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
             }
@@ -258,58 +246,6 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         }
     }
     //FirebaseAuth.AuthStateListener//Override/////////////////////////////////////////////////////
-
-
-    // Click Handling
-    // ============================================================================================
-    /* Wraps handleClick */
-    @Override
-    public void onClick(View v) {
-        handleClick(v.getId());
-    }
-
-    @OnClick(R.id.btn_google_sign_in)
-    public void googleSignIn() {
-        Intent signInIntent = signInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    /* Handles all clicks in activity */
-    public void handleClick(int id) {
-        switch (id) {
-            case R.id.btn_login:
-                email = etEmail.getText().toString().trim();
-                password = etPassword.getText().toString().trim();
-                if (validateForm(email, password)) {
-
-                    // Email/Password login to firebase
-                    credential = EmailAuthProvider.getCredential(email, password);
-
-                    signIn(this, credential);
-                }
-                break;
-
-            case R.id.btn_sign_up:
-                email = etEmail.getText().toString().trim();
-                password = etPassword.getText().toString().trim();
-                if (validateForm(email, password)) {
-
-                    // Email/Password sign up in firebase
-                    createUser(this, email, password);
-                }
-                break;
-
-            case R.id.tv_sign_up_here:
-                changeView(true);
-                break;
-
-            case R.id.tv_login_here:
-                changeView(false);
-                break;
-        }
-    }
-
-
 
     /* Validates login and sign up forms using email and password combination */
     public boolean validateForm(String email, String password) {
@@ -339,20 +275,48 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         return emailIsValid && passwordIsValid;
     }
 
-    /* Changes the view from the login view to sign up or vice versa */
-    public void changeView(boolean hideLogin) {
-        if (hideLogin) {
-            animateView(btnSignUp, btnLogin, null);
-            animateView(ivSignUpImg, ivLoginImg, null);
-            animateView(tvLoginQuest, tvSignUpQuest, tvLoginHere);
-            tvSignUpHere.setVisibility(View.INVISIBLE);
 
-        } else {
-            animateView(btnLogin, btnSignUp, null);
-            animateView(ivLoginImg, ivSignUpImg, null);
-            animateView(tvSignUpQuest, tvLoginQuest, tvSignUpHere);
-            tvLoginHere.setVisibility(View.INVISIBLE);
+    @OnClick(R.id.btn_google_sign_in)
+    public void googSignIn() {
+        googleSignIn(this, signInClient);
+    }
+
+    @OnClick(R.id.btn_login)
+    public void login() {
+        email = etEmail.getText().toString().trim();
+        password = etPassword.getText().toString().trim();
+        if (validateForm(email, password)) {
+
+            // Email/Password login to firebase
+            credential = EmailAuthProvider.getCredential(email, password);
+            signIn(this, credential, signInClient);
         }
+    }
+    @OnClick(R.id.btn_sign_up)
+    public void signUp() {
+        email = etEmail.getText().toString().trim();
+        password = etPassword.getText().toString().trim();
+        if (validateForm(email, password)) {
+            credential = EmailAuthProvider.getCredential(email, password);
+            // Email/Password sign up in firebase
+            createUser(this, email, password, signInClient);
+        }
+    }
+
+    @OnClick(R.id.tv_sign_up_here)
+    public void signUpScreen() {
+        animateView(btnSignUp, btnLogin, null);
+        animateView(ivSignUpImg, ivLoginImg, null);
+        animateView(tvSignUpQuest, tvLoginQuest, tvLoginHere);
+        tvSignUpHere.setVisibility(View.INVISIBLE);
+    }
+
+    @OnClick(R.id.tv_login_here)
+    public void loginScreen() {
+        animateView(btnLogin, btnSignUp, null);
+        animateView(ivLoginImg, ivSignUpImg, null);
+        animateView(tvLoginQuest, tvSignUpQuest, tvSignUpHere);
+        tvLoginHere.setVisibility(View.INVISIBLE);
     }
 
     /* Animates view elements as they become visible */
@@ -367,7 +331,6 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
                 (float) Math.hypot(inView.getWidth(), inView.getHeight())
         );
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.setDuration(SLIDE_DURATION);
         animator.start();
 
 
@@ -375,11 +338,12 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
             slide_end.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
+                    navTextView.setPadding(100,0, 0, 0);
+                    navTextView.setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    navTextView.setVisibility(View.VISIBLE);
                 }
 
                 @Override
@@ -390,5 +354,5 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
             navTextView.startAnimation(slide_end);
         }
     }
-    //=Click=Handling==============================================================================
+
 }
