@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,9 +24,11 @@ import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.User;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
+import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 import static ca.judacribz.gainzassist.util.UI.*;
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT_NAME;
 
@@ -39,7 +40,7 @@ public class StartWorkout extends AppCompatActivity {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    public static Activity act;
+    public Activity act;
     public WorkoutHelper workoutHelper;
     public static Workout workout;
     View setsView;
@@ -68,6 +69,7 @@ public class StartWorkout extends AppCompatActivity {
         layInflater = getLayoutInflater();
 
         setupPager();
+        genWarmUps();
     }
 
     /* Setup fragments with page with icons for the tab bar */
@@ -146,5 +148,40 @@ public class StartWorkout extends AppCompatActivity {
                 LinearLayoutManager.HORIZONTAL,
                 false));
         setList.setAdapter(new SetsAdapter(sets));
+    }
+
+    public void genWarmUps() {
+        ArrayList<Exercise> exercises = workout.getExercises();
+        ArrayList<Exercise> warmups = new ArrayList<>();
+
+        float oneRepMax;
+        Exercise exercise;
+        for (int i = 0; i < exercises.size(); i++) {
+            exercise = exercises.get(i);
+            oneRepMax = getOneRepMax(exercise.getAvgReps(), exercise.getAvgWeight());
+
+            int reps = exercise.getAvgReps();
+            ArrayList<Set> sets = new ArrayList<>();
+            int ind = 1;
+            while (reps > 0) {
+                sets.add(new Set(ind++, reps, 0.0f));
+                reps -= 2;
+            }
+
+            Set set;
+            float percent = 0.5f;
+            float increments = 0.3f / (float) (sets.size() - 1);
+            float weight = exercise.getAvgWeight();
+            for (int j = 0; j < sets.size(); j++) {
+                set = sets.get(j);
+                set.setWeight(percent * weight);
+                sets.set(j, set);
+                percent += increments;
+            }
+
+            warmups.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets));
+        }
+
+        User.getInstance().setWarmups(warmups);
     }
 }

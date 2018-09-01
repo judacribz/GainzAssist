@@ -1,5 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
+import java.util.ArrayList;
+
 public class User {
 
     // Global Vars
@@ -7,6 +9,7 @@ public class User {
     private String email;
     private String uid;
     private static User instance;
+    private ArrayList<Exercise> warmups;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -33,6 +36,14 @@ public class User {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public ArrayList<Exercise> getWarmups() {
+        return warmups;
+    }
+
+    public void setWarmups(ArrayList<Exercise> warmups) {
+        this.warmups = warmups;
     }
 
     public String getEmail() {
