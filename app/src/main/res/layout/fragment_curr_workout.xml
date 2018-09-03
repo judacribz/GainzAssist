@@ -15,15 +15,15 @@
         android:layout_weight="5">
 
         <!-- How to do exercise button-->
-        <include
+        <Button
             android:id="@+id/btn_how_to"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:textAlignment="center"
             android:padding="1dp"
-            android:minWidth="150dp"
-            layout="@layout/part_button" />
+            android:minWidth="150dp"/>
 
         <!-- Exercise name -->
         <TextView
@@ -64,7 +64,7 @@
 
     <!-- Equipment graphics -->
     <RelativeLayout
-        android:id="@+id/rlEquipmentDisplay"
+        android:id="@+id/rl_equip_disp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
@@ -145,22 +145,20 @@
         android:layout_weight="2"
         android:background="@color/colorAccent">
 
-        <include
+        <Button
             android:id="@+id/btnCancelSet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:text="@string/cancel_set"
-            layout="@layout/part_button" />
+            android:text="@string/cancel_set"/>
 
-        <include
+        <Button
             android:id="@+id/btnFinishSet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:text="@string/finish_set"
-            layout="@layout/part_button" />
+            android:text="@string/finish_set" />
     </RelativeLayout>
 </LinearLayout>

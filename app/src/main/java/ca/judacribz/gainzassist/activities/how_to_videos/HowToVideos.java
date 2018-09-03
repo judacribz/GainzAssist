@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
+
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
+
+import static ca.judacribz.gainzassist.activities.start_workout.fragments.CurrWorkout.EXTRA_HOW_TO_VID;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class HowToVideos extends AppCompatActivity
@@ -28,9 +32,8 @@ public class HowToVideos extends AppCompatActivity
     String URL = "https://www.googleapis.com/youtube/v3/search?" +  // default youtube search url
                  "part=snippet&" +                                  // search resource
                  "fields=items(id/videoId,snippet/title)&" +        // needed fields
-                 "q=how%20to%20squat&" +                            // search text
                  "maxResults=30&" +                                 // number of results to show
-                 "key=";                                            // for google api key
+                 "q=how%20to%20";                                  // search text
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -44,9 +47,8 @@ public class HowToVideos extends AppCompatActivity
     YouTubePlayerFragment ytpFmt;
     FragmentManager fmtMgr;
     FragmentTransaction fmtTxn;
-    String videoId;
+    String videoId, exerciseName;
     //---------------------------------------------------------------------------------------------
-
 
     // AppCompatActivity Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +56,8 @@ public class HowToVideos extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_how_to_videos);
-        setToolbar(this, "How To Squat", true);
+        exerciseName = getIntent().getStringExtra(EXTRA_HOW_TO_VID);
+        setToolbar(this, "How To " + exerciseName, true);
 
         fmtMgr = getFragmentManager();
 
@@ -65,7 +68,9 @@ public class HowToVideos extends AppCompatActivity
 
         task = new SearchVideosTask();
         task.setYouTubeSearchObserver(this);
-        task.execute(URL.concat(getString(R.string.google_api_key)));
+        task.execute(URL.concat(exerciseName)
+                        .concat("&key=")
+                        .concat(getString(R.string.google_api_key)));
 
         rvLayoutManager = new LinearLayoutManager(this);
         rvVideoList.setLayoutManager(rvLayoutManager);
@@ -118,10 +123,15 @@ public class HowToVideos extends AppCompatActivity
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void videoSearchDataReceived(ArrayList<String> videoIds, ArrayList<String> videoTitles) {
-        thumbnailAdapter = new ThumbnailAdapter(videoIds, videoTitles);
-        rvVideoList.setAdapter(thumbnailAdapter);
+        if (videoIds.size() > 0) {
+            thumbnailAdapter = new ThumbnailAdapter(videoIds, videoTitles);
+            rvVideoList.setAdapter(thumbnailAdapter);
 
-        thumbnailAdapter.setVideoClickObserver(this);
+            thumbnailAdapter.setVideoClickObserver(this);
+        } else {
+            Toast.makeText(this, "No video results", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
     //SearchVideosTask.YouTubeSearchObserver//Override/////////////////////////////////////////////
 
