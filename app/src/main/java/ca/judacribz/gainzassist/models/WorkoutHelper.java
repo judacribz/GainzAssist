@@ -237,14 +237,16 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         String where         = EMAIL + " = ?";
         String[] whereArgs   = new String[] {email};
 
-        Cursor cursor = db.query(TABLE_WORKOUTS, column, where, whereArgs, WORKOUT_NAME, null, null, null);
+        if (email != null) {
+            Cursor cursor = db.query(TABLE_WORKOUTS, column, where, whereArgs, WORKOUT_NAME, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                workoutNames.add(cursor.getString(0));
-            } while (cursor.moveToNext());
+            if (cursor.moveToFirst()) {
+                do {
+                    workoutNames.add(cursor.getString(0));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
         }
-        cursor.close();
 
         return workoutNames;
     }

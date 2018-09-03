@@ -25,32 +25,32 @@
         android:background="@color/colorBg"/>
 
     <!-- Facebook Login Button-->
-    <FrameLayout
-        android:id="@+id/flay_facebook_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_google_sign_in"
-        android:layout_alignEnd="@id/et_email"
-        android:layout_alignStart="@id/et_email"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@color/colorBg">
+    <!--<FrameLayout-->
+        <!--android:id="@+id/flay_facebook_login"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/btn_google_sign_in"-->
+        <!--android:layout_alignEnd="@id/et_email"-->
+        <!--android:layout_alignStart="@id/et_email"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:layout_marginBottom="20dp"-->
+        <!--android:background="@color/colorBg">-->
 
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/btn_facebook_login"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_margin="4dp"
-            android:textColor="@color/colorBg"/>
-    </FrameLayout>
+        <!--<com.facebook.login.widget.LoginButton-->
+            <!--android:id="@+id/btn_facebook_login"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_margin="4dp"-->
+            <!--android:textColor="@color/colorBg"/>-->
+    <!--</FrameLayout>-->
 
     <!-- Image for login -->
     <ImageView
         android:id="@+id/iv_login_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/flay_facebook_login"
+        android:layout_below="@id/btn_google_sign_in"
         android:layout_above="@id/et_email"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/cd_login_img"
@@ -61,9 +61,10 @@
         android:id="@+id/iv_sign_up_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/flay_facebook_login"
+        android:layout_below="@id/btn_google_sign_in"
         android:layout_above="@id/et_email"
         android:layout_centerHorizontal="true"
+        android:paddingTop="5dp"
         android:contentDescription="@string/cd_sign_up_img"
         android:tint="@color/colorBg"
         android:visibility="invisible"/>

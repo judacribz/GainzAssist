@@ -14,35 +14,52 @@
         android:background="@color/colorAccent"
         android:layout_weight="5">
 
-        <!-- Exercise name -->
-        <TextView
-            android:id="@+id/lblExerciseTitle"
+        <!-- How to do exercise button-->
+        <include
+            android:id="@+id/btn_how_to"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_toStartOf="@id/btnHowTo"
+            android:padding="1dp"
+            android:minWidth="150dp"
+            layout="@layout/part_button" />
+
+        <!-- Exercise name -->
+        <TextView
+            android:id="@+id/tv_exercise_title"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/btn_how_to"
             android:background="@color/colorAccent"
             android:fontFamily="@font/fnl"
             android:textSize="40sp"/>
 
-        <!-- How to do exercise button-->
-        <Button
-            android:id="@+id/btnHowTo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:maxWidth="120dp"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Button"/>
 
         <!-- Exercise set number -->
         <TextView
-            android:id="@+id/lblSetInfo"
+            android:id="@+id/tv_set_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/lblExerciseTitle"
+            android:layout_below="@id/tv_exercise_title"
+            android:layout_alignParentBottom="true"
+            android:minWidth="100dp"
             android:background="@color/colorAccent"
             android:textAllCaps="true"/>
+
+        <!-- Timer -->
+        <TextView
+            android:id="@+id/tv_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_exercise_title"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@id/tv_set_info"
+            android:background="@color/colorAccent"
+            android:textColor="@color/colorText"
+            android:textSize="40sp"/>
     </RelativeLayout>
 
     <!-- Equipment graphics -->
@@ -128,29 +145,22 @@
         android:layout_weight="2"
         android:background="@color/colorAccent">
 
-        <Button
+        <include
             android:id="@+id/btnCancelSet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:text="@string/cancel_set"/>
+            android:text="@string/cancel_set"
+            layout="@layout/part_button" />
 
-        <Button
+        <include
             android:id="@+id/btnFinishSet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:text="@string/finish_set"/>
-
-        <Button
-            android:id="@+id/btnFinishWorkout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:text="@string/finish_workout"
-            android:visibility="gone"/>
+            android:text="@string/finish_set"
+            layout="@layout/part_button" />
     </RelativeLayout>
 </LinearLayout>
