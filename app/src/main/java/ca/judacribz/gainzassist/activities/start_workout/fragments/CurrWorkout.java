@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -52,7 +51,9 @@ public class CurrWorkout extends Fragment {
     ArrayList<Set> currSets;
     Set currSet;
     String currExerciseName, currEquipment;
-    ArrayList<Exercise> warmups;
+    ArrayList<Exercise> warmups, exercises;
+    boolean onWarmup = true;
+    int setIndex = 0, exIndex = 0;
 
     float currWeight, weight, minWeight = MIN_WEIGHT, weightChange = WEIGHT_CHANGE;
     int currReps, reps;
@@ -93,20 +94,27 @@ public class CurrWorkout extends Fragment {
         act = (StartWorkout) getActivity();
 
         warmups = User.getInstance().getWarmups();
+        currExercise = warmups.get(exIndex);
+        exercises = StartWorkout.workout.getExercises();
 
-        currExercise = warmups.get(0);
+        setCurrSet();
+    }
+
+    public void setCurrSet() {
         currExerciseName = currExercise.getName();
+
         currSets = currExercise.getSets();
-        currSet = currSets.get(0);
-        weight = currWeight = currSet.getWeight();
+        currSet = currSets.get(setIndex++);
+
         reps = currReps = currSet.getReps();
 
-        currEquipment = currExercise.getEquipment();
-
-        if (currEquipment.toLowerCase().equals(getString(R.string.barbell))) {
+        currEquipment = currExercise.getEquipment().toLowerCase();
+        if (currEquipment.equals(getString(R.string.barbell))) {
             minWeight = BB_MIN_WEIGHT;
             weightChange = BB_WEIGHT_CHANGE;
         }
+        currWeight = currSet.getWeight();
+        weight = Math.max(currWeight, minWeight);
     }
 
     @Override
@@ -129,7 +137,7 @@ public class CurrWorkout extends Fragment {
 
         setupEquipView();
         setRepsWeight();
-        startTimer(500000);
+        startTimer(5000);
 
         return view;
     }
@@ -243,6 +251,8 @@ public class CurrWorkout extends Fragment {
 
             // Changes the timer text, when it gets to 0:00, to "Start the next set"
             public void onFinish() {
+                this.cancel();
+                tvTimer.setText(R.string.start_next_set);
             }
         };
     }
@@ -307,7 +317,39 @@ public class CurrWorkout extends Fragment {
 
     public void setWeight() {
         etCurrWeight.setText(String.valueOf(Math.max(weight, minWeight)));
-        equipmentView.setup(weight, getString(R.string.barbell));
+        equipmentView.setup(weight, currEquipment);
     }
+
+    @OnClick(R.id.btn_finish_set)
+    public void finishSet() {
+
+        countDownTimer.cancel();
+        startTimer(5000);
+
+        if (currSets.size() == setIndex) {
+            setIndex = 0;
+
+            if (onWarmup) {
+                onWarmup = false;
+                currExercise = exercises.get(exIndex);
+            } else {
+                onWarmup = true;
+
+                ++exIndex;
+                if (exIndex != exercises.size())
+                    currExercise = warmups.get(exIndex);
+            }
+        }
+
+        setCurrSet();
+        updateUI();
+    }
+
+    public void updateUI() {
+//        tvExInfo.setText(String.format("Warmup 1/%s", warmups.size()));
+//        tvSetInfo.setText(String.format("Set 1/%s", currExercise.getNumSets()));
+        tvExerciseTitle.setText(currExerciseName);
+    }
+
     //=Click=Handling==============================================================================
 }
