@@ -26,50 +26,48 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
+import ca.judacribz.gainzassist.models.CurrSet;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.User;
+import ca.judacribz.gainzassist.models.CurrUser;
+
+import static ca.judacribz.gainzassist.models.CurrSet.MIN_REPS;
 
 public class CurrWorkout extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
     public static final String EXTRA_HOW_TO_VID = "ca.judacribz.gainzassist.EXTRA_HOW_TO_VID";
-    public static final float BB_MIN_WEIGHT = 45.0f;
-    public static final float MIN_WEIGHT = 0.0f;
-    public static final float BB_WEIGHT_CHANGE = 5.0f;
-    public static final float WEIGHT_CHANGE = 2.5f;
-    public static final int MIN_REPS = 0;
+
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
+
     EquipmentView equipmentView;
     CountDownTimer countDownTimer;
+
+    CurrSet currSet;
+
     Exercise currExercise;
-    ArrayList<Set> currSets;
-    Set currSet;
-    String currExerciseName, currEquipment;
+    ArrayList<Set> sets;
     ArrayList<Exercise> warmups, exercises;
-    boolean onWarmup = true;
-    int setIndex = 0, exIndex = 0;
-
-    float currWeight, weight, minWeight = MIN_WEIGHT, weightChange = WEIGHT_CHANGE;
-    int currReps, reps;
-
-
+    int set_i = 0, ex_i = 0;
 
     // --------------------------------------------------------------------------------------------
     // UI Elements
     @BindView(R.id.rl_equip_disp) ViewGroup vgEquipDisp;
     @BindView(R.id.tv_timer) TextView tvTimer;
+
     @BindView(R.id.tv_exercise_title) TextView tvExerciseTitle;
     @BindView(R.id.tv_set_info) TextView tvSetInfo;
     @BindView(R.id.tv_ex_info) TextView tvExInfo;
+
     @BindView(R.id.btn_how_to) Button btnHowTo;
     @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
     @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
+
     @BindView(R.id.et_curr_reps) EditText etCurrReps;
     @BindView(R.id.et_curr_weight) EditText etCurrWeight;
     // --------------------------------------------------------------------------------------------
@@ -92,29 +90,14 @@ public class CurrWorkout extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) getActivity();
+        currSet = CurrSet.getInstance();
 
-        warmups = User.getInstance().getWarmups();
-        currExercise = warmups.get(exIndex);
+        warmups = CurrUser.getInstance().getWarmups();
+        currExercise = warmups.get(ex_i);
         exercises = StartWorkout.workout.getExercises();
+        sets = currExercise.getSets();
 
         setCurrSet();
-    }
-
-    public void setCurrSet() {
-        currExerciseName = currExercise.getName();
-
-        currSets = currExercise.getSets();
-        currSet = currSets.get(setIndex++);
-
-        reps = currReps = currSet.getReps();
-
-        currEquipment = currExercise.getEquipment().toLowerCase();
-        if (currEquipment.equals(getString(R.string.barbell))) {
-            minWeight = BB_MIN_WEIGHT;
-            weightChange = BB_WEIGHT_CHANGE;
-        }
-        currWeight = currSet.getWeight();
-        weight = Math.max(currWeight, minWeight);
     }
 
     @Override
@@ -123,20 +106,15 @@ public class CurrWorkout extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
         ButterKnife.bind(this, view);
 
-        String info = "Warmup 1/" + warmups.size() + "\nSet 1/" + currExercise.getNumSets();
-        tvExInfo.setText(String.format("Warmup 1/%s", warmups.size()));
-        tvSetInfo.setText(String.format("Set 1/%s", currExercise.getNumSets()));
-        tvExerciseTitle.setText(currExerciseName);
-
         setupEquipView();
         setRepsWeight();
+        updateUI();
         startTimer(5000);
 
         return view;
@@ -155,13 +133,15 @@ public class CurrWorkout extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().isEmpty()) {
-                    reps = Integer.valueOf(s.toString());
+                int reps;
+                String repStr = s.toString();
+                if (!repStr.isEmpty()) {
+                    reps = Integer.valueOf(repStr);
                 } else {
                     reps = MIN_REPS;
                 }
 
-                if (reps == MIN_REPS) {
+                if (currSet.setReps(reps)) {
                     btnDecReps.setEnabled(false);
                 }
             }
@@ -174,21 +154,22 @@ public class CurrWorkout extends Fragment {
         etCurrWeight.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if (!btnDecWeight.isEnabled()) {
+                if (!btnDecWeight.isEnabled())
                     btnDecWeight.setEnabled(true);
-                }
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                float weight;
                 if (!s.toString().isEmpty()) {
                     weight = Float.valueOf(s.toString());
-                    equipmentView.setup(weight, getString(R.string.barbell));
+                    equipmentView.setup(weight, currSet.getEquip());
                 } else {
-                    weight = minWeight;
+                    weight = currSet.getMinWeight();
                 }
 
-                if ((weight - weightChange) < minWeight) {
+
+                if (currSet.setWeight(weight)) {
                     btnDecWeight.setEnabled(false);
                 }
             }
@@ -198,7 +179,6 @@ public class CurrWorkout extends Fragment {
             }
         });
     }
-
     // Set up the custom view (EquipmentView) to display the equipment. View added dynamically
     // to trigger onDraw method
     public void setupEquipView() {
@@ -210,14 +190,10 @@ public class CurrWorkout extends Fragment {
 
         vgEquipDisp.addView(equipmentView, 0);
 
-        setEquipViewWeight();
-    }
-
-    public void setEquipViewWeight() {
         equipmentView.post(new Runnable() {
             @Override
             public void run() {
-                equipmentView.setup(weight, getString(R.string.barbell));
+                equipmentView.setup(currSet.getWeight(), currSet.getEquip());
             }
         });
     }
@@ -271,7 +247,7 @@ public class CurrWorkout extends Fragment {
     @OnClick(R.id.btn_how_to)
     public void startWorkoutsList() {
         Intent intent = new Intent(act, HowToVideos.class);
-        intent.putExtra(EXTRA_HOW_TO_VID, currExerciseName);
+        intent.putExtra(EXTRA_HOW_TO_VID, currSet.getExName());
         startActivity(intent);
     }
 
@@ -289,66 +265,85 @@ public class CurrWorkout extends Fragment {
 
     @OnClick(R.id.btn_dec_reps)
     public void decReps() {
-        reps--;
+        currSet.decReps();
         setReps();
     }
 
     @OnClick(R.id.btn_inc_reps)
     public void incReps() {
-        reps++;
+        currSet.incReps();
         setReps();
     }
 
     public void setReps() {
-        etCurrReps.setText(String.valueOf(reps));
+        etCurrReps.setText(String.valueOf(currSet.getReps()));
     }
 
     @OnClick(R.id.btn_dec_weight)
     public void decWeight() {
-        weight -= weightChange;
+        currSet.decWeight();
         setWeight();
     }
 
     @OnClick(R.id.btn_inc_weight)
     public void incWeight() {
-        weight += weightChange;
+        currSet.incWeight();
         setWeight();
     }
 
     public void setWeight() {
-        etCurrWeight.setText(String.valueOf(Math.max(weight, minWeight)));
-        equipmentView.setup(weight, currEquipment);
+        float weight = currSet.getWeight();
+        etCurrWeight.setText(String.valueOf(weight));
+        equipmentView.setup(weight, currSet.getEquip());
     }
 
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
+        if (!currSet.getIsWarmup()  && ex_i == exercises.size() - 1 && set_i == sets.size() - 1) {
+                act.finish();
+        } else {
 
-        countDownTimer.cancel();
-        startTimer(5000);
+            countDownTimer.cancel();
+            startTimer(5000);
 
-        if (currSets.size() == setIndex) {
-            setIndex = 0;
+            // End of sets
+            if (set_i == sets.size()) {
+                set_i = 0;
 
-            if (onWarmup) {
-                onWarmup = false;
-                currExercise = exercises.get(exIndex);
-            } else {
-                onWarmup = true;
 
-                ++exIndex;
-                if (exIndex != exercises.size())
-                    currExercise = warmups.get(exIndex);
+                if (currSet.getIsWarmup()) {
+                    currExercise = exercises.get(ex_i);
+                } else {
+                    ++ex_i;
+                    currExercise = warmups.get(ex_i);
+                }
+                currSet.switchSetType();
+                sets = currExercise.getSets();
             }
-        }
 
-        setCurrSet();
-        updateUI();
+            setCurrSet();
+            updateUI();
+        }
+    }
+
+    public void setCurrSet() {
+        currSet.setExName(currExercise.getName());
+        currSet.setEquip(currExercise.getEquipment());
+        currSet.setSet(sets.get(set_i++));
     }
 
     public void updateUI() {
-//        tvExInfo.setText(String.format("Warmup 1/%s", warmups.size()));
-//        tvSetInfo.setText(String.format("Set 1/%s", currExercise.getNumSets()));
-        tvExerciseTitle.setText(currExerciseName);
+//        String info = "Warmup 1/" + warmups.size() + "\nSet 1/" + currExercise.getNumSets();
+        String setType;
+        if (currSet.getIsWarmup()) {
+            setType = "Warmup";
+        } else {
+            setType = "Main";
+        }
+
+        tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, warmups.size()));
+        tvSetInfo.setText(String.format("Set %s/%s", currSet.getSetNum(), currExercise.getNumSets()));
+        tvExerciseTitle.setText(currSet.getExName());
     }
 
     //=Click=Handling==============================================================================

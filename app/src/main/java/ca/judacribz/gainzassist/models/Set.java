@@ -39,6 +39,10 @@ public class Set {
         return reps;
     }
 
+    public void setReps(int reps) {
+        this.reps = reps;
+    }
+
     public float getWeight() {
         return weight;
     }

@@ -2,36 +2,43 @@ package ca.judacribz.gainzassist.models;
 
 import java.util.ArrayList;
 
-public class User {
+public class CurrUser {
+
+    // Constants
+    // --------------------------------------------------------------------------------------------
+    private static final CurrUser INST = new CurrUser();
+    // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
     private String email;
     private String uid;
-    private static User instance;
     private ArrayList<Exercise> warmups;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
     // ThumbnailAdapter Constructor/Instance                                                     //
     // ######################################################################################### //
-    private User() {
+    private CurrUser() {
     }
 
-    /* Returns the instance if one exists, otherwise creates one and returns it */
-    public static User getInstance(){
-        if (instance == null) {
-            instance = new User();
-        }
-
-        return instance;
+    public static CurrUser getInstance(){
+        return INST;
     }
     // ######################################################################################### //
 
     // Getters and setters
     // ============================================================================================
+    public String getEmail() {
+        return email;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUid() {
+        return uid;
     }
 
     public void setUid(String uid) {
@@ -46,12 +53,5 @@ public class User {
         this.warmups = warmups;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUid() {
-        return uid;
-    }
     // ============================================================================================
 }

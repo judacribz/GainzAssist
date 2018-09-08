@@ -1,7 +1,6 @@
 package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import com.google.firebase.auth.FirebaseAuth;
@@ -13,9 +12,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.User;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
@@ -69,8 +68,8 @@ public class Database {
                     String email = fbUser.getEmail();
                     String uid = fbUser.getUid();
 
-                    // Sets singleton User Instance variables
-                    User user = User.getInstance();
+                    // Sets singleton CurrUser Instance variables
+                    CurrUser user = CurrUser.getInstance();
                     user.setEmail(email);
                     user.setUid(uid);
 

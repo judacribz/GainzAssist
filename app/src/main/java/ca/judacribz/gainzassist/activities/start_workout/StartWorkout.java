@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.CountDownTimer;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.content.ContextCompat;
@@ -19,12 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.*;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.User;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
@@ -182,6 +180,6 @@ public class StartWorkout extends AppCompatActivity {
             warmups.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets));
         }
 
-        User.getInstance().setWarmups(warmups);
+        CurrUser.getInstance().setWarmups(warmups);
     }
 }

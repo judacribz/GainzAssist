@@ -221,7 +221,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         FirebaseUser fbUser = firebaseAuth.getCurrentUser();
 
-        // User is signed in
+        // CurrUser is signed in
         if (fbUser != null) {
             Toast.makeText(
                     this,

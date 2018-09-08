@@ -9,18 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.User;
-import ca.judacribz.gainzassist.models.Workout;
-
-import static ca.judacribz.gainzassist.util.Calculations.*;
+import ca.judacribz.gainzassist.models.CurrUser;
 
 public class CurrWarmups extends Fragment {
 
@@ -76,7 +71,7 @@ public class CurrWarmups extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         Exercise exercise;
-        ArrayList<Exercise> warmups = User.getInstance().getWarmups();
+        ArrayList<Exercise> warmups = CurrUser.getInstance().getWarmups();
 
         for (int i = 0; i < warmups.size(); i++) {
             exercise = warmups.get(i);
