@@ -58,7 +58,7 @@ public class EquipmentView extends View{
 
     String text;
     private Paint paint;
-    ArrayList<RectF> plates;
+    ArrayList<RectF> plates = null;
 
     Context context;
     // ============================================================================================

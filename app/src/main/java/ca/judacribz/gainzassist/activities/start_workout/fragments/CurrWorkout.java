@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,9 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.CurrUser;
 
+import static android.support.v4.widget.TextViewCompat.getAutoSizeMaxTextSize;
+import static android.support.v4.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults;
+import static android.widget.TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM;
 import static ca.judacribz.gainzassist.models.CurrSet.MIN_REPS;
 
 public class CurrWorkout extends Fragment {
@@ -112,12 +116,20 @@ public class CurrWorkout extends Fragment {
         View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
         ButterKnife.bind(this, view);
 
+        tvExerciseTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40f);
+        tvSetInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+        tvExInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         setupEquipView();
         setRepsWeight();
         updateUI();
         startTimer(5000);
-
-        return view;
     }
 
     private void setRepsWeight() {

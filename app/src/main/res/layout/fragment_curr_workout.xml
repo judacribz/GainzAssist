@@ -30,21 +30,23 @@
         <TextView
             android:id="@+id/tv_exercise_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignBottom="@id/btn_how_to"
+            android:layout_alignTop="@id/btn_how_to"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/btn_how_to"
-            android:background="@color/colorAccent"
+            android:background="@color/colorText"
             android:gravity="center"
-            android:fontFamily="@font/fnl"
-            android:textSize="40sp"/>
+            android:fontFamily="@font/fnl"/>
 
         <!-- Exercise/Set number -->
         <LinearLayout
             android:id="@+id/ll_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_exercise_title"
             android:layout_alignParentBottom="true"
+            android:layout_below="@id/btn_how_to"
+            android:layout_marginStart="1dp"
             android:background="@color/colorAccent"
             android:orientation="vertical"
             android:paddingBottom="5dp">
@@ -56,9 +58,7 @@
                 android:layout_weight="1"
                 android:background="@color/colorAccent"
                 android:gravity="center"
-                android:textAllCaps="true"
-                android:textColor="@android:color/holo_red_dark"
-                android:textSize="25sp"/>
+                android:textColor="@android:color/holo_red_dark"/>
 
             <TextView
                 android:id="@+id/tv_set_info"
@@ -67,7 +67,6 @@
                 android:layout_weight="1"
                 android:background="@color/colorAccent"
                 android:gravity="center"
-                android:textAllCaps="true"
                 android:textColor="@android:color/holo_red_dark"
                 android:textSize="25sp"/>
         </LinearLayout>
