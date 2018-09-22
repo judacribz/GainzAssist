@@ -67,7 +67,7 @@ public class StartWorkout extends AppCompatActivity {
         layInflater = getLayoutInflater();
 
         setupPager();
-        genWarmUps();
+        genWarmups();
     }
 
     /* Setup fragments with page with icons for the tab bar */
@@ -148,7 +148,8 @@ public class StartWorkout extends AppCompatActivity {
         setList.setAdapter(new SetsAdapter(sets));
     }
 
-    public void genWarmUps() {
+    // TODO optimize
+    public void genWarmups() {
         ArrayList<Exercise> exercises = workout.getExercises();
         ArrayList<Exercise> warmups = new ArrayList<>();
 
@@ -157,8 +158,12 @@ public class StartWorkout extends AppCompatActivity {
         for (int i = 0; i < exercises.size(); i++) {
             exercise = exercises.get(i);
             oneRepMax = getOneRepMax(exercise.getAvgReps(), exercise.getAvgWeight());
-
+            float minWeight = 0f;
             int reps = exercise.getAvgReps();
+            String equip = exercise.getEquipment();
+            if (equip.equals(getString(R.string.barbell))) {
+                minWeight = 45f;
+            }
             ArrayList<Set> sets = new ArrayList<>();
             int ind = 1;
             while (reps > 0) {
@@ -172,7 +177,7 @@ public class StartWorkout extends AppCompatActivity {
             float weight = exercise.getAvgWeight();
             for (int j = 0; j < sets.size(); j++) {
                 set = sets.get(j);
-                set.setWeight(percent * weight);
+                set.setWeight(Math.max(percent * weight, minWeight));
                 sets.set(j, set);
                 percent += increments;
             }

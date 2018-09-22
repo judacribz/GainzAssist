@@ -35,7 +35,7 @@
             android:layout_alignTop="@id/btn_how_to"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/btn_how_to"
-            android:background="@color/colorText"
+            android:background="@color/colorAccent"
             android:gravity="center"
             android:fontFamily="@font/fnl"/>
 
@@ -96,6 +96,7 @@
         android:background="@color/colorText">
     </RelativeLayout>
 
+    <!-- TODO fix edittext heights (make identical)-->
     <!-- Exercise reps and weight control -->
     <RelativeLayout
         android:layout_width="match_parent"
