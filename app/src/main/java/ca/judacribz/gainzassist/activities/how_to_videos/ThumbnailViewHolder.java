@@ -13,11 +13,13 @@ import ca.judacribz.gainzassist.R;
 
 public class ThumbnailViewHolder extends RecyclerView.ViewHolder
         implements View.OnClickListener,
-                   YouTubeThumbnailView.OnInitializedListener {
+                   YouTubeThumbnailView.OnInitializedListener,
+                   YouTubeThumbnailLoader.OnThumbnailLoadedListener {
 
     // Interfaces
     // --------------------------------------------------------------------------------------------
     private VideoClickObserver videoClickObserver;
+
 
     public interface VideoClickObserver {
         void onVideoClick(String videoId);
@@ -36,6 +38,7 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
     // Global Vars
     // --------------------------------------------------------------------------------------------
     private YouTubeThumbnailView thumbnailView;
+    private YouTubeThumbnailLoader thumbnailLoader;
     private TextView tvVideoTitle;
     private  String videoId;
     private ArrayList<String> videoIds;
@@ -72,12 +75,27 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
     public void onInitializationSuccess(YouTubeThumbnailView thumbnailView,
                                         final YouTubeThumbnailLoader thumbnailLoader) {
         this.thumbnailView = thumbnailView;
+        this.thumbnailLoader = thumbnailLoader;
+        this.thumbnailLoader.setOnThumbnailLoadedListener(this);
         thumbnailLoader.setVideo(videoId);
     }
 
     @Override
     public void onInitializationFailure(YouTubeThumbnailView thumbnailView,
                                         YouTubeInitializationResult initializationResult) {
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    // YouTubeThumbnailLoader.OnThumbnailLoadedListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onThumbnailLoaded(YouTubeThumbnailView thumbnailView, String s) {
+        thumbnailLoader.release();
+    }
+
+    @Override
+    public void onThumbnailError(YouTubeThumbnailView thumbnailView,
+                                 YouTubeThumbnailLoader.ErrorReason errorReason) {
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
