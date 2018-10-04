@@ -46,6 +46,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
+import ca.judacribz.gainzassist.async.BGTask;
 
 import static ca.judacribz.gainzassist.R.layout.activity_login;
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
@@ -229,7 +230,8 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
                     Toast.LENGTH_SHORT
             ).show();
 
-            setUserInfo(this);
+            // Run in bg, start Main activity once database is loaded
+            new BGTask().execute(this, new Intent(this, Main.class));
 
             if (linkGoogle) {
                 fbUser
@@ -246,9 +248,6 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 //            for (UserInfo profile : fbUser.getProviderData()) {
 //                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
 //            }
-
-            startActivity(new Intent(this, Main.class));
-            finish();
         }
     }
     //FirebaseAuth.AuthStateListener//Override/////////////////////////////////////////////////////
