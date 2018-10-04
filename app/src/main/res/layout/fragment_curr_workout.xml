@@ -15,15 +15,18 @@
         android:layout_weight="5">
 
         <!-- How to do exercise button-->
+
         <Button
             android:id="@+id/btn_how_to"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:background="@drawable/touch_anim_ripple"
             android:gravity="center"
             android:padding="1dp"
             android:text="@string/how_to"
+            android:textColor="@drawable/selector_btn_text_default"
             android:textSize="20sp"/>
 
         <!-- Exercise name -->
@@ -124,6 +127,7 @@
             android:layout_alignTop="@id/et_curr_reps"
             android:layout_alignBottom="@id/et_curr_reps"
             android:layout_toStartOf="@id/et_curr_reps"
+            android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
@@ -133,6 +137,7 @@
             android:layout_alignTop="@id/et_curr_reps"
             android:layout_alignBottom="@id/et_curr_reps"
             android:layout_toEndOf="@id/et_curr_reps"
+            android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_plus"/>
 
         <EditText
@@ -155,6 +160,7 @@
             android:layout_alignTop="@id/et_curr_weight"
             android:layout_alignBottom="@id/et_curr_weight"
             android:layout_toStartOf="@id/et_curr_weight"
+            android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
@@ -164,6 +170,7 @@
             android:layout_alignTop="@id/et_curr_weight"
             android:layout_alignBottom="@id/et_curr_weight"
             android:layout_toEndOf="@id/et_curr_weight"
+            android:background="@drawable/touch_anim_ripple"
             android:src="@drawable/ic_plus"/>
     </RelativeLayout>
 
@@ -182,9 +189,11 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
+            android:background="@drawable/touch_anim_ripple"
+            android:gravity="center"
             android:text="@string/cancel_set"
-            android:textSize="20sp"
-            android:gravity="center"/>
+            android:textColor="@drawable/selector_btn_text_default"
+            android:textSize="20sp"/>
 
         <Button
             android:id="@+id/btn_finish_set"
@@ -192,8 +201,10 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
+            android:background="@drawable/touch_anim_ripple"
+            android:gravity="center"
             android:text="@string/finish_set"
-            android:textSize="20sp"
-            android:gravity="center"/>
+            android:textColor="@drawable/selector_btn_text_default"
+            android:textSize="20sp"/>
     </RelativeLayout>
 </LinearLayout>

@@ -64,7 +64,6 @@
         android:visibility="invisible"
         style="@android:style/Widget.Holo.Light.ProgressBar.Large"/>
 
-
     <!-- Image for sign up -->
     <ImageView
         android:id="@+id/iv_sign_up_image"
