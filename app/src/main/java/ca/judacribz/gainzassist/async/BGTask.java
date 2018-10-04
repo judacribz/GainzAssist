@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import ca.judacribz.gainzassist.Main;
 
@@ -17,6 +19,7 @@ public class BGTask extends AsyncTask<Object, Void, Object[]> {
 
         return obj;
     }
+
 
     @Override
     protected void onPostExecute(Object[] objs) {

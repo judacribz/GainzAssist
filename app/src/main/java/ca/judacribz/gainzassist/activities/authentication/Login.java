@@ -1,7 +1,6 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
@@ -18,25 +17,19 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.io.IOException;
@@ -48,9 +41,7 @@ import butterknife.OnClick;
 import ca.judacribz.gainzassist.*;
 import ca.judacribz.gainzassist.async.BGTask;
 
-import static ca.judacribz.gainzassist.R.layout.activity_login;
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
-import static ca.judacribz.gainzassist.firebase.Database.*;
 
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
@@ -95,6 +86,10 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 //    @BindView(R.id.btn_facebook_login) LoginButton btnFacebook;
     @BindView(R.id.btn_login) Button btnLogin;
     @BindView(R.id.btn_sign_up) Button btnSignUp;
+
+
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
     // --------------------------------------------------------------------------------------------
 
 
@@ -103,8 +98,9 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setInitView(this, activity_login, R.string.app_name,  false);
+        setInitView(this, R.layout.activity_login, R.string.app_name,  false);
 
+        progressBar.setMax(10);
         // Get firebase instance and setup google and facebook sign in
         setupSignInMethods();
 
@@ -192,6 +188,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     protected void onStop() {
         super.onStop();
         auth.removeAuthStateListener(this);
+        progressBar.setVisibility(View.GONE);
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
@@ -231,20 +228,12 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
             ).show();
 
             // Run in bg, start Main activity once database is loaded
+
+            progressBar.setProgress(0);
+            progressBar.setVisibility(View.VISIBLE);
             new BGTask().execute(this, new Intent(this, Main.class));
 
-            if (linkGoogle) {
-                fbUser
-                        .linkWithCredential(credential)
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(Login.this, "Linked!", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-            }
+
 //            for (UserInfo profile : fbUser.getProviderData()) {
 //                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
 //            }
@@ -291,7 +280,6 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
         email = etEmail.getText().toString().trim();
         password = etPassword.getText().toString().trim();
         if (validateForm(email, password)) {
-
             // Email/Password login to firebase
             credential = EmailAuthProvider.getCredential(email, password);
             signIn(this, credential, signInClient);

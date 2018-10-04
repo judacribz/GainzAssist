@@ -56,6 +56,15 @@
         android:contentDescription="@string/cd_login_img"
         android:tint="@color/colorBg"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:padding="100dp"
+        android:visibility="invisible"
+        style="@android:style/Widget.Holo.Light.ProgressBar.Large"/>
+
+
     <!-- Image for sign up -->
     <ImageView
         android:id="@+id/iv_sign_up_image"
