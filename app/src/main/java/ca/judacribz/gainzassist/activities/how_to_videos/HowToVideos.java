@@ -28,12 +28,13 @@ public class HowToVideos extends AppCompatActivity
     // --------------------------------------------------------------------------------------------
     public static final String EXTRA_VIDEO_ID =
             "ca.judacribz.gainzassist.act_how_to_videos.EXTRA_VIDEO_ID";
+    public static final String SEARCH_SPACE_STR = "%20";
 
     String URL = "https://www.googleapis.com/youtube/v3/search?" +  // default youtube search url
                  "part=snippet&" +                                  // search resource
                  "fields=items(id/videoId,snippet/title)&" +        // needed fields
                  "maxResults=30&" +                                 // number of results to show
-                 "q=how%20to%20";                                  // search text
+                 "q=how%20to%20";                                   // search text
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -68,7 +69,7 @@ public class HowToVideos extends AppCompatActivity
 
         task = new SearchVideosTask();
         task.setYouTubeSearchObserver(this);
-        task.execute(URL.concat(exerciseName)
+        task.execute(URL.concat(exerciseName.replaceAll("\\s+", SEARCH_SPACE_STR))
                         .concat("&key=")
                         .concat(getString(R.string.google_api_key)));
 
