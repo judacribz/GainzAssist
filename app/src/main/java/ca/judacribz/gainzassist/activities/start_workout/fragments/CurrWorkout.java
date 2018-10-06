@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -23,6 +24,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
+import butterknife.Optional;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
@@ -93,13 +96,16 @@ public class CurrWorkout extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        act = (StartWorkout) getActivity();
+        act = (StartWorkout) context;
         currSet = CurrSet.getInstance();
 
+        // get all warmup exercises
         warmups = CurrUser.getInstance().getWarmups();
         currExercise = warmups.get(ex_i);
-        exercises = StartWorkout.workout.getExercises();
         sets = currExercise.getSets();
+
+        // get all main exercises
+        exercises = StartWorkout.workout.getExercises();
 
         setCurrSet();
     }
@@ -116,81 +122,64 @@ public class CurrWorkout extends Fragment {
         View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
         ButterKnife.bind(this, view);
 
-        tvExerciseTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40f);
-        tvSetInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-        tvExInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         setupEquipView();
-        setRepsWeight();
+        setReps();
+        setWeight();
         updateUI();
         startTimer(5000);
     }
 
-    private void setRepsWeight() {
-        setReps();
-        setWeight();
-
-        etCurrReps.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    // TextWatcher for reps ET
+    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    public void beforeRepsChanged() {
                 if (!btnDecReps.isEnabled())
                     btnDecReps.setEnabled(true);
-            }
+    }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int reps;
-                String repStr = s.toString();
-                if (!repStr.isEmpty()) {
-                    reps = Integer.valueOf(repStr);
-                } else {
-                    reps = MIN_REPS;
-                }
+    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    public void onRepsChanged(CharSequence s, int start, int before, int count) {
+        int reps;
+        String repStr = s.toString();
+        if (!repStr.isEmpty()) {
+            reps = Integer.valueOf(repStr);
+        } else {
+            reps = MIN_REPS;
+        }
 
-                if (currSet.setReps(reps)) {
-                    btnDecReps.setEnabled(false);
-                }
-            }
+        if (currSet.setReps(reps)) {
+            btnDecReps.setEnabled(false);
+        }
+    }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-
-        etCurrWeight.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    // TextWatcher for weight ET
+    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    public void beforeWeightChanged() {
                 if (!btnDecWeight.isEnabled())
                     btnDecWeight.setEnabled(true);
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                float weight;
-                if (!s.toString().isEmpty()) {
-                    weight = Float.valueOf(s.toString());
-                    equipmentView.setup(weight, currSet.getEquip());
-                } else {
-                    weight = currSet.getMinWeight();
-                }
-
-
-                if (currSet.setWeight(weight)) {
-                    btnDecWeight.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
     }
+
+    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    public void onWeightChanged(CharSequence s, int start, int before, int count) {
+            float weight;
+            if (!s.toString().isEmpty()) {
+                weight = Float.valueOf(s.toString());
+                equipmentView.setup(weight, currSet.getEquip());
+            } else {
+                weight = currSet.getMinWeight();
+            }
+
+            if (currSet.setWeight(weight)) {
+                btnDecWeight.setEnabled(false);
+            }
+    }
+
     // Set up the custom view (EquipmentView) to display the equipment. View added dynamically
     // to trigger onDraw method
     public void setupEquipView() {
@@ -248,6 +237,8 @@ public class CurrWorkout extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+        set_i = 0;
+        ex_i = 0;
         countDownTimer.cancel();
     }
 
