@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.TextViewCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.TypedValue;
@@ -133,52 +134,8 @@ public class CurrWorkout extends Fragment {
         setReps();
         setWeight();
         updateUI();
-        startTimer(5000);
     }
 
-    // TextWatcher for reps ET
-    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    public void beforeRepsChanged() {
-                if (!btnDecReps.isEnabled())
-                    btnDecReps.setEnabled(true);
-    }
-
-    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)
-    public void onRepsChanged(CharSequence s, int start, int before, int count) {
-        int reps;
-        String repStr = s.toString();
-        if (!repStr.isEmpty()) {
-            reps = Integer.valueOf(repStr);
-        } else {
-            reps = MIN_REPS;
-        }
-
-        if (currSet.setReps(reps)) {
-            btnDecReps.setEnabled(false);
-        }
-    }
-
-    // TextWatcher for weight ET
-    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    public void beforeWeightChanged() {
-                if (!btnDecWeight.isEnabled())
-                    btnDecWeight.setEnabled(true);
-    }
-
-    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
-    public void onWeightChanged(CharSequence s, int start, int before, int count) {
-            float weight;
-            if (!s.toString().isEmpty()) {
-                weight = Float.valueOf(s.toString());
-                equipmentView.setup(weight, currSet.getEquip());
-            } else {
-                weight = currSet.getMinWeight();
-            }
-
-            if (currSet.setWeight(weight)) {
-                btnDecWeight.setEnabled(false);
-            }
-    }
 
     // Set up the custom view (EquipmentView) to display the equipment. View added dynamically
     // to trigger onDraw method
@@ -200,8 +157,8 @@ public class CurrWorkout extends Fragment {
     }
 
     public void startTimer(long timeInMillis) {
-        countDownTimer = getCountDownTimer(timeInMillis);
-        countDownTimer.start();
+            countDownTimer = getCountDownTimer(timeInMillis);
+            countDownTimer.start();
     }
 
     /* Creates and returns a new CountDownTimer with the rest time to count down from. Has the
@@ -211,7 +168,6 @@ public class CurrWorkout extends Fragment {
     CountDownTimer getCountDownTimer(long milliseconds) {
 
         return new CountDownTimer(milliseconds, 1000) {
-            String timerText = "";
             long seconds;
             long minutes;
 
@@ -222,14 +178,14 @@ public class CurrWorkout extends Fragment {
                 minutes = seconds / 60;
                 seconds = seconds % 60;
 
-                timerText = minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds);
-                tvTimer.setText(timerText);
+                tvTimer.setText((minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds)));
+                TextViewCompat.setAutoSizeTextTypeWithDefaults(tvTimer, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
             }
 
             // Changes the timer text, when it gets to 0:00, to "Start the next set"
             public void onFinish() {
-                this.cancel();
                 tvTimer.setText(R.string.start_next_set);
+                cancel();
             }
         };
     }
@@ -239,11 +195,54 @@ public class CurrWorkout extends Fragment {
         super.onStop();
         set_i = 0;
         ex_i = 0;
-        countDownTimer.cancel();
+        if (countDownTimer != null)
+            countDownTimer.cancel();
     }
 
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
+    // TextWatcher Handling
+    // =============================================================================================
+    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    public void beforeRepsChanged() {
+        if (!btnDecReps.isEnabled())
+            btnDecReps.setEnabled(true);
+    }
+
+    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    public void onRepsChanged(CharSequence s, int start, int before, int count) {
+        int reps;
+        String repStr = s.toString();
+
+        if (!repStr.isEmpty())
+            reps = Integer.valueOf(repStr);
+        else
+            reps = MIN_REPS;
+
+        if (currSet.setReps(reps))
+            btnDecReps.setEnabled(false);
+    }
+
+    // TextWatcher for weight ET
+    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    public void beforeWeightChanged() {
+        if (!btnDecWeight.isEnabled())
+            btnDecWeight.setEnabled(true);
+    }
+
+    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    public void onWeightChanged(CharSequence s, int start, int before, int count) {
+        float weight;
+        if (!s.toString().isEmpty()) {
+            weight = Float.valueOf(s.toString());
+            equipmentView.setup(weight, currSet.getEquip());
+        } else
+            weight = currSet.getMinWeight();
+
+        if (currSet.setWeight(weight))
+            btnDecWeight.setEnabled(false);
+    }
+    // =TextWatcher=Handling========================================================================
 
     // Click Handling
     // ============================================================================================
@@ -256,7 +255,7 @@ public class CurrWorkout extends Fragment {
 
     @OnClick(R.id.tv_timer)
     public void changeTimerState() {
-        if (currTime/1000 != 0) {
+        if (currTime / 1000 != 0) {
             if (countDownTimer == null) {
                 startTimer(currTime);
             } else {
@@ -264,6 +263,7 @@ public class CurrWorkout extends Fragment {
                 countDownTimer = null;
             }
         }
+
     }
 
     @OnClick(R.id.btn_dec_reps)
@@ -303,11 +303,11 @@ public class CurrWorkout extends Fragment {
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
         if (!currSet.getIsWarmup()  && ex_i == exercises.size() - 1 && set_i == sets.size() - 1) {
-                act.finish();
+            act.finish();
         } else {
-
-            countDownTimer.cancel();
-            startTimer(5000);
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+            }
 
             // End of sets
             if (set_i == sets.size()) {
@@ -340,14 +340,25 @@ public class CurrWorkout extends Fragment {
         String setType;
         if (currSet.getIsWarmup()) {
             setType = "Warmup";
+            tvTimer.setText(R.string.start_next_set);
         } else {
             setType = "Main";
+            startTimer(5000);
         }
 
         tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, warmups.size()));
-        tvSetInfo.setText(String.format("Set %s/%s", currSet.getSetNum(), currExercise.getNumSets()));
+        tvSetInfo.setText(String.format(
+                "Set %s/%s",
+                currSet.getSetNum(),
+                currExercise.getNumSets())
+        );
         tvExerciseTitle.setText(currSet.getExName());
+
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(tvExInfo, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(tvSetInfo, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(tvExerciseTitle, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
+        TextViewCompat.setAutoSizeTextTypeWithDefaults(tvTimer, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
     }
 
-    //=Click=Handling==============================================================================
+    //=Click=Handling===============================================================================
 }
