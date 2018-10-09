@@ -81,7 +81,6 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         super.onStart();
 
         workoutNames = workoutHelper.getAllWorkoutNames();
-        workoutNames = workoutHelper.getAllWorkoutNames();
         displayWorkoutList(workoutNames);
     }
 
