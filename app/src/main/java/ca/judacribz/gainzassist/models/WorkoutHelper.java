@@ -182,6 +182,17 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     }
 
 
+    /* Gets all exercise names in the db and returns a list of Strings
+     */
+    public ArrayList<String> getAllExerciseNames(String workoutName) {
+        ArrayList<String> exerciseNames = new ArrayList<>();
+        for (Exercise exercise : getWorkout(workoutName).getExercises()) {
+            exerciseNames.add(exercise.getName());
+        }
+
+        return exerciseNames;
+    }
+
     /* Get a Workout object using the workout name
      */
     public Workout getWorkout(String workoutName) {
