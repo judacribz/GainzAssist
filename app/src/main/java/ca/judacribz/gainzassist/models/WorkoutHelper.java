@@ -5,15 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import static ca.judacribz.gainzassist.activities.start_workout.StartWorkout.workout;
 
 public class WorkoutHelper extends SQLiteOpenHelper {
 
@@ -65,6 +62,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
     // Global Vars
     // ============================================================================================
+    private SQLiteDatabase db;
+    private ContentValues cv;
     private String email;
     private Context context;
     private Gson gson;
@@ -78,6 +77,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         this.context = context;
         this.email = CurrUser.getInstance().getEmail();
 
+        cv = new ContentValues();
         gson = new Gson();
     }
     // ######################################################################################### //
@@ -111,13 +111,23 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
 
     /* Convert Exercise ArrayList to Blob format */
-    private byte[] getBlobFromList(ArrayList<?> list) {
-        return gson.toJson(list).getBytes();
+    private byte[] getBlobFromExercises(ArrayList<Exercise> exercises) {
+        return gson.toJson(exercises).getBytes();
     }
 
     /* Convert Blob of Exercises to Exercise ArrayList format */
-    private ArrayList<?> getListFromBlob(byte[] blob) {
-        return gson.fromJson(new String(blob), new TypeToken<ArrayList<?>>() {}.getType());
+    private ArrayList<Exercise> getExercisesFromBlob(byte[] blob) {
+        return gson.fromJson(new String(blob), new TypeToken<ArrayList<Exercise>>() {}.getType());
+    }
+
+    /* Convert Exercise ArrayList to Blob format */
+    private byte[] getBlobFromSets(ArrayList<Set> sets) {
+        return gson.toJson(sets).getBytes();
+    }
+
+    /* Convert Blob of Exercises to Exercise ArrayList format */
+    private ArrayList<Set> getSetsFromBlob(byte[] blob) {
+        return gson.fromJson(new String(blob), new TypeToken<ArrayList<Set>>() {}.getType());
     }
 
     /* Checks to see if the database exists */
@@ -130,55 +140,54 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     // ============================================================================================
     // CREATE
     // --------------------------------------------------------------------------------------------
-    /* Creates a db entry for the workout
-     */
-    public void addWorkout(Workout workout) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues newValues = new ContentValues();
-
-        newValues.put(WORKOUT_NAME,  workout.getName());
-        newValues.put(EXERCISES,     getBlobFromList(workout.getExercises()));
-        newValues.put(EMAIL,         email);
-
-        db.insert(TABLE_WORKOUTS, null, newValues);
-    }
-
     /* Creates a db entry for each workout in the provided ArrayList
      */
     public void addWorkouts(ArrayList<Workout> workouts) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues newValues;
+        db = this.getWritableDatabase();
+        cv.clear();
+        cv.put(EMAIL, email);
 
         for (Workout workout : workouts) {
-            // put that data into the database
-            newValues = new ContentValues();
-
-            newValues.put(WORKOUT_NAME, workout.getName());
-            newValues.put(EXERCISES, getBlobFromList(workout.getExercises()));
-            newValues.put(EMAIL, email);
-            db.insert(TABLE_WORKOUTS, null, newValues);
+            addWorkout(workout, true);
         }
+    }
+
+    /* Creates a db entry for the workout
+     */
+    public void addWorkout(Workout workout, boolean dbProvided) {
+
+        if (!dbProvided) {
+            db = this.getWritableDatabase();
+            cv.clear();
+
+            cv.put(EMAIL, email);
+        }
+
+        cv.put(WORKOUT_NAME,  workout.getName());
+        cv.put(EXERCISES,     getBlobFromExercises(workout.getExercises()));
+
+        db.insert(TABLE_WORKOUTS, null, cv);
     }
 
     /* Creates a db entry for the session
      */
     public void addSession(Session session) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues newValues = new ContentValues();
+        db = this.getWritableDatabase();
+        cv.clear();
 
         ArrayList<String> exerciseNames = session.getExerciseNames();
         ArrayList<ArrayList<Set>> sets = session.getAllSets();
 
-        newValues.put(TIMESTAMP, session.getTimestamp());
-        newValues.put(WORKOUT_NAME, session.getWorkoutName());
-        newValues.put(EMAIL, email);
+        cv.put(TIMESTAMP, session.getTimestamp());
+        cv.put(WORKOUT_NAME, session.getWorkoutName());
+        cv.put(EMAIL, email);
 
         for (int i = 0; i < exerciseNames.size(); i++) {
-            newValues.put(EXERCISE_NAME, exerciseNames.get(i));
-            newValues.put(SETS, getBlobFromList(sets.get(i)));
+            cv.put(EXERCISE_NAME, exerciseNames.get(i));
+            cv.put(SETS, getBlobFromSets(sets.get(i)));
 
-            db.insert(TABLE_SESSIONS, null, newValues);
-            newValues.clear();
+            db.insert(TABLE_SESSIONS, null, cv);
+            cv.clear();
         }
     }
     // --------------------------------------------------------------------------------------------
@@ -191,7 +200,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         boolean emailExists = false;
 
         if (exists()) {
-            SQLiteDatabase db = this.getReadableDatabase();
+            db = this.getReadableDatabase();
 
             // Get unique workout names
             String[] column = new String[]{EMAIL};
@@ -222,7 +231,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Check if a workout exists in the database
      */
     public boolean workoutExists(String workoutName) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        db = this.getReadableDatabase();
         Workout workout = null;
 
         String[] columns   = new String[] {EXERCISES};
@@ -250,7 +259,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Get a Workout object using the workout name
      */
     public Workout getWorkout(String workoutName) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        db = this.getReadableDatabase();
         ArrayList<Exercise> exercises = new ArrayList<>();
         Workout workout = null;
 
@@ -262,7 +271,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
 
-            exercises = (ArrayList<Exercise>) getListFromBlob(cursor.getBlob(0));
+            exercises = (ArrayList<Exercise>) getExercisesFromBlob(cursor.getBlob(0));
 
             if (exercises != null)
                 workout = new Workout(workoutName, exercises);
@@ -275,7 +284,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Gets all workouts in the db and returns a list of Workout objects
      */
     public ArrayList<Workout> getAllWorkouts() {
-        SQLiteDatabase db = this.getReadableDatabase();
+        db = this.getReadableDatabase();
         ArrayList<Workout> workouts = new ArrayList<>();
         ArrayList<Exercise> exercises;
 
@@ -287,7 +296,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                exercises = (ArrayList<Exercise>) getListFromBlob(cursor.getBlob(1));
+                exercises = (ArrayList<Exercise>) getExercisesFromBlob(cursor.getBlob(1));
 
                 if (exercises != null)
                     workouts.add(new Workout(cursor.getString(0), exercises));
@@ -301,7 +310,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Gets all workout names in the db and returns a list of Strings
      */
     public ArrayList<String> getAllWorkoutNames() {
-        SQLiteDatabase db = this.getReadableDatabase();
+        db = this.getReadableDatabase();
         ArrayList<String> workoutNames = new ArrayList<>();
 
         // Get workout names
@@ -329,16 +338,16 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Updates the weight for an exercise in a workout
      */
 //    public boolean updateWeight(String workoutName, String exerciseName, float newWeight) {
-//        SQLiteDatabase db = this.getWritableDatabase();
+//        db = this.getWritableDatabase();
 //
 //
-//        ContentValues newValues = new ContentValues();
-//        newValues.put(WEIGHT, newWeight);
+//        cv.clear();
+//        cv.put(WEIGHT, newWeight);
 //
 //        String where = EMAIL + " = ? AND " + WORKOUT_NAME + " = ? AND " + EXERCISE_NAME + " = ?";
 //        String[] whereArgs = new String[] {email, workoutName, exerciseName};
 //
-//        int numRows = db.update(TABLE_WORKOUTS, newValues, where, whereArgs);
+//        int numRows = db.update(TABLE_WORKOUTS, cv, where, whereArgs);
 //
 //        return (numRows == 1);
 //    }
@@ -348,7 +357,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Deletes a workout
      */
     public boolean deleteWorkout(String workoutName) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        db = this.getWritableDatabase();
 
         String where       = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
         String[] whereArgs = new String[] {workoutName, email};
@@ -360,7 +369,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Deletes all workouts
      */
     public void deleteAllWorkouts() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        db = this.getWritableDatabase();
 
         db.delete(TABLE_WORKOUTS, "", new String[] {});
     }

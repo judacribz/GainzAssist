@@ -162,7 +162,7 @@ public class Database {
                     Workout workout = new Workout(workoutShot.getKey(), exercises);
 
                     // Add workout name and exercises list to workouts list
-                    workoutHelper.addWorkout(workout);
+                    workoutHelper.addWorkout(workout, false);
                 }
             }
 

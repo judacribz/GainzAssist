@@ -265,7 +265,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
 
                 workout = new Workout(getTextString(etWorkoutName), exercises);
 
-                workoutHelper.addWorkout(workout);
+                workoutHelper.addWorkout(workout, false);
                 addWorkoutFirebase(workout);
 
                 discardWorkout();
