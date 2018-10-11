@@ -32,6 +32,22 @@ public class Session {
         this.exerciseNames = (new WorkoutHelper(context)).getAllExerciseNames(workoutName);
     }
 
+    public String getWorkoutName() {
+        return workoutName;
+    }
+
+    public ArrayList<String> getExerciseNames() {
+        return exerciseNames;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public ArrayList<ArrayList<Set>> getAllSets() {
+        return allSets;
+    }
+
     /* Helper function used to store Session information in the firebase db */
     Map<String, Object> toMap() {
         Map<String, Object> session = new HashMap<>();
