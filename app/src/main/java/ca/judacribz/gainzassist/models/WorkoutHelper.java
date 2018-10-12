@@ -142,27 +142,22 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     // --------------------------------------------------------------------------------------------
     /* Creates a db entry for each workout in the provided ArrayList
      */
-    public void addWorkouts(ArrayList<Workout> workouts) {
-        db = this.getWritableDatabase();
-        cv.clear();
-        cv.put(EMAIL, email);
-
-        for (Workout workout : workouts) {
-            addWorkout(workout, true);
-        }
-    }
+//    public void addWorkouts(ArrayList<Workout> workouts) {
+//        db = this.getWritableDatabase();
+//        cv.clear();
+//        cv.put(EMAIL, email);
+//
+//        for (Workout workout : workouts) {
+//            addWorkout(workout, true);
+//        }
+//    }
 
     /* Creates a db entry for the workout
      */
-    public void addWorkout(Workout workout, boolean dbProvided) {
-
-        if (!dbProvided) {
-            db = this.getWritableDatabase();
-            cv.clear();
-
-            cv.put(EMAIL, email);
-        }
-
+    public void addWorkout(Workout workout) {
+        db = this.getWritableDatabase();
+        cv.clear();
+        cv.put(EMAIL, email);
         cv.put(WORKOUT_NAME,  workout.getName());
         cv.put(EXERCISES,     getBlobFromExercises(workout.getExercises()));
 

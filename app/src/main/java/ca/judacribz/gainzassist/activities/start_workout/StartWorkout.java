@@ -12,10 +12,13 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import butterknife.*;
 import java.util.ArrayList;
 
@@ -152,35 +155,46 @@ public class StartWorkout extends AppCompatActivity {
     public void genWarmups() {
         ArrayList<Exercise> exercises = workout.getExercises();
         ArrayList<Exercise> warmups = new ArrayList<>();
+        ArrayList<Set> sets = new ArrayList<>();
 
-        float oneRepMax;
-        Exercise exercise;
-        for (int i = 0; i < exercises.size(); i++) {
-            exercise = exercises.get(i);
+        float oneRepMax, minWeight, weight, percWeight, newWeight;
+        int reps, setNum = 0;
+        String equip;
+
+        for (Exercise exercise: exercises) {
+            equip = exercise.getEquipment();
+            minWeight = getString(R.string.barbell).equals(equip.toLowerCase()) ? 45f : 0f;
+            weight = exercise.getAvgWeight();
+            if (weight == minWeight)
+                continue;
+
             oneRepMax = getOneRepMax(exercise.getAvgReps(), exercise.getAvgWeight());
-            float minWeight = 0f;
-            int reps = exercise.getAvgReps();
-            String equip = exercise.getEquipment();
-            if (equip.equals(getString(R.string.barbell))) {
-                minWeight = 45f;
-            }
-            ArrayList<Set> sets = new ArrayList<>();
-            int ind = 1;
-            while (reps > 0) {
-                sets.add(new Set(ind++, reps, 0.0f));
-                reps -= 2;
-            }
+            reps = exercise.getAvgReps();
 
-            Set set;
-            float percent = 0.5f;
-            float increments = 0.3f / (float) (sets.size() - 1);
-            float weight = exercise.getAvgWeight();
-            for (int j = 0; j < sets.size(); j++) {
-                set = sets.get(j);
-                set.setWeight(Math.max(percent * weight, minWeight));
-                sets.set(j, set);
-                percent += increments;
-            }
+            percWeight = minWeight/weight;
+            sets.add(new Set(setNum++, reps, minWeight));
+            do {
+                newWeight = percWeight*weight;
+                newWeight -= newWeight % 5;
+                sets.add(new Set(setNum++, reps, newWeight));
+
+                percWeight += 0.2f;
+                if (reps - 2 > 0)
+                    reps -= 2;
+                else if (reps - 1 > 0)
+                    --reps;
+
+//            while (weightAmt > minWeight && weightAmt < weight) {
+//                set = sets.get(j);
+//                weightAmt = (int) (percent * weight);
+//                weightAmt -= weightAmt % 5;
+//                Log.d("START_WORKOUT", "genWarmups: " + minWeight);
+//                set.setWeight(Math.max((float) weightAmt, minWeight));
+//                sets.set(j, set);
+//                percent += increments;
+//            }
+
+            } while (percWeight < 0.9);
 
             warmups.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets));
         }
