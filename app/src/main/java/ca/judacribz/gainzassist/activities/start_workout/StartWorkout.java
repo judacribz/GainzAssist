@@ -72,11 +72,10 @@ public class StartWorkout extends AppCompatActivity {
         layInflater = getLayoutInflater();
 
         genWarmups();
-        setupPager();
     }
 
     /* Setup fragments with page with icons for the tab bar */
-    private void setupPager() {
+    private void setupPager(Workout workout, ArrayList<Exercise> warmups) {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
@@ -107,7 +106,7 @@ public class StartWorkout extends AppCompatActivity {
             }
         });
 
-        viewPager.setAdapter(new WorkoutPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new WorkoutPagerAdapter(getSupportFragmentManager(), workout, warmups));
         viewPager.setCurrentItem(1);
         viewPager.setOffscreenPageLimit(3);
     }
@@ -200,6 +199,7 @@ public class StartWorkout extends AppCompatActivity {
 
             warmups.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets));
         }
+        setupPager(workout, warmups);
 
         CurrUser.getInstance().setWarmups(warmups);
     }

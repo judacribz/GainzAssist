@@ -43,6 +43,8 @@ import ca.judacribz.gainzassist.models.Workout;
 import static android.support.v4.widget.TextViewCompat.getAutoSizeMaxTextSize;
 import static android.support.v4.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults;
 import static android.widget.TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM;
+import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
+import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.models.CurrSet.MIN_REPS;
 
 public class CurrWorkout extends Fragment {
@@ -56,7 +58,7 @@ public class CurrWorkout extends Fragment {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
-
+    Bundle bundle;
     EquipmentView equipmentView;
     CountDownTimer countDownTimer;
 
@@ -106,6 +108,7 @@ String TAG = "CurrWorkout";
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) context;
+        bundle = this.getArguments();
 
         // get all warmup exercises
         if (currUser.warmupsEmpty()) {
@@ -142,6 +145,11 @@ String TAG = "CurrWorkout";
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
         ButterKnife.bind(this, view);
+
+        if (bundle != null) {
+            warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
+            exercises = ((Workout) bundle.getParcelable(EXTRA_WORKOUT)).getExercises();
+        }
 
         return view;
     }
@@ -332,10 +340,11 @@ String TAG = "CurrWorkout";
 
                 if (currSet.getIsWarmup()) {
                     currExercise = exercises.get(ex_i);
-                } else {
+                } else if (!warmups.isEmpty()){
                     ex_i++;
                     currExercise = warmups.get(ex_i);
                 }
+
                 if (!warmups.isEmpty())
                     currSet.switchSetType();
                 else

@@ -1,10 +1,13 @@
 package ca.judacribz.gainzassist.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Workout {
+public class Workout implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
@@ -42,4 +45,32 @@ public class Workout {
 
         return workout;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(this.exercises);
+        dest.writeString(this.name);
+    }
+
+    protected Workout(Parcel in) {
+        this.exercises = in.createTypedArrayList(Exercise.CREATOR);
+        this.name = in.readString();
+    }
+
+    public static final Parcelable.Creator<Workout> CREATOR = new Parcelable.Creator<Workout>() {
+        @Override
+        public Workout createFromParcel(Parcel source) {
+            return new Workout(source);
+        }
+
+        @Override
+        public Workout[] newArray(int size) {
+            return new Workout[size];
+        }
+    };
 }

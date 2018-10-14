@@ -18,6 +18,8 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Workout;
 
+import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
+
 public class CurrExercises extends Fragment {
 
     // Constants
@@ -28,7 +30,8 @@ public class CurrExercises extends Fragment {
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
     LinearLayout vgSets, vgSubtitle;
-
+    Bundle bundle;
+    Workout workout;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -50,7 +53,7 @@ public class CurrExercises extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) getActivity();
-
+        bundle = getArguments();
     }
 
     @Override
@@ -66,25 +69,19 @@ public class CurrExercises extends Fragment {
        View view =  inflater.inflate(R.layout.fragment_curr_exercises, container, false);
        vgSubtitle = (LinearLayout) view.findViewById(R.id.ll_exercise_attr_insert);
        vgSets = (LinearLayout) view.findViewById(R.id.ll_exercise_sets_insert);
+        if (bundle != null) {
+            workout = bundle.getParcelable(EXTRA_WORKOUT);
+        }
+
+        if (workout != null) {
+            int i = 0;
+            for (Exercise exercise : workout.getExercises()) {
+                act.displaySets(200 + i, exercise.getName(), exercise.getSets(), vgSubtitle, vgSets);
+            }
+        }
+
 
        return view;
-    }
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Workout workout = StartWorkout.workout;
-        ArrayList<Exercise> exercises = workout.getExercises();
-        int exIndex = exercises.size();
-
-        Exercise exercise;
-        for (int i = 0; i < exercises.size(); i++) {
-            exercise = exercises.get(i);
-
-            act.displaySets(100 + i, exercise.getName(), exercise.getSets(), vgSubtitle, vgSets);
-        }
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

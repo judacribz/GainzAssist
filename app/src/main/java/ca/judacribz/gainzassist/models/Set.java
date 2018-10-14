@@ -1,9 +1,12 @@
 package ca.judacribz.gainzassist.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class Set {
+public class Set implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
@@ -62,4 +65,35 @@ public class Set {
 
         return set;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.setNumber);
+        dest.writeInt(this.reps);
+        dest.writeFloat(this.weight);
+    }
+
+    protected Set(Parcel in) {
+        this.setNumber = in.readInt();
+        this.reps = in.readInt();
+        this.weight = in.readFloat();
+    }
+
+    public static final Parcelable.Creator<Set> CREATOR = new Parcelable.Creator<Set>() {
+        @Override
+        public Set createFromParcel(Parcel source) {
+            return new Set(source);
+        }
+
+        @Override
+        public Set[] newArray(int size) {
+            return new Set[size];
+        }
+    };
 }
