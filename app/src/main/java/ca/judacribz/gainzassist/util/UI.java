@@ -47,10 +47,11 @@ public class UI {
     /* Exits app and goes to home screen if back pressed twice from this screen */
     public static void handleBackButton(Context context) {
         if (backPressedTwice) {
-            Intent exitApp = new Intent(Intent.ACTION_MAIN);
-            exitApp.addCategory(Intent.CATEGORY_HOME);
-            exitApp.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(exitApp);
+            context.startActivity(
+                    new Intent(Intent.ACTION_MAIN)
+                    .addCategory(Intent.CATEGORY_HOME)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            );
         } else {
             backPressedTwice = true;
             Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show();

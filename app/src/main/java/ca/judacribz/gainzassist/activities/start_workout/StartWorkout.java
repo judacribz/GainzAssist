@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +24,7 @@ import butterknife.*;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.CurrSet;
 import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
@@ -69,8 +71,8 @@ public class StartWorkout extends AppCompatActivity {
 
         layInflater = getLayoutInflater();
 
-        setupPager();
         genWarmups();
+        setupPager();
     }
 
     /* Setup fragments with page with icons for the tab bar */
@@ -115,6 +117,13 @@ public class StartWorkout extends AppCompatActivity {
         finish();
         return super.onSupportNavigateUp();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        CurrUser.getInstance().clearWarmups();
+    }
+
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds
@@ -158,7 +167,7 @@ public class StartWorkout extends AppCompatActivity {
         ArrayList<Set> sets = new ArrayList<>();
 
         float oneRepMax, minWeight, weight, percWeight, newWeight;
-        int reps, setNum = 0;
+        int reps, setNum = 1;
         String equip;
 
         for (Exercise exercise: exercises) {
@@ -194,7 +203,7 @@ public class StartWorkout extends AppCompatActivity {
 //                percent += increments;
 //            }
 
-            } while (percWeight < 0.9);
+            } while (percWeight < 0.8f);
 
             warmups.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets));
         }

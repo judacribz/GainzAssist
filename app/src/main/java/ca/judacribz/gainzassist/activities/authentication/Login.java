@@ -39,7 +39,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
-import ca.judacribz.gainzassist.async.BGTask;
+import ca.judacribz.gainzassist.async.BGStartActivityTask;
 
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
 
@@ -231,7 +231,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 
             progressBar.setProgress(0);
             progressBar.setVisibility(View.VISIBLE);
-            new BGTask().execute(this, new Intent(this, Main.class));
+            new BGStartActivityTask().execute(this, new Intent(this, Main.class));
 
 
 //            for (UserInfo profile : fbUser.getProviderData()) {

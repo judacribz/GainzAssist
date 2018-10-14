@@ -59,11 +59,12 @@ public class CurrWorkout extends Fragment {
     EquipmentView equipmentView;
     CountDownTimer countDownTimer;
 
-    CurrSet currSet;
+    CurrSet currSet = CurrSet.getInstance();
+    CurrUser currUser = CurrUser.getInstance();
 
     Exercise currExercise;
     ArrayList<Set> sets;
-    ArrayList<Exercise> warmups, exercises;
+    ArrayList<Exercise> warmups = null, exercises;
     int set_i = 0, ex_i = 0;
 
     ArrayList<Exercise> finExercises;
@@ -105,15 +106,23 @@ public class CurrWorkout extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) context;
-        currSet = CurrSet.getInstance();
 
         // get all warmup exercises
-        warmups = CurrUser.getInstance().getWarmups();
-        currExercise = warmups.get(ex_i);
-        sets = currExercise.getSets();
-
+        if (currUser.warmupsEmpty())
+            currSet.setType(false);
+        else {
+            warmups = currUser.getWarmups();
+            Toast.makeText(context, "warmup not empty", Toast.LENGTH_SHORT).show();
+        }
         // get all main exercises
         exercises = StartWorkout.workout.getExercises();
+
+        if (warmups == null || warmups.isEmpty()) {
+            currExercise = exercises.get(ex_i);
+        } else {
+            currExercise = warmups.get(ex_i);
+        }
+        sets = currExercise.getSets();
 
         // init finished workout variables
         finExercises = new ArrayList<>();
@@ -351,7 +360,6 @@ public class CurrWorkout extends Fragment {
     }
 
     public void updateUI() {
-//        String info = "Warmup 1/" + warmups.size() + "\nSet 1/" + currExercise.getNumSets();
         String setType;
         if (currSet.getIsWarmup()) {
             setType = "Warmup";
@@ -368,7 +376,7 @@ public class CurrWorkout extends Fragment {
         if (!lockWeight)
             setWeight();
 
-        tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, warmups.size()));
+        tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, exercises.size()));
         tvSetInfo.setText(String.format(
                 "Set %s/%s",
                 currSet.getSetNum(),

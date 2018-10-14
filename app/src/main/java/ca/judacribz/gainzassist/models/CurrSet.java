@@ -1,5 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
+import android.support.annotation.Nullable;
+
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
@@ -132,6 +134,10 @@ public class CurrSet {
         set.setWeight(weight);
 
         return this.weight == minWeight;
+    }
+
+    public void setType(boolean type) {
+        isWarmup = type;
     }
 
     public float getMinWeight() {

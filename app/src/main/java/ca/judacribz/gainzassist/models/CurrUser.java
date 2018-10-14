@@ -13,7 +13,7 @@ public class CurrUser {
     // --------------------------------------------------------------------------------------------
     private String email;
     private String uid;
-    private ArrayList<Exercise> warmups;
+    private ArrayList<Exercise> warmups = new ArrayList<>();
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -51,6 +51,14 @@ public class CurrUser {
 
     public void setWarmups(ArrayList<Exercise> warmups) {
         this.warmups = warmups;
+    }
+
+    public boolean warmupsEmpty() {
+        return warmups.isEmpty();
+    }
+
+    public void clearWarmups() {
+        warmups.clear();
     }
 
     // ============================================================================================
