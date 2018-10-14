@@ -19,8 +19,6 @@ public class CurrSet {
     private static final float BB_WEIGHT_CHANGE = 5.0f;
     private static final float WEIGHT_CHANGE = 2.5f;
     public static final int MIN_REPS = 0;
-
-    public static final int MIN_REACHED = 1001;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -29,7 +27,6 @@ public class CurrSet {
     private Set set;
     private int setNum, reps;
     private float weight, minWeight = MIN_WEIGHT, weightChange = WEIGHT_CHANGE;
-
     private boolean isWarmup = true;
     // --------------------------------------------------------------------------------------------
 
@@ -80,7 +77,6 @@ public class CurrSet {
             this.minWeight = MIN_WEIGHT;
             this.weightChange = WEIGHT_CHANGE;
         }
-
     }
 
     public Set getSet() {
@@ -134,10 +130,6 @@ public class CurrSet {
         set.setWeight(weight);
 
         return this.weight == minWeight;
-    }
-
-    public void setType(boolean type) {
-        isWarmup = type;
     }
 
     public float getMinWeight() {

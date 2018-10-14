@@ -11,6 +11,7 @@ import android.support.v4.widget.TextViewCompat;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,12 +65,11 @@ public class CurrWorkout extends Fragment {
 
     Exercise currExercise;
     ArrayList<Set> sets;
-    ArrayList<Exercise> warmups = null, exercises;
+    ArrayList<Exercise> warmups = new ArrayList<>(),
+                        exercises = new ArrayList<>();
     int set_i = 0, ex_i = 0;
 
     ArrayList<Exercise> finExercises;
-
-    boolean lockReps = false, lockWeight = false;
 
     // --------------------------------------------------------------------------------------------
     // UI Elements
@@ -99,7 +99,7 @@ public class CurrWorkout extends Fragment {
         return new CurrWorkout();
     }
     // ######################################################################################### //
-
+String TAG = "CurrWorkout";
     // Fragment Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -108,16 +108,17 @@ public class CurrWorkout extends Fragment {
         act = (StartWorkout) context;
 
         // get all warmup exercises
-        if (currUser.warmupsEmpty())
-            currSet.setType(false);
-        else {
+        if (currUser.warmupsEmpty()) {
+            if (currSet.getIsWarmup()) {
+                currSet.switchSetType();
+            }
+        } else {
             warmups = currUser.getWarmups();
-            Toast.makeText(context, "warmup not empty", Toast.LENGTH_SHORT).show();
         }
         // get all main exercises
         exercises = StartWorkout.workout.getExercises();
 
-        if (warmups == null || warmups.isEmpty()) {
+        if (warmups.isEmpty()) {
             currExercise = exercises.get(ex_i);
         } else {
             currExercise = warmups.get(ex_i);
@@ -198,7 +199,6 @@ public class CurrWorkout extends Fragment {
                 seconds = seconds % 60;
 
                 tvTimer.setText((minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds)));
-                TextViewCompat.setAutoSizeTextTypeWithDefaults(tvTimer, TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
             }
 
             // Changes the timer text, when it gets to 0:00, to "Start the next set"
@@ -212,6 +212,10 @@ public class CurrWorkout extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+
+        if (!currSet.getIsWarmup())
+            currSet.switchSetType();
+
         set_i = 0;
         ex_i = 0;
         if (countDownTimer != null)
@@ -224,9 +228,6 @@ public class CurrWorkout extends Fragment {
     // =============================================================================================
     @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
-        if (!currSet.getIsWarmup())
-            lockReps = true;
-
         if (!btnDecReps.isEnabled())
             btnDecReps.setEnabled(true);
     }
@@ -247,9 +248,6 @@ public class CurrWorkout extends Fragment {
     // TextWatcher for weight ET
     @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeWeightChanged() {
-        if (!currSet.getIsWarmup())
-            lockWeight = true;
-
         if (!btnDecWeight.isEnabled())
             btnDecWeight.setEnabled(true);
     }
@@ -335,12 +333,13 @@ public class CurrWorkout extends Fragment {
                 if (currSet.getIsWarmup()) {
                     currExercise = exercises.get(ex_i);
                 } else {
-                    lockReps = false;
-                    lockWeight = false;
                     ex_i++;
                     currExercise = warmups.get(ex_i);
                 }
-                currSet.switchSetType();
+                if (!warmups.isEmpty())
+                    currSet.switchSetType();
+                else
+                    ex_i++;
                 sets = currExercise.getSets();
             }
 
@@ -364,17 +363,13 @@ public class CurrWorkout extends Fragment {
         if (currSet.getIsWarmup()) {
             setType = "Warmup";
             tvTimer.setText(R.string.start_next_set);
-
         } else {
             setType = "Main";
             startTimer(5000);
         }
 
-        if (!lockReps)
-            setReps();
-
-        if (!lockWeight)
-            setWeight();
+        setReps();
+        setWeight();
 
         tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, exercises.size()));
         tvSetInfo.setText(String.format(

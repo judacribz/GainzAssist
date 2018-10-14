@@ -131,7 +131,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     }
 
     /* Checks to see if the database exists */
-    private boolean exists() {
+    public boolean exists() {
         return (new File(context.getDatabasePath(TABLE_WORKOUTS).toString())).exists();
     }
 
@@ -189,40 +189,6 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
     // RETRIEVE
     // --------------------------------------------------------------------------------------------
-    /* Checks if user's email exists in db
-     */
-    public boolean emailExists() {
-        boolean emailExists = false;
-
-        if (exists()) {
-            db = this.getReadableDatabase();
-
-            // Get unique workout names
-            String[] column = new String[]{EMAIL};
-            String where = EMAIL + " = ?";
-            String[] whereArgs = new String[]{email};
-
-            Cursor workoutCursor = db.query(
-                    true, // true for unique
-                    TABLE_WORKOUTS,
-                    column,
-                    where,
-                    whereArgs,
-                    EMAIL,
-                    null,
-                    null,
-                    null
-            );
-
-            if (workoutCursor.getCount() == 1) {
-                emailExists = true;
-            }
-            workoutCursor.close();
-        }
-
-        return emailExists;
-    }
-
     /* Check if a workout exists in the database
      */
     public boolean workoutExists(String workoutName) {

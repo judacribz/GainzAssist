@@ -164,13 +164,16 @@ public class StartWorkout extends AppCompatActivity {
     public void genWarmups() {
         ArrayList<Exercise> exercises = workout.getExercises();
         ArrayList<Exercise> warmups = new ArrayList<>();
-        ArrayList<Set> sets = new ArrayList<>();
+        ArrayList<Set> sets;
 
         float oneRepMax, minWeight, weight, percWeight, newWeight;
-        int reps, setNum = 1;
+        int reps, setNum;
         String equip;
 
         for (Exercise exercise: exercises) {
+            sets = new ArrayList<>();
+            setNum = 1;
+
             equip = exercise.getEquipment();
             minWeight = getString(R.string.barbell).equals(equip.toLowerCase()) ? 45f : 0f;
             weight = exercise.getAvgWeight();
@@ -192,16 +195,6 @@ public class StartWorkout extends AppCompatActivity {
                     reps -= 2;
                 else if (reps - 1 > 0)
                     --reps;
-
-//            while (weightAmt > minWeight && weightAmt < weight) {
-//                set = sets.get(j);
-//                weightAmt = (int) (percent * weight);
-//                weightAmt -= weightAmt % 5;
-//                Log.d("START_WORKOUT", "genWarmups: " + minWeight);
-//                set.setWeight(Math.max((float) weightAmt, minWeight));
-//                sets.set(j, set);
-//                percent += increments;
-//            }
 
             } while (percWeight < 0.8f);
 
