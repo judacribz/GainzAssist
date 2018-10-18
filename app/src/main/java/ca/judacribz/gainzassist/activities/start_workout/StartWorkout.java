@@ -79,6 +79,7 @@ public class StartWorkout extends AppCompatActivity {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
+
             Drawable icon;
             @Override
             public void onTabSelected(Tab tab) {

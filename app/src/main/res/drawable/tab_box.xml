@@ -4,21 +4,20 @@
 
     <gradient
         android:type="linear"
-        android:startColor="@color/colorBg"
-        android:endColor="@color/colorAccent"
+        android:startColor="@color/colorAccent"
+        android:endColor="@color/colorBg"
         android:angle="45"/>
 
     <gradient
         android:type="radial"
-        android:centerX="50%"
-        android:centerY="50%"
-        android:startColor="@color/colorBg"
         android:endColor="@color/colorAccent"
-        android:gradientRadius="1000"/>
+        android:startColor="@color/colorBg"
+        android:gradientRadius="400"/>
 
     <stroke
         android:width="2dp"
-        android:color="@color/colorAccent" />
+        android:color="@color/colorBg" />
+
     <corners
-        android:radius="5dp"/>
+        android:radius="2dp" />
 </shape>

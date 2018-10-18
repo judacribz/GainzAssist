@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -22,13 +23,15 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorBg"
         android:layout_alignParentBottom="true">
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tlay_navbar"
             android:layout_width="match_parent"
+            app:tabPadding="2dp"
             android:layout_height="wrap_content"
-            app:tabBackground="@drawable/touch_anim_ripple"
+            app:tabBackground="@drawable/anim_tab_ripple"
             app:tabIndicatorColor="@color/colorTitle"
             app:tabIndicatorHeight="2dp"
             app:tabSelectedTextColor="@color/colorTitle"
@@ -56,6 +59,4 @@
                 android:text="@string/exercises" />
         </android.support.design.widget.TabLayout>
     </android.support.design.widget.AppBarLayout>
-
-
 </RelativeLayout>

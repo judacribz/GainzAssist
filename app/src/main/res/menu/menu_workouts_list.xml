@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/touch_anim_ripple"
+    android:background="@drawable/anim_button_ripple"
     tools:context=".activities.workouts_list.WorkoutsList">
 
     <!-- Resources:

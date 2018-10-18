@@ -22,7 +22,7 @@
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:gravity="center"
             android:padding="1dp"
             android:text="@string/how_to"
@@ -60,7 +60,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:autoSizeTextType="uniform"
                 android:background="@color/colorAccent"
                 android:gravity="center"
                 android:textColor="@android:color/holo_red_dark"/>
@@ -70,7 +69,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:autoSizeTextType="uniform"
                 android:background="@color/colorAccent"
                 android:gravity="center"
                 android:textColor="@android:color/holo_red_dark"/>
@@ -128,7 +126,7 @@
             android:layout_alignTop="@id/et_curr_reps"
             android:layout_alignBottom="@id/et_curr_reps"
             android:layout_toStartOf="@id/et_curr_reps"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
@@ -138,7 +136,7 @@
             android:layout_alignTop="@id/et_curr_reps"
             android:layout_alignBottom="@id/et_curr_reps"
             android:layout_toEndOf="@id/et_curr_reps"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_plus"/>
 
         <EditText
@@ -161,7 +159,7 @@
             android:layout_alignTop="@id/et_curr_weight"
             android:layout_alignBottom="@id/et_curr_weight"
             android:layout_toStartOf="@id/et_curr_weight"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
@@ -171,7 +169,7 @@
             android:layout_alignTop="@id/et_curr_weight"
             android:layout_alignBottom="@id/et_curr_weight"
             android:layout_toEndOf="@id/et_curr_weight"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_plus"/>
     </RelativeLayout>
 
@@ -190,7 +188,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:gravity="center"
             android:text="@string/cancel_set"
             android:textColor="@drawable/selector_btn_text_default"
@@ -202,7 +200,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:background="@drawable/touch_anim_ripple"
+            android:background="@drawable/anim_button_ripple"
             android:gravity="center"
             android:text="@string/finish_set"
             android:textColor="@drawable/selector_btn_text_default"

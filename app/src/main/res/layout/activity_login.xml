@@ -111,7 +111,7 @@
         android:layout_above="@id/rlay_login_content"
         android:layout_alignEnd="@id/et_email"
         android:layout_alignStart="@id/et_email"
-        android:background="@drawable/touch_anim_ripple"
+        android:background="@drawable/anim_button_ripple"
         android:text="@string/login"
         android:textColor="@drawable/selector_btn_text_default"/>
 
@@ -123,7 +123,7 @@
         android:layout_above="@id/rlay_login_content"
         android:layout_alignEnd="@id/et_email"
         android:layout_alignStart="@id/et_email"
-        android:background="@drawable/touch_anim_ripple"
+        android:background="@drawable/anim_button_ripple"
         android:text="@string/sign_up"
         android:textColor="@drawable/selector_btn_text_default"
         android:visibility="invisible"/>
