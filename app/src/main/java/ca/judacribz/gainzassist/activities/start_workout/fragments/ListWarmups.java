@@ -3,24 +3,21 @@ package ca.judacribz.gainzassist.activities.start_workout.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.CurrUser;
 
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 
-public class CurrWarmups extends Fragment {
+public class ListWarmups extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -34,14 +31,14 @@ public class CurrWarmups extends Fragment {
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // CurrWarmups Constructor/Instance                                                        //
+    // ListWarmups Constructor/Instance                                                        //
     // ######################################################################################### //
-    public CurrWarmups() {
+    public ListWarmups() {
         // Required empty public constructor
     }
 
-    public static CurrWarmups newInstance() {
-        return new CurrWarmups();
+    public static ListWarmups newInstance() {
+        return new ListWarmups();
     }
 
     // ######################################################################################### //

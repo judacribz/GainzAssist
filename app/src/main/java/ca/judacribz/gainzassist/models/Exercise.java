@@ -13,14 +13,20 @@ public class Exercise implements Parcelable {
     // --------------------------------------------------------------------------------------------
     private String name, type, equipment;
     private ArrayList<Set> sets;
+
+    public enum SetsType {
+        WARMUP_SET,
+        MAIN_SET
+    }
+    private SetsType setsType = null;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
     // Exercise Constructors                                                                     //
     // ######################################################################################### //
     // ######################################################################################### //
-    /* Required empty constructor for firebase */
     public Exercise() {
+        /* Required empty constructor for Firebase */
     }
 
     public Exercise(String name, String type, String equipment, ArrayList<Set> sets) {
@@ -28,6 +34,11 @@ public class Exercise implements Parcelable {
         this.type      = type;
         this.equipment = equipment;
         this.sets      = sets;
+    }
+
+    public Exercise(String name, String type, String equipment, ArrayList<Set> sets, SetsType setsType) {
+        this(name, type, equipment, sets);
+        setSetsType(setsType);
     }
     // ============================================================================================
 
@@ -67,6 +78,14 @@ public class Exercise implements Parcelable {
 
     public int getNumSets() {
         return sets.size();
+    }
+
+    public void setSetsType(SetsType setsType) {
+        this.setsType = setsType;
+    }
+
+    public SetsType getSetsType() {
+        return setsType;
     }
 
     public float getAvgWeight() {

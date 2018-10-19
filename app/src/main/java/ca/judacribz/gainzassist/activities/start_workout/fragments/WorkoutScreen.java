@@ -2,17 +2,10 @@ package ca.judacribz.gainzassist.activities.start_workout.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.TextViewCompat;
-import android.support.v7.widget.AppCompatTextView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -29,25 +21,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTextChanged;
-import butterknife.Optional;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
-import ca.judacribz.gainzassist.models.CurrSet;
+import ca.judacribz.gainzassist.models.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.Workout;
 
-import static android.support.v4.widget.TextViewCompat.getAutoSizeMaxTextSize;
-import static android.support.v4.widget.TextViewCompat.setAutoSizeTextTypeWithDefaults;
-import static android.widget.TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM;
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
-import static ca.judacribz.gainzassist.models.CurrSet.MIN_REPS;
+import static ca.judacribz.gainzassist.models.CurrWorkout.MIN_REPS;
 
-public class CurrWorkout extends Fragment {
+public class WorkoutScreen extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -61,8 +49,9 @@ public class CurrWorkout extends Fragment {
     Bundle bundle;
     EquipmentView equipmentView;
     CountDownTimer countDownTimer;
+    long currTime;
 
-    CurrSet currSet = CurrSet.getInstance();
+    CurrWorkout currWorkout = CurrWorkout.getInstance();
     CurrUser currUser = CurrUser.getInstance();
 
     Exercise currExercise;
@@ -91,42 +80,23 @@ public class CurrWorkout extends Fragment {
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // CurrWorkout Constructor/Instance                                                          //
+    // WorkoutScreen Constructor/Instance                                                          //
     // ######################################################################################### //
-    public CurrWorkout() {
+    public WorkoutScreen() {
         // Required empty public constructor
     }
 
-    public static CurrWorkout newInstance() {
-        return new CurrWorkout();
+    public static WorkoutScreen newInstance() {
+        return new WorkoutScreen();
     }
     // ######################################################################################### //
-String TAG = "CurrWorkout";
+String TAG = "WorkoutScreen";
     // Fragment Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) context;
-        bundle = this.getArguments();
-
-        // get all warmup exercises
-        if (currUser.warmupsEmpty()) {
-            if (currSet.getIsWarmup()) {
-                currSet.switchSetType();
-            }
-        } else {
-            warmups = currUser.getWarmups();
-        }
-        // get all main exercises
-        exercises = StartWorkout.workout.getExercises();
-
-        if (warmups.isEmpty()) {
-            currExercise = exercises.get(ex_i);
-        } else {
-            currExercise = warmups.get(ex_i);
-        }
-        sets = currExercise.getSets();
 
         // init finished workout variables
         finExercises = new ArrayList<>();
@@ -146,11 +116,6 @@ String TAG = "CurrWorkout";
         View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
         ButterKnife.bind(this, view);
 
-        if (bundle != null) {
-            warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
-            exercises = ((Workout) bundle.getParcelable(EXTRA_WORKOUT)).getExercises();
-        }
-
         return view;
     }
 
@@ -159,8 +124,6 @@ String TAG = "CurrWorkout";
         super.onResume();
 
         setupEquipView();
-        setReps();
-        setWeight();
         updateUI();
     }
 
@@ -179,7 +142,7 @@ String TAG = "CurrWorkout";
         equipmentView.post(new Runnable() {
             @Override
             public void run() {
-                equipmentView.setup(currSet.getWeight(), currSet.getEquip());
+                equipmentView.setup(currWorkout.getWeight(), currWorkout.getEquip());
             }
         });
     }
@@ -192,7 +155,6 @@ String TAG = "CurrWorkout";
     /* Creates and returns a new CountDownTimer with the rest time to count down from. Has the
      * following format: 0:00
      */
-    long currTime;
     CountDownTimer getCountDownTimer(long milliseconds) {
 
         return new CountDownTimer(milliseconds, 1000) {
@@ -220,14 +182,6 @@ String TAG = "CurrWorkout";
     @Override
     public void onStop() {
         super.onStop();
-
-        if (!currSet.getIsWarmup())
-            currSet.switchSetType();
-
-        set_i = 0;
-        ex_i = 0;
-        if (countDownTimer != null)
-            countDownTimer.cancel();
     }
 
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
@@ -249,7 +203,7 @@ String TAG = "CurrWorkout";
         else
             reps = MIN_REPS;
 
-        if (currSet.setReps(reps))
+        if (currWorkout.setReps(reps))
             btnDecReps.setEnabled(false);
     }
 
@@ -265,22 +219,21 @@ String TAG = "CurrWorkout";
         float weight;
         if (!s.toString().isEmpty()) {
             weight = Float.valueOf(s.toString());
-            equipmentView.setup(weight, currSet.getEquip());
+            equipmentView.setup(weight, currWorkout.getEquip());
         } else
-            weight = currSet.getMinWeight();
+            weight = currWorkout.getMinWeight();
 
-        if (currSet.setWeight(weight))
+        if (currWorkout.setWeight(weight))
             btnDecWeight.setEnabled(false);
     }
     // =TextWatcher=Handling========================================================================
 
     // Click Handling
     // =============================================================================================
-    // YouTube Vids on how to do an exercise
     @OnClick(R.id.btn_how_to)
     public void startWorkoutsList() {
         Intent intent = new Intent(act, HowToVideos.class);
-        intent.putExtra(EXTRA_HOW_TO_VID, currSet.getExName());
+        intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.getExName());
         startActivity(intent);
     }
 
@@ -301,10 +254,10 @@ String TAG = "CurrWorkout";
     public void changeReps(ImageButton repsBtn) {
         switch (repsBtn.getId()) {
             case R.id.btn_inc_reps:
-                currSet.incReps();
+                currWorkout.incReps();
                 break;
             case R.id.btn_dec_reps:
-                currSet.decReps();
+                currWorkout.decReps();
                 break;
         }
         setReps();
@@ -315,10 +268,10 @@ String TAG = "CurrWorkout";
     public void changeWeight(ImageButton weightBtn) {
         switch (weightBtn.getId()) {
             case R.id.btn_inc_weight:
-                currSet.incWeight();
+                currWorkout.incWeight();
                 break;
             case R.id.btn_dec_weight:
-                currSet.decWeight();
+                currWorkout.decWeight();
                 break;
         }
         setWeight();
@@ -326,30 +279,11 @@ String TAG = "CurrWorkout";
 
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
-        if (!currSet.getIsWarmup()  && ex_i == exercises.size() - 1 && set_i == sets.size() - 1) {
+        if (!currWorkout.getIsWarmup()  && ex_i == exercises.size() - 1 && set_i == sets.size() - 1) {
             act.finish();
         } else {
             if (countDownTimer != null) {
                 countDownTimer.cancel();
-            }
-
-            // End of sets
-            if (set_i == sets.size()) {
-                set_i = 0;
-
-
-                if (currSet.getIsWarmup()) {
-                    currExercise = exercises.get(ex_i);
-                } else if (!warmups.isEmpty()){
-                    ex_i++;
-                    currExercise = warmups.get(ex_i);
-                }
-
-                if (!warmups.isEmpty())
-                    currSet.switchSetType();
-                else
-                    ex_i++;
-                sets = currExercise.getSets();
             }
 
             setCurrSet();
@@ -357,19 +291,9 @@ String TAG = "CurrWorkout";
         }
     }
 
-    public void setCurrSet() {
-        currSet.setExName(currExercise.getName());
-        currSet.setEquip(currExercise.getEquipment());
-
-        Set set = sets.get(set_i);
-        set_i++;
-
-        currSet.setSet(set);
-    }
-
     public void updateUI() {
         String setType;
-        if (currSet.getIsWarmup()) {
+        if (currWorkout.getIsWarmup()) {
             setType = "Warmup";
             tvTimer.setText(R.string.start_next_set);
         } else {
@@ -383,21 +307,17 @@ String TAG = "CurrWorkout";
         tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, exercises.size()));
         tvSetInfo.setText(String.format(
                 "Set %s/%s",
-                currSet.getSetNum(),
+                currWorkout.getSetNum(),
                 currExercise.getNumSets())
         );
-        tvExerciseTitle.setText(currSet.getExName());
+        tvExerciseTitle.setText(currWorkout.getExName());
 
-    }
-
-    public void setReps() {
-        etCurrReps.setText(String.valueOf(currSet.getReps()));
     }
 
     public void setWeight() {
-        float weight = currSet.getWeight();
+        float weight = currWorkout.getWeight();
         etCurrWeight.setText(String.valueOf(weight));
-        equipmentView.setup(weight, currSet.getEquip());
+        equipmentView.setup(weight, currWorkout.getEquip());
     }
 
     //=Click=Handling===============================================================================

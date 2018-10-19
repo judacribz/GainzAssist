@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.start_workout.fragments.CurrWorkout">
+    tools:context=".activities.start_workout.fragments.WorkoutScreen">
 
     <!--Resources:
         http://www.fontspace.com/category/athletic -->

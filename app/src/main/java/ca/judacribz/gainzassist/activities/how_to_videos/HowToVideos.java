@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 
-import static ca.judacribz.gainzassist.activities.start_workout.fragments.CurrWorkout.EXTRA_HOW_TO_VID;
+import static ca.judacribz.gainzassist.activities.start_workout.fragments.WorkoutScreen.EXTRA_HOW_TO_VID;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class HowToVideos extends AppCompatActivity

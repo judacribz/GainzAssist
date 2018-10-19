@@ -3,15 +3,11 @@ package ca.judacribz.gainzassist.activities.start_workout.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
@@ -20,7 +16,7 @@ import ca.judacribz.gainzassist.models.Workout;
 
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
 
-public class CurrExercises extends Fragment {
+public class ListExercises extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -35,14 +31,14 @@ public class CurrExercises extends Fragment {
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // CurrExercises Constructor/Instance                                                        //
+    // ListExercises Constructor/Instance                                                        //
     // ######################################################################################### //
-    public CurrExercises() {
+    public ListExercises() {
         // Required empty public constructor
     }
 
-    public static CurrExercises newInstance() {
-        return new CurrExercises();
+    public static ListExercises newInstance() {
+        return new ListExercises();
     }
     // ######################################################################################### //
 

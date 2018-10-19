@@ -1,18 +1,18 @@
 package ca.judacribz.gainzassist.models;
 
-import android.support.annotation.Nullable;
-
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 
-import static android.support.v4.content.res.TypedArrayUtils.getString;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
+import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 
-public class CurrSet {
+public class CurrWorkout {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    private static final CurrSet INST = new CurrSet();
+    private static final CurrWorkout INST = new CurrWorkout();
+
     private static final String BARBELL = "barbell";
     private static final float BB_MIN_WEIGHT = 45.0f;
     private static final float MIN_WEIGHT = 0.0f;
@@ -23,21 +23,74 @@ public class CurrSet {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    private Workout workout;
     private String workName, exName, exType, equip;
     private Set set;
     private int setNum, reps;
     private float weight, minWeight = MIN_WEIGHT, weightChange = WEIGHT_CHANGE;
     private boolean isWarmup = true;
+    private ArrayList<Exercise> exercises, allExs;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // CurrSet Constructor/Instance                                                     //
+    // WorkoutScreen Constructor/Instance                                                     //
     // ######################################################################################### //
-    private CurrSet() {
+    private CurrWorkout() {
     }
 
-    public static CurrSet getInstance() {
+    public static CurrWorkout getInstance() {
         return INST;
+    }
+
+    public void setWorkout(Workout workout) {
+        setWorkName(workout.getName());
+        this.exercises = workout.getExercises();
+
+        genWarmups();
+    }
+
+    public void genWarmups() {
+        allExs = new ArrayList<>();
+        ArrayList<Set> sets;
+
+        float oneRepMax, minWeight, weight, percWeight, newWeight;
+        int reps, setNum;
+        String equip;
+
+        for (Exercise exercise: exercises) {
+            exercise.setSetsType(MAIN_SET);
+            sets = new ArrayList<>();
+            setNum = 1;
+
+            equip = exercise.getEquipment();
+            minWeight = BARBELL.equals(equip.toLowerCase()) ? 45f : 0f;
+            weight = exercise.getAvgWeight();
+            if (weight == minWeight) {
+                allExs.add(exercise);
+                continue;
+            }
+
+            oneRepMax = getOneRepMax(exercise.getAvgReps(), exercise.getAvgWeight());
+            reps = exercise.getAvgReps();
+
+            percWeight = minWeight/weight;
+            sets.add(new Set(setNum++, reps, minWeight));
+            do {
+                newWeight = percWeight*weight;
+                newWeight -= newWeight % 5;
+                sets.add(new Set(setNum++, reps, newWeight));
+
+                percWeight += 0.2f;
+                if (reps - 2 > 0)
+                    reps -= 2;
+                else if (reps - 1 > 0)
+                    --reps;
+
+            } while (percWeight < 0.8f);
+
+            allExs.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets, WARMUP_SET));
+            allExs.add(exercise);
+        }
     }
 
     public String getWorkName() {
