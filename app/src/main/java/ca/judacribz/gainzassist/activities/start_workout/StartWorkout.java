@@ -73,12 +73,12 @@ public class StartWorkout extends AppCompatActivity {
             currWorkout = CurrWorkout.getInstance();
             currWorkout.setWorkout(workout);
 
-            setupPager(workout, currWorkout.getWarmups());
+            setupPager();
         }
     }
 
     /* Setup fragments with page with icons for the tab bar */
-    private void setupPager(Workout workout, ArrayList<Exercise> warmups) {
+    private void setupPager() {
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
@@ -110,7 +110,11 @@ public class StartWorkout extends AppCompatActivity {
             }
         });
 
-        viewPager.setAdapter(new WorkoutPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new WorkoutPagerAdapter(
+                getSupportFragmentManager(),
+                workout,
+                currWorkout.getWarmups())
+        );
         viewPager.setCurrentItem(1);
         viewPager.setOffscreenPageLimit(3);
     }
@@ -131,23 +135,25 @@ public class StartWorkout extends AppCompatActivity {
 
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds
      * dynamically to the view.
-     * Called in ListExercises and ListWarmups
+     * Called in ExercisesList and WarmupsList
      */
-    @SuppressLint("InflateParams")
-    public void displaySets(int id,
-                            String exerciseName,
-                            ArrayList<Set> sets,
-                            LinearLayout vgSubtitle,
-                            LinearLayout vgSets) {
+
+    public void displaySets(
+            int id,
+            String exerciseName,
+            ArrayList<Set> sets,
+            LinearLayout llSubtitle,
+            LinearLayout llSets
+    ) {
 
         // Add subtitle layout which includes "Set #", "Reps" and "Weight"
-        setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
-        vgSubtitle.addView(setsView, 0);
+        setsView = layInflater.inflate(R.layout.part_sets_subtitles, llSubtitle);
+        llSubtitle.addView(setsView, 0);
 
         // Add the listView layout which contains a textView and a recyclerVIew
-        setsView = layInflater.inflate(R.layout.part_horizontal_rv, null);
+        setsView = layInflater.inflate(R.layout.part_horizontal_rv, llSets);
         setsView.setId(id);
-        vgSets.addView(setsView, 0);
+        llSets.addView(setsView, 0);
 
         // Set the title in the textView within the listView layout above
         tvExerciseName = (TextView) setsView.findViewById(R.id.tv_exercise_name);

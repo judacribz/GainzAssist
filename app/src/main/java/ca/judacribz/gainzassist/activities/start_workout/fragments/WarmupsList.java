@@ -9,14 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Workout;
 
-//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
+import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 
-public class ListExercises extends Fragment {
+public class WarmupsList extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -27,21 +28,20 @@ public class ListExercises extends Fragment {
     StartWorkout act;
     LinearLayout vgSets, vgSubtitle;
     Bundle bundle;
-    Workout workout;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // ListExercises Constructor/Instance                                                        //
+    // WarmupsList Constructor/Instance                                                        //
     // ######################################################################################### //
-    public ListExercises() {
+    public WarmupsList() {
         // Required empty public constructor
     }
 
-    public static ListExercises newInstance() {
-        return new ListExercises();
+    public static WarmupsList newInstance() {
+        return new WarmupsList();
     }
-    // ######################################################################################### //
 
+    // ######################################################################################### //
 
     // Fragment Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,35 +49,35 @@ public class ListExercises extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) getActivity();
-        bundle = getArguments();
+        bundle = this.getArguments();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
+    ArrayList<Exercise> warmups = new ArrayList<>();
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-       View view =  inflater.inflate(R.layout.fragment_curr_exercises, container, false);
-       vgSubtitle = (LinearLayout) view.findViewById(R.id.ll_exercise_attr_insert);
-       vgSets = (LinearLayout) view.findViewById(R.id.ll_exercise_sets_insert);
+        View view =  inflater.inflate(R.layout.fragment_curr_warmups, container, false);
+        vgSubtitle = view.findViewById(R.id.ll_exercise_attr_insert);
+        vgSets = view.findViewById(R.id.ll_exercise_sets_insert);
+
         if (bundle != null) {
-//            workout = bundle.getParcelable(EXTRA_WORKOUT);
+            warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
         }
 
-        if (workout != null) {
+        if (warmups != null) {
             int i = 0;
-            for (Exercise exercise : workout.getExercises()) {
-                act.displaySets(200 + i, exercise.getName(), exercise.getSets(), vgSubtitle, vgSets);
+            for (Exercise exercise : warmups) {
+                act.displaySets(100 + i++, exercise.getName(), exercise.getSets(), vgSubtitle, vgSets);
             }
         }
 
-
-       return view;
+        return view;
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 }

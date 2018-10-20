@@ -1,31 +1,46 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import java.util.ArrayList;
+
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
+import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Workout;
 
 public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
     // Constants
     // --------------------------------------------------------------------------------------------
+    final public static String EXTRA_WARMUPS = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS";
+    final public static String EXTRA_WORKOUT = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WORKOUT";
     final private static Fragment[] FMTS = new Fragment[] {
-            ListWarmups.newInstance(),
+            WarmupsList.newInstance(),
             WorkoutScreen.newInstance(),
-            ListExercises.newInstance()
+            ExercisesList.newInstance()
     };
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    private Bundle bundle = new Bundle();
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
-    WorkoutPagerAdapter(FragmentManager fragmentManager) {
+    WorkoutPagerAdapter(FragmentManager fragmentManager, Workout workout, ArrayList<Exercise> warmups) {
         super(fragmentManager);
+
+        bundle.putParcelable(EXTRA_WORKOUT, workout);
+        bundle.putParcelableArrayList(EXTRA_WARMUPS, warmups);
+
+        for (Fragment fmt : FMTS) {
+            fmt.setArguments(bundle);
+        }
     }
     // ######################################################################################### //
 
