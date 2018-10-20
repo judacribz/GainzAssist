@@ -15,7 +15,7 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 
-import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
+//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 
 public class ListWarmups extends Fragment {
 
@@ -67,7 +67,7 @@ public class ListWarmups extends Fragment {
         vgSets = view.findViewById(R.id.ll_exercise_sets_insert);
 
         if (bundle != null) {
-            warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
+//            warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
         }
 
         if (warmups != null) {

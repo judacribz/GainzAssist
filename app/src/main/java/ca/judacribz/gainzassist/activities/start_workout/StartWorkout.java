@@ -2,6 +2,7 @@ package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.database.sqlite.SQLiteTransactionListener;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
@@ -12,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.CurrUser;
+import ca.judacribz.gainzassist.models.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
@@ -40,11 +43,14 @@ public class StartWorkout extends AppCompatActivity {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    public Activity act;
-    public WorkoutHelper workoutHelper;
-    public static Workout workout;
-    View setsView;
+    WorkoutHelper workoutHelper;
+    Workout workout;
+    ArrayList<Exercise> warmups;
+
     LayoutInflater layInflater;
+    View setsView;
+
+    CurrWorkout currWorkout;
 
     TextView tvExerciseName;
     RecyclerView setList;
@@ -61,12 +67,14 @@ public class StartWorkout extends AppCompatActivity {
         setInitView(this, R.layout.activity_start_workout, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
         setTheme(R.style.WorkoutTheme);
 
-        act = this;
-
         workoutHelper = new WorkoutHelper(this);
         workout = workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
+        if (workout != null) {
+            currWorkout = CurrWorkout.getInstance();
+            currWorkout.setWorkout(workout);
 
-        layInflater = getLayoutInflater();
+            setupPager(workout, currWorkout.getWarmups());
+        }
     }
 
     /* Setup fragments with page with icons for the tab bar */
@@ -118,8 +126,8 @@ public class StartWorkout extends AppCompatActivity {
         super.onStop();
         CurrUser.getInstance().clearWarmups();
     }
-
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
+
 
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds
      * dynamically to the view.
@@ -154,7 +162,4 @@ public class StartWorkout extends AppCompatActivity {
                 false));
         setList.setAdapter(new SetsAdapter(sets));
     }
-
-    // TODO optimize
-
 }

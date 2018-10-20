@@ -29,7 +29,7 @@ public class CurrWorkout {
     private int setNum, reps;
     private float weight, minWeight = MIN_WEIGHT, weightChange = WEIGHT_CHANGE;
     private boolean isWarmup = true;
-    private ArrayList<Exercise> exercises, allExs;
+    private ArrayList<Exercise> warmups, exercises, allExs;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -43,40 +43,43 @@ public class CurrWorkout {
     }
 
     public void setWorkout(Workout workout) {
-        setWorkName(workout.getName());
         this.exercises = workout.getExercises();
 
+        setWorkName(workout.getName());
         genWarmups();
     }
 
-    public void genWarmups() {
-        allExs = new ArrayList<>();
+    private void genWarmups() {
+        Exercise warmup;
         ArrayList<Set> sets;
-
         float oneRepMax, minWeight, weight, percWeight, newWeight;
         int reps, setNum;
         String equip;
 
+        allExs = new ArrayList<>();
+        warmups = new ArrayList<>();
+
         for (Exercise exercise: exercises) {
             exercise.setSetsType(MAIN_SET);
-            sets = new ArrayList<>();
-            setNum = 1;
-
             equip = exercise.getEquipment();
-            minWeight = BARBELL.equals(equip.toLowerCase()) ? 45f : 0f;
+
+            minWeight = BARBELL.equals(equip.toLowerCase()) ? BB_MIN_WEIGHT : MIN_WEIGHT;
             weight = exercise.getAvgWeight();
             if (weight == minWeight) {
                 allExs.add(exercise);
                 continue;
             }
 
+            //Todo: use onerepmax
             oneRepMax = getOneRepMax(exercise.getAvgReps(), exercise.getAvgWeight());
             reps = exercise.getAvgReps();
 
-            percWeight = minWeight/weight;
+            setNum = 1;
+            sets = new ArrayList<>();
             sets.add(new Set(setNum++, reps, minWeight));
+            percWeight = minWeight / weight;
             do {
-                newWeight = percWeight*weight;
+                newWeight = percWeight * weight;
                 newWeight -= newWeight % 5;
                 sets.add(new Set(setNum++, reps, newWeight));
 
@@ -88,9 +91,15 @@ public class CurrWorkout {
 
             } while (percWeight < 0.8f);
 
-            allExs.add(new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets, WARMUP_SET));
+            warmup = new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets, WARMUP_SET);
+            warmups.add(warmup);
+            allExs.add(warmup);
             allExs.add(exercise);
         }
+    }
+
+    public ArrayList<Exercise> getWarmups() {
+        return warmups;
     }
 
     public String getWorkName() {

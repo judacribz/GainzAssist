@@ -30,9 +30,9 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.Workout;
-
-import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
-import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
+//
+//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
+//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.models.CurrWorkout.MIN_REPS;
 
 public class WorkoutScreen extends Fragment {
@@ -101,7 +101,7 @@ String TAG = "WorkoutScreen";
         // init finished workout variables
         finExercises = new ArrayList<>();
 
-        setCurrSet();
+//        setCurrSet();
     }
 
     @Override
@@ -260,7 +260,7 @@ String TAG = "WorkoutScreen";
                 currWorkout.decReps();
                 break;
         }
-        setReps();
+//        setReps();
     }
 
     // Weight change
@@ -286,7 +286,7 @@ String TAG = "WorkoutScreen";
                 countDownTimer.cancel();
             }
 
-            setCurrSet();
+//            setCurrSet();
             updateUI();
         }
     }
@@ -301,7 +301,7 @@ String TAG = "WorkoutScreen";
             startTimer(5000);
         }
 
-        setReps();
+//        setReps();
         setWeight();
 
         tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, exercises.size()));

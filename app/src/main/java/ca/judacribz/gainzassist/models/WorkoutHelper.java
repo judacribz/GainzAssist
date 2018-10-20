@@ -220,19 +220,20 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     /* Get a Workout object using the workout name
      */
     public Workout getWorkout(String workoutName) {
-        db = this.getReadableDatabase();
-        ArrayList<Exercise> exercises = new ArrayList<>();
+        ArrayList<Exercise> exercises;
         Workout workout = null;
 
+        db = this.getReadableDatabase();
+
         String[] columns   = new String[] {EXERCISES};
-        String where       = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
+        String   where     = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
         String[] whereArgs = new String[] {workoutName, email};
 
         Cursor cursor = db.query(TABLE_WORKOUTS, columns, where, whereArgs, "", "", "");
 
         if (cursor.moveToFirst()) {
 
-            exercises = (ArrayList<Exercise>) getExercisesFromBlob(cursor.getBlob(0));
+            exercises = getExercisesFromBlob(cursor.getBlob(0));
 
             if (exercises != null)
                 workout = new Workout(workoutName, exercises);

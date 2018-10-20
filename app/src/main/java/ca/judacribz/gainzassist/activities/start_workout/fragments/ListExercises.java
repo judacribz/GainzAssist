@@ -14,7 +14,7 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Workout;
 
-import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
+//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
 
 public class ListExercises extends Fragment {
 
@@ -66,7 +66,7 @@ public class ListExercises extends Fragment {
        vgSubtitle = (LinearLayout) view.findViewById(R.id.ll_exercise_attr_insert);
        vgSets = (LinearLayout) view.findViewById(R.id.ll_exercise_sets_insert);
         if (bundle != null) {
-            workout = bundle.getParcelable(EXTRA_WORKOUT);
+//            workout = bundle.getParcelable(EXTRA_WORKOUT);
         }
 
         if (workout != null) {
