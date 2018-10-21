@@ -29,7 +29,6 @@ import ca.judacribz.gainzassist.models.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.CurrUser;
-import ca.judacribz.gainzassist.models.Workout;
 //
 //import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 //import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
@@ -54,7 +53,6 @@ public class WorkoutScreen extends Fragment {
     CurrWorkout currWorkout = CurrWorkout.getInstance();
     CurrUser currUser = CurrUser.getInstance();
 
-    Exercise currExercise;
     ArrayList<Set> sets;
     ArrayList<Exercise> warmups = new ArrayList<>(),
                         exercises = new ArrayList<>();
@@ -100,8 +98,6 @@ String TAG = "WorkoutScreen";
 
         // init finished workout variables
         finExercises = new ArrayList<>();
-
-//        setCurrSet();
     }
 
     @Override
@@ -110,8 +106,9 @@ String TAG = "WorkoutScreen";
     }
 
     @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container,
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
         ButterKnife.bind(this, view);
@@ -142,7 +139,7 @@ String TAG = "WorkoutScreen";
         equipmentView.post(new Runnable() {
             @Override
             public void run() {
-                equipmentView.setup(currWorkout.getWeight(), currWorkout.getEquip());
+                equipmentView.setup(currWorkout.getCurrWeight(), currWorkout.getCurrEquip());
             }
         });
     }
@@ -182,6 +179,8 @@ String TAG = "WorkoutScreen";
     @Override
     public void onStop() {
         super.onStop();
+
+        currWorkout.reset();
     }
 
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
@@ -219,9 +218,9 @@ String TAG = "WorkoutScreen";
         float weight;
         if (!s.toString().isEmpty()) {
             weight = Float.valueOf(s.toString());
-            equipmentView.setup(weight, currWorkout.getEquip());
+            equipmentView.setup(weight, currWorkout.getCurrEquip());
         } else
-            weight = currWorkout.getMinWeight();
+            weight = currWorkout.getCurrMinWeight();
 
         if (currWorkout.setWeight(weight))
             btnDecWeight.setEnabled(false);
@@ -233,7 +232,7 @@ String TAG = "WorkoutScreen";
     @OnClick(R.id.btn_how_to)
     public void startWorkoutsList() {
         Intent intent = new Intent(act, HowToVideos.class);
-        intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.getExName());
+        intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.getCurrExName());
         startActivity(intent);
     }
 
@@ -260,7 +259,7 @@ String TAG = "WorkoutScreen";
                 currWorkout.decReps();
                 break;
         }
-//        setReps();
+        setReps();
     }
 
     // Weight change
@@ -279,20 +278,19 @@ String TAG = "WorkoutScreen";
 
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
-        if (!currWorkout.getIsWarmup()  && ex_i == exercises.size() - 1 && set_i == sets.size() - 1) {
-            act.finish();
-        } else {
-            if (countDownTimer != null) {
-                countDownTimer.cancel();
-            }
-
-//            setCurrSet();
+        if (currWorkout.finishCurrSet()) {
             updateUI();
+        } else {
+            act.finish();
         }
     }
 
     public void updateUI() {
         String setType;
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+
         if (currWorkout.getIsWarmup()) {
             setType = "Warmup";
             tvTimer.setText(R.string.start_next_set);
@@ -301,23 +299,34 @@ String TAG = "WorkoutScreen";
             startTimer(5000);
         }
 
-//        setReps();
+        setReps();
         setWeight();
 
-        tvExInfo.setText(String.format("%s %s/%s",setType, ex_i+1, exercises.size()));
+        tvExInfo.setText(String.format(
+                "%s %s/%s",
+                setType,
+                currWorkout.getCurrExNum(),
+                currWorkout.getCurrNumExs())
+        );
+
         tvSetInfo.setText(String.format(
                 "Set %s/%s",
-                currWorkout.getSetNum(),
-                currExercise.getNumSets())
+                currWorkout.getCurrSetNum(),
+                currWorkout.getCurrNumSets())
         );
-        tvExerciseTitle.setText(currWorkout.getExName());
+
+        tvExerciseTitle.setText(currWorkout.getCurrExName());
 
     }
 
+    private void setReps() {
+        etCurrReps.setText(String.valueOf(currWorkout.getCurrReps()));
+    }
+
     public void setWeight() {
-        float weight = currWorkout.getWeight();
-        etCurrWeight.setText(String.valueOf(weight));
-        equipmentView.setup(weight, currWorkout.getEquip());
+        float weight = currWorkout.getCurrWeight();
+        etCurrWeight.setText(String.valueOf(currWorkout.getCurrWeight()));
+        equipmentView.setup(weight, currWorkout.getCurrEquip());
     }
 
     //=Click=Handling===============================================================================

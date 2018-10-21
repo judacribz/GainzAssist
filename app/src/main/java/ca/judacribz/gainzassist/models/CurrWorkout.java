@@ -2,8 +2,7 @@ package ca.judacribz.gainzassist.models;
 
 import java.util.ArrayList;
 
-import ca.judacribz.gainzassist.R;
-
+import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 
@@ -24,12 +23,15 @@ public class CurrWorkout {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     private Workout workout;
-    private String workName, exName, exType, equip;
-    private Set set;
-    private int setNum, reps;
-    private float weight, minWeight = MIN_WEIGHT, weightChange = WEIGHT_CHANGE;
-    private boolean isWarmup = true;
-    private ArrayList<Exercise> warmups, exercises, allExs;
+    private String workName, currExName, currExType, equip;
+    private Set currSet;
+    private int currSetNum, currReps;
+    private float currWeight, currMinWeight = MIN_WEIGHT, currWeightChange = WEIGHT_CHANGE;
+    private ArrayList<Exercise> currWarmups, exercises, allExs;
+    private ArrayList<Set> currSets;
+    private Exercise currExercise;
+    private int set_i, ex_i, currNumSets, currNumWarmups, currNumExs, currNumAllExs;
+    private SetsType currSetsType;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -43,36 +45,41 @@ public class CurrWorkout {
     }
 
     public void setWorkout(Workout workout) {
-        this.exercises = workout.getExercises();
-
         setWorkName(workout.getName());
-        genWarmups();
+        genWarmups(workout.getExercises());
     }
 
-    private void genWarmups() {
+    private void setWorkName(String workName) {
+        this.workName = workName;
+    }
+
+    private void genWarmups(ArrayList<Exercise> exercises) {
+        ArrayList<Exercise> allExs = new ArrayList<>();
+        ArrayList<Exercise> warmups = new ArrayList<>();
         Exercise warmup;
         ArrayList<Set> sets;
+
         float oneRepMax, minWeight, weight, percWeight, newWeight;
         int reps, setNum;
         String equip;
 
-        allExs = new ArrayList<>();
-        warmups = new ArrayList<>();
+        this.exercises = exercises;
+        this.currNumExs = exercises.size();
 
-        for (Exercise exercise: exercises) {
-            exercise.setSetsType(MAIN_SET);
-            equip = exercise.getEquipment();
+        for (Exercise exs: exercises) {
+            exs.setSetsType(MAIN_SET);
+            equip = exs.getEquipment();
 
             minWeight = BARBELL.equals(equip.toLowerCase()) ? BB_MIN_WEIGHT : MIN_WEIGHT;
-            weight = exercise.getAvgWeight();
+            weight = exs.getAvgWeight();
             if (weight == minWeight) {
-                allExs.add(exercise);
+                allExs.add(exs);
                 continue;
             }
 
             //Todo: use onerepmax
-            oneRepMax = getOneRepMax(exercise.getAvgReps(), exercise.getAvgWeight());
-            reps = exercise.getAvgReps();
+            oneRepMax = getOneRepMax(exs.getAvgReps(), exs.getAvgWeight());
+            reps = exs.getAvgReps();
 
             setNum = 1;
             sets = new ArrayList<>();
@@ -91,118 +98,201 @@ public class CurrWorkout {
 
             } while (percWeight < 0.8f);
 
-            warmup = new Exercise(exercise.getName(), exercise.getType(), exercise.getEquipment(), sets, WARMUP_SET);
+            warmup = new Exercise(exs.getName(), exs.getType(), exs.getEquipment(), sets, WARMUP_SET);
             warmups.add(warmup);
             allExs.add(warmup);
-            allExs.add(exercise);
+            allExs.add(exs);
+        }
+
+        setCurrWarmups(warmups);
+        setCurrExercises(allExs);
+    }
+
+    private void setCurrWarmups(ArrayList<Exercise> warmups) {
+        this.currWarmups = warmups;
+        this.currNumWarmups = warmups.size();
+    }
+
+    private void setCurrExercises(ArrayList<Exercise> allExercises) {
+        this.allExs = allExercises;
+        this.currNumAllExs = allExercises.size();
+        setCurrExercise(allExercises.get(0));
+    }
+
+    public boolean finishCurrSet() {
+        this.set_i++;
+        if (atEndOfSets()) {
+            this.ex_i++;
+
+            if (atEndOfExercises()) {
+                return false;
+            } else {
+                setCurrExercise(allExs.get(ex_i));
+            }
+
+            this.set_i = 0;
+        } else {
+            setCurrSet(currSets.get(set_i));
+        }
+
+        return true;
+    }
+
+    private boolean atEndOfSets() {
+        return this.currNumSets == this.set_i;
+    }
+
+    private boolean atEndOfExercises() {
+        return this.currNumAllExs == this.ex_i;
+    }
+
+    private void setCurrExercise(Exercise exercise) {
+        this.currExercise = exercise;
+        this.currSetsType = exercise.getSetsType();
+
+        setCurrExName(exercise.getName());
+        setCurrEquip(exercise.getEquipment());
+        setCurrExType(exercise.getType());
+        setCurrSets(exercise.getSets());
+        setCurrSetsType(exercise.getSetsType());
+    }
+
+    private void setCurrExName(String currExName) {
+        this.currExName = currExName;
+    }
+
+    private void setCurrEquip(String equip) {
+        this.equip = equip.toLowerCase();
+        if (BARBELL.equals(this.equip)) {
+            this.currMinWeight = BB_MIN_WEIGHT;
+            this.currWeightChange = BB_WEIGHT_CHANGE;
+        } else {
+            this.currMinWeight = MIN_WEIGHT;
+            this.currWeightChange = WEIGHT_CHANGE;
         }
     }
 
-    public ArrayList<Exercise> getWarmups() {
-        return warmups;
+    private void setCurrExType(String exType) {
+        this.currExType = exType;
+    }
+
+    private void setCurrSets(ArrayList<Set> currSets) {
+        this.currSets = currSets;
+        this.currNumSets = currSets.size();
+        setCurrSet(this.currSets.get(0));
+    }
+
+    private void setCurrSetsType(SetsType setsType) {
+        this.currSetsType = setsType;
+    }
+
+    private void setCurrSet(Set set) {
+        this.currSet = set;
+        this.currSetNum = this.currSet.getSetNumber();
+        this.currReps = this.currSet.getReps();
+        this.currWeight = this.currSet.getWeight();
     }
 
     public String getWorkName() {
         return workName;
     }
 
-    public void setWorkName(String workName) {
-        this.workName = workName;
+    public ArrayList<Exercise> getWarmups() {
+        return currWarmups;
     }
 
-    public String getExName() {
-        return exName;
+    public int getCurrNumExs() {
+        if (this.currSetsType == WARMUP_SET) {
+            return this.currNumWarmups;
+        }
+
+        return this.currNumExs;
     }
 
-    public void setExName(String exName) {
-        this.exName = exName;
+    public int getCurrExNum() {
+        if (this.currSetsType == WARMUP_SET) {
+            return currWarmups.indexOf(currExercise) + 1;
+        }
+
+        return exercises.indexOf(currExercise) + 1;
     }
 
-    public String getExType() {
-        return exType;
+    public String getCurrExName() {
+        return currExName;
     }
 
-    public void setExType(String exType) {
-        this.exType = exType;
+    public SetsType getCurrExType() {
+        return currSetsType;
     }
 
-    public String getEquip() {
+    public String getCurrEquip() {
         return equip;
     }
 
-    public void setEquip(String equip) {
-        this.equip = equip.toLowerCase();
-        if (BARBELL.equals(this.equip)) {
-            this.minWeight = BB_MIN_WEIGHT;
-            this.weightChange = BB_WEIGHT_CHANGE;
-        } else {
-            this.minWeight = MIN_WEIGHT;
-            this.weightChange = WEIGHT_CHANGE;
-        }
+    public int getCurrNumSets() {
+        return currNumSets;
     }
 
-    public Set getSet() {
-        return set;
+    public Set getCurrSet() {
+        return currSet;
     }
 
-    public void setSet(Set set) {
-        this.setNum = set.getSetNumber();
-        this.reps = set.getReps();
-        this.weight = set.getWeight();
-        this.set = set;
+    public int getCurrSetNum() {
+        return set_i + 1;
     }
 
-    public int getSetNum() {
-        return set.getSetNumber();
-    }
-
-    public int getReps() {
-        return set.getReps();
+    /* Reps------------------------------------------------------------------------------------- */
+    public int getCurrReps() {
+        return currSet.getReps();
     }
 
     public void incReps() {
-        setReps(++reps);
+        setReps(++currReps);
     }
 
     public void decReps() {
-        setReps(--reps);
+        setReps(--currReps);
     }
 
     public boolean setReps(int reps) {
-        this.reps = reps;
-        set.setReps(reps);
+        this.currReps = reps;
 
-        return this.reps == MIN_REPS;
+        return this.currReps == MIN_REPS;
     }
+    /* Reps-end--------------------------------------------------------------------------------- */
 
-    public float getWeight() {
-        return set.getWeight();
+    /* Weight----------------------------------------------------------------------------------- */
+    public float getCurrWeight() {
+        return this.currWeight;
     }
 
     public void incWeight() {
-        setWeight(this.weight + this.weightChange);
+        setWeight(this.currWeight + this.currWeightChange);
     }
 
     public void decWeight() {
-        setWeight(Math.max(minWeight, this.weight - weightChange));
+        setWeight(Math.max(this.currMinWeight, this.currWeight - this.currWeightChange));
     }
 
     public boolean setWeight(float weight) {
-        this.weight = weight;
-        set.setWeight(weight);
+        this.currWeight = weight;
 
-        return this.weight == minWeight;
+        return this.currWeight == this.currMinWeight;
     }
 
-    public float getMinWeight() {
-        return minWeight;
+    public float getCurrMinWeight() {
+        return currMinWeight;
     }
+    /* Weight-end------------------------------------------------------------------------------- */
+
 
     public boolean getIsWarmup() {
-        return isWarmup;
+        return WARMUP_SET.equals(currExercise.getSetsType());
     }
 
-    public void switchSetType() {
-        isWarmup = !isWarmup;
+
+    public void reset() {
+        this.ex_i = 0;
+        this.set_i = 0;
     }
 }

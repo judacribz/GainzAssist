@@ -79,9 +79,10 @@ public class StartWorkout extends AppCompatActivity {
 
     /* Setup fragments with page with icons for the tab bar */
     private void setupPager() {
+        layInflater = getLayoutInflater();
+
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
-
 
             Drawable icon;
             @Override
@@ -138,20 +139,18 @@ public class StartWorkout extends AppCompatActivity {
      * Called in ExercisesList and WarmupsList
      */
 
-    public void displaySets(
-            int id,
-            String exerciseName,
-            ArrayList<Set> sets,
-            LinearLayout llSubtitle,
-            LinearLayout llSets
-    ) {
+    public void displaySets(int id,
+                            String exerciseName,
+                            ArrayList<Set> sets,
+                            LinearLayout llSubtitle,
+                            LinearLayout llSets) {
 
         // Add subtitle layout which includes "Set #", "Reps" and "Weight"
-        setsView = layInflater.inflate(R.layout.part_sets_subtitles, llSubtitle);
+        setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
         llSubtitle.addView(setsView, 0);
 
         // Add the listView layout which contains a textView and a recyclerVIew
-        setsView = layInflater.inflate(R.layout.part_horizontal_rv, llSets);
+        setsView = layInflater.inflate(R.layout.part_horizontal_rv, null);
         setsView.setId(id);
         llSets.addView(setsView, 0);
 

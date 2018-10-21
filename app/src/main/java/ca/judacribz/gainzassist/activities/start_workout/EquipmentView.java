@@ -126,7 +126,7 @@ public class EquipmentView extends View{
     // Sets up the RectF objects to be drawn in onDraw which represent the workout equipment
     public void setup(float weight, @Nullable String equipment) {
         if (equipment != null) {
-            this.equipment = equipment;
+            this.equipment = equipment.toLowerCase();
         }
 
         // Setup barbell with weights

@@ -173,7 +173,7 @@
             android:src="@drawable/ic_plus"/>
     </RelativeLayout>
 
-    <!-- Exercise set control -->
+    <!-- Exercise currSet control -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
