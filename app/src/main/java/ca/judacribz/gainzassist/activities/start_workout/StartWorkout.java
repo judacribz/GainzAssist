@@ -129,7 +129,8 @@ public class StartWorkout extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        CurrUser.getInstance().clearWarmups();
+
+        currWorkout.reset();
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 

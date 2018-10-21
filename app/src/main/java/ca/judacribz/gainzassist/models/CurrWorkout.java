@@ -18,6 +18,8 @@ public class CurrWorkout {
     private static final float BB_WEIGHT_CHANGE = 5.0f;
     private static final float WEIGHT_CHANGE = 2.5f;
     public static final int MIN_REPS = 0;
+    public static final long HEAVY_REST_TIME = 180000;
+    public static final long LIGHT_REST_TIME = 90000;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -32,6 +34,7 @@ public class CurrWorkout {
     private Exercise currExercise;
     private int set_i, ex_i, currNumSets, currNumWarmups, currNumExs, currNumAllExs;
     private SetsType currSetsType;
+    private long currRestTime;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -116,7 +119,8 @@ public class CurrWorkout {
     private void setCurrExercises(ArrayList<Exercise> allExercises) {
         this.allExs = allExercises;
         this.currNumAllExs = allExercises.size();
-        setCurrExercise(allExercises.get(0));
+        this.ex_i = 0;
+        setCurrExercise(allExercises.get(this.ex_i));
     }
 
     public boolean finishCurrSet() {
@@ -127,12 +131,10 @@ public class CurrWorkout {
             if (atEndOfExercises()) {
                 return false;
             } else {
-                setCurrExercise(allExs.get(ex_i));
+                setCurrExercise(allExs.get(this.ex_i));
             }
-
-            this.set_i = 0;
         } else {
-            setCurrSet(currSets.get(set_i));
+            setCurrSet(currSets.get(this.set_i));
         }
 
         return true;
@@ -153,6 +155,7 @@ public class CurrWorkout {
         setCurrExName(exercise.getName());
         setCurrEquip(exercise.getEquipment());
         setCurrExType(exercise.getType());
+
         setCurrSets(exercise.getSets());
         setCurrSetsType(exercise.getSetsType());
     }
@@ -179,7 +182,8 @@ public class CurrWorkout {
     private void setCurrSets(ArrayList<Set> currSets) {
         this.currSets = currSets;
         this.currNumSets = currSets.size();
-        setCurrSet(this.currSets.get(0));
+        this.set_i = 0;
+        setCurrSet(this.currSets.get(this.set_i));
     }
 
     private void setCurrSetsType(SetsType setsType) {
@@ -247,17 +251,27 @@ public class CurrWorkout {
     }
 
     public void incReps() {
-        setReps(++currReps);
+        setCurrReps(++currReps);
     }
 
     public void decReps() {
-        setReps(--currReps);
+        setCurrReps(--currReps);
     }
 
-    public boolean setReps(int reps) {
+    public boolean setCurrReps(int reps) {
         this.currReps = reps;
 
+        if (currSetsType == MAIN_SET)
+            setCurrRestTime();
+
         return this.currReps == MIN_REPS;
+    }
+    public void setCurrRestTime() {
+        currRestTime =  (currReps <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
+    }
+
+    public long getCurrRestTime() {
+        return this.currRestTime;
     }
     /* Reps-end--------------------------------------------------------------------------------- */
 

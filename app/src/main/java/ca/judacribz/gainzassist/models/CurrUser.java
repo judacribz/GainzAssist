@@ -13,7 +13,6 @@ public class CurrUser {
     // --------------------------------------------------------------------------------------------
     private String email;
     private String uid;
-    private ArrayList<Exercise> warmups;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -44,22 +43,5 @@ public class CurrUser {
     public void setUid(String uid) {
         this.uid = uid;
     }
-
-    public ArrayList<Exercise> getWarmups() {
-        return warmups;
-    }
-
-    public void setWarmups(ArrayList<Exercise> warmups) {
-        this.warmups = warmups;
-    }
-
-    public boolean warmupsEmpty() {
-        return (warmups.size() == 0);
-    }
-
-    public void clearWarmups() {
-        warmups = new ArrayList<>();
-    }
-
     // ============================================================================================
 }

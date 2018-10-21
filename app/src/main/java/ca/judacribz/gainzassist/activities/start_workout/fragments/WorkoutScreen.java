@@ -175,14 +175,6 @@ String TAG = "WorkoutScreen";
             }
         };
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        currWorkout.reset();
-    }
-
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
     // TextWatcher Handling
@@ -202,7 +194,7 @@ String TAG = "WorkoutScreen";
         else
             reps = MIN_REPS;
 
-        if (currWorkout.setReps(reps))
+        if (currWorkout.setCurrReps(reps))
             btnDecReps.setEnabled(false);
     }
 
@@ -293,10 +285,11 @@ String TAG = "WorkoutScreen";
 
         if (currWorkout.getIsWarmup()) {
             setType = "Warmup";
+            startTimer(currWorkout.getCurrRestTime());
             tvTimer.setText(R.string.start_next_set);
         } else {
             setType = "Main";
-            startTimer(5000);
+            startTimer(currWorkout.getCurrRestTime());
         }
 
         setReps();
