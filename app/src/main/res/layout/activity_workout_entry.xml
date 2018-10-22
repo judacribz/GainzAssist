@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.add_workout.WorkoutEntry">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/partial_titlebar" />
+
+    <!-- Workout Name EditText -->
+    <!--========================================================================================-->
+    <EditText
+        android:id="@+id/et_workout_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_above="@id/et_num_exercises"
+        android:backgroundTint="@color/colorLightAccent"
+        android:hint="@string/hint_workout_name"
+        android:inputType="text"
+        android:textColorHint="@color/colorLightAccent" />
+    <!--Workout=Name============================================================================-->
+
+    <EditText
+        android:id="@+id/et_num_exercises"
+        android:layout_width="wrap_content"
+        android:layout_height="51dp"
+        android:layout_centerInParent="true"
+        android:layout_margin="10dp"
+        android:background="@color/colorBg"
+        android:textAlignment="center"
+        android:ems="5"
+        android:inputType="number"
+        android:text="@string/initial_num_exercises"
+        android:textColor="@color/colorText" />
+
+    <ImageButton
+        android:id="@+id/ibtn_inc_exercises"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:layout_alignBottom="@id/et_num_exercises"
+        android:layout_toEndOf="@id/et_num_exercises"
+        android:background="@drawable/anim_button_ripple"
+        android:src="@drawable/ic_plus"/>
+
+    <ImageButton
+        android:id="@+id/ibtn_dec_exercises"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
+        android:layout_alignBottom="@id/et_num_exercises"
+        android:layout_toStartOf="@id/et_num_exercises"
+        android:background="@drawable/anim_button_ripple"
+        android:src="@drawable/ic_minus"/>
+
+    <TextView
+        android:id="@+id/tv_num_exercises"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_num_exercises"
+        android:layout_marginTop="-10dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/hint_exercises"/>
+
+    <Button
+        android:id="@+id/btn_enter"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/tv_num_exercises"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:background="@drawable/anim_button_ripple"
+        android:text="@string/skip"
+        android:textColor="@drawable/selector_btn_text_default"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_below="@id/tv_num_exercises"
+        android:padding="10dp"
+        android:background="@drawable/anim_button_ripple"
+        android:text="@string/cancel"
+        android:textColor="@drawable/selector_btn_text_default"
+        android:textSize="20sp"/>
+</RelativeLayout>

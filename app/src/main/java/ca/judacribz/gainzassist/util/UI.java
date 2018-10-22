@@ -117,21 +117,27 @@ public class UI {
         return Float.valueOf(getTextString(et));
     }
 
-    /* Validates a EditTexts to be non-empty or else an error is set */
+    /* Validates EditTexts to be non-empty or else an error is set */
     public static boolean validateForm(Activity act, EditText[] ets) {
         boolean isValid = true;
-        String text;
 
         for (EditText et : ets) {
-            text = et.getText().toString().trim();
-
-            if (text.isEmpty()) {
-                et.setError(act.getString(R.string.err_required));
-                isValid = false;
-            }
+            isValid &= validateFormEntry(act, et);
         }
 
         return isValid;
+    }
+
+    /* Validates an EditText to be non-empty or else an error is set */
+    public static boolean validateFormEntry(Activity act, EditText et) {
+        String text = et.getText().toString().trim();
+
+        if (text.isEmpty()) {
+            et.setError(act.getString(R.string.err_required));
+            return false;
+        }
+
+        return true;
     }
 
     public static void clearForm(EditText[] ets) {

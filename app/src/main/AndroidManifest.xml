@@ -56,18 +56,23 @@
         <activity android:name=".activities.how_to_videos.HowToVideos" />
 
         <!-- WorkoutsList Activity -->
-        <activity android:name=".activities.workouts_list.WorkoutsList"
+        <activity
+            android:name=".activities.workouts_list.WorkoutsList"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- StartWorkout Activity -->
         <activity
             android:name=".activities.start_workout.StartWorkout"
-            android:windowSoftInputMode="adjustPan|stateHidden"/>
-
-        <!-- AddWorkout Activity -->
-        <activity
-            android:name=".activities.add_workout.AddWorkout"
             android:windowSoftInputMode="adjustPan|stateHidden" />
+
+        <!-- WorkoutEntrySummary Activity -->
+        <activity
+            android:name=".activities.add_workout.WorkoutEntrySummary"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity
+            android:name=".activities.add_workout.WorkoutEntry"/>
+        <activity android:name=".activities.add_workout.ExerciseEntry"
+            />
     </application>
 
 </manifest>

@@ -1,7 +1,6 @@
 package ca.judacribz.gainzassist.activities.workouts_list;
 
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,24 +8,21 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.add_workout.AddWorkout;
+import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
+import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntrySummary;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
@@ -212,7 +208,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.act_add_workout:
-                startActivity(new Intent(this, AddWorkout.class));
+                startActivity(new Intent(this, WorkoutEntry.class));
                 break;
         }
 

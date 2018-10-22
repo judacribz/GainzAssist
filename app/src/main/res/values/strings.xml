@@ -35,6 +35,7 @@
     <string name="hint_search_workouts"><i>Search Workouts</i></string>
     <string name="hint_workout_name"><i>Workout Name</i></string>
     <string name="hint_exercise_name"><i>Exercise Name</i></string>
+    <string name="hint_exercises"><i>Exercises</i></string>
 
     <!-- Facebook Login Config -->
     <string name="fb_app_id">529898790716957</string>
@@ -85,4 +86,10 @@
     <string name="how_to">How To</string>
     <string name="start_next_set">Start Next Set</string>
     <string name="no_rest_needed">No Rest Needed</string>
+    <string name="do_later">do later</string>
+    <string name="enter">enter</string>
+    <string name="cancel">cancel</string>
+    <string name="skip">skip</string>
+    <string name="num_of_exercises"># of exercises</string>
+    <string name="initial_num_exercises">3</string>
 </resources>

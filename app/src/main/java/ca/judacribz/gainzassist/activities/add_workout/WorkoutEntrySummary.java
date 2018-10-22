@@ -24,7 +24,7 @@ import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
 
-public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver {
+public class WorkoutEntrySummary extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ public class AddWorkout extends AppCompatActivity implements SingleItemAdapter.I
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_workout);
+        setContentView(R.layout.activity_workout_entry_summary);
         ButterKnife.bind(this);
         setToolbar(this, R.string.create_workout, true);
 
