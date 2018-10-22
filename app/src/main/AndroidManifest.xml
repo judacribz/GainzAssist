@@ -71,7 +71,7 @@
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
             android:name=".activities.add_workout.WorkoutEntry"/>
-        <activity android:name=".activities.add_workout.ExerciseEntry"
+        <activity android:name=".activities.add_workout.ExercisesEntry"
             />
     </application>
 

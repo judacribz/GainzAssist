@@ -33,7 +33,7 @@ public class UI {
      *
     <include
        android:id="@id/toolbar"
-       layout="@layout/partial_titlebar"/>
+       layout="@layout/partial_title_bar"/>
      */
     public static void setInitView(Activity act, int layoutId, int titleId, boolean setBackArrow) {
         setInitView(act, layoutId, act.getResources().getString(titleId), setBackArrow);
@@ -70,7 +70,7 @@ public class UI {
         return setToolbar(act, act.getResources().getString(titleId), setBackArrow);
     }
     public static String setToolbar(AppCompatActivity act, String title, boolean setBackArrow) {
-        // Set the partial_titlebar to the activity
+        // Set the partial_title_bar to the activity
         act.setSupportActionBar((Toolbar) act.findViewById(R.id.toolbar));
 
 
@@ -85,7 +85,7 @@ public class UI {
             }
         }
 
-        // Set the title for the partial_titlebar
+        // Set the title for the partial_title_bar
         ((TextView) act.findViewById(R.id.title)).setText(title);
 
         return title;

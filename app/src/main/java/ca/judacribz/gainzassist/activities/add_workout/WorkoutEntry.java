@@ -1,11 +1,8 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +21,7 @@ public class WorkoutEntry extends AppCompatActivity{
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT_NAME";
     public static final String EXTRA_NUM_EXERCISES
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_NUM_EXERCISES";
-    private static final int MIN_NUM_EXERCISES = 1;
+    public static final int MIN_NUM_EXERCISES = 1;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -112,7 +109,7 @@ public class WorkoutEntry extends AppCompatActivity{
 
     @OnClick(R.id.btn_enter)
     public void enterWorkoutName() {
-        Intent intent = new Intent(this, ExerciseEntry.class);
+        Intent intent = new Intent(this, ExercisesEntry.class);
 
         if (!isEmpty) {
             intent.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName));
