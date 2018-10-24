@@ -22,7 +22,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
-import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntrySummary;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
