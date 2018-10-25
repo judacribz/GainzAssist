@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
@@ -25,9 +27,10 @@ public class ExercisesList extends Fragment {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
-    LinearLayout vgSets, vgSubtitle;
     Bundle bundle;
-    Workout workout;
+
+    @BindView(R.id.ll_exercise_subtitle_insert) LinearLayout llExSubInsert;
+    @BindView(R.id.ll_exercise_sets_insert) LinearLayout llExSetsInsert;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -62,17 +65,21 @@ public class ExercisesList extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-       View view =  inflater.inflate(R.layout.fragment_curr_exercises, container, false);
-       vgSubtitle = (LinearLayout) view.findViewById(R.id.ll_exercise_attr_insert);
-       vgSets = (LinearLayout) view.findViewById(R.id.ll_exercise_sets_insert);
+       View view =  inflater.inflate(R.layout.fragment_exercises_list, container, false);
+        ButterKnife.bind(this, view);
         if (bundle != null) {
-            workout = bundle.getParcelable(EXTRA_WORKOUT);
-        }
-
-        if (workout != null) {
-            int i = 0;
-            for (Exercise exercise : workout.getExercises()) {
-                act.displaySets(200 + i, exercise.getName(), exercise.getSets(), vgSubtitle, vgSets);
+            Workout workout = bundle.getParcelable(EXTRA_WORKOUT);
+            if (workout != null) {
+                int i = 0;
+                for (Exercise exercise : workout.getExercises()) {
+                    act.displaySets(
+                            200 + i,
+                            exercise.getName(),
+                            exercise.getSets(),
+                            llExSubInsert,
+                            llExSetsInsert
+                    );
+                }
             }
         }
 
