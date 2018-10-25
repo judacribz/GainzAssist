@@ -231,7 +231,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 
             progressBar.setProgress(0);
             progressBar.setVisibility(View.VISIBLE);
-            new BGStartActivityTask().execute(this, new Intent(this, Main.class));
+            new BGStartActivityTask(this).execute(new Intent(this, Main.class));
 
 
 //            for (UserInfo profile : fbUser.getProviderData()) {
