@@ -9,9 +9,6 @@ import static ca.judacribz.gainzassist.firebase.Database.setUserInfo;
 
 public class BGStartActivityTask extends AsyncTask<Object, Void, Object[]> {
 
-    public BGStartActivityTask(z login) {
-    }
-
     @Override
     protected Object[] doInBackground(Object... objs) {
         setUserInfo((Activity) objs[0]);
@@ -21,7 +18,7 @@ public class BGStartActivityTask extends AsyncTask<Object, Void, Object[]> {
 
     @Override
     protected void onPostExecute(final Object[] objs) {
-        Activity act = (Activity) objs[0];
+        final Activity act = (Activity) objs[0];
         act.startActivity((Intent) objs[1]);
         act.finish();
 

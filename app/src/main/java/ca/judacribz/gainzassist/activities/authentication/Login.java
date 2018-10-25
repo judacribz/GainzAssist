@@ -44,6 +44,7 @@ import ca.judacribz.gainzassist.async.BGStartActivityTask;
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
 
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
+import static ca.judacribz.gainzassist.firebase.Database.setUserInfo;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
 
 public class Login extends AppCompatActivity implements /*FacebookCallback<LoginResult>,*/
@@ -231,8 +232,10 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 
             progressBar.setProgress(0);
             progressBar.setVisibility(View.VISIBLE);
-            new BGStartActivityTask(this).execute(new Intent(this, Main.class));
+            setUserInfo(this);
 
+            startActivity(new Intent(this, Main.class));
+            finish();
 
 //            for (UserInfo profile : fbUser.getProviderData()) {
 //                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
