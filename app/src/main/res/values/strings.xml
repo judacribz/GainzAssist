@@ -96,4 +96,6 @@
     <string name="num_of_exercises"># of exercises</string>
     <string name="initial_num_exercises">3</string>
     <string name="exercise_num">Exercise %d</string>
+    <string name="min">1</string>
+    <string name="starting_sets">3</string>
 </resources>

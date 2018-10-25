@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -14,9 +13,7 @@ import ca.judacribz.gainzassist.R;
 
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
-import static ca.judacribz.gainzassist.util.UI.getTextFloat;
-import static ca.judacribz.gainzassist.util.UI.setInitView;
-import static ca.judacribz.gainzassist.util.UI.setSpinnerWithArray;
+import static ca.judacribz.gainzassist.util.UI.*;
 
 public class ExercisesEntry extends AppCompatActivity {
 
@@ -28,8 +25,11 @@ public class ExercisesEntry extends AppCompatActivity {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     String workoutName;
-    int numExs, ex_i = MIN_NUM_EXERCISES;
-    float minWeight, weightChange;
+    int numExs,
+        ex_i = MIN_NUM_EXERCISES,
+        reps, sets,
+        minInt = 1; // for min reps/sets
+    float weight, minWeight, weightChange;
 
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_num_reps) EditText etNumReps;
@@ -51,7 +51,7 @@ public class ExercisesEntry extends AppCompatActivity {
                 String.format(getString(R.string.exercise_num), ex_i),
                 true
         );
-
+//        setTheme(R.style.WorkoutTheme);
         ibtnDecWeight.setEnabled(false);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
@@ -91,8 +91,6 @@ public class ExercisesEntry extends AppCompatActivity {
         }
     }
 
-
-    float weight;
     @OnTextChanged(value = R.id.et_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onNumExercisesChanged(CharSequence s, int start, int before, int count) {
         String weightStr = s.toString();
@@ -106,6 +104,54 @@ public class ExercisesEntry extends AppCompatActivity {
                 etWeight.setText(String.valueOf(minWeight));
         }
 
+    }
+
+
+    @OnTextChanged(value = R.id.et_num_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    public void beforeRepsChanged() {
+        beforeNumChanged(ibtnDecReps);
+    }
+
+    @OnTextChanged(value = R.id.et_num_sets, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    public void beforeSetsChanged() {
+        beforeNumChanged(ibtnDecSets);
+    }
+
+    public void beforeNumChanged(ImageButton ibtnDec) {
+        if (!ibtnDec.isEnabled()) {
+            ibtnDec.setEnabled(true);
+            ibtnDec.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @OnTextChanged(R.id.et_num_reps)
+    public void onRepsChanged(CharSequence s,
+                              int start,
+                              int before,
+                              int count) {
+        reps = onNumChanged(etNumReps, ibtnDecReps, s.toString());
+    }
+
+    @OnTextChanged(R.id.et_num_sets)
+    public void onSetsChanged(CharSequence s,
+                              int start,
+                              int before,
+                              int count) {
+        sets = onNumChanged(etNumSets, ibtnDecSets, s.toString());
+    }
+
+    public int onNumChanged(EditText etNum, ImageButton ibtnDec, String str) {
+        int value = (str.isEmpty()) ? minInt : Integer.valueOf(str);
+
+        if (value <= minInt) {
+            ibtnDec.setEnabled(false);
+            ibtnDec.setVisibility(View.GONE);
+
+            if (value < minInt)
+                etNum.setText(String.valueOf(minInt));
+        }
+
+        return value;
     }
     // =TextWatcher=Handling========================================================================
 
@@ -125,24 +171,29 @@ public class ExercisesEntry extends AppCompatActivity {
     /* Increase reps */
     @OnClick(R.id.ibtn_inc_reps)
     public void incNumReps() {
+        etNumReps.setText(String.valueOf(getTextInt(etNumReps) + 1));
     }
 
     /* Decrease reps */
     @OnClick(R.id.ibtn_dec_reps)
     public void decNumReps() {
+        etNumReps.setText(String.valueOf(getTextInt(etNumReps) - 1));
     }
+
     /* Increase sets */
     @OnClick(R.id.ibtn_inc_sets)
     public void incNumSets() {
+        etNumSets.setText(String.valueOf(getTextInt(etNumSets) + 1));
     }
 
     /* Decrease sets */
     @OnClick(R.id.ibtn_dec_sets)
     public void decNumSets() {
+        etNumSets.setText(String.valueOf(getTextInt(etNumSets) - 1));
     }
 
     @OnClick(R.id.btn_enter)
-    public void enterWorkoutName() {
+    public void enterExercise() {
 
     }
 

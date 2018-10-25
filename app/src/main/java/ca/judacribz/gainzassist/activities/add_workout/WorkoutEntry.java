@@ -113,9 +113,10 @@ public class WorkoutEntry extends AppCompatActivity{
 
         if (!isEmpty) {
             intent.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName));
-            intent.putExtra(EXTRA_NUM_EXERCISES, 3);
         }
 
+
+        intent.putExtra(EXTRA_NUM_EXERCISES, getTextInt(etNumExercises));
         startActivity(intent);
     }
 
