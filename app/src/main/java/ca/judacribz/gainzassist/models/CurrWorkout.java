@@ -33,7 +33,7 @@ public class CurrWorkout {
     private ArrayList<Set> currSets;
     private Exercise currExercise;
     private int set_i, ex_i, currNumSets, currNumWarmups, currNumExs, currNumAllExs;
-    private SetsType currSetsType;
+    private SetsType currSetsType, prevSetsType;
     private long currRestTime;
     // --------------------------------------------------------------------------------------------
 
@@ -150,7 +150,6 @@ public class CurrWorkout {
 
     private void setCurrExercise(Exercise exercise) {
         this.currExercise = exercise;
-        this.currSetsType = exercise.getSetsType();
 
         setCurrExName(exercise.getName());
         setCurrEquip(exercise.getEquipment());
@@ -187,6 +186,7 @@ public class CurrWorkout {
     }
 
     private void setCurrSetsType(SetsType setsType) {
+        this.prevSetsType = this.currSetsType;
         this.currSetsType = setsType;
     }
 
@@ -267,7 +267,7 @@ public class CurrWorkout {
         return this.currReps == MIN_REPS;
     }
     public void setCurrRestTime() {
-        currRestTime =  (currReps <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
+        this.currRestTime =  (this.currReps <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
     }
 
     public long getCurrRestTime() {

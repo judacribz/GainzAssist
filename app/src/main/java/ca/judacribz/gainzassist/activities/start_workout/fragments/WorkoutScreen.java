@@ -196,7 +196,9 @@ String TAG = "WorkoutScreen";
     }
 
     // TextWatcher for weight ET
-    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    @OnTextChanged(
+            value = R.id.et_curr_weight,
+            callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeWeightChanged() {
         if (!btnDecWeight.isEnabled())
             btnDecWeight.setEnabled(true);
@@ -282,7 +284,6 @@ String TAG = "WorkoutScreen";
 
         if (currWorkout.getIsWarmup()) {
             setType = "Warmup";
-            startTimer(currWorkout.getCurrRestTime());
             tvTimer.setText(R.string.start_next_set);
         } else {
             setType = "Main";
