@@ -150,7 +150,7 @@ public class StartWorkout extends AppCompatActivity {
         setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
         llSubtitle.addView(setsView, 0);
 
-        // Add the listView layout which contains a textView and a recyclerVIew
+        // Add the listView layout which containsExercise a textView and a recyclerVIew
         setsView = layInflater.inflate(R.layout.part_horizontal_rv, null);
         setsView.setId(id);
         llSets.addView(setsView, 0);

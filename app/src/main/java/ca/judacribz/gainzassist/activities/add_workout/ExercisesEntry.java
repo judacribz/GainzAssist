@@ -26,21 +26,16 @@ public class ExercisesEntry extends AppCompatActivity {
     // --------------------------------------------------------------------------------------------
     public static final String EXTRA_WORKOUT
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT";
+    public static final int REQ_NEW_WORKOUT_SUMMARY = 1002;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
     Workout workout;
-    ArrayList<Exercise> exercises;
     ArrayList<Set> sets;
-    ArrayList<String> exerciseNames;
     String workoutName, exerciseName;
 
-
-    int numExs,
-        ex_i = 0,
-        reps, num_sets,
-        minInt = 1; // for min reps/num_sets
+    int numExs, num_reps, num_sets, ex_i = 0, minInt = 1; // for min num_reps/num_sets
     float weight, minWeight, weightChange;
 
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
@@ -61,19 +56,16 @@ public class ExercisesEntry extends AppCompatActivity {
         setInitView(
                 this,
                 R.layout.activity_exercises_entry,
-                String.format(getString(R.string.exercise_num), ex_i),
+                String.format(getString(R.string.title_exercises_entry), ex_i),
                 true
         );
-//        setTheme(R.style.WorkoutTheme);
+        workout = new Workout();
 
-        exercises = new ArrayList<>();
-        exerciseNames = new ArrayList<>();
-        ibtnDecWeight.setEnabled(false);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
         Intent workoutEntryIntent = getIntent();
-        workoutName = workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME);
-        numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_NUM_EXERCISES);
+        workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
+        numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_NUM);
     }
 
     @OnItemSelected(R.id.spr_equipment)
@@ -96,6 +88,13 @@ public class ExercisesEntry extends AppCompatActivity {
 
     }
 
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        if (req == REQ_NEW_WORKOUT_SUMMARY) {
+            finish();
+        }
+    }
 
     // TextWatcher Handling
     // =============================================================================================
@@ -145,7 +144,7 @@ public class ExercisesEntry extends AppCompatActivity {
                               int start,
                               int before,
                               int count) {
-        reps = onNumChanged(etNumReps, ibtnDecReps, s.toString());
+        num_reps = onNumChanged(etNumReps, ibtnDecReps, s.toString());
     }
 
     @OnTextChanged(R.id.et_num_sets)
@@ -184,13 +183,13 @@ public class ExercisesEntry extends AppCompatActivity {
     public void decNumWeight() {
         etWeight.setText(String.valueOf(Math.max(getTextFloat(etWeight) - weightChange, minWeight)));
     }
-    /* Increase reps */
+    /* Increase num_reps */
     @OnClick(R.id.ibtn_inc_reps)
     public void incNumReps() {
         etNumReps.setText(String.valueOf(getTextInt(etNumReps) + 1));
     }
 
-    /* Decrease reps */
+    /* Decrease num_reps */
     @OnClick(R.id.ibtn_dec_reps)
     public void decNumReps() {
         etNumReps.setText(String.valueOf(getTextInt(etNumReps) - 1));
@@ -214,33 +213,35 @@ public class ExercisesEntry extends AppCompatActivity {
         if (validateFormEntry(this, etExerciseName)) {
             exerciseName = getTextString(etExerciseName);
 
-            if (exerciseNames.contains(exerciseName)) {
-                etExerciseName.setError("exercsise already added");
+            // Check if exercise already added
+            if (workout.containsExercise(exerciseName)) {
+                etExerciseName.setError(String.format(
+                        getString(R.string.err_exercise_exists),
+                        exerciseName
+                ));
             } else {
                 sets = new ArrayList<>();
-                reps = getTextInt(etNumReps);
+                num_reps = getTextInt(etNumReps);
                 num_sets = getTextInt(etNumSets);
                 for (int i = 1; i <= num_sets; i++) {
-                    sets.add(new Set(i, reps, weight));
+                    sets.add(new Set(i, num_reps, weight));
                 }
-
-                exerciseNames.add(exerciseName);
-                etExerciseName.setText("");
-
-                exercises.add(new Exercise(
+                workout.addExercise(new Exercise(
                         exerciseName,
                         "Strength",
-                        sprEquipment.getSelectedItem().toString(),
+                        getTextString(sprEquipment),
                         sets
                 ));
-                workout = new Workout(workoutName, exercises);
+
 
                 ex_i++;
                 if (ex_i >= numExs) {
-                    Intent intent = new Intent(this, NewWorkoutSummary.class);
-                    intent.putExtra(EXTRA_WORKOUT, workout);
-                    startActivity(intent);
+                    Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
+                    newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workout);
+                    startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
                 }
+
+                etExerciseName.setText("");
             }
         }
     }

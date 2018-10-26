@@ -3,11 +3,22 @@ package ca.judacribz.gainzassist.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Exercise implements Parcelable {
+
+
+    public static final ArrayList<String> EQUIPMENT_TYPES = new ArrayList<>(Arrays.asList(
+            "Barbell",
+            "Dumbbell",
+            "N/A"
+    ));
+
+    public static final ArrayList<String> EXERCISE_TYPES = new ArrayList<>(Arrays.asList(
+            "Strength",
+            "Cardiovascular",
+            "Plyometrics"
+    ));
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
