@@ -193,7 +193,7 @@ public class CurrWorkout {
     private void setCurrSet(Set set) {
         this.currSet = set;
         this.currSetNum = this.currSet.getSetNumber();
-        this.currReps = this.currSet.getReps();
+        setCurrReps(this.currSet.getReps());
         this.currWeight = this.currSet.getWeight();
     }
 
@@ -261,7 +261,7 @@ public class CurrWorkout {
     public boolean setCurrReps(int reps) {
         this.currReps = reps;
 
-        if (currSetsType == MAIN_SET)
+        if (this.currSetsType == MAIN_SET)
             setCurrRestTime();
 
         return this.currReps == MIN_REPS;
