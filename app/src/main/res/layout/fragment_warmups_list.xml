@@ -12,14 +12,14 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/ll_exercise_attr_insert"
+            android:id="@+id/ll_exercise_subtitle_insert"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"/>
 
         <LinearLayout
             android:id="@+id/ll_exercise_sets_insert"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"/>
     </LinearLayout>

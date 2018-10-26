@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,15 +19,16 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     private ArrayList<Set> sets;
 
     // Adapter Constructor
-    public SetsAdapter(ArrayList<Set> sets) {
+    SetsAdapter(ArrayList<Set> sets) {
         this.sets = sets;
         this.numberOfSets = sets.size();
     }
 
     // SetsAdapter @Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    @NonNull
     @Override
-    public SetsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SetsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         View view = inflater.inflate(R.layout.part_sets_input, parent, false);
@@ -34,7 +36,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     }
 
     @Override
-    public void onBindViewHolder(SetsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SetsViewHolder holder, int position) {
 
         Set set = sets.get(position);
         holder.bind(set.getSetNumber(), set.getReps(), set.getWeight());
@@ -63,6 +65,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         // ViewHolder Constructor
         SetsViewHolder(View itemView) {
             super(itemView);
+
 
             tvSetNum = itemView.findViewById(R.id.tv_sets);
             etReps = itemView.findViewById(R.id.et_reps);

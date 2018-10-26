@@ -107,7 +107,7 @@ String TAG = "WorkoutScreen";
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_curr_workout, container, false);
+        View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
 
         return view;
