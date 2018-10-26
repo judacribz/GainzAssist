@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -161,7 +162,9 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         cv.put(WORKOUT_NAME,  workout.getName());
         cv.put(EXERCISES,     getBlobFromExercises(workout.getExercises()));
 
-        db.insert(TABLE_WORKOUTS, null, cv);
+       long i =  db.insert(TABLE_WORKOUTS, null, cv);
+
+        Toast.makeText(context, "adding" + i, Toast.LENGTH_SHORT).show();
     }
 
     /* Creates a db entry for the session

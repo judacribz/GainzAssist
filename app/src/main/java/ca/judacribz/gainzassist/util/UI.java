@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -103,6 +104,10 @@ public class UI {
     }
 
     /* Gets string value from EditText element */
+    public static String getTextString(Spinner spr) {
+        return spr.getSelectedItem().toString();
+    }
+
     public static String getTextString(EditText et) {
         return et.getText().toString().trim();
     }
@@ -142,9 +147,21 @@ public class UI {
 
     public static void clearForm(EditText[] ets) {
         for (EditText et : ets) {
-            et.setText("");
+            clearFormEntry(et);
         }
     }
+
+    public static void clearFormEntry(EditText et) {
+        et.setText("");
+    }
+
+    public static int calculateNoOfColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (dpWidth / 180);
+        return noOfColumns;
+    }
+
 
 //        /* Checks to see if the database exists */
 //        public static boolean exists(Context context) {

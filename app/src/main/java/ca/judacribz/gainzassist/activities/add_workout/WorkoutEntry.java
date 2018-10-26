@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import android.widget.Toast;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 
@@ -21,7 +22,10 @@ public class WorkoutEntry extends AppCompatActivity{
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT_NAME";
     public static final String EXTRA_NUM_EXERCISES
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_NUM_EXERCISES";
-    public static final int MIN_NUM_EXERCISES = 1;
+
+    public static final int REQ_EXERCISE_ENTRY = 1001;
+
+    public static final int MIN_NUM = 1;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -41,6 +45,13 @@ public class WorkoutEntry extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_workout_entry, R.string.add_workout, true);
 
+    }
+
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        if (req == REQ_EXERCISE_ENTRY) {
+                finish();
+        }
     }
 
     /* Toolbar back arrow handling */
@@ -64,14 +75,14 @@ public class WorkoutEntry extends AppCompatActivity{
     @OnTextChanged(value = R.id.et_num_exercises, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onNumExercisesChanged(CharSequence s, int start, int before, int count) {
         String numExStr = s.toString();
-        numExs = (numExStr.isEmpty()) ? MIN_NUM_EXERCISES : Integer.valueOf(numExStr);
+        numExs = (numExStr.isEmpty()) ? MIN_NUM : Integer.valueOf(numExStr);
 
-        if (numExs <= MIN_NUM_EXERCISES) {
+        if (numExs <= MIN_NUM) {
             ibtnDecExercises.setEnabled(false);
             ibtnDecExercises.setVisibility(View.GONE);
 
-            if (numExs < MIN_NUM_EXERCISES)
-                etNumExercises.setText(String.valueOf(MIN_NUM_EXERCISES));
+            if (numExs < MIN_NUM)
+                etNumExercises.setText(String.valueOf(MIN_NUM));
         }
 
     }
@@ -95,13 +106,13 @@ public class WorkoutEntry extends AppCompatActivity{
 
     // Click Handling
     // =============================================================================================
-    /* Increase number of sets */
+    /* Increase number of num_sets */
     @OnClick(R.id.ibtn_inc_exercises)
     public void incNumExs() {
         etNumExercises.setText(String.valueOf(getTextInt(etNumExercises) + 1));
     }
 
-    /* Decrease number of sets */
+    /* Decrease number of num_sets */
     @OnClick(R.id.ibtn_dec_exercises)
     public void decNumExs() {
         etNumExercises.setText(String.valueOf(getTextInt(etNumExercises) - 1));
@@ -109,14 +120,16 @@ public class WorkoutEntry extends AppCompatActivity{
 
     @OnClick(R.id.btn_enter)
     public void enterWorkoutName() {
-        Intent intent = new Intent(this, ExercisesEntry.class);
+        Intent exercisesEntry = new Intent(this, ExercisesEntry.class);
 
         if (!isEmpty) {
-            intent.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName));
-            intent.putExtra(EXTRA_NUM_EXERCISES, 3);
+            Toast.makeText(this, "" + getTextString(etWorkoutName), Toast.LENGTH_SHORT).show();
+            exercisesEntry.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName));
         }
 
-        startActivity(intent);
+
+        exercisesEntry.putExtra(EXTRA_NUM_EXERCISES, getTextInt(etNumExercises));
+        startActivityForResult(exercisesEntry, REQ_EXERCISE_ENTRY);
     }
 
     @OnClick(R.id.btn_cancel)

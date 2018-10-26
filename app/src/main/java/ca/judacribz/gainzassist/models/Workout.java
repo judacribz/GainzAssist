@@ -2,7 +2,6 @@ package ca.judacribz.gainzassist.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,21 +10,45 @@ public class Workout implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    private ArrayList<Exercise> exercises;
-    private String name;
+    private ArrayList<Exercise> exercises = new ArrayList<>();
+    private String name = "";
     // --------------------------------------------------------------------------------------------
+
 
     // ######################################################################################### //
     // Workout Constructor                                                                       //
     // ######################################################################################### //
+    public Workout() {
+    }
+
     public Workout(String name, ArrayList<Exercise> exercises) {
-        this.name = name;
+        setName(name);
         this.exercises = exercises;
     }
     // ######################################################################################### //
 
+
     // Getters and setters
     // ============================================================================================
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void addExercise(Exercise exercise) {
+        exercises.add(exercise);
+    }
+
+    public Exercise getExercise(String exName) {
+            for (Exercise exercise : exercises) {
+                if (exercise.getName().equals(exName)) {
+                    return exercise;
+                }
+            }
+
+            return null;
+    }
+
+
     public ArrayList<Exercise> getExercises() {
         return exercises;
     }
@@ -35,17 +58,9 @@ public class Workout implements Parcelable {
     }
     // ============================================================================================
 
-    /* Helper function used to store Workout information in the firebase db */
-    public Map<String, Object> toMap() {
-        Map<String, Object> workout = new HashMap<>();
 
-        for (Exercise exercise: exercises) {
-            workout.put(exercise.getName(), exercise.toMap());
-        }
-
-        return workout;
-    }
-
+    // Parcelable Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public int describeContents() {
         return 0;
@@ -73,4 +88,41 @@ public class Workout implements Parcelable {
             return new Workout[size];
         }
     };
+    //Parcelable//Override////////////////////////////////////////////////////////////////////////
+
+
+    // Helper functions
+    // --------------------------------------------------------------------------------------------
+    /* Helper function used to store Workout information in the firebase db */
+    public Map<String, Object> toMap() {
+        Map<String, Object> workout = new HashMap<>();
+
+        for (Exercise exercise: exercises) {
+            workout.put(exercise.getName(), exercise.toMap());
+        }
+
+        return workout;
+    }
+
+
+    /* Returns true if the exercise exist, false if not */
+    public boolean containsExercise(String exerciseName) {
+        for (Exercise exercise : exercises) {
+            if (exercise.getName().toLowerCase().equals(exerciseName.toLowerCase())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public ArrayList<String> getExerciseNames() {
+        ArrayList<String> exerciseNames = new ArrayList<>();
+        for (Exercise exercise : exercises) {
+            exerciseNames.add(exercise.getName());
+        }
+
+        return  exerciseNames;
+    }
+    // --------------------------------------------------------------------------------------------
 }

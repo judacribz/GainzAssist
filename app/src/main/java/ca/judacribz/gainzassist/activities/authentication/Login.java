@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.models.WorkoutHelper;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -39,7 +41,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
-import ca.judacribz.gainzassist.async.BGStartActivityTask;
 
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
 

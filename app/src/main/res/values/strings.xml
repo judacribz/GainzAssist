@@ -1,10 +1,9 @@
 <resources>
     <!-- Titles -->
     <string name="app_name">Gainz Assist</string>
-    <string name="create_account">Create Account</string>
-
-    <!--TODO remove-->
-    <string name="how_to_squat">How To Squat</string>
+    <string name="title_create_account">Create Account</string>
+    <string name="title_exercises_entry">Exercise %d</string>
+    <string name="title_new_workout_summary">New Workout Summary</string>
 
     <!-- Content Descriptions -->
     <string name="cd_login_img">Main image in the login screen</string>
@@ -24,7 +23,7 @@
     <string name="err_required">Required</string>
     <string name="err_required_email_format">Email Format Required</string>
     <string name="err_required_password_min">Minimum 6 Characters Required</string>
-    <string name="err_exercise_exists">Exercise Already Added</string>
+    <string name="err_exercise_exists">%s exists</string>
 
     <!-- Success Msgs -->
     <string name="sign_up_success">Sign Up Success!</string>
@@ -95,5 +94,7 @@
     <string name="skip">skip</string>
     <string name="num_of_exercises"># of exercises</string>
     <string name="initial_num_exercises">3</string>
-    <string name="exercise_num">Exercise %d</string>
+    <string name="min">1</string>
+    <string name="starting_sets">3</string>
+    <string name="update_exercise">Update Exercise</string>
 </resources>

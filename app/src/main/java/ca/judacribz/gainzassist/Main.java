@@ -14,6 +14,7 @@ import butterknife.*;
 import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
+import ca.judacribz.gainzassist.async.FirebaseService;
 
 import static ca.judacribz.gainzassist.util.UI.*;
 
