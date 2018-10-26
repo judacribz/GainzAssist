@@ -3,6 +3,10 @@ package ca.judacribz.gainzassist.firebase;
 import android.app.Activity;
 
 import java.util.ArrayList;
+
+import android.content.Intent;
+import android.widget.Toast;
+import ca.judacribz.gainzassist.async.FirebaseService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -48,7 +52,7 @@ public class Database {
     }
 
     /* Gets firebase db reference for 'users/<uid>/workouts/' */
-    private static DatabaseReference getWorkoutsRef() {
+    public static DatabaseReference getWorkoutsRef() {
         return getUserRef().child(WORKOUTS);
     }
 
@@ -73,6 +77,8 @@ public class Database {
                     user.setEmail(email);
                     user.setUid(uid);
 
+                    act.startService(new Intent(act, FirebaseService.class));
+
                     // If newly added user
                     if (!dataSnapshot.hasChildren()) {
                         userRef
@@ -82,8 +88,6 @@ public class Database {
                         // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
                         copyDefaultWorkoutsFirebase();
                     }
-
-                    getWorkoutsFirebase(act);
                 }
 
                 @Override
@@ -112,77 +116,6 @@ public class Database {
         });
     }
 
-
-    /* Gets all workouts from firebase db from 'users/<uid>/workouts/' and if the local db is
-     * missing any workouts, those ones are added */
-    public static void getWorkoutsFirebase(final Activity act) {
-
-        getWorkoutsRef().addChildEventListener(new ChildEventListener() {
-            WorkoutHelper workoutHelper = new WorkoutHelper(act);
-
-            ArrayList<String> workoutNames = workoutHelper.getAllWorkoutNames();
-            ArrayList<Exercise> exercises;
-            ArrayList<Set> sets;
-
-            Exercise exercise;
-            Set set;
-            String workoutName;
-
-            @Override
-            public void onChildAdded(DataSnapshot workoutShot, String s) {
-
-                workoutName = workoutShot.getKey();
-                if (!workoutNames.contains(workoutName)) {
-
-                    exercises = new ArrayList<>();
-                    for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
-
-                        // Add set to sets list
-                        sets = new ArrayList<>();
-                        for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
-                            set = setShot.getValue(Set.class);
-
-                            if (set != null) {
-                                set.setSetNumber(Integer.valueOf(setShot.getKey()));
-
-                                sets.add(set);
-                            }
-                        }
-
-                        // Adds sets to exercise object, and add exercise to exercises list
-                        exercise = exerciseShot.getValue(Exercise.class);
-                        if (exercise != null) {
-                            exercise.setName(exerciseShot.getKey());
-                            exercise.setSets(sets);
-
-                            exercises.add(exercise);
-                        }
-                    }
-
-                    Workout workout = new Workout(workoutShot.getKey(), exercises);
-
-                    // Add workout name and exercises list to workouts list
-                    workoutHelper.addWorkout(workout);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
 
     /* Adds a workout under "users/<uid>/workouts/" */
     public static void addWorkoutFirebase(Workout workout) {
