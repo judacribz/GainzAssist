@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -20,6 +21,8 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
+import static ca.judacribz.gainzassist.activities.add_workout.ExercisesEntry.EXTRA_WORKOUT;
+import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.EXTRA_WORKOUT_NAME;
 import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -76,6 +79,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         ButterKnife.bind(this);
         setToolbar(this, R.string.create_workout, true);
 
+        Intent workoutEntryIntent = getIntent();
+        workout = workoutEntryIntent.getParcelableExtra(EXTRA_WORKOUT);
+
         setSpinnerWithArray(this, R.array.exerciseType, sprType);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
@@ -94,11 +100,18 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
         forms = new EditText[]{etExerciseName, etReps, etWeight, etSets};
         exerciseNames = new ArrayList<>();
-        exercises = new ArrayList<>();
+        exercises = workout.getExercises();
+        for (Exercise exercise : exercises) {
+            exerciseNames.add(exercise.getName());
+        }
+        updateAdapter();
+
+        etWorkoutName.setText(workout.getName());
+
         workoutHelper = new WorkoutHelper(this);
     }
 
-    /* Disables decrease ImageButtons when EditText value is at 0 (for reps or sets) */
+    /* Disables decrease ImageButtons when EditText value is at 0 (for reps or num_sets) */
     public void setTextWatcher(final EditText et, final ImageButton btnDec, final boolean isInt) {
         et.addTextChangedListener(new TextWatcher() {
             @Override
@@ -181,13 +194,13 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         etReps.setText(String.valueOf(Math.max(getTextInt(etReps) - MIN_INT, MIN_INT)));
     }
 
-    /* Increase number of sets */
+    /* Increase number of num_sets */
     @OnClick(R.id.btn_inc_sets)
     public void incSets() {
         etSets.setText(String.valueOf(getTextInt(etSets) + MIN_INT));
     }
 
-    /* Decrease number of sets */
+    /* Decrease number of num_sets */
     @OnClick(R.id.btn_dec_sets)
     public void decSets() {
         etSets.setText(String.valueOf(Math.max(getTextInt(etSets) - MIN_INT, MIN_INT)));
@@ -218,7 +231,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
                 exerciseNames.add(exName);
                 updateAdapter();
 
-                // add set objects matching the number of sets user chose
+                // add set objects matching the number of num_sets user chose
                 exSets = new ArrayList<>();
                 for (int i = 1; i <= getTextInt(etSets); i++) {
                     exSets.add(new Set(
@@ -264,8 +277,6 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
             } else {
 
                 workout = new Workout(getTextString(etWorkoutName), exercises);
-
-                workoutHelper.addWorkout(workout);
                 addWorkoutFirebase(workout);
 
                 discardWorkout();

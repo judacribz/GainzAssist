@@ -177,7 +177,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         popupView.findViewById(R.id.btn_delete_workout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                workoutHelper.deleteWorkout(name);
+
                 deleteWorkoutFirebase(name);
                 popupWindow.dismiss();
                 workoutNames = workoutHelper.getAllWorkoutNames();

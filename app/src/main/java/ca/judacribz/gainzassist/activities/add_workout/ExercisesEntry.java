@@ -10,6 +10,11 @@ import android.widget.Spinner;
 
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.Workout;
+
+import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
@@ -19,18 +24,26 @@ public class ExercisesEntry extends AppCompatActivity {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-
+    public static final String EXTRA_WORKOUT
+            = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT";
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    String workoutName;
+    Workout workout;
+    ArrayList<Exercise> exercises;
+    ArrayList<Set> sets;
+    ArrayList<String> exerciseNames;
+    String workoutName, exerciseName;
+
+
     int numExs,
-        ex_i = MIN_NUM_EXERCISES,
-        reps, sets,
-        minInt = 1; // for min reps/sets
+        ex_i = 0,
+        reps, num_sets,
+        minInt = 1; // for min reps/num_sets
     float weight, minWeight, weightChange;
 
+    @BindView(R.id.et_exercise_name) EditText etExerciseName;
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_num_reps) EditText etNumReps;
     @BindView(R.id.et_num_sets) EditText etNumSets;
@@ -52,6 +65,9 @@ public class ExercisesEntry extends AppCompatActivity {
                 true
         );
 //        setTheme(R.style.WorkoutTheme);
+
+        exercises = new ArrayList<>();
+        exerciseNames = new ArrayList<>();
         ibtnDecWeight.setEnabled(false);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
@@ -137,7 +153,7 @@ public class ExercisesEntry extends AppCompatActivity {
                               int start,
                               int before,
                               int count) {
-        sets = onNumChanged(etNumSets, ibtnDecSets, s.toString());
+        num_sets = onNumChanged(etNumSets, ibtnDecSets, s.toString());
     }
 
     public int onNumChanged(EditText etNum, ImageButton ibtnDec, String str) {
@@ -180,13 +196,13 @@ public class ExercisesEntry extends AppCompatActivity {
         etNumReps.setText(String.valueOf(getTextInt(etNumReps) - 1));
     }
 
-    /* Increase sets */
+    /* Increase num_sets */
     @OnClick(R.id.ibtn_inc_sets)
     public void incNumSets() {
         etNumSets.setText(String.valueOf(getTextInt(etNumSets) + 1));
     }
 
-    /* Decrease sets */
+    /* Decrease num_sets */
     @OnClick(R.id.ibtn_dec_sets)
     public void decNumSets() {
         etNumSets.setText(String.valueOf(getTextInt(etNumSets) - 1));
@@ -195,6 +211,38 @@ public class ExercisesEntry extends AppCompatActivity {
     @OnClick(R.id.btn_enter)
     public void enterExercise() {
 
+        if (validateFormEntry(this, etExerciseName)) {
+            exerciseName = getTextString(etExerciseName);
+
+            if (exerciseNames.contains(exerciseName)) {
+                etExerciseName.setError("exercsise already added");
+            } else {
+                sets = new ArrayList<>();
+                reps = getTextInt(etNumReps);
+                num_sets = getTextInt(etNumSets);
+                for (int i = 1; i <= num_sets; i++) {
+                    sets.add(new Set(i, reps, weight));
+                }
+
+                exerciseNames.add(exerciseName);
+                etExerciseName.setText("");
+
+                exercises.add(new Exercise(
+                        exerciseName,
+                        "Strength",
+                        sprEquipment.getSelectedItem().toString(),
+                        sets
+                ));
+                workout = new Workout(workoutName, exercises);
+
+                ex_i++;
+                if (ex_i >= numExs) {
+                    Intent intent = new Intent(this, NewWorkoutSummary.class);
+                    intent.putExtra(EXTRA_WORKOUT, workout);
+                    startActivity(intent);
+                }
+            }
+        }
     }
 
     @OnClick(R.id.btn_cancel)

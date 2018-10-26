@@ -95,13 +95,13 @@ public class WorkoutEntry extends AppCompatActivity{
 
     // Click Handling
     // =============================================================================================
-    /* Increase number of sets */
+    /* Increase number of num_sets */
     @OnClick(R.id.ibtn_inc_exercises)
     public void incNumExs() {
         etNumExercises.setText(String.valueOf(getTextInt(etNumExercises) + 1));
     }
 
-    /* Decrease number of sets */
+    /* Decrease number of num_sets */
     @OnClick(R.id.ibtn_dec_exercises)
     public void decNumExs() {
         etNumExercises.setText(String.valueOf(getTextInt(etNumExercises) - 1));
