@@ -97,4 +97,5 @@
     <string name="min">1</string>
     <string name="starting_sets">3</string>
     <string name="update_exercise">Update Exercise</string>
+    <string name="update_workout">Update Workout</string>
 </resources>

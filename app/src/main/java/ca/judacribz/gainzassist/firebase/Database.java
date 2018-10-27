@@ -123,6 +123,6 @@ public class Database {
     }
 
     public static void deleteWorkoutFirebase(String workoutName) {
-        getWorkoutsRef().child(workoutName).setValue(null);
+        getWorkoutsRef().child(workoutName).removeValue();
     }
 }

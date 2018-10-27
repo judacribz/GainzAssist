@@ -21,19 +21,25 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
+import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.EXERCISES_ENTRY;
+import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
+import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
+import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.firebase.Database.deleteWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
                                                                TextWatcher {
 
+
     public static final String EXTRA_WORKOUT_NAME
-            = "ca.judacribz.gainzassist.activity_workouts_list.EXTRA_WORKOUT_NAME";
+            = "ca.judacribz.gainzassist.activities.workouts_list.EXTRA_WORKOUT_NAME";
 
     // Global Variables
     // --------------------------------------------------------------------------------------------
@@ -165,27 +171,38 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void onWorkoutLongClick(View anch, final String name) {
+    public void onWorkoutLongClick(View anch, final String workoutName) {
         View popupView = getLayoutInflater().inflate(R.layout.part_confirm_popup, null);
 
         final PopupWindow popupWindow = new PopupWindow(popupView,
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         TextView textView = popupView.findViewById(R.id.tv_workout_name);
-        textView.setText(name);
+        textView.setText(workoutName);
+        popupView.findViewById(R.id.btn_edit_workout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newWorkoutSummaryIntent = new Intent(
+                        getApplicationContext(),
+                        NewWorkoutSummary.class
+                );
+                newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workoutHelper.getWorkout(workoutName));
+                newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
+                startActivity(newWorkoutSummaryIntent);
+            }
+        });
 
         popupView.findViewById(R.id.btn_delete_workout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                deleteWorkoutFirebase(name);
+                deleteWorkoutFirebase(workoutName);
                 popupWindow.dismiss();
-                workoutNames = workoutHelper.getAllWorkoutNames();
-                displayWorkoutList(workoutNames);
             }
         });
         // If the PopupWindow should be focusable
         popupWindow.setFocusable(true);
+
+
 
         // If you need the PopupWindow to dismiss when when touched outside
 //        popupWindow.setBackgroundDrawable(new ColorDrawable());

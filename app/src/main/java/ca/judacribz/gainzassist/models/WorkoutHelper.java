@@ -317,6 +317,20 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 //        return (numRows == 1);
 //    }
 
+        public boolean updateWorkout(String workoutName, Workout workout) {
+        db = this.getWritableDatabase();
+
+        cv.clear();
+        cv.put(EXERCISES, getBlobFromExercises(workout.getExercises()));
+
+        String where = EMAIL + " = ? AND " + WORKOUT_NAME + " = ?";
+        String[] whereArgs = new String[] {email, workoutName};
+
+        int numRows = db.update(TABLE_WORKOUTS, cv, where, whereArgs);
+
+        return (numRows == 1);
+    }
+
     // DELETE
     // --------------------------------------------------------------------------------------------
     /* Deletes a workout

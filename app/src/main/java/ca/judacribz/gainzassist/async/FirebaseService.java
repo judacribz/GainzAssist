@@ -54,39 +54,14 @@ public class FirebaseService extends IntentService implements ChildEventListener
         workoutName = workoutShot.getKey();
         if (!workoutNames.contains(workoutName)) {
 
-            exercises = new ArrayList<>();
-            for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
-                // Add set to sets list
-                sets = new ArrayList<>();
-                for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
-                    set = setShot.getValue(Set.class);
-
-                    if (set != null) {
-                        set.setSetNumber(Integer.valueOf(setShot.getKey()));
-
-                        sets.add(set);
-                    }
-                }
-
-                // Adds sets to exercise object, and add exercise to exercises list
-                exercise = exerciseShot.getValue(Exercise.class);
-                if (exercise != null) {
-                    exercise.setName(exerciseShot.getKey());
-                    exercise.setSets(sets);
-
-                    exercises.add(exercise);
-                }
-            }
-
-            Workout workout = new Workout(workoutShot.getKey(), exercises);
-
-            // Add workout name and exercises list to workouts list
-            workoutHelper.addWorkout(workout);
+            workoutHelper.addWorkout(extractWorkout(workoutShot));
         }
     }
 
     @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+    public void onChildChanged(DataSnapshot workoutShot, String s) {
+
+        workoutHelper.updateWorkout(workoutShot.getKey(), extractWorkout(workoutShot));
 
     }
 
@@ -104,5 +79,33 @@ public class FirebaseService extends IntentService implements ChildEventListener
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
+    }
+
+    public Workout extractWorkout(DataSnapshot workoutShot) {
+        exercises = new ArrayList<>();
+        for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
+            // Add set to sets list
+            sets = new ArrayList<>();
+            for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
+                set = setShot.getValue(Set.class);
+
+                if (set != null) {
+                    set.setSetNumber(Integer.valueOf(setShot.getKey()));
+
+                    sets.add(set);
+                }
+            }
+
+            // Adds sets to exercise object, and add exercise to exercises list
+            exercise = exerciseShot.getValue(Exercise.class);
+            if (exercise != null) {
+                exercise.setName(exerciseShot.getKey());
+                exercise.setSets(sets);
+
+                exercises.add(exercise);
+            }
+        }
+
+        return new Workout(workoutShot.getKey(), exercises);
     }
 }

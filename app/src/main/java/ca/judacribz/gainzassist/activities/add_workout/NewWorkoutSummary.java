@@ -1,5 +1,7 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,13 +12,13 @@ import android.widget.*;
 import java.util.ArrayList;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
-import static ca.judacribz.gainzassist.activities.add_workout.ExercisesEntry.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
 import static ca.judacribz.gainzassist.models.Exercise.*;
@@ -27,6 +29,12 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
     // Constants
     // --------------------------------------------------------------------------------------------
+    public static final String EXTRA_WORKOUT
+            = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT";
+    public static final String EXTRA_CALLING_ACTIVITY
+            = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_CALLING_ACTIVITY";
+
+
     private static final int MIN_INT = 1;
     private static final float MIN_FLOAT = 5.0f;
 
@@ -34,6 +42,11 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     private static final int POS_CARDIO = 1;
 
     private static final int POS_NA = 2;
+
+    public enum CALLING_ACTIVITY {
+        WORKOUTS_LIST,
+        EXERCISES_ENTRY
+    }
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -65,6 +78,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
     @BindView(R.id.btn_add_exercise) Button btnAddExercise;
     @BindView(R.id.btn_update_exercise) Button btnUpdateExercise;
+    @BindView(R.id.btn_add_workout) Button btnAddWorkout;
 
     @BindView(R.id.rv_exercise_btns) RecyclerView rvExerciseList;
 
@@ -81,7 +95,14 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
         setInitView(this, R.layout.activity_new_workout_summary, R.string.title_new_workout_summary, true);
 
-        workout = getIntent().getParcelableExtra(EXTRA_WORKOUT);
+        Intent intent = getIntent();
+        workout = intent.getParcelableExtra(EXTRA_WORKOUT);
+        switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {
+            case WORKOUTS_LIST:
+                btnAddWorkout.setText(getString(R.string.update_workout));
+                break;
+        }
+
         formEntries = new EditText[]{etExerciseName, etNumReps, etWeight, etNumSets};
 
 
@@ -179,6 +200,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         String weightStr = s.toString();
         weight = (weightStr.isEmpty()) ? minWeight : Float.valueOf(weightStr);
 
+
         if (weight <= minWeight) {
             ibtnDecWeight.setEnabled(false);
             ibtnDecWeight.setVisibility(View.GONE);
@@ -186,7 +208,6 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
             if (weight < minWeight)
                 etWeight.setText(String.valueOf(minWeight));
         }
-
     }
 
 
@@ -250,7 +271,7 @@ Exercise ex;
         ex = workout.getExercise(exName);
         etExerciseName.setText(exName);
         etNumSets.setText(String.valueOf(ex.getNumSets()));
-        etNumReps.setText(String.valueOf(ex.getNumSets()));
+        etNumReps.setText(String.valueOf(ex.getAvgReps()));
         etWeight.setText(String.valueOf(ex.getAvgWeight()));
         sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex.getEquipment()));
         sprType.setSelection(EXERCISE_TYPES.indexOf(ex.getType()));
@@ -378,6 +399,7 @@ Exercise ex;
             }
         }
     }
+
 
     /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
     @OnClick(R.id.btn_clear_exercise)

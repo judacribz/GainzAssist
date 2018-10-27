@@ -16,6 +16,8 @@ import ca.judacribz.gainzassist.models.Workout;
 
 import java.util.ArrayList;
 
+import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.*;
+import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.*;
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -24,8 +26,7 @@ public class ExercisesEntry extends AppCompatActivity {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    public static final String EXTRA_WORKOUT
-            = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT";
+
     public static final int REQ_NEW_WORKOUT_SUMMARY = 1002;
     // --------------------------------------------------------------------------------------------
 
@@ -238,6 +239,7 @@ public class ExercisesEntry extends AppCompatActivity {
                 if (ex_i >= numExs) {
                     Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
                     newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workout);
+                    newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
                     startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
                 }
 
