@@ -1,5 +1,8 @@
 package ca.judacribz.gainzassist.models;
 
+import android.app.Activity;
+import ca.judacribz.gainzassist.activities.start_workout.fragments.WorkoutScreen;
+
 import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.models.Exercise.*;
@@ -36,6 +39,18 @@ public class CurrWorkout {
     private SetsType currSetsType, prevSetsType;
     private long currRestTime;
     // --------------------------------------------------------------------------------------------
+
+    private RestTimeSetListener restTimeSetListener;
+
+    // Ideally, your interface should be declared inside ClassB.
+    public interface RestTimeSetListener {
+        public void startTimer(long timeInMillis);
+    }
+
+    public void setRestTimeSetListener(RestTimeSetListener restTimeSetListener) {
+        this.restTimeSetListener = restTimeSetListener;
+    }
+
 
     // ######################################################################################### //
     // WorkoutScreen Constructor/Instance                                                     //
@@ -125,6 +140,7 @@ public class CurrWorkout {
 
     public boolean finishCurrSet() {
         this.set_i++;
+
         if (atEndOfSets()) {
             this.ex_i++;
 
@@ -141,7 +157,7 @@ public class CurrWorkout {
     }
 
     private boolean atEndOfSets() {
-        return this.currNumSets == this.set_i;
+        return this.set_i >= this.currNumSets;
     }
 
     private boolean atEndOfExercises() {
@@ -151,12 +167,12 @@ public class CurrWorkout {
     private void setCurrExercise(Exercise exercise) {
         this.currExercise = exercise;
 
-        setCurrExName(exercise.getName());
-        setCurrEquip(exercise.getEquipment());
-        setCurrExType(exercise.getType());
+        setCurrExName(this.currExercise.getName());
+        setCurrEquip(this.currExercise.getEquipment());
+        setCurrExType(this.currExercise.getType());
 
-        setCurrSets(exercise.getSets());
-        setCurrSetsType(exercise.getSetsType());
+        setCurrSets(this.currExercise.getSets());
+        setCurrSetsType(this.currExercise.getSetsType());
     }
 
     private void setCurrExName(String currExName) {
@@ -261,13 +277,15 @@ public class CurrWorkout {
     public boolean setCurrReps(int reps) {
         this.currReps = reps;
 
-        if (this.currSetsType == MAIN_SET)
+        if (this.currSetsType == MAIN_SET) {
             setCurrRestTime();
+        }
 
         return this.currReps == MIN_REPS;
     }
     public void setCurrRestTime() {
         this.currRestTime =  (this.currReps <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
+        restTimeSetListener.startTimer(this.currRestTime);
     }
 
     public long getCurrRestTime() {

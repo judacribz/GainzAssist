@@ -65,8 +65,9 @@ public class ExercisesList extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-       View view =  inflater.inflate(R.layout.fragment_exercises_list, container, false);
+        View view =  inflater.inflate(R.layout.fragment_exercises_list, container, false);
         ButterKnife.bind(this, view);
+
         if (bundle != null) {
             Workout workout = bundle.getParcelable(EXTRA_WORKOUT);
             if (workout != null) {
@@ -82,7 +83,6 @@ public class ExercisesList extends Fragment {
                 }
             }
         }
-
 
        return view;
     }

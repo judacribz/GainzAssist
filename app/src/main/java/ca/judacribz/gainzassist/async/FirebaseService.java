@@ -12,7 +12,6 @@ import ca.judacribz.gainzassist.models.WorkoutHelper;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -23,14 +22,12 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     private final static String SETS = "sets";
 
-    WorkoutHelper workoutHelper;
-    ArrayList<String> workoutNames;
+    WorkoutHelper workoutHelper = new WorkoutHelper(this);
     ArrayList<Exercise> exercises;
     ArrayList<Set> sets;
 
     Exercise exercise;
     Set set;
-    String workoutName;
 
     public FirebaseService() {
         super("FirebaseService");
@@ -38,8 +35,6 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        workoutHelper = new WorkoutHelper(getApplicationContext());
-        workoutNames = workoutHelper.getAllWorkoutNames();
         getWorkoutsRef().addChildEventListener(this);
 
         return Service.START_STICKY;
@@ -49,12 +44,12 @@ public class FirebaseService extends IntentService implements ChildEventListener
     protected void onHandleIntent(Intent intent) {
     }
 
+    ArrayList<String> workoutNames;
     @Override
     public void onChildAdded(DataSnapshot workoutShot, String s) {
+        workoutNames = workoutHelper.getAllWorkoutNames();
 
-        workoutName = workoutShot.getKey();
-        if (!workoutNames.contains(workoutName)) {
-
+        if (workoutNames.size() > 0 && !workoutNames.contains(workoutShot.getKey())) {
             workoutHelper.addWorkout(extractWorkout(workoutShot));
         }
     }

@@ -102,7 +102,6 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_login, R.string.app_name,  false);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         progressBar.setMax(10);
         // Get firebase instance and setup google and facebook sign in

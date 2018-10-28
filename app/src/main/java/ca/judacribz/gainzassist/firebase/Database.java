@@ -36,7 +36,6 @@ public class Database {
 
     // --------------------------------------------------------------------------------------------
 
-
     /* Gets firebase db reference for 'users/<uid>/' */
     private static DatabaseReference getUserRef() {
         DatabaseReference userRef = null;
