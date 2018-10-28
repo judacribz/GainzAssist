@@ -47,11 +47,7 @@ public class FirebaseService extends IntentService implements ChildEventListener
     ArrayList<String> workoutNames;
     @Override
     public void onChildAdded(DataSnapshot workoutShot, String s) {
-        workoutNames = workoutHelper.getAllWorkoutNames();
-
-        if (workoutNames.size() > 0 && !workoutNames.contains(workoutShot.getKey())) {
-            workoutHelper.addWorkout(extractWorkout(workoutShot));
-        }
+        workoutHelper.addWorkout(extractWorkout(workoutShot));
     }
 
     @Override
