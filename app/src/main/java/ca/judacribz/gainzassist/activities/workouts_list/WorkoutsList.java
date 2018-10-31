@@ -75,6 +75,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
         // Get all workouts from database
         workoutHelper = new WorkoutHelper(this);
+        workoutHelper.close();
     }
 
     @Override

@@ -76,8 +76,6 @@ public class Database {
                     user.setEmail(email);
                     user.setUid(uid);
 
-                    act.startService(new Intent(act, FirebaseService.class));
-
                     // If newly added user
                     if (!dataSnapshot.hasChildren()) {
                         userRef
@@ -87,6 +85,9 @@ public class Database {
                         // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
                         copyDefaultWorkoutsFirebase();
                     }
+
+
+                    act.startService(new Intent(act, FirebaseService.class));
                 }
 
                 @Override
