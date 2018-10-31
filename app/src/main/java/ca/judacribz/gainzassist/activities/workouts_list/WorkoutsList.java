@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -82,6 +83,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         super.onStart();
 
         workoutNames = workoutHelper.getAllWorkoutNames();
+        Toast.makeText(this, "" + workoutNames.get(0), Toast.LENGTH_SHORT).show();
         displayWorkoutList(workoutNames);
     }
 

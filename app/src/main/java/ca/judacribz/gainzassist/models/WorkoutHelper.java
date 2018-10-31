@@ -13,6 +13,10 @@ import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.util.ArrayList;
 
+import ca.judacribz.gainzassist.R;
+
+import static ca.judacribz.gainzassist.util.Helper.getEmailFromPref;
+
 public class WorkoutHelper extends SQLiteOpenHelper {
 
     // Constants
@@ -76,7 +80,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     public WorkoutHelper(Context context) {
         super(context, "workouts", null, DATABASE_VERSION);
         this.context = context;
-        this.email = CurrUser.getInstance().getEmail();
+        this.email = getEmailFromPref(context);
+        Toast.makeText(context, "DB: " + this.email, Toast.LENGTH_SHORT).show();
 
         cv = new ContentValues();
         gson = new Gson();

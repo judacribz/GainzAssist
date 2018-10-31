@@ -1,7 +1,9 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -46,6 +48,7 @@ import static ca.judacribz.gainzassist.firebase.Authentication.*;
 
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.firebase.Database.setUserInfo;
+import static ca.judacribz.gainzassist.util.Helper.setUserInfoInPref;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
 
 public class Login extends AppCompatActivity implements /*FacebookCallback<LoginResult>,*/
@@ -221,15 +224,14 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         FirebaseUser fbUser = firebaseAuth.getCurrentUser();
 
-        // CurrUser is signed in
+        // Current User is signed in
         if (fbUser != null) {
             Toast.makeText(
                     this,
                     String.format(getString(R.string.txt_logged_in), fbUser.getEmail()),
                     Toast.LENGTH_SHORT
             ).show();
-
-            // Run in bg, start Main activity once database is loaded
+            setUserInfoInPref(this, fbUser.getEmail(), fbUser.getUid());
 
             progressBar.setProgress(0);
             progressBar.setVisibility(View.VISIBLE);

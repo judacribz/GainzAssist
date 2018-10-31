@@ -23,7 +23,6 @@ import butterknife.*;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;

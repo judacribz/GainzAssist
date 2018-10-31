@@ -25,7 +25,6 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.CurrUser;
 //
 //import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 //import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
@@ -48,7 +47,6 @@ public class WorkoutScreen extends Fragment {
     long currTime;
 
     CurrWorkout currWorkout = CurrWorkout.getInstance();
-    CurrUser currUser = CurrUser.getInstance();
 
     ArrayList<Set> sets;
     ArrayList<Exercise> warmups = new ArrayList<>(),

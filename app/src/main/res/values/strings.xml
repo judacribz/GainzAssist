@@ -98,4 +98,5 @@
     <string name="starting_sets">3</string>
     <string name="update_exercise">Update Exercise</string>
     <string name="update_workout">Update Workout</string>
+    <string name="file_user_info">user_info.file</string>
 </resources>

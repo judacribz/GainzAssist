@@ -3,8 +3,12 @@ package ca.judacribz.gainzassist.firebase;
 import android.app.Activity;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.async.FirebaseService;
 import com.google.firebase.auth.FirebaseAuth;
@@ -16,11 +20,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import ca.judacribz.gainzassist.models.CurrUser;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
+import ca.judacribz.gainzassist.util.Helper;
+
+import static ca.judacribz.gainzassist.util.Helper.*;
 
 public class Database {
 
@@ -69,21 +75,16 @@ public class Database {
 
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    String email = fbUser.getEmail();
-                    String uid = fbUser.getUid();
 
-                    // Sets singleton CurrUser Instance variables
-                    CurrUser user = CurrUser.getInstance();
-                    user.setEmail(email);
-                    user.setUid(uid);
-
-                    act.startService(new Intent(act, FirebaseService.class));
+                    if (!isMyServiceRunning(act, FirebaseService.class)) {
+                        act.startService(new Intent(act, FirebaseService.class));
+                    }
 
                     // If newly added user
                     if (!dataSnapshot.hasChildren()) {
                         userRef
                             .child(EMAIL)
-                            .setValue(email);
+                            .setValue(fbUser.getEmail());
 
                         // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
                         copyDefaultWorkoutsFirebase();

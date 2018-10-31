@@ -39,7 +39,7 @@ public class Authentication {
 
 
     /* Wrapper function to create an user in Firebase */
-    public static boolean createUser(final Activity act, String email, String password, final GoogleSignInClient signInClient) {
+    public static void createUser(final Activity act, String email, String password, final GoogleSignInClient signInClient) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(act, new OnCompleteListener<AuthResult>() {
 
@@ -65,8 +65,6 @@ public class Authentication {
                         }
                     }
                 });
-
-        return userCreated;
     }
 
     /* Wrapper function to log in an user using a firebase credential */

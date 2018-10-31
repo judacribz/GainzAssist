@@ -67,6 +67,7 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     @Override
     public void onChildRemoved(DataSnapshot workoutShot) {
+        Toast.makeText(this, "Deleted " + workoutShot.getKey(), Toast.LENGTH_SHORT).show();
         workoutHelper.deleteWorkout(workoutShot.getKey());
 
     }

@@ -1,6 +1,8 @@
 package ca.judacribz.gainzassist;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.*;
 
@@ -16,6 +19,7 @@ import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.async.FirebaseService;
 
+import static ca.judacribz.gainzassist.util.Helper.getEmailFromPref;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class Main extends AppCompatActivity {
@@ -44,6 +48,9 @@ public class Main extends AppCompatActivity {
         btnResumeWorkout.setText(R.string.resume_workout);
         btnWorkouts.setText(R.string.workouts);
         btnStepCounter.setText(R.string.step_counter);
+
+        SharedPreferences sharedPref = getSharedPreferences("user_info.file", Context.MODE_PRIVATE);
+        Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
     }
 
     @Override
