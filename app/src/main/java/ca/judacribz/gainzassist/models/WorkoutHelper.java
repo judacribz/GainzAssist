@@ -167,7 +167,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         cv.put(WORKOUT_NAME,  workout.getName());
         cv.put(EXERCISES,     getBlobFromExercises(workout.getExercises()));
 
-       long i =  db.insert(TABLE_WORKOUTS, null, cv);
+        long i =  db.insert(TABLE_WORKOUTS, null, cv);
 
         Toast.makeText(context, "adding" + i, Toast.LENGTH_SHORT).show();
     }

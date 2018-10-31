@@ -9,10 +9,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.TextView;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.*;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -25,12 +23,10 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
-//
-//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
-//import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
+
 import static ca.judacribz.gainzassist.models.CurrWorkout.MIN_REPS;
 
-public class WorkoutScreen extends Fragment {
+public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSetListener{
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -45,13 +41,7 @@ public class WorkoutScreen extends Fragment {
     EquipmentView equipmentView;
     CountDownTimer countDownTimer;
     long currTime;
-
     CurrWorkout currWorkout = CurrWorkout.getInstance();
-
-    ArrayList<Set> sets;
-    ArrayList<Exercise> warmups = new ArrayList<>(),
-                        exercises = new ArrayList<>();
-    int set_i = 0, ex_i = 0;
 
     ArrayList<Exercise> finExercises;
 
@@ -83,7 +73,7 @@ public class WorkoutScreen extends Fragment {
         return new WorkoutScreen();
     }
     // ######################################################################################### //
-String TAG = "WorkoutScreen";
+
     // Fragment Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -108,6 +98,8 @@ String TAG = "WorkoutScreen";
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
 
+        currWorkout.setRestTimeSetListener((CurrWorkout.RestTimeSetListener) this);
+
         return view;
     }
 
@@ -124,12 +116,7 @@ String TAG = "WorkoutScreen";
     // to trigger onDraw method
     public void setupEquipView() {
         equipmentView = new EquipmentView(act);
-        equipmentView.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-        ));
-
-        vgEquipDisp.addView(equipmentView, 0);
+        int p  = getResources().getDisplayMetrics().widthPixels;
 
         equipmentView.post(new Runnable() {
             @Override
@@ -137,11 +124,22 @@ String TAG = "WorkoutScreen";
                 equipmentView.setup(currWorkout.getCurrWeight(), currWorkout.getCurrEquip());
             }
         });
+
+        equipmentView.setLayoutParams(new LayoutParams(
+                        p/2,
+                        LayoutParams.MATCH_PARENT
+        ));
+
+        vgEquipDisp.addView(equipmentView, 0);
     }
 
+    @Override
     public void startTimer(long timeInMillis) {
-            countDownTimer = getCountDownTimer(timeInMillis);
-            countDownTimer.start();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        countDownTimer = getCountDownTimer(timeInMillis);
+        countDownTimer.start();
     }
 
     /* Creates and returns a new CountDownTimer with the rest time to count down from. Has the
@@ -285,7 +283,6 @@ String TAG = "WorkoutScreen";
             tvTimer.setText(R.string.start_next_set);
         } else {
             setType = "Main";
-            startTimer(currWorkout.getCurrRestTime());
         }
 
         setReps();

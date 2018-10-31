@@ -16,6 +16,7 @@ import android.widget.Toast;
 import butterknife.ButterKnife;
 
 import ca.judacribz.gainzassist.R;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class UI {
 

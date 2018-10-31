@@ -22,14 +22,12 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     private final static String SETS = "sets";
 
-    WorkoutHelper workoutHelper;
-    ArrayList<String> workoutNames;
+    WorkoutHelper workoutHelper = new WorkoutHelper(this);
     ArrayList<Exercise> exercises;
     ArrayList<Set> sets;
 
     Exercise exercise;
     Set set;
-    String workoutName;
 
     public FirebaseService() {
         super("FirebaseService");
@@ -37,8 +35,6 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        workoutHelper = new WorkoutHelper(getApplicationContext());
-        workoutNames = workoutHelper.getAllWorkoutNames();
         getWorkoutsRef().addChildEventListener(this);
 
         return Service.START_STICKY;
@@ -48,14 +44,10 @@ public class FirebaseService extends IntentService implements ChildEventListener
     protected void onHandleIntent(Intent intent) {
     }
 
+    ArrayList<String> workoutNames;
     @Override
     public void onChildAdded(DataSnapshot workoutShot, String s) {
-
-        workoutName = workoutShot.getKey();
-        if (!workoutNames.contains(workoutName)) {
-
-            workoutHelper.addWorkout(extractWorkout(workoutShot));
-        }
+        workoutHelper.addWorkout(extractWorkout(workoutShot));
     }
 
     @Override

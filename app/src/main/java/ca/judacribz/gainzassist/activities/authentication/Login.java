@@ -43,6 +43,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
+import com.google.firebase.database.FirebaseDatabase;
 
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
 

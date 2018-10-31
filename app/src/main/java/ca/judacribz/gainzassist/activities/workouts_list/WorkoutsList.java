@@ -26,6 +26,7 @@ import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
+import ca.judacribz.gainzassist.async.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.EXERCISES_ENTRY;
@@ -37,7 +38,6 @@ import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
                                                                TextWatcher {
-
 
     public static final String EXTRA_WORKOUT_NAME
             = "ca.judacribz.gainzassist.activities.workouts_list.EXTRA_WORKOUT_NAME";
@@ -79,6 +79,11 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
 
@@ -88,7 +93,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     }
 
     /* Helper function to display button list of workouts */
-    void displayWorkoutList(ArrayList<String> workouts) {
+    public void displayWorkoutList(ArrayList<String> workouts) {
         filteredWorkouts = workouts;
         workoutAdapter = new SingleItemAdapter(
                 this,
@@ -106,7 +111,6 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     @Override
     protected void onStop() {
         super.onStop();
-
         workoutHelper.close();
     }
 
