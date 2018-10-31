@@ -1,17 +1,27 @@
 package ca.judacribz.gainzassist.models;
 
+import android.arch.persistence.room.*;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import ca.judacribz.gainzassist.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@Entity(tableName = "workouts",
+        primaryKeys = {"name"})
 public class Workout implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    @NonNull
+    private String name;
+
+    @Ignore
     private ArrayList<Exercise> exercises = new ArrayList<>();
-    private String name = "";
     // --------------------------------------------------------------------------------------------
 
 
@@ -21,9 +31,12 @@ public class Workout implements Parcelable {
     public Workout() {
     }
 
-    public Workout(String name, ArrayList<Exercise> exercises) {
+
+    public Workout(String name, @Nullable ArrayList<Exercise> exercises) {
         setName(name);
-        this.exercises = exercises;
+        if (exercises != null){
+            this.exercises = exercises;
+        }
     }
     // ######################################################################################### //
 

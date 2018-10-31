@@ -7,6 +7,8 @@ import android.util.Patterns;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.models.WorkoutHelper;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -109,6 +111,9 @@ public class Authentication {
         );
 
         LoginManager.getInstance().logOut();
+
+        act.stopService(new Intent(act, FirebaseService.class));
+        (new WorkoutHelper(act)).deleteAllWorkouts();
     }
 
     /* Used by sign in and sign up to firebase to handle exception if they fail */

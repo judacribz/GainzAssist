@@ -75,10 +75,6 @@ public class Database {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    if (!isMyServiceRunning(act, FirebaseService.class)) {
-                        act.startService(new Intent(act, FirebaseService.class));
-                    }
-
                     // If newly added user
                     if (!dataSnapshot.hasChildren()) {
                         userRef
@@ -87,6 +83,10 @@ public class Database {
 
                         // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
                         copyDefaultWorkoutsFirebase();
+                    }
+
+                    if (!isMyServiceRunning(act, FirebaseService.class)) {
+                        act.startService(new Intent(act, FirebaseService.class));
                     }
                 }
 

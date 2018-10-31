@@ -1,8 +1,11 @@
 package ca.judacribz.gainzassist;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +21,11 @@ import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.models.Workout;
+import ca.judacribz.gainzassist.models.WorkoutViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static ca.judacribz.gainzassist.util.Helper.getEmailFromPref;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -40,6 +48,7 @@ public class Main extends AppCompatActivity {
 
     // AppCompatActivity Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    private WorkoutViewModel workoutViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +60,27 @@ public class Main extends AppCompatActivity {
 
         SharedPreferences sharedPref = getSharedPreferences("user_info.file", Context.MODE_PRIVATE);
         Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
+
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
+//        workoutViewModel
+
+//        workoutViewModel.deleteAll();
+//        workoutViewModel.insert(new Workout("yom", null));
+//        workoutViewModel.insert(new Workout("bom", null));
+//        workoutViewModel.insert(new Workout("sdf", null));
+//        workoutViewModel.insert(new Workout("sddfds", null));
+
+        workoutViewModel.getAllWorkouts().observe(this, new Observer<List<Workout>>() {
+            @Override
+            public void onChanged(@Nullable List<Workout> workouts) {
+
+                if (workouts != null)
+                    Toast.makeText(Main.this, "" + workouts.size(), Toast.LENGTH_SHORT).show();
+
+            }
+
+        });
+
     }
 
     @Override

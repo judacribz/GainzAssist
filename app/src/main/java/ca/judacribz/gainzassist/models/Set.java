@@ -1,16 +1,33 @@
 package ca.judacribz.gainzassist.models;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "sets",
+        primaryKeys = {"exercise_name", "set_number"},
+        foreignKeys = @ForeignKey(
+                entity = Exercise.class,
+                parentColumns = "name",
+                childColumns = "exercise_name",
+                onDelete = CASCADE))
 public class Set implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    private int setNumber, reps;
+    @ColumnInfo(name = "exercise_name")
+    private String exerciseName;
+
+    @ColumnInfo(name = "set_number")
+    private int setNumber;
+    private int reps;
     private float weight;
     // --------------------------------------------------------------------------------------------
 

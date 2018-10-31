@@ -28,7 +28,6 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     // Column names
     private static final String WORKOUT_NAME  = "workoutName";
     private static final String EXERCISES     = "exercises";
-    private static final String EMAIL         = "email";
 
     private static final String TIMESTAMP     = "timestamp";
     private static final String EXERCISE_NAME = "exerciseName";
@@ -42,8 +41,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
             TABLE_WORKOUTS + " (" +
                     WORKOUT_NAME  + " text not null," +
                     EXERCISES     + " blob not null," +
-                    EMAIL         + " varchar2(100) not null," +
-                    "PRIMARY KEY (" + WORKOUT_NAME + ", " + EMAIL + ")" +
+                    "PRIMARY KEY (" + WORKOUT_NAME + ")" +
             ")"
     );
 
@@ -55,8 +53,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
                     WORKOUT_NAME  + " text not null," +
                     EXERCISE_NAME + " text not null," +
                     SETS          + " blob not null," +
-                    EMAIL         + " varchar2(100) not null," +
-                    "PRIMARY KEY (" + TIMESTAMP + ", " + EMAIL + ")" +
+                    "PRIMARY KEY (" + TIMESTAMP + ")" +
             ")"
     );
 
@@ -69,7 +66,6 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     // ============================================================================================
     private SQLiteDatabase db;
     private ContentValues cv;
-    private String email;
     private Context context;
     private Gson gson;
     // ============================================================================================
@@ -80,8 +76,6 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     public WorkoutHelper(Context context) {
         super(context, "workouts", null, DATABASE_VERSION);
         this.context = context;
-        this.email = getEmailFromPref(context);
-        Toast.makeText(context, "DB: " + this.email, Toast.LENGTH_SHORT).show();
 
         cv = new ContentValues();
         gson = new Gson();
@@ -163,13 +157,12 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     public void addWorkout(Workout workout) {
         db = this.getWritableDatabase();
         cv.clear();
-        cv.put(EMAIL, email);
         cv.put(WORKOUT_NAME,  workout.getName());
         cv.put(EXERCISES,     getBlobFromExercises(workout.getExercises()));
 
-        long i =  db.insert(TABLE_WORKOUTS, null, cv);
+//        long i =  db.insert(TABLE_WORKOUTS, null, cv);
 
-        Toast.makeText(context, "adding" + i, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(context, "adding" + i, Toast.LENGTH_SHORT).show();
     }
 
     /* Creates a db entry for the session
@@ -183,7 +176,6 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
         cv.put(TIMESTAMP, session.getTimestamp());
         cv.put(WORKOUT_NAME, session.getWorkoutName());
-        cv.put(EMAIL, email);
 
         for (int i = 0; i < exerciseNames.size(); i++) {
             cv.put(EXERCISE_NAME, exerciseNames.get(i));
@@ -204,8 +196,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         Workout workout = null;
 
         String[] columns   = new String[] {EXERCISES};
-        String where       = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
-        String[] whereArgs = new String[] {workoutName, email};
+        String where       = WORKOUT_NAME + " = ?";
+        String[] whereArgs = new String[] {workoutName};
 
         Cursor cursor = db.query(TABLE_WORKOUTS, columns, where, whereArgs, "", "", "");
         cursor.close();
@@ -234,8 +226,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         db = this.getReadableDatabase();
 
         String[] columns   = new String[] {EXERCISES};
-        String   where     = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
-        String[] whereArgs = new String[] {workoutName, email};
+        String   where     = WORKOUT_NAME + " = ?";
+        String[] whereArgs = new String[] {workoutName};
 
         Cursor cursor = db.query(TABLE_WORKOUTS, columns, where, whereArgs, "", "", "");
 
@@ -259,10 +251,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         ArrayList<Exercise> exercises;
 
         String[] column      = new String[] {WORKOUT_NAME, EXERCISES};
-        String where         = EMAIL + " = ?";
-        String[] whereArgs   = new String[] {email};
 
-        Cursor cursor = db.query(TABLE_WORKOUTS, column, where, whereArgs, WORKOUT_NAME, null, null, null);
+        Cursor cursor = db.query(TABLE_WORKOUTS, column, null, null, WORKOUT_NAME, null, null, null);
 
         if (cursor.moveToFirst()) {
             do {
@@ -285,19 +275,14 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
         // Get workout names
         String[] column      = new String[] {WORKOUT_NAME};
-        String where         = EMAIL + " = ?";
-        String[] whereArgs   = new String[] {email};
+        Cursor cursor = db.query(TABLE_WORKOUTS, column, null, null, WORKOUT_NAME, null, null, null);
 
-        if (email != null) {
-            Cursor cursor = db.query(TABLE_WORKOUTS, column, where, whereArgs, WORKOUT_NAME, null, null, null);
-
-            if (cursor.moveToFirst()) {
-                do {
-                    workoutNames.add(cursor.getString(0));
-                } while (cursor.moveToNext());
-            }
-            cursor.close();
+        if (cursor.moveToFirst()) {
+            do {
+                workoutNames.add(cursor.getString(0));
+            } while (cursor.moveToNext());
         }
+        cursor.close();
 
         return workoutNames;
     }
@@ -328,8 +313,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         cv.clear();
         cv.put(EXERCISES, getBlobFromExercises(workout.getExercises()));
 
-        String where = EMAIL + " = ? AND " + WORKOUT_NAME + " = ?";
-        String[] whereArgs = new String[] {email, workoutName};
+        String where = WORKOUT_NAME + " = ?";
+        String[] whereArgs = new String[] {workoutName};
 
         int numRows = db.update(TABLE_WORKOUTS, cv, where, whereArgs);
 
@@ -343,8 +328,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     public boolean deleteWorkout(String workoutName) {
         db = this.getWritableDatabase();
 
-        String where       = WORKOUT_NAME + " = ? AND " + EMAIL + " = ?";
-        String[] whereArgs = new String[] {workoutName, email};
+        String where       = WORKOUT_NAME + " = ?";
+        String[] whereArgs = new String[] {workoutName};
         int numRows        = db.delete(TABLE_WORKOUTS, where, whereArgs);
 
         return (numRows > 0);
@@ -355,7 +340,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     public void deleteAllWorkouts() {
         db = this.getWritableDatabase();
 
-        db.delete(TABLE_WORKOUTS, "", new String[] {});
+        db.delete(TABLE_WORKOUTS, null, null);
     }
     // --------------------------------------------------------------------------------------------
     // ============================================================================================

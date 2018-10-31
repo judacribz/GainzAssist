@@ -76,6 +76,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
         // Get all workouts from database
         workoutHelper = new WorkoutHelper(this);
+        workoutHelper.close();
     }
 
     @Override
@@ -88,7 +89,6 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         super.onStart();
 
         workoutNames = workoutHelper.getAllWorkoutNames();
-        Toast.makeText(this, "" + workoutNames.get(0), Toast.LENGTH_SHORT).show();
         displayWorkoutList(workoutNames);
     }
 
