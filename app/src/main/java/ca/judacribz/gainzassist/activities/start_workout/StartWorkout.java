@@ -2,9 +2,11 @@ package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
 import android.database.sqlite.SQLiteTransactionListener;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import butterknife.*;
 import java.util.ArrayList;
 
@@ -63,21 +66,20 @@ public class StartWorkout extends AppCompatActivity {
         setTheme(R.style.WorkoutTheme);
 
         WorkoutViewModel workoutViewModel = new WorkoutViewModel(getApplication());
-//        workoutHelper = new WorkoutHelper(this);
-//        workout = workoutViewModel.getWorkoutFromName(getIntent().getStringExtra(EXTRA_WORKOUT_NAME)).getValue();
-//
-////                workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
-//
-//        workout.setExercises(
-//                (ArrayList<Exercise>) workoutViewModel.getExercisesFromWorkout(
-//                        workout.getId()
-//                ).getValue());
-        if (workout != null) {
-            currWorkout = CurrWorkout.getInstance();
-            currWorkout.setWorkout(workout);
+        workoutViewModel.getWorkoutFromName(getIntent().getStringExtra(EXTRA_WORKOUT_NAME)).observe(this, new Observer<Workout>() {
+            @Override
+            public void onChanged(@Nullable Workout w) {
+                if (workout != null) {
+                    currWorkout = CurrWorkout.getInstance();
+                    currWorkout.setWorkout(workout);
 
-            setupPager();
-        }
+                    setupPager();
+                }
+            }
+        });
+
+
+
     }
 
     /* Setup fragments with page with icons for the tab bar */

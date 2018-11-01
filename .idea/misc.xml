@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="android.arch.persistence.room.ColumnInfo" />
-      <item index="1" class="java.lang.String" itemvalue="android.arch.persistence.room.Insert" />
-      <item index="2" class="java.lang.String" itemvalue="android.arch.persistence.room.PrimaryKey" />
-      <item index="3" class="java.lang.String" itemvalue="android.arch.persistence.room.Query" />
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="android.arch.persistence.room.Insert" />
+      <item index="1" class="java.lang.String" itemvalue="android.arch.persistence.room.Query" />
     </list>
-    <writeAnnotations>
-      <writeAnnotation name="android.arch.persistence.room.ColumnInfo" />
-      <writeAnnotation name="android.arch.persistence.room.PrimaryKey" />
-    </writeAnnotations>
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />

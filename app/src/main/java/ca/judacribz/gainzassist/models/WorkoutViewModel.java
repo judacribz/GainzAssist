@@ -9,7 +9,6 @@ import java.util.List;
 
 public class WorkoutViewModel extends AndroidViewModel {
     private WorkoutRepo workoutRepo;
-    private LiveData<List<Workout>> workouts;
 
     public WorkoutViewModel(Application app) {
         super(app);
@@ -46,6 +45,7 @@ public class WorkoutViewModel extends AndroidViewModel {
     }
 
     public LiveData<Workout> getWorkoutFromName(String name) {
+        workoutRepo.getWorkoutFromName(name).
         return workoutRepo.getWorkoutFromName(name);
     }
 
