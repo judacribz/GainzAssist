@@ -3,18 +3,16 @@ package ca.judacribz.gainzassist.models;
 import android.arch.persistence.room.*;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import java.util.*;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "exercises",
-        primaryKeys = {"workout_name", "name"},
         foreignKeys = @ForeignKey(
                 entity = Workout.class,
-                parentColumns = "name",
-                childColumns = "workout_name",
+                parentColumns = "id",
+                childColumns = "workout_id",
                 onDelete = CASCADE))
 public class Exercise implements Parcelable {
 
@@ -33,14 +31,18 @@ public class Exercise implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @ColumnInfo(name = "workout_name")
-    private String workoutName;
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
+    @ColumnInfo(name = "workout_id")
+    private int workoutId;
     private String name;
     private String type;
     private String equipment;
 
     @Ignore
     private ArrayList<Set> sets;
+
     public enum SetsType {
         WARMUP_SET,
         MAIN_SET
@@ -72,6 +74,21 @@ public class Exercise implements Parcelable {
 
     // Getters and setters
     // ============================================================================================
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getWorkoutId() {
+        return id;
+    }
+
+    public void setWorkoutId(int workoutId) {
+        this.workoutId = workoutId;
+    }
     public String getName() {
         return name;
     }

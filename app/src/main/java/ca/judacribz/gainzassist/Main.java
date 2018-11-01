@@ -64,22 +64,11 @@ public class Main extends AppCompatActivity {
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
 //        workoutViewModel
 
-//        workoutViewModel.deleteAll();
+//        workoutViewModel.deleteAllWorkouts();
 //        workoutViewModel.insert(new Workout("yom", null));
 //        workoutViewModel.insert(new Workout("bom", null));
 //        workoutViewModel.insert(new Workout("sdf", null));
 //        workoutViewModel.insert(new Workout("sddfds", null));
-
-        workoutViewModel.getAllWorkouts().observe(this, new Observer<List<Workout>>() {
-            @Override
-            public void onChanged(@Nullable List<Workout> workouts) {
-
-                if (workouts != null)
-                    Toast.makeText(Main.this, "" + workouts.size(), Toast.LENGTH_SHORT).show();
-
-            }
-
-        });
 
     }
 

@@ -9,10 +9,14 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
-@Database(entities = {Workout.class}, version = 1, exportSchema = false)
+@Database(entities = {Workout.class, Exercise.class, Set.class},
+          version = 1,
+          exportSchema = false)
 public abstract class WorkoutDatabase extends RoomDatabase {
 
     public abstract WorkoutDao workoutDao();
+    public abstract ExerciseDao exerciseDao();
+    public abstract SetDao setDao();
 
     private static volatile WorkoutDatabase INSTANCE;
 
@@ -40,6 +44,8 @@ public abstract class WorkoutDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+
+
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
         private final WorkoutDao workoutDao;
@@ -50,7 +56,7 @@ public abstract class WorkoutDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(final Void... params) {
-//            workoutDao.deleteAll();
+//            workoutDao.deleteAllWorkouts();
 //            workoutDao.insert(new Workout("yy", null));
 
             return null;

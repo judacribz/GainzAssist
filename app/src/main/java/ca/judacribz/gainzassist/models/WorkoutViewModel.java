@@ -14,19 +14,92 @@ public class WorkoutViewModel extends AndroidViewModel {
     public WorkoutViewModel(Application app) {
         super(app);
         workoutRepo = new WorkoutRepo(app);
-        workouts = workoutRepo.getAllWorkouts();
     }
 
+    // CREATE
+    // --------------------------------------------------------------------------------------------
+    public void insertWorkout(Workout... workouts) {
+        for (Workout workout : workouts)
+            workoutRepo.insertWorkout(workout);
+    }
+
+    public void insertExercise(Exercise... exercises) {
+        for (Exercise exercise : exercises)
+            workoutRepo.insertExercise(exercise);
+    }
+
+    public void insertSet(Set... sets) {
+        for (Set set : sets)
+            workoutRepo.insertSet(set);
+    }
+    // --------------------------------------------------------------------------------------------
+
+
+    // RETRIEVE
+    // --------------------------------------------------------------------------------------------
     public LiveData<List<Workout>> getAllWorkouts() {
-        return workouts;
+        return workoutRepo.getAllWorkouts();
     }
 
-    public void insert(Workout workout) {
-        workoutRepo.insert(workout);
+    public LiveData<Workout> getWorkout(int id) {
+        return workoutRepo.getWorkout(id);
     }
 
-    public void deleteAll() {
-        workoutRepo.deleteAll();
+    public LiveData<Workout> getWorkoutFromName(String name) {
+        return workoutRepo.getWorkoutFromName(name);
     }
 
+    public LiveData<List<Exercise>> getExercisesFromWorkout(int workoutId) {
+        return workoutRepo.getExercisesFromWorkout(workoutId);
+    }
+
+    public LiveData<Exercise> getExercise(int id) {
+        return workoutRepo.getExercise(id);
+    }
+
+    public LiveData<List<String>> getAllUniqueExerciseNames() {
+        return workoutRepo.getAllUniqueExerciseNames();
+    }
+
+    public LiveData<List<Set>> getSetsFromExercise(int exerciseId) {
+        return workoutRepo.getSetsFromExercise(exerciseId);
+    }
+
+    // --------------------------------------------------------------------------------------------
+
+
+    // UPDATE
+    // --------------------------------------------------------------------------------------------
+    void updateWorkout(Workout workout) {
+        workoutRepo.updateWorkout(workout);
+    }
+
+    void updateExercise(Exercise exercise) {
+        workoutRepo.updateExercise(exercise);
+    }
+
+    void updateSet(Set set) {
+        workoutRepo.updateSet(set);
+    }
+    // --------------------------------------------------------------------------------------------
+
+
+    // DELETE
+    // --------------------------------------------------------------------------------------------
+    public void deleteAllWorkouts() {
+        workoutRepo.deleteAllWorkouts();
+    }
+
+    public void deleteWorkout(Workout workout) {
+        workoutRepo.deleteWorkout(workout);
+    }
+
+    public void deleteExercise(Exercise exercise) {
+        workoutRepo.deleteExercise(exercise);
+    }
+
+    public void deleteSet(Set set) {
+        workoutRepo.deleteSet(set);
+    }
+    // --------------------------------------------------------------------------------------------
 }

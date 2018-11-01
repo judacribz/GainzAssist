@@ -23,11 +23,7 @@ import butterknife.*;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.models.CurrWorkout;
-import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.WorkoutHelper;
+import ca.judacribz.gainzassist.models.*;
 
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
@@ -66,8 +62,16 @@ public class StartWorkout extends AppCompatActivity {
         setInitView(this, R.layout.activity_start_workout, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
         setTheme(R.style.WorkoutTheme);
 
+        WorkoutViewModel workoutViewModel = new WorkoutViewModel(getApplication());
         workoutHelper = new WorkoutHelper(this);
-        workout = workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
+        workout = workoutViewModel.getWorkoutFromName(getIntent().getStringExtra(EXTRA_WORKOUT_NAME)).getValue();
+
+//                workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
+
+        workout.setExercises(
+                (ArrayList<Exercise>) workoutViewModel.getExercisesFromWorkout(
+                        workout.getId()
+                ).getValue());
         if (workout != null) {
             currWorkout = CurrWorkout.getInstance();
             currWorkout.setWorkout(workout);

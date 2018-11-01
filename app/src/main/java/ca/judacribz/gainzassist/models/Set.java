@@ -1,8 +1,6 @@
 package ca.judacribz.gainzassist.models;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.*;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -12,21 +10,20 @@ import java.util.Map;
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "sets",
-        primaryKeys = {"exercise_name", "set_number"},
+        primaryKeys = {"set_number", "exercise_id"},
         foreignKeys = @ForeignKey(
                 entity = Exercise.class,
-                parentColumns = "name",
-                childColumns = "exercise_name",
+                parentColumns = "id",
+                childColumns = "exercise_id",
                 onDelete = CASCADE))
 public class Set implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @ColumnInfo(name = "exercise_name")
-    private String exerciseName;
-
     @ColumnInfo(name = "set_number")
     private int setNumber;
+    @ColumnInfo(name = "exercise_id")
+    private int exerciseId;
     private int reps;
     private float weight;
     // --------------------------------------------------------------------------------------------
@@ -35,6 +32,7 @@ public class Set implements Parcelable {
     // Set Constructors                                                                          //
     // ######################################################################################### //
     /* Required empty constructor for firebase */
+    @Ignore
     public Set() {
     }
 
@@ -55,6 +53,14 @@ public class Set implements Parcelable {
         this.setNumber = setNumber;
     }
 
+    public int getExerciseId() {
+        return exerciseId;
+    }
+
+    public void setExerciseId(int exerciseId) {
+        this.exerciseId = exerciseId;
+    }
+
     public int getReps() {
         return reps;
     }
@@ -70,6 +76,7 @@ public class Set implements Parcelable {
     public void setWeight(float weight) {
         this.weight = weight;
     }
+
     // ============================================================================================
 
 

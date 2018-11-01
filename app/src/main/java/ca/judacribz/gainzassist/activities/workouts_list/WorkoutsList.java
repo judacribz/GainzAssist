@@ -1,6 +1,10 @@
 package ca.judacribz.gainzassist.activities.workouts_list;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,16 +22,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ca.judacribz.gainzassist.Main;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
+import ca.judacribz.gainzassist.models.WorkoutViewModel;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.EXERCISES_ENTRY;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
@@ -58,6 +67,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     @BindView(R.id.et_workouts_search) EditText searchBar;
     // --------------------------------------------------------------------------------------------
 
+    WorkoutViewModel workoutViewModel;
     // WorkoutsList Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -77,6 +87,22 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         // Get all workouts from database
         workoutHelper = new WorkoutHelper(this);
         workoutHelper.close();
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
+        LiveData<List<Workout>> workouts = workoutViewModel.getAllWorkouts();
+
+
+        ArrayList<Workout> newWorkouts = new ArrayList<>();
+        for (Workout workout : workouts.getValue()) {
+            workoutNames.add(workout.getName());
+            workout.setExercises(
+                    (ArrayList<Exercise>) workoutViewModel.getExercisesFromWorkout(
+                            workout.getId()
+                    ).getValue()
+            );
+            newWorkouts.add(workout);
+        }
+
+
     }
 
     @Override
@@ -88,8 +114,8 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     protected void onStart() {
         super.onStart();
 
-        workoutNames = workoutHelper.getAllWorkoutNames();
-        displayWorkoutList(workoutNames);
+//        workoutNames = workoutHelper.getAllWorkoutNames();
+//        displayWorkoutList(workoutNames);
     }
 
     /* Helper function to display button list of workouts */

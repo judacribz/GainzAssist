@@ -5,19 +5,18 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import ca.judacribz.gainzassist.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@Entity(tableName = "workouts",
-        primaryKeys = {"name"})
+@Entity(tableName = "workouts")
 public class Workout implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @NonNull
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
     private String name;
 
     @Ignore
@@ -43,6 +42,14 @@ public class Workout implements Parcelable {
 
     // Getters and setters
     // ============================================================================================
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -106,7 +113,7 @@ public class Workout implements Parcelable {
 
     // Helper functions
     // --------------------------------------------------------------------------------------------
-    /* Helper function used to store Workout information in the firebase db */
+    /* Helper function used to store Workout information in the Firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();
 
@@ -136,6 +143,10 @@ public class Workout implements Parcelable {
         }
 
         return  exerciseNames;
+    }
+
+    public void setExercises(ArrayList<Exercise> exercises) {
+        this.exercises = exercises;
     }
     // --------------------------------------------------------------------------------------------
 }

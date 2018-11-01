@@ -5,10 +5,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
-import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.WorkoutHelper;
+import ca.judacribz.gainzassist.models.*;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,14 +26,22 @@ public class FirebaseService extends IntentService implements ChildEventListener
     Exercise exercise;
     Set set;
 
+    WorkoutRepo workoutRepo;
+
     public FirebaseService() {
         super("FirebaseService");
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+
+        workoutRepo = new WorkoutRepo(getApplication());
+    }
+
+    @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         getWorkoutsRef().addChildEventListener(this);
-
         return Service.START_STICKY;
     }
 
@@ -47,7 +52,8 @@ public class FirebaseService extends IntentService implements ChildEventListener
     ArrayList<String> workoutNames;
     @Override
     public void onChildAdded(DataSnapshot workoutShot, String s) {
-        workoutHelper.addWorkout(extractWorkout(workoutShot));
+        workoutRepo.insertWorkout(extractWorkout(workoutShot));
+//        workoutHelper.addWorkout(extractWorkout(workoutShot));
     }
 
     @Override
