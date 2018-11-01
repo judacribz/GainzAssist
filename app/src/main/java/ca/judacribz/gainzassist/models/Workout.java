@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@Entity(tableName = "workouts")
+@Entity(tableName = "workouts",
+        indices = {@Index(value = {"name"}, unique = true)})
 public class Workout implements Parcelable {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
 
     private String name;
 
@@ -42,11 +43,11 @@ public class Workout implements Parcelable {
 
     // Getters and setters
     // ============================================================================================
-    public int getId() {
+    public long getId() {
         return this.id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

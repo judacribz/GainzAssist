@@ -9,14 +9,14 @@ import java.util.List;
 public interface ExerciseDao {
 
     @Insert
-    void insert(Exercise exercise);
+    Long insert(Exercise exercise);
 
 
     @Query("SELECT * from exercises WHERE workout_id = :workoutId")
-    LiveData<List<Exercise>> getFromWorkout(int workoutId);
+    LiveData<List<Exercise>> getFromWorkout(long workoutId);
 
     @Query("SELECT * from  exercises WHERE id = :id")
-    LiveData<Exercise> get(int id);
+    LiveData<Exercise> get(long id);
 
     @Query("SELECT DISTINCT name FROM exercises")
     LiveData<List<String>> getAllUniqueNames();

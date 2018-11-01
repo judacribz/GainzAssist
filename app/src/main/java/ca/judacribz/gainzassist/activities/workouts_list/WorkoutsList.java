@@ -90,17 +90,20 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
         LiveData<List<Workout>> workouts = workoutViewModel.getAllWorkouts();
 
+        workouts.observe(this, new Observer<List<Workout>>() {
+            @Override
+            public void onChanged(@Nullable List<Workout> workouts) {
+                if (workouts != null) {
+                    Toast.makeText(WorkoutsList.this, workouts.size() + "", Toast.LENGTH_SHORT).show();
+                    for (Workout workout : workouts) {
+                        if (!workoutNames.contains(workout.getName()))
+                            workoutNames.add(workout.getName());
+                    }
+                    displayWorkoutList(workoutNames);
+                }
+            }
+        });
 
-        ArrayList<Workout> newWorkouts = new ArrayList<>();
-        for (Workout workout : workouts.getValue()) {
-            workoutNames.add(workout.getName());
-            workout.setExercises(
-                    (ArrayList<Exercise>) workoutViewModel.getExercisesFromWorkout(
-                            workout.getId()
-                    ).getValue()
-            );
-            newWorkouts.add(workout);
-        }
 
 
     }

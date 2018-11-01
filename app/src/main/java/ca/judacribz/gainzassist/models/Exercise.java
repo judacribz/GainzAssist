@@ -32,10 +32,10 @@ public class Exercise implements Parcelable {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
 
     @ColumnInfo(name = "workout_id")
-    private int workoutId;
+    private long workoutId;
     private String name;
     private String type;
     private String equipment;
@@ -74,19 +74,19 @@ public class Exercise implements Parcelable {
 
     // Getters and setters
     // ============================================================================================
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getWorkoutId() {
-        return id;
+    public long getWorkoutId() {
+        return workoutId;
     }
 
-    public void setWorkoutId(int workoutId) {
+    public void setWorkoutId(long workoutId) {
         this.workoutId = workoutId;
     }
     public String getName() {

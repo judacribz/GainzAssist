@@ -63,15 +63,15 @@ public class StartWorkout extends AppCompatActivity {
         setTheme(R.style.WorkoutTheme);
 
         WorkoutViewModel workoutViewModel = new WorkoutViewModel(getApplication());
-        workoutHelper = new WorkoutHelper(this);
-        workout = workoutViewModel.getWorkoutFromName(getIntent().getStringExtra(EXTRA_WORKOUT_NAME)).getValue();
-
-//                workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
-
-        workout.setExercises(
-                (ArrayList<Exercise>) workoutViewModel.getExercisesFromWorkout(
-                        workout.getId()
-                ).getValue());
+//        workoutHelper = new WorkoutHelper(this);
+//        workout = workoutViewModel.getWorkoutFromName(getIntent().getStringExtra(EXTRA_WORKOUT_NAME)).getValue();
+//
+////                workoutHelper.getWorkout(getIntent().getStringExtra(EXTRA_WORKOUT_NAME));
+//
+//        workout.setExercises(
+//                (ArrayList<Exercise>) workoutViewModel.getExercisesFromWorkout(
+//                        workout.getId()
+//                ).getValue());
         if (workout != null) {
             currWorkout = CurrWorkout.getInstance();
             currWorkout.setWorkout(workout);

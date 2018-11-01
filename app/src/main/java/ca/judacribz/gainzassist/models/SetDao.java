@@ -13,7 +13,7 @@ public interface SetDao {
 
 
     @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")
-    LiveData<List<Set>> getSetsFromExercise(int exerciseId);
+    LiveData<List<Set>> getSetsFromExercise(long exerciseId);
 
 
     @Update

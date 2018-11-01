@@ -26,7 +26,6 @@ public abstract class WorkoutDatabase extends RoomDatabase {
                 @Override
                 public void onOpen (@NonNull SupportSQLiteDatabase db){
                     super.onOpen(db);
-                    new PopulateDbAsync(INSTANCE).execute();
                 }
             };
 

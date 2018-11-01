@@ -46,11 +46,11 @@ public class WorkoutRepo {
     // CREATE
     // --------------------------------------------------------------------------------------------
     public void insertWorkout(Workout workout) {
-        new RepoAsyncTask(workoutDao, exerciseDao, workout).execute(INSERT_WORKOUT);
+        new RepoAsyncTask(workoutDao, exerciseDao, setDao, workout).execute(INSERT_WORKOUT);
     }
 
     void insertExercise(Exercise exercise) {
-        new RepoAsyncTask(exerciseDao, exercise).execute(INSERT_EXERCISE);
+        new RepoAsyncTask(exerciseDao, setDao, exercise).execute(INSERT_EXERCISE);
     }
 
     void insertSet(Set set) {
@@ -65,7 +65,7 @@ public class WorkoutRepo {
         return workoutDao.getAll();
     }
 
-    LiveData<Workout> getWorkout(int id) {
+    LiveData<Workout> getWorkout(long id) {
         return workoutDao.get(id);
     }
 
@@ -73,11 +73,11 @@ public class WorkoutRepo {
         return workoutDao.getFromName(name);
     }
 
-    LiveData<List<Exercise>> getExercisesFromWorkout(int workoutId) {
+    LiveData<List<Exercise>> getExercisesFromWorkout(long workoutId) {
         return exerciseDao.getFromWorkout(workoutId);
     }
 
-    LiveData<Exercise> getExercise(int id) {
+    LiveData<Exercise> getExercise(long id) {
         return exerciseDao.get(id);
     }
 
@@ -85,7 +85,7 @@ public class WorkoutRepo {
         return exerciseDao.getAllUniqueNames();
     }
 
-    LiveData<List<Set>> getSetsFromExercise(int exerciseId) {
+    LiveData<List<Set>> getSetsFromExercise(long exerciseId) {
         return setDao.getSetsFromExercise(exerciseId);
     }
     // --------------------------------------------------------------------------------------------
@@ -94,11 +94,11 @@ public class WorkoutRepo {
     // UPDATE
     // --------------------------------------------------------------------------------------------
     void updateWorkout(Workout workout) {
-        new RepoAsyncTask(workoutDao, exerciseDao, workout).execute(UPDATE_WORKOUT);
+        new RepoAsyncTask(workoutDao, exerciseDao, setDao, workout).execute(UPDATE_WORKOUT);
     }
 
     void updateExercise(Exercise exercise) {
-        new RepoAsyncTask(exerciseDao, exercise).execute(UPDATE_EXERCISE);
+        new RepoAsyncTask(exerciseDao, null, exercise).execute(UPDATE_EXERCISE);
     }
 
     void updateSet(Set set) {
@@ -110,15 +110,15 @@ public class WorkoutRepo {
     // DELETE
     // --------------------------------------------------------------------------------------------
     void deleteAllWorkouts() {
-        new RepoAsyncTask(workoutDao, null, null).execute(DELETE_ALL_WORKOUTS);
+        new RepoAsyncTask(workoutDao, null, null, null).execute(DELETE_ALL_WORKOUTS);
     }
 
     void deleteWorkout(Workout workout) {
-        new RepoAsyncTask(workoutDao, null, null).execute(DELETE_WORKOUT);
+        new RepoAsyncTask(workoutDao, null, null, null).execute(DELETE_WORKOUT);
     }
 
     void deleteExercise(Exercise exercise) {
-        new RepoAsyncTask(exerciseDao, null).execute(DELETE_EXERCISE);
+        new RepoAsyncTask(exerciseDao, null, null).execute(DELETE_EXERCISE);
     }
 
     void deleteSet(Set set) {
@@ -137,25 +137,25 @@ public class WorkoutRepo {
         private Exercise exercise;
         private Set set;
 
-        private int id = -1;
+        private long id = -1;
 
-        RepoAsyncTask(WorkoutDao workoutDao, @Nullable ExerciseDao exerciseDao, @Nullable Workout workout) {
+        RepoAsyncTask(WorkoutDao workoutDao,
+                      @Nullable ExerciseDao exerciseDao,
+                      @Nullable SetDao setDao,
+                      @Nullable Workout workout) {
             this.workoutDao = workoutDao;
             this.exerciseDao = exerciseDao;
+            this.setDao = setDao;
             this.workout = workout;
         }
 
-        RepoAsyncTask(WorkoutDao workoutDao, int workoutId) {
-            this.workoutDao = workoutDao;
-            this.id = workoutId;
-        }
-
-        RepoAsyncTask(ExerciseDao exerciseDao, @Nullable Exercise exercise) {
+        RepoAsyncTask(ExerciseDao exerciseDao, @Nullable SetDao setDao, @Nullable Exercise exercise) {
             this.exerciseDao = exerciseDao;
+            this.setDao = setDao;
             this.exercise = exercise;
         }
 
-        RepoAsyncTask(SetDao setDao, Set set) {
+        RepoAsyncTask(SetDao setDao,@Nullable Set set) {
             this.setDao = setDao;
             this.set = set;
         }
@@ -166,14 +166,22 @@ public class WorkoutRepo {
             for (RepoTask task : tasks) {
                 switch (task) {
                     case INSERT_WORKOUT:
-                        workoutDao.insert(workout);
-
+                        long wid = workoutDao.insert(workout);
+                        for (Exercise exercise : workout.getExercises()) {
+                            exercise.setWorkoutId(wid);
+                            new RepoAsyncTask(exerciseDao, setDao, exercise).execute(INSERT_EXERCISE);
+                        }
                         break;
                     case INSERT_EXERCISE:
-                        exerciseDao.insert(exercise);
+                        long eid = exerciseDao.insert(exercise);
+                        for (Set set : exercise.getSets()) {
+                            set.setExerciseId(eid);
+                            new RepoAsyncTask(setDao, set).execute(INSERT_SET);
+                        }
                         break;
                     case INSERT_SET:
-                        setDao.insert(set);
+                        if (setDao != null)
+                            setDao.insert(set);
                         break;
 
 

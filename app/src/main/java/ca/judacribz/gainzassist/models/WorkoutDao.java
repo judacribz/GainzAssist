@@ -8,15 +8,15 @@ import java.util.List;
 @Dao
 public interface WorkoutDao {
 
-    @Insert
-    void insert(Workout... workout);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    Long insert(Workout workout);
 
 
     @Query("SELECT * from  workouts")
     LiveData<List<Workout>> getAll();
 
     @Query("SELECT * from  workouts WHERE id = :id")
-    LiveData<Workout> get(int id);
+    LiveData<Workout> get(long id);
 
     @Query("SELECT * from  workouts WHERE name = :name")
     LiveData<Workout> getFromName(String name);

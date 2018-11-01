@@ -61,14 +61,6 @@ public class Main extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences("user_info.file", Context.MODE_PRIVATE);
         Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
 
-        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
-//        workoutViewModel
-
-//        workoutViewModel.deleteAllWorkouts();
-//        workoutViewModel.insert(new Workout("yom", null));
-//        workoutViewModel.insert(new Workout("bom", null));
-//        workoutViewModel.insert(new Workout("sdf", null));
-//        workoutViewModel.insert(new Workout("sddfds", null));
 
     }
 
