@@ -31,8 +31,9 @@ import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
-import ca.judacribz.gainzassist.async.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
+import ca.judacribz.gainzassist.models.db.WorkoutRepo.*;
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
@@ -41,7 +42,7 @@ import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
                                                                TextWatcher,
-                                                               OnWorkoutReceivedListener {
+        RepoAsyncTask.OnWorkoutReceivedListener {
 
     public static final String EXTRA_WORKOUT
             = "ca.judacribz.gainzassist.activities.workouts_list.EXTRA_WORKOUT";
@@ -53,9 +54,9 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
 
     ArrayList<String> workoutNames;
     ArrayList<String> filteredWorkouts;
-    WorkoutHelper workoutHelper;
+//    WorkoutHelper workoutHelper;
 
-    OnWorkoutReceivedListener onWorkoutReceivedListener;
+    RepoAsyncTask.OnWorkoutReceivedListener onWorkoutReceivedListener;
     // --------------------------------------------------------------------------------------------
 
     // ButterKnife Injections
@@ -82,19 +83,18 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         workoutsList.setHasFixedSize(true);
 
         // Get all workouts from database
-        workoutHelper = new WorkoutHelper(this);
-        workoutHelper.close();
-        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
-        LiveData<List<Workout>> workouts = workoutViewModel.getAllWorkouts();
+//        workoutHelper = new WorkoutHelper(this);
+//        workoutHelper.close();
 
-        workouts.observe(this, new Observer<List<Workout>>() {
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
+        workoutViewModel.getAllWorkouts().observe(this, new Observer<List<Workout>>() {
             @Override
             public void onChanged(@Nullable List<Workout> workouts) {
                 if (workouts != null) {
                     Toast.makeText(WorkoutsList.this, workouts.size() + "", Toast.LENGTH_SHORT).show();
+                    workoutNames = new ArrayList<>();
                     for (Workout workout : workouts) {
-                        if (!workoutNames.contains(workout.getName()))
-                            workoutNames.add(workout.getName());
+                        workoutNames.add(workout.getName());
                     }
                     displayWorkoutList(workoutNames);
                 }
@@ -134,7 +134,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     @Override
     protected void onStop() {
         super.onStop();
-        workoutHelper.close();
+//        workoutHelper.close();
     }
 
     @Override
@@ -190,22 +190,16 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onWorkoutClick(String name) {
+        extraKey = EXTRA_WORKOUT;
+        intent = new Intent(this, StartWorkout.class);
         workoutViewModel.getWorkoutFromName(this, name);
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 
 
-    @Override
-    public void onWorkoutsReceived(Workout workout) {
-        Intent startWorkoutIntent = new Intent(this, StartWorkout.class);
-        startWorkoutIntent.putExtra(EXTRA_WORKOUT, workout);
-        startActivity(startWorkoutIntent);
-    }
-
-
     // SingleItemAdapter.ItemLongClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
+//TODO change to dialogbar
     @Override
     public void onWorkoutLongClick(View anch, final String workoutName) {
         View popupView = getLayoutInflater().inflate(R.layout.part_confirm_popup, null);
@@ -222,9 +216,12 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
                         getApplicationContext(),
                         NewWorkoutSummary.class
                 );
-                newWorkoutSummaryIntent.putExtra(NewWorkoutSummary.EXTRA_WORKOUT, workoutHelper.getWorkout(workoutName));
                 newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
-                startActivity(newWorkoutSummaryIntent);
+
+                extraKey = NewWorkoutSummary.EXTRA_WORKOUT;
+                intent = newWorkoutSummaryIntent;
+
+                workoutViewModel.getWorkoutFromName(WorkoutsList.this, workoutName);
             }
         });
 
@@ -253,6 +250,16 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
                 location[0] + anch.getPaddingStart()/2, location[1]);
     }
     //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////
+
+
+    Intent intent;
+    String extraKey;
+    @Override
+    public void onWorkoutsReceived(Workout workout) {
+        intent.putExtra(extraKey, workout);
+        startActivity(intent);
+    }
+
 
     // Click Handling
     // ============================================================================================

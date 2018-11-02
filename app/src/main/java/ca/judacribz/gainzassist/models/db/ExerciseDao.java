@@ -1,7 +1,8 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models.db;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.*;
+import ca.judacribz.gainzassist.models.Exercise;
 
 import java.util.List;
 

@@ -1,11 +1,13 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models.db;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
+import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.Workout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WorkoutViewModel extends AndroidViewModel {
@@ -91,7 +93,7 @@ public class WorkoutViewModel extends AndroidViewModel {
     }
 
     public void deleteWorkout(Workout workout) {
-        workoutRepo.deleteWorkout(workout);
+        workoutRepo.deleteWorkout(workout.getName());
     }
 
     public void deleteExercise(Exercise exercise) {

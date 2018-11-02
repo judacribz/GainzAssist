@@ -53,11 +53,11 @@ public class Set implements Parcelable {
         this.setNumber = setNumber;
     }
 
-    long getExerciseId() {
+    public long getExerciseId() {
         return exerciseId;
     }
 
-    void setExerciseId(long exerciseId) {
+    public void setExerciseId(long exerciseId) {
         this.exerciseId = exerciseId;
     }
 

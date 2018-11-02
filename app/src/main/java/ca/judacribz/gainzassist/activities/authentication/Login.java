@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.async.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -158,6 +159,8 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     public void onStart() {
         super.onStart();
         if (getIntent().getBooleanExtra(EXTRA_LOGOUT_USER, false)) {
+            WorkoutViewModel workoutViewModel = new WorkoutViewModel(getApplication());
+            workoutViewModel.deleteAllWorkouts();
             signOut(this, signInClient);
         }
         auth.addAuthStateListener(this);

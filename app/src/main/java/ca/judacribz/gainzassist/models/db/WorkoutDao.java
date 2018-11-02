@@ -1,7 +1,8 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models.db;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.*;
+import ca.judacribz.gainzassist.models.Workout;
 
 import java.util.List;
 
@@ -28,7 +29,9 @@ public interface WorkoutDao {
     @Update
     void update(Workout... workout);
 
+    @Query("DELETE from workouts")
+    void deleteAll();
 
-    @Delete
-    void delete(Workout... workout);
+    @Query("DELETE from workouts WHERE name = :name")
+    void delete(String name);
 }

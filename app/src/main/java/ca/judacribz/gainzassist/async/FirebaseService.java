@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.models.*;
+import ca.judacribz.gainzassist.models.db.WorkoutRepo;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,8 +67,9 @@ public class FirebaseService extends IntentService implements ChildEventListener
     @Override
     public void onChildRemoved(DataSnapshot workoutShot) {
         Toast.makeText(this, "Deleted " + workoutShot.getKey(), Toast.LENGTH_SHORT).show();
-        workoutHelper.deleteWorkout(workoutShot.getKey());
+//        workoutHelper.deleteWorkout(workoutShot.getKey());
 
+        workoutRepo.deleteWorkout(workoutShot.getKey());
     }
 
     @Override

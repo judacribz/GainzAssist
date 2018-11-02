@@ -41,7 +41,7 @@ public class Exercise implements Parcelable {
     private String equipment;
 
     @Ignore
-    private ArrayList<Set> sets;
+    private ArrayList<Set> sets = new ArrayList<>();
 
     public enum SetsType {
         WARMUP_SET,
@@ -131,6 +131,10 @@ public class Exercise implements Parcelable {
 
     public SetsType getSetsType() {
         return setsType;
+    }
+
+    public void addSet(Set set) {
+        this.sets.add(set);
     }
 
     public float getAvgWeight() {
