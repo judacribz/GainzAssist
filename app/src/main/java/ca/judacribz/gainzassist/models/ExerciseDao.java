@@ -13,7 +13,10 @@ public interface ExerciseDao {
 
 
     @Query("SELECT * from exercises WHERE workout_id = :workoutId")
-    LiveData<List<Exercise>> getFromWorkout(long workoutId);
+    LiveData<List<Exercise>> getLiveFromWorkout(long workoutId);
+
+    @Query("SELECT * from exercises WHERE workout_id = :workoutId")
+    List<Exercise> getFromWorkout(long workoutId);
 
     @Query("SELECT * from  exercises WHERE id = :id")
     LiveData<Exercise> get(long id);

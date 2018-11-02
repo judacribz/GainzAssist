@@ -26,30 +26,25 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ca.judacribz.gainzassist.Main;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
-import ca.judacribz.gainzassist.async.FirebaseService;
-import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.WorkoutHelper;
-import ca.judacribz.gainzassist.models.WorkoutViewModel;
+import ca.judacribz.gainzassist.async.OnWorkoutReceivedListener;
+import ca.judacribz.gainzassist.models.*;
 
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.EXERCISES_ENTRY;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.firebase.Database.deleteWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
-                                                               TextWatcher {
+                                                               TextWatcher,
+                                                               OnWorkoutReceivedListener {
 
-    public static final String EXTRA_WORKOUT_NAME
-            = "ca.judacribz.gainzassist.activities.workouts_list.EXTRA_WORKOUT_NAME";
+    public static final String EXTRA_WORKOUT
+            = "ca.judacribz.gainzassist.activities.workouts_list.EXTRA_WORKOUT";
 
     // Global Variables
     // --------------------------------------------------------------------------------------------
@@ -59,6 +54,8 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     ArrayList<String> workoutNames;
     ArrayList<String> filteredWorkouts;
     WorkoutHelper workoutHelper;
+
+    OnWorkoutReceivedListener onWorkoutReceivedListener;
     // --------------------------------------------------------------------------------------------
 
     // ButterKnife Injections
@@ -103,9 +100,6 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
                 }
             }
         });
-
-
-
     }
 
     @Override
@@ -196,11 +190,18 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onWorkoutClick(String name) {
-        Intent startWorkoutIntent = new Intent(this, StartWorkout.class);
-        startWorkoutIntent.putExtra(EXTRA_WORKOUT_NAME, name);
-        startActivity(startWorkoutIntent);
+        workoutViewModel.getWorkoutFromName(this, name);
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
+
+
+    @Override
+    public void onWorkoutsReceived(Workout workout) {
+        Intent startWorkoutIntent = new Intent(this, StartWorkout.class);
+        startWorkoutIntent.putExtra(EXTRA_WORKOUT, workout);
+        startActivity(startWorkoutIntent);
+    }
+
 
     // SingleItemAdapter.ItemLongClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +222,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
                         getApplicationContext(),
                         NewWorkoutSummary.class
                 );
-                newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workoutHelper.getWorkout(workoutName));
+                newWorkoutSummaryIntent.putExtra(NewWorkoutSummary.EXTRA_WORKOUT, workoutHelper.getWorkout(workoutName));
                 newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
                 startActivity(newWorkoutSummaryIntent);
             }

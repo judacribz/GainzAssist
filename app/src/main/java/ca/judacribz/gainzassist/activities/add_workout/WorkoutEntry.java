@@ -19,7 +19,7 @@ public class WorkoutEntry extends AppCompatActivity{
     // Constants
     // --------------------------------------------------------------------------------------------
     public static final String EXTRA_WORKOUT_NAME
-            = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT_NAME";
+            = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT";
     public static final String EXTRA_NUM_EXERCISES
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_NUM_EXERCISES";
 

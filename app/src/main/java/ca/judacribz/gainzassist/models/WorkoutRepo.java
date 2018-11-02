@@ -1,13 +1,11 @@
 package ca.judacribz.gainzassist.models;
 
 import android.app.Application;
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
-import android.arch.lifecycle.Observer;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import ca.judacribz.gainzassist.async.OnWorkoutReceivedListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +64,7 @@ public class WorkoutRepo {
 
     // RETRIEVE
     // --------------------------------------------------------------------------------------------
-    LiveData<List<Workout>> getAllWorkouts() {
+    LiveData<List<Workout>> getAllWorkoutsLive() {
         return workoutDao.getAll();
     }
 
@@ -74,13 +72,12 @@ public class WorkoutRepo {
         return workoutDao.get(id);
     }
 
-
-    LiveData<Workout> getWorkoutFromName(final String name) {
-        return workoutDao.getFromName(name);
+    void getWorkoutFromName(Context context, String name) {
+        new RepoAsyncTask(context, name).execute(GET_WORKOUT);
     }
 
     LiveData<List<Exercise>> getExercisesFromWorkout(long workoutId) {
-        return exerciseDao.getFromWorkout(workoutId);
+        return exerciseDao.getLiveFromWorkout(workoutId);
     }
 
     LiveData<Exercise> getExercise(long id) {
@@ -92,7 +89,7 @@ public class WorkoutRepo {
     }
 
     LiveData<List<Set>> getSetsFromExercise(long exerciseId) {
-        return setDao.getSetsFromExercise(exerciseId);
+        return setDao.getLiveFromExercise(exerciseId);
     }
     // --------------------------------------------------------------------------------------------
 
@@ -133,12 +130,18 @@ public class WorkoutRepo {
     // --------------------------------------------------------------------------------------------
 
 
-    private static class RepoAsyncTask extends AsyncTask<RepoTask, Void, Void> {
+    public static class RepoAsyncTask extends AsyncTask<RepoTask, Void, Void> {
 
 
-        private Workout workout;
-        private Exercise exercise;
-        private Set set;
+        OnWorkoutReceivedListener onWorkoutReceivedListener = null;
+
+        public void setOnWorkoutReceivedListener(@Nullable OnWorkoutReceivedListener onWorkoutReceivedListener) {
+            this.onWorkoutReceivedListener = onWorkoutReceivedListener;
+        }
+        private String workoutName = null;
+        private Workout workout = null;
+        private Exercise exercise = null;
+        private Set set = null;
 
         private long id = -1;
 
@@ -147,6 +150,10 @@ public class WorkoutRepo {
 
         RepoAsyncTask(Workout workout) {
             this.workout = workout;
+        }
+        RepoAsyncTask(Context context, String workoutName) {
+            setOnWorkoutReceivedListener((OnWorkoutReceivedListener) context);
+            this.workoutName = workoutName;
         }
 
         RepoAsyncTask(Exercise exercise) {
@@ -162,6 +169,15 @@ public class WorkoutRepo {
 
             for (RepoTask task : tasks) {
                 switch (task) {
+                    case GET_WORKOUT:
+                        workout = workoutDao.getFromName(workoutName);
+                        for (Exercise exercise : exerciseDao.getFromWorkout(workout.getId())) {
+                            exercise.setSets((ArrayList<Set>) setDao.getFromExercise(exercise.getId()));
+                            workout.addExercise(exercise);
+                        }
+                        onWorkoutReceivedListener.onWorkoutsReceived(workout);
+
+                        break;
                     case INSERT_WORKOUT:
                         long wid = workoutDao.insert(workout);
                         for (Exercise exercise : workout.getExercises()) {
@@ -195,7 +211,8 @@ public class WorkoutRepo {
 
 
                     case DELETE_WORKOUT:
-                        workoutDao.delete(workout);
+                        if (workout != null)
+                            workoutDao.delete(workout);
                         break;
                     case DELETE_EXERCISE:
                         exerciseDao.delete(exercise);
@@ -209,6 +226,6 @@ public class WorkoutRepo {
             return null;
         }
 
-    }
+        }
 
 }

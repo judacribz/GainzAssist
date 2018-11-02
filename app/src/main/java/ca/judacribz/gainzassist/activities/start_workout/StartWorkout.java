@@ -1,9 +1,7 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.arch.lifecycle.Observer;
-import android.database.sqlite.SQLiteTransactionListener;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
@@ -15,23 +13,19 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import android.widget.Toast;
 import butterknife.*;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.*;
 
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
-import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 import static ca.judacribz.gainzassist.util.UI.*;
-import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT_NAME;
+import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT;
 
 public class StartWorkout extends AppCompatActivity {
 
@@ -62,23 +56,15 @@ public class StartWorkout extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setInitView(this, R.layout.activity_start_workout, getIntent().getStringExtra(EXTRA_WORKOUT_NAME), true);
+        Intent intent = getIntent();
+        workout = intent.getParcelableExtra(EXTRA_WORKOUT);
+        setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
 
-        WorkoutViewModel workoutViewModel = new WorkoutViewModel(getApplication());
-        workoutViewModel.getWorkoutFromName(getIntent().getStringExtra(EXTRA_WORKOUT_NAME)).observe(this, new Observer<Workout>() {
-            @Override
-            public void onChanged(@Nullable Workout w) {
-                if (workout != null) {
-                    currWorkout = CurrWorkout.getInstance();
-                    currWorkout.setWorkout(workout);
+        currWorkout = CurrWorkout.getInstance();
+        currWorkout.setWorkout(workout);
 
-                    setupPager();
-                }
-            }
-        });
-
-
+        setupPager();
 
     }
 

@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.models;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,16 +38,15 @@ public class WorkoutViewModel extends AndroidViewModel {
     // RETRIEVE
     // --------------------------------------------------------------------------------------------
     public LiveData<List<Workout>> getAllWorkouts() {
-        return workoutRepo.getAllWorkouts();
+        return workoutRepo.getAllWorkoutsLive();
     }
 
     public LiveData<Workout> getWorkout(long id) {
         return workoutRepo.getWorkout(id);
     }
 
-    public LiveData<Workout> getWorkoutFromName(String name) {
-        workoutRepo.getWorkoutFromName(name).
-        return workoutRepo.getWorkoutFromName(name);
+    public void getWorkoutFromName(Context context, String name) {
+        workoutRepo.getWorkoutFromName(context, name);
     }
 
     public LiveData<List<Exercise>> getExercisesFromWorkout(long workoutId) {
