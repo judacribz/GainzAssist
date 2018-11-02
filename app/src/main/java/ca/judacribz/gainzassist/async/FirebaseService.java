@@ -60,7 +60,8 @@ public class FirebaseService extends IntentService implements ChildEventListener
     @Override
     public void onChildChanged(DataSnapshot workoutShot, String s) {
 
-        workoutHelper.updateWorkout(workoutShot.getKey(), extractWorkout(workoutShot));
+        workoutRepo.insertWorkout(extractWorkout(workoutShot));
+//        workoutHelper.updateWorkout(workoutShot.getKey(), extractWorkout(workoutShot));
 
     }
 

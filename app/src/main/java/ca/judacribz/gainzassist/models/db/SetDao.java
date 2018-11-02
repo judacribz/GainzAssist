@@ -9,7 +9,7 @@ import java.util.List;
 @Dao
 public interface SetDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Set set);
 
     @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")

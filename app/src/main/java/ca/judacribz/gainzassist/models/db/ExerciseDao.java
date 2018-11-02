@@ -9,7 +9,7 @@ import java.util.List;
 @Dao
 public interface ExerciseDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insert(Exercise exercise);
 
 
