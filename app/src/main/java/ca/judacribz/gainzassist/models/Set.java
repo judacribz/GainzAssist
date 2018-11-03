@@ -23,7 +23,7 @@ public class Set implements Parcelable {
     @ColumnInfo(name = "set_number")
     private int setNumber;
     @ColumnInfo(name = "exercise_id")
-    private long exerciseId;
+    private int exerciseId;
     private int reps;
     private float weight;
     // --------------------------------------------------------------------------------------------
@@ -53,11 +53,11 @@ public class Set implements Parcelable {
         this.setNumber = setNumber;
     }
 
-    public long getExerciseId() {
+    public int getExerciseId() {
         return exerciseId;
     }
 
-    public void setExerciseId(long exerciseId) {
+    public void setExerciseId(int exerciseId) {
         this.exerciseId = exerciseId;
     }
 

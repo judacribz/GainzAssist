@@ -1,7 +1,10 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
 import android.app.Activity;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,6 +13,8 @@ import android.view.View;
 import android.widget.*;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
@@ -18,6 +23,7 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 
 import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
@@ -62,6 +68,8 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
     WorkoutHelper workoutHelper;
 
+    WorkoutViewModel workoutViewModel;
+
     // UI Elements
     @BindView(R.id.et_workout_name) EditText etWorkoutName;
 
@@ -92,9 +100,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setInitView(this, R.layout.activity_new_workout_summary, R.string.title_new_workout_summary, true);
 
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
         Intent intent = getIntent();
         workout = intent.getParcelableExtra(EXTRA_WORKOUT);
         switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {
@@ -393,7 +401,10 @@ Exercise ex;
             } else {
 
                 workout = new Workout(getTextString(etWorkoutName), exercises);
+
                 addWorkoutFirebase(workout);
+
+                workoutViewModel.insertWorkout(workout);
 
                 discardWorkout();
             }

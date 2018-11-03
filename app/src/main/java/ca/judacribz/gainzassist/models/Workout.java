@@ -16,7 +16,7 @@ public class Workout implements Parcelable {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     @PrimaryKey(autoGenerate = true)
-    private long id;
+    private int id;
 
     private String name;
 
@@ -43,11 +43,11 @@ public class Workout implements Parcelable {
 
     // Getters and setters
     // ============================================================================================
-    public long getId() {
+    public int getId() {
         return this.id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -117,10 +117,13 @@ public class Workout implements Parcelable {
     /* Helper function used to store Workout information in the Firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();
+        Map<String, Object> exs = new HashMap<>();
 
         for (Exercise exercise: exercises) {
-            workout.put(exercise.getName(), exercise.toMap());
+            exs.put(String.valueOf(exercises.indexOf(exercise)), exercise.toMap());
         }
+
+        workout.put("exercises", exs);
 
         return workout;
     }

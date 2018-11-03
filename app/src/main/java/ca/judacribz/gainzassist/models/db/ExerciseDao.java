@@ -14,10 +14,10 @@ public interface ExerciseDao {
 
 
     @Query("SELECT * from exercises WHERE workout_id = :workoutId")
-    LiveData<List<Exercise>> getLiveFromWorkout(long workoutId);
+    LiveData<List<Exercise>> getLiveFromWorkout(int workoutId);
 
     @Query("SELECT * from exercises WHERE workout_id = :workoutId")
-    List<Exercise> getFromWorkout(long workoutId);
+    List<Exercise> getFromWorkout(int workoutId);
 
     @Query("SELECT * from  exercises WHERE id = :id")
     LiveData<Exercise> get(long id);
@@ -25,6 +25,8 @@ public interface ExerciseDao {
     @Query("SELECT DISTINCT name FROM exercises")
     LiveData<List<String>> getAllUniqueNames();
 
+    @Query("SELECT id from  exercises WHERE name = :name AND workout_id = :workoutId")
+    int getId(String name, int workoutId);
 
     @Update
     void update(Exercise... exercise);

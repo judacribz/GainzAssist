@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutRepo;
+import ca.judacribz.gainzassist.models.db.WorkoutRepo.*;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,9 +15,11 @@ import com.google.firebase.database.DatabaseError;
 import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.firebase.Database.getWorkoutsRef;
+import static ca.judacribz.gainzassist.models.db.WorkoutRepo.EXTRA_WORKOUT_ID;
 
 
-public class FirebaseService extends IntentService implements ChildEventListener {
+public class FirebaseService extends IntentService implements ChildEventListener, OnWorkoutReceivedListener
+{
 
     private final static String SETS = "sets";
 
@@ -53,7 +56,10 @@ public class FirebaseService extends IntentService implements ChildEventListener
     ArrayList<String> workoutNames;
     @Override
     public void onChildAdded(DataSnapshot workoutShot, String s) {
-        workoutRepo.insertWorkout(extractWorkout(workoutShot));
+
+        workoutRepo.setWorkoutShot(workoutShot);
+        workoutRepo.getWorkoutId(this, workoutShot.getKey());
+
 //        workoutHelper.addWorkout(extractWorkout(workoutShot));
     }
 
@@ -85,7 +91,7 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     public Workout extractWorkout(DataSnapshot workoutShot) {
         exercises = new ArrayList<>();
-        for (DataSnapshot exerciseShot : workoutShot.getChildren()) {
+        for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
             // Add set to sets list
             sets = new ArrayList<>();
             for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
@@ -101,7 +107,7 @@ public class FirebaseService extends IntentService implements ChildEventListener
             // Adds sets to exercise object, and add exercise to exercises list
             exercise = exerciseShot.getValue(Exercise.class);
             if (exercise != null) {
-                exercise.setName(exerciseShot.getKey());
+//                exercise.setName(exerciseShot.getKey());
                 exercise.setSets(sets);
 
                 exercises.add(exercise);
@@ -109,5 +115,14 @@ public class FirebaseService extends IntentService implements ChildEventListener
         }
 
         return new Workout(workoutShot.getKey(), exercises);
+    }
+
+    @Override
+    public void onWorkoutsReceived(Workout workout) {
+    }
+
+    @Override
+    public void onWorkoutShotReceived(DataSnapshot workoutShot) {
+        workoutRepo.insertWorkout(extractWorkout(workoutShot));
     }
 }

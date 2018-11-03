@@ -13,10 +13,10 @@ public interface SetDao {
     void insert(Set set);
 
     @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")
-    LiveData<List<Set>> getLiveFromExercise(long exerciseId);
+    LiveData<List<Set>> getLiveFromExercise(int exerciseId);
 
     @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")
-    List<Set> getFromExercise(long exerciseId);
+    List<Set> getFromExercise(int exerciseId);
 
 
     @Update
