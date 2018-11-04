@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +16,11 @@ import butterknife.*;
 import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import ca.judacribz.gainzassist.services.FBMessaging;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 
 import static ca.judacribz.gainzassist.util.Helper.getEmailFromPref;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -49,6 +55,20 @@ public class Main extends AppCompatActivity {
 
         SharedPreferences sharedPref = getSharedPreferences("user_info.file", Context.MODE_PRIVATE);
         Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+        FBMessaging FBMessaging = new FBMessaging();
+        FirebaseMessaging.getInstance().subscribeToTopic("weather")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                             @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "YOLOO";
+                        if (!task.isSuccessful()) {
+                            msg = "NOOO";
+                        }
+                        Toast.makeText(Main.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
 
 
     }

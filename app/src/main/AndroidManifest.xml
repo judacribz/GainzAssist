@@ -74,12 +74,11 @@
         <activity android:name=".activities.add_workout.ExercisesEntry"/>
 
         <service
-                android:name=".services.FirebaseDatabase"
+                android:name=".services.FBDatabase"
                 android:exported="false">
         </service>
 
-     <service
-                android:name=".services.FirebaseMessaging">
+        <service android:name=".services.FBMessaging">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

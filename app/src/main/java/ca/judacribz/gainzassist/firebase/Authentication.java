@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import ca.judacribz.gainzassist.services.FirebaseDatabase;
+import ca.judacribz.gainzassist.services.FBDatabase;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -110,7 +110,7 @@ public class Authentication {
 
         LoginManager.getInstance().logOut();
 
-        act.stopService(new Intent(act, FirebaseDatabase.class));
+        act.stopService(new Intent(act, FBDatabase.class));
         (new WorkoutHelper(act)).deleteAllWorkouts();
     }
 

@@ -17,14 +17,14 @@ import static ca.judacribz.gainzassist.firebase.Database.getWorkoutsRef;
 import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
 
 
-public class FirebaseDatabase extends IntentService implements
+public class FBDatabase extends IntentService implements
         ChildEventListener,
         OnWorkoutReceivedListener {
 
     WorkoutRepo workoutRepo;
 
-    public FirebaseDatabase() {
-        super("FirebaseDatabase");
+    public FBDatabase() {
+        super("FBDatabase");
     }
 
     @Override

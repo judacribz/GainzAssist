@@ -2,7 +2,7 @@ package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
-import ca.judacribz.gainzassist.services.FirebaseDatabase;
+import ca.judacribz.gainzassist.services.FBDatabase;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -72,8 +72,8 @@ public class Database {
                             copyDefaultWorkoutsFirebase();
                         }
 
-                        if (!isMyServiceRunning(act, FirebaseDatabase.class)) {
-                            act.startService(new Intent(act, FirebaseDatabase.class));
+                        if (!isMyServiceRunning(act, FBDatabase.class)) {
+                            act.startService(new Intent(act, FBDatabase.class));
                         }
                     }
 
