@@ -15,7 +15,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 entity = Exercise.class,
                 parentColumns = "id",
                 childColumns = "exercise_id",
-                onDelete = CASCADE))
+                onDelete = CASCADE),
+        indices = {@Index(value = {"exercise_id", "set_number"}, unique = true)})
 public class Set implements Parcelable {
 
     // Global Vars

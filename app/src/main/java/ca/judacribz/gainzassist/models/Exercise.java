@@ -13,7 +13,8 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 entity = Workout.class,
                 parentColumns = "id",
                 childColumns = "workout_id",
-                onDelete = CASCADE))
+                onDelete = CASCADE),
+                indices = {@Index(value = {"workout_id", "name"}, unique = true)})
 public class Exercise implements Parcelable {
 
     @Ignore

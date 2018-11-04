@@ -1,30 +1,16 @@
 package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.widget.Toast;
 import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
-import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.WorkoutHelper;
-import ca.judacribz.gainzassist.util.Helper;
 
 import static ca.judacribz.gainzassist.util.Helper.*;
 
@@ -40,54 +26,77 @@ public class Database {
     private final static String DEFAULT_WORKOUTS_PATH = "default_workouts";
     private static final String USER_PATH = "users/%s";
 
+    private static FirebaseUser firebaseUser;
+    private static DatabaseReference userRef;
+    private static DatabaseReference userWorkoutsRef;
+
     // --------------------------------------------------------------------------------------------
 
+    //TODO change to get ref for a specific user when friends/chatting added
     /* Gets firebase db reference for 'users/<uid>/' */
     private static DatabaseReference getUserRef() {
-        DatabaseReference userRef = null;
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            userRef = FirebaseDatabase.getInstance().getReference(
-                    String.format(USER_PATH, user.getUid())
-            );
-        }
-
-        return userRef;
+        return (firebaseUser != null) ?
+                firebaseDatabase.getReference(String.format(USER_PATH, firebaseUser.getUid())) :
+                null;
     }
 
     /* Gets firebase db reference for 'users/<uid>/workouts/' */
     public static DatabaseReference getWorkoutsRef() {
-        return getUserRef().child(WORKOUTS);
+        userRef = getUserRef();
+
+        return (userRef != null) ? userRef.child(WORKOUTS) : null;
     }
 
 
     /* Sets the user email in firebase db under 'users/<uid>/email' */
     public static void setUserInfo(final Activity act) {
-        final FirebaseUser fbUser = FirebaseAuth.getInstance().getCurrentUser();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         // FIREBASE: add user data
-        if (fbUser != null) {
-            final DatabaseReference userRef = getUserRef();
+        if (firebaseUser != null) {
+            userRef = getUserRef();
 
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            if (userRef != null) {
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
+                    @Override
+                    public void onDataChange(DataSnapshot userShot) {
+
+                        // If newly added user
+                        if (!userShot.hasChildren()) {
+                            userRef.child(EMAIL).setValue(firebaseUser.getEmail());
+
+                            // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
+                            copyDefaultWorkoutsFirebase();
+                        }
+
+                        if (!isMyServiceRunning(act, FirebaseService.class)) {
+                            act.startService(new Intent(act, FirebaseService.class));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+        }
+    }
+
+    /* Gets workouts from firebase db under 'default_workouts/' and adds it to
+     * 'users/<uid>/workouts/' */
+    private static void copyDefaultWorkoutsFirebase() {
+        DatabaseReference defaultWorkoutsRef = FirebaseDatabase.getInstance().getReference(DEFAULT_WORKOUTS_PATH);
+        userWorkoutsRef = getWorkoutsRef();
+
+        if (defaultWorkoutsRef != null && userWorkoutsRef != null) {
+            defaultWorkoutsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    // If newly added user
-                    if (!dataSnapshot.hasChildren()) {
-                        userRef
-                            .child(EMAIL)
-                            .setValue(fbUser.getEmail());
-
-                        // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
-                        copyDefaultWorkoutsFirebase();
-                    }
-
-                    if (!isMyServiceRunning(act, FirebaseService.class)) {
-                        act.startService(new Intent(act, FirebaseService.class));
-                    }
+                public void onDataChange(DataSnapshot defaultWorkoutsShot) {
+                    userWorkoutsRef.setValue(defaultWorkoutsShot.getValue());
                 }
 
                 @Override
@@ -97,32 +106,21 @@ public class Database {
         }
     }
 
-    /* Gets workouts from firebase db under 'default_workouts/' and adds it to
-     * 'users/<uid>/workouts/' */
-    public static void copyDefaultWorkoutsFirebase() {
-        DatabaseReference defaultRef = FirebaseDatabase.getInstance().getReference(
-                DEFAULT_WORKOUTS_PATH
-        );
-
-        defaultRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                getWorkoutsRef().setValue(dataSnapshot.getValue());
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
 
     /* Adds a workout under "users/<uid>/workouts/" */
     public static void addWorkoutFirebase(Workout workout) {
-        getWorkoutsRef().child(workout.getName()).setValue(workout.toMap());
+        userWorkoutsRef = getWorkoutsRef();
+
+        if (userWorkoutsRef != null) {
+            userWorkoutsRef.child(workout.getName()).setValue(workout.toMap());
+        }
     }
 
     public static void deleteWorkoutFirebase(String workoutName) {
-        getWorkoutsRef().child(workoutName).removeValue();
+        userWorkoutsRef = getWorkoutsRef();
+
+        if (userWorkoutsRef != null) {
+            userWorkoutsRef.child(workoutName).removeValue();
+        }
     }
 }

@@ -1,6 +1,5 @@
 package ca.judacribz.gainzassist.activities.workouts_list;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -31,9 +30,8 @@ import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
-import ca.judacribz.gainzassist.async.OnWorkoutReceivedListener;
+import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
-import ca.judacribz.gainzassist.models.db.WorkoutRepo.*;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.google.firebase.database.DataSnapshot;
 
@@ -260,11 +258,6 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         intent.putExtra(extraKey, workout);
         startActivity(intent);
     }
-
-    @Override
-    public void onWorkoutShotReceived(DataSnapshot workoutShot) {
-    }
-
 
     // Click Handling
     // ============================================================================================

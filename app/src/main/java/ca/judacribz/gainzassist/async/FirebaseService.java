@@ -5,30 +5,23 @@ import android.app.Service;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
+import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutRepo;
-import ca.judacribz.gainzassist.models.db.WorkoutRepo.*;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.firebase.Database.getWorkoutsRef;
-import static ca.judacribz.gainzassist.models.db.WorkoutRepo.EXTRA_WORKOUT_ID;
+import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
 
 
-public class FirebaseService extends IntentService implements ChildEventListener, OnWorkoutReceivedListener
-{
-
-    private final static String SETS = "sets";
-
-    WorkoutHelper workoutHelper = new WorkoutHelper(this);
-    ArrayList<Exercise> exercises;
-    ArrayList<Set> sets;
-
-    Exercise exercise;
-    Set set;
+public class FirebaseService extends IntentService implements
+        ChildEventListener,
+        OnWorkoutReceivedListener {
 
     WorkoutRepo workoutRepo;
 
@@ -45,7 +38,12 @@ public class FirebaseService extends IntentService implements ChildEventListener
 
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        getWorkoutsRef().addChildEventListener(this);
+        DatabaseReference userWorkoutsRef = getWorkoutsRef();
+
+        if (userWorkoutsRef != null) {
+            userWorkoutsRef.addChildEventListener(this);
+        }
+
         return Service.START_STICKY;
     }
 
@@ -53,76 +51,37 @@ public class FirebaseService extends IntentService implements ChildEventListener
     protected void onHandleIntent(Intent intent) {
     }
 
-    ArrayList<String> workoutNames;
     @Override
     public void onChildAdded(DataSnapshot workoutShot, String s) {
 
-        workoutRepo.setWorkoutShot(workoutShot);
-        workoutRepo.getWorkoutId(this, workoutShot.getKey());
-
-//        workoutHelper.addWorkout(extractWorkout(workoutShot));
+        //TODO change to read from textfile for list of current workout names instead of using interface
+        workoutRepo.getWorkoutId(this, workoutShot);
     }
 
     @Override
     public void onChildChanged(DataSnapshot workoutShot, String s) {
 
         workoutRepo.insertWorkout(extractWorkout(workoutShot));
-//        workoutHelper.updateWorkout(workoutShot.getKey(), extractWorkout(workoutShot));
 
     }
 
     @Override
     public void onChildRemoved(DataSnapshot workoutShot) {
         Toast.makeText(this, "Deleted " + workoutShot.getKey(), Toast.LENGTH_SHORT).show();
-//        workoutHelper.deleteWorkout(workoutShot.getKey());
-
         workoutRepo.deleteWorkout(workoutShot.getKey());
     }
 
     @Override
     public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
     }
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
-
     }
 
-    public Workout extractWorkout(DataSnapshot workoutShot) {
-        exercises = new ArrayList<>();
-        for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
-            // Add set to sets list
-            sets = new ArrayList<>();
-            for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
-                set = setShot.getValue(Set.class);
-
-                if (set != null) {
-                    set.setSetNumber(Integer.valueOf(setShot.getKey()));
-
-                    sets.add(set);
-                }
-            }
-
-            // Adds sets to exercise object, and add exercise to exercises list
-            exercise = exerciseShot.getValue(Exercise.class);
-            if (exercise != null) {
-//                exercise.setName(exerciseShot.getKey());
-                exercise.setSets(sets);
-
-                exercises.add(exercise);
-            }
-        }
-
-        return new Workout(workoutShot.getKey(), exercises);
-    }
 
     @Override
     public void onWorkoutsReceived(Workout workout) {
-    }
-
-    @Override
-    public void onWorkoutShotReceived(DataSnapshot workoutShot) {
-        workoutRepo.insertWorkout(extractWorkout(workoutShot));
+        workoutRepo.insertWorkout(workout);
     }
 }
