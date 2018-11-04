@@ -2,14 +2,13 @@ package ca.judacribz.gainzassist.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
-import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.services.FirebaseDatabase;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import static ca.judacribz.gainzassist.util.Helper.*;
@@ -35,7 +34,7 @@ public class Database {
     //TODO change to get ref for a specific user when friends/chatting added
     /* Gets firebase db reference for 'users/<uid>/' */
     private static DatabaseReference getUserRef() {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        com.google.firebase.database.FirebaseDatabase firebaseDatabase = com.google.firebase.database.FirebaseDatabase.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         return (firebaseUser != null) ?
@@ -73,8 +72,8 @@ public class Database {
                             copyDefaultWorkoutsFirebase();
                         }
 
-                        if (!isMyServiceRunning(act, FirebaseService.class)) {
-                            act.startService(new Intent(act, FirebaseService.class));
+                        if (!isMyServiceRunning(act, FirebaseDatabase.class)) {
+                            act.startService(new Intent(act, FirebaseDatabase.class));
                         }
                     }
 
@@ -89,7 +88,7 @@ public class Database {
     /* Gets workouts from firebase db under 'default_workouts/' and adds it to
      * 'users/<uid>/workouts/' */
     private static void copyDefaultWorkoutsFirebase() {
-        DatabaseReference defaultWorkoutsRef = FirebaseDatabase.getInstance().getReference(DEFAULT_WORKOUTS_PATH);
+        DatabaseReference defaultWorkoutsRef = com.google.firebase.database.FirebaseDatabase.getInstance().getReference(DEFAULT_WORKOUTS_PATH);
         userWorkoutsRef = getWorkoutsRef();
 
         if (defaultWorkoutsRef != null && userWorkoutsRef != null) {

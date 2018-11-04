@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.async;
+package ca.judacribz.gainzassist.services;
 
 import android.app.IntentService;
 import android.app.Service;
@@ -9,24 +9,22 @@ import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutRepo;
 import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-
-import java.util.ArrayList;
+import com.google.firebase.database.DataSnapshot;
 
 import static ca.judacribz.gainzassist.firebase.Database.getWorkoutsRef;
 import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
 
 
-public class FirebaseService extends IntentService implements
+public class FirebaseDatabase extends IntentService implements
         ChildEventListener,
         OnWorkoutReceivedListener {
 
     WorkoutRepo workoutRepo;
 
-    public FirebaseService() {
-        super("FirebaseService");
+    public FirebaseDatabase() {
+        super("FirebaseDatabase");
     }
 
     @Override
