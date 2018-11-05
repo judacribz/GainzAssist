@@ -161,7 +161,7 @@ public class CurrWorkout {
     }
 
     private boolean atEndOfExercises() {
-        return this.currNumAllExs == this.ex_i;
+        return (this.ex_i >= this.currNumAllExs);
     }
 
     private void setCurrExercise(Exercise exercise) {

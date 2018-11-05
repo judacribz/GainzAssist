@@ -205,7 +205,8 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
         float weight;
         if (!s.toString().isEmpty()) {
             weight = Float.valueOf(s.toString());
-            equipmentView.setup(weight, currWorkout.getCurrEquip());
+            if (equipmentView != null)
+                equipmentView.setup(weight, currWorkout.getCurrEquip());
         } else
             weight = currWorkout.getCurrMinWeight();
 

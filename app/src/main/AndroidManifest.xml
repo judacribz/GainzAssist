@@ -54,7 +54,9 @@
         <activity android:name=".Main"/>
 
         <!-- HowToVideos Activity -->
-        <activity android:name=".activities.how_to_videos.HowToVideos"/>
+        <activity
+                android:name=".activities.how_to_videos.HowToVideos"
+                android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <!-- WorkoutsList Activity -->
         <activity

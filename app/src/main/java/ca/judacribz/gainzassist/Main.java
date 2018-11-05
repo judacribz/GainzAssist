@@ -47,10 +47,8 @@ public class Main extends AppCompatActivity {
         btnWorkouts.setText(R.string.workouts);
         btnStepCounter.setText(R.string.step_counter);
 
-        SharedPreferences sharedPref = getSharedPreferences("user_info.file", Context.MODE_PRIVATE);
-        Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
-
-
+        //TODO remove
+//        Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
     }
 
     @Override

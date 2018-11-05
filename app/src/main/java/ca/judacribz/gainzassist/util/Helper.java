@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
@@ -12,7 +11,6 @@ import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Helper {
     private static final String EMAIL = "email";
@@ -31,11 +29,17 @@ public class Helper {
     }
 
     public static String getEmailFromPref(Context context) {
-        return context.getSharedPreferences(context.getString(R.string.file_user_info), Context.MODE_PRIVATE).getString(EMAIL, null);
+        return context.getSharedPreferences(
+                context.getString(R.string.file_user_info),
+                Context.MODE_PRIVATE
+        ).getString(EMAIL, null);
     }
 
     public static void setUserInfoInPref(Activity act, String email, String uid) {
-        SharedPreferences sharedPref = act.getSharedPreferences(act.getString(R.string.file_user_info), Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = act.getSharedPreferences(
+                act.getString(R.string.file_user_info),
+                Context.MODE_PRIVATE
+        );
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(EMAIL, email);
         editor.apply();
@@ -47,17 +51,21 @@ public class Helper {
         Exercise exercise;
         ArrayList<Set> sets;
         Set set;
+        String setNum;
 
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
             // Add set to sets list
             sets = new ArrayList<>();
             for (DataSnapshot setShot : exerciseShot.child("sets").getChildren()) {
                 set = setShot.getValue(Set.class);
-
                 if (set != null) {
-                    set.setSetNumber(Integer.valueOf(setShot.getKey()));
 
-                    sets.add(set);
+                    setNum = setShot.getKey();
+
+                    if (setNum != null) {
+                        set.setSetNumber(Integer.valueOf(setNum));
+                        sets.add(set);
+                    }
                 }
             }
 

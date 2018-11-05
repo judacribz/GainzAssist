@@ -20,7 +20,7 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
         void onVideoClick(String videoId);
     }
 
-    public void setVideoClickObserver(VideoClickObserver videoClickObserver) {
+    void setVideoClickObserver(VideoClickObserver videoClickObserver) {
         this.videoClickObserver = videoClickObserver;
     }
     // --------------------------------------------------------------------------------------------

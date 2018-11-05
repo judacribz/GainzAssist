@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.activities.how_to_videos;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
@@ -42,6 +43,8 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
     private TextView tvVideoTitle;
     private  String videoId;
     private ArrayList<String> videoIds;
+
+    private ProgressBar progressBar;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -54,6 +57,7 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
 
         thumbnailView = (YouTubeThumbnailView) itemView.findViewById(R.id.yt_tv_video);
         tvVideoTitle = (TextView) itemView.findViewById(R.id.tv_video_title);
+        progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
 
         ((ImageButton) itemView.findViewById(R.id.btn_play_video)).setOnClickListener(this);
     }
@@ -63,6 +67,9 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
     // Sets the thumbnail for each item
     void bind(String videoId, String videoTitle) {
         this.videoId = videoId;
+
+        progressBar.setProgress(0);
+        progressBar.setVisibility(View.VISIBLE);
 
         tvVideoTitle.setText(videoTitle);
         thumbnailView.initialize(String.format(THUMBNAIL_URL, videoId), this);
@@ -90,6 +97,8 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onThumbnailLoaded(YouTubeThumbnailView thumbnailView, String s) {
+        progressBar.setVisibility(View.GONE);
+        thumbnailView.setVisibility(View.VISIBLE);
         thumbnailLoader.release();
     }
 

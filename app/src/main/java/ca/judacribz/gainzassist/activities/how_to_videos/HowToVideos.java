@@ -2,6 +2,7 @@ package ca.judacribz.gainzassist.activities.how_to_videos;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,7 +34,7 @@ public class HowToVideos extends AppCompatActivity
     String URL = "https://www.googleapis.com/youtube/v3/search?" +  // default youtube search url
                  "part=snippet&" +                                  // search resource
                  "fields=items(id/videoId,snippet/title)&" +        // needed fields
-                 "maxResults=30&" +                                 // number of results to show
+                 "maxResults=10&" +                                 // number of results to show
                  "q=how%20to%20";                                   // search text
     // --------------------------------------------------------------------------------------------
 
@@ -67,15 +68,23 @@ public class HowToVideos extends AppCompatActivity
 
         handleFmt(false);
 
+
         task = new SearchVideosTask();
         task.setYouTubeSearchObserver(this);
         task.execute(URL.concat(exerciseName.replaceAll("\\s+", SEARCH_SPACE_STR))
-                        .concat("&key=")
-                        .concat(getString(R.string.google_api_key)));
+                .concat("&key=")
+                .concat(getString(R.string.google_api_key)));
 
         rvLayoutManager = new LinearLayoutManager(this);
         rvVideoList.setLayoutManager(rvLayoutManager);
         rvVideoList.setHasFixedSize(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
     }
 
     @Override
@@ -92,12 +101,15 @@ public class HowToVideos extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (ytpFmt.isHidden()) {
-            super.onBackPressed();
-        } else {
+        if (!ytpFmt.isHidden()) {
             handleFmt(false);
+
+//            super.onBackPressed();
+        } else {
+            super.onBackPressed();
         }
     }
+    boolean backPressed = false;
 
     /* Handles showing or hiding the youtube player fragment */
     void handleFmt(boolean showFmt) {
@@ -109,13 +121,17 @@ public class HowToVideos extends AppCompatActivity
 
         } else {
             if (player != null) {
-                player.release();
+                if (isFullScreen) {
+                    backPressed = true;
+                    player.setFullscreen(false);
+                } else {
+                    player.release();
+                }
             }
-
             fmtTxn.hide(ytpFmt);
         }
 
-        fmtTxn.commit();
+        fmtTxn.commitNow();
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
@@ -145,17 +161,34 @@ public class HowToVideos extends AppCompatActivity
         handleFmt(true);
     }
     //ThumbnailAdapter.VideoClickObserver//Override////////////////////////////////////////////////
-
+boolean isFullScreen = false;
 
     // Interface Callback: YouTubePlayer.OnInitializedListener Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider,
-                                        YouTubePlayer player,
+                                        final YouTubePlayer player,
                                         boolean b) {
         this.player = player;
         player.setPlayerStateChangeListener(this);
-        player.setShowFullscreenButton(false);
+        player.setOnFullscreenListener(new YouTubePlayer.OnFullscreenListener() {
+            @Override
+            public void onFullscreen(boolean isfullScreen) {
+
+                HowToVideos.this.isFullScreen = isfullScreen;
+                if (!isfullScreen) {
+                    if (backPressed) {
+                        player.release();
+                    }
+                } else {
+                    Toast.makeText(HowToVideos.this, "Fullscreen", Toast.LENGTH_SHORT).show();
+
+                    ytpFmt.initialize(getString(R.string.google_api_key), HowToVideos.this);
+                }
+            }
+
+        });
+        player.setShowFullscreenButton(true);
         player.loadVideo(videoId);
     }
 
@@ -174,6 +207,7 @@ public class HowToVideos extends AppCompatActivity
 
     @Override
     public void onLoaded(String s) {
+
     }
 
     @Override
