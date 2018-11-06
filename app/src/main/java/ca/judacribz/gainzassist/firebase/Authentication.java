@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import ca.judacribz.gainzassist.async.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -109,8 +108,6 @@ public class Authentication {
                     }
                 }
         );
-
-        LoginManager.getInstance().logOut();
 
         act.stopService(new Intent(act, FirebaseService.class));
         (new WorkoutHelper(act)).deleteAllWorkouts();

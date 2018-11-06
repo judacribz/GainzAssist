@@ -1,9 +1,7 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -21,11 +19,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-import ca.judacribz.gainzassist.async.FirebaseService;
-import ca.judacribz.gainzassist.models.WorkoutHelper;
+import android.widget.Toast;;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -44,7 +39,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
-import com.google.firebase.database.FirebaseDatabase;
 
 import static ca.judacribz.gainzassist.firebase.Authentication.*;
 
@@ -71,7 +65,6 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     AuthCredential googleCred;
     GoogleSignInOptions signInOptions;
     GoogleSignInClient signInClient;
-    CallbackManager callBackManager;
 
     String email, password;
     Animation slide_end;

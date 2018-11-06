@@ -1,9 +1,10 @@
 package ca.judacribz.gainzassist.activities.how_to_videos;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,10 +12,11 @@ import android.widget.Toast;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
-import com.google.android.youtube.player.YouTubePlayerFragment;
+
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 
 import static ca.judacribz.gainzassist.activities.start_workout.fragments.WorkoutScreen.EXTRA_HOW_TO_VID;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
@@ -46,7 +48,7 @@ public class HowToVideos extends AppCompatActivity
     SearchVideosTask task;
 
     YouTubePlayer player;
-    YouTubePlayerFragment ytpFmt;
+    YouTubePlayerSupportFragment ytpFmt;
     FragmentManager fmtMgr;
     FragmentTransaction fmtTxn;
     String videoId, exerciseName;
@@ -61,10 +63,10 @@ public class HowToVideos extends AppCompatActivity
         exerciseName = getIntent().getStringExtra(EXTRA_HOW_TO_VID);
         setToolbar(this, "How To " + exerciseName, true);
 
-        fmtMgr = getFragmentManager();
+        fmtMgr = getSupportFragmentManager();
 
         rvVideoList = (RecyclerView) findViewById(R.id.rv_video_list);
-        ytpFmt = (YouTubePlayerFragment) getFragmentManager().findFragmentById(R.id.fmt_youtube);
+        ytpFmt = (YouTubePlayerSupportFragment) getSupportFragmentManager().findFragmentById(R.id.fmt_youtube);
 
         handleFmt(false);
 
