@@ -16,6 +16,8 @@ import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Workout;
+import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
 
@@ -70,7 +72,7 @@ public class WarmupsList extends Fragment {
         ButterKnife.bind(this, view);
 
         if (bundle != null) {
-            ArrayList<Exercise> warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
+            ArrayList<Exercise> warmups = ((Workout) Parcels.unwrap(bundle.getParcelable(EXTRA_WARMUPS))).getExercises();
             if (warmups != null) {
                 int i = 0;
                 for (Exercise exercise : warmups) {

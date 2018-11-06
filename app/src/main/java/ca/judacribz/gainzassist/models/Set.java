@@ -1,14 +1,14 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
+@Parcel
 @Entity(tableName = "sets",
         primaryKeys = {"set_number", "exercise_id"},
         foreignKeys = @ForeignKey(
@@ -17,16 +17,16 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 childColumns = "exercise_id",
                 onDelete = CASCADE),
         indices = {@Index(value = {"exercise_id", "set_number"}, unique = true)})
-public class Set implements Parcelable {
+public class Set {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
     @ColumnInfo(name = "set_number")
-    private int setNumber;
+    int setNumber;
     @ColumnInfo(name = "exercise_id")
-    private int exerciseId;
-    private int reps;
-    private float weight;
+    int exerciseId;
+    int reps;
+    float weight;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -90,35 +90,4 @@ public class Set implements Parcelable {
 
         return set;
     }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.setNumber);
-        dest.writeInt(this.reps);
-        dest.writeFloat(this.weight);
-    }
-
-    protected Set(Parcel in) {
-        this.setNumber = in.readInt();
-        this.reps = in.readInt();
-        this.weight = in.readFloat();
-    }
-
-    public static final Parcelable.Creator<Set> CREATOR = new Parcelable.Creator<Set>() {
-        @Override
-        public Set createFromParcel(Parcel source) {
-            return new Set(source);
-        }
-
-        @Override
-        public Set[] newArray(int size) {
-            return new Set[size];
-        }
-    };
 }

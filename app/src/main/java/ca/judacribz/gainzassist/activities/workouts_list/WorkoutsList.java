@@ -34,6 +34,7 @@ import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.google.firebase.database.DataSnapshot;
+import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
@@ -255,7 +256,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     String extraKey;
     @Override
     public void onWorkoutsReceived(Workout workout) {
-        intent.putExtra(extraKey, workout);
+        intent.putExtra(extraKey, Parcels.wrap(workout));
         startActivity(intent);
     }
 

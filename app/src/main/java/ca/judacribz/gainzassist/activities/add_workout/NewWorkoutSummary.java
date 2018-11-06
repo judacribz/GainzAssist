@@ -24,6 +24,7 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
@@ -104,7 +105,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
         Intent intent = getIntent();
-        workout = intent.getParcelableExtra(EXTRA_WORKOUT);
+        workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
         switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {
             case WORKOUTS_LIST:
                 btnAddWorkout.setText(getString(R.string.update_workout));

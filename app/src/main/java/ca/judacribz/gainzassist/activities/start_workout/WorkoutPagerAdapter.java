@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Workout;
+import org.parceler.Parcels;
 
 public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
@@ -35,8 +36,8 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     WorkoutPagerAdapter(FragmentManager fragmentManager, Workout workout, ArrayList<Exercise> warmups) {
         super(fragmentManager);
 
-        bundle.putParcelable(EXTRA_WORKOUT, workout);
-        bundle.putParcelableArrayList(EXTRA_WARMUPS, warmups);
+        bundle.putParcelable(EXTRA_WORKOUT, Parcels.wrap(workout));
+        bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(new Workout("warmups", warmups)));
 
         for (Fragment fmt : FMTS) {
             fmt.setArguments(bundle);

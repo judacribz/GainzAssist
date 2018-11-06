@@ -1,13 +1,13 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
-import android.os.Parcel;
-import android.os.Parcelable;
+import org.parceler.Parcel;
 
 import java.util.*;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
+@Parcel
 @Entity(tableName = "exercises",
         foreignKeys = @ForeignKey(
                 entity = Workout.class,
@@ -15,7 +15,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 childColumns = "workout_id",
                 onDelete = CASCADE),
                 indices = {@Index(value = {"workout_id", "name"}, unique = true)})
-public class Exercise implements Parcelable {
+public class Exercise {
 
     @Ignore
     public static final ArrayList<String> EQUIPMENT_TYPES = new ArrayList<>(Arrays.asList(
@@ -33,23 +33,23 @@ public class Exercise implements Parcelable {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    int id;
 
     @ColumnInfo(name = "workout_id")
-    private int workoutId;
-    private String name;
-    private String type;
-    private String equipment;
+    int workoutId;
+    String name;
+    String type;
+    String equipment;
 
     @Ignore
-    private ArrayList<Set> sets = new ArrayList<>();
+    ArrayList<Set> sets = new ArrayList<>();
 
     public enum SetsType {
         WARMUP_SET,
         MAIN_SET
     }
     @Ignore
-    private SetsType setsType = null;
+    SetsType setsType = null;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -176,37 +176,4 @@ public class Exercise implements Parcelable {
 
         return exercise;
     }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.name);
-        dest.writeString(this.type);
-        dest.writeString(this.equipment);
-        dest.writeTypedList(this.sets);
-    }
-
-    protected Exercise(Parcel in) {
-        this.name = in.readString();
-        this.type = in.readString();
-        this.equipment = in.readString();
-        this.sets = in.createTypedArrayList(Set.CREATOR);
-    }
-
-    public static final Parcelable.Creator<Exercise> CREATOR = new Parcelable.Creator<Exercise>() {
-        @Override
-        public Exercise createFromParcel(Parcel source) {
-            return new Exercise(source);
-        }
-
-        @Override
-        public Exercise[] newArray(int size) {
-            return new Exercise[size];
-        }
-    };
 }

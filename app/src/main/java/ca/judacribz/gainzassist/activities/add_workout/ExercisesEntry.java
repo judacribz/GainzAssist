@@ -13,6 +13,7 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -238,7 +239,7 @@ public class ExercisesEntry extends AppCompatActivity {
                 ex_i++;
                 if (ex_i >= numExs) {
                     Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
-                    newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workout);
+                    newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
                     newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
                     startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
                 }

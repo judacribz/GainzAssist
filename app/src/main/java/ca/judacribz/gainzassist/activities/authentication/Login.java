@@ -230,6 +230,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
             ).show();
             setUserInfoInPref(this, fbUser.getEmail(), fbUser.getUid());
 
+
             progressBar.setProgress(0);
             progressBar.setVisibility(View.VISIBLE);
             setUserInfo(this);

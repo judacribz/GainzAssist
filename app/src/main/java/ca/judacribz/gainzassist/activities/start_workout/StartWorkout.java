@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.*;
+import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.util.UI.*;
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT;
@@ -57,7 +59,7 @@ public class StartWorkout extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        workout = intent.getParcelableExtra(EXTRA_WORKOUT);
+        workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
 

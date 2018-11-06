@@ -42,24 +42,4 @@ public abstract class WorkoutDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
-
-
-
-    private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
-
-        private final WorkoutDao workoutDao;
-
-        PopulateDbAsync(WorkoutDatabase db) {
-            workoutDao = db.workoutDao();
-        }
-
-        @Override
-        protected Void doInBackground(final Void... params) {
-//            workoutDao.deleteAllWorkouts();
-//            workoutDao.insert(new Workout("yy", null));
-
-            return null;
-        }
-    }
-
 }

@@ -15,6 +15,7 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Workout;
+import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WORKOUT;
 
@@ -69,7 +70,7 @@ public class ExercisesList extends Fragment {
         ButterKnife.bind(this, view);
 
         if (bundle != null) {
-            Workout workout = bundle.getParcelable(EXTRA_WORKOUT);
+            Workout workout = (Workout) Parcels.unwrap(bundle.getParcelable(EXTRA_WORKOUT));
             if (workout != null) {
                 int i = 0;
                 for (Exercise exercise : workout.getExercises()) {
