@@ -232,7 +232,9 @@ public class ExercisesEntry extends AppCompatActivity {
                         exerciseName,
                         "Strength",
                         getTextString(sprEquipment),
-                        sets
+                        getTextInt(etNumSets),
+                        getTextInt(etNumReps),
+                        getTextFloat(etWeight)
                 ));
 
 

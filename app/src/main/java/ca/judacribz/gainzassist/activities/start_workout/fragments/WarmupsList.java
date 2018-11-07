@@ -72,14 +72,13 @@ public class WarmupsList extends Fragment {
         ButterKnife.bind(this, view);
 
         if (bundle != null) {
-            ArrayList<Exercise> warmups = ((Workout) Parcels.unwrap(bundle.getParcelable(EXTRA_WARMUPS))).getExercises();
+            ArrayList<Exercise> warmups = Parcels.unwrap(bundle.getParcelable(EXTRA_WARMUPS));
             if (warmups != null) {
                 int i = 0;
                 for (Exercise exercise : warmups) {
                     act.displaySets(
                             100 + i++,
-                            exercise.getName(),
-                            exercise.getSets(),
+                            exercise,
                             llExSubInsert,
                             llExSetsInsert
                     );

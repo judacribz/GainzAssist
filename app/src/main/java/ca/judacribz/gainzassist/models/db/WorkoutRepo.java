@@ -12,6 +12,7 @@ import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;
@@ -251,12 +252,12 @@ String tag = "YOOOO";
 
                     case GET_WORKOUT:
                         workout = workoutDao.getFromName(workoutName);
+
                         for (Exercise exercise : exerciseDao.getFromWorkout(workout.getId())) {
-                            for (Set set :setDao.getFromExercise(exercise.getId())) {
-                                exercise.addSet(set);
-                            }
+                            exercise.setSetsList(null);
                             workout.addExercise(exercise);
                         }
+
                         onWorkoutReceivedListener.onWorkoutsReceived(workout);
 //                        setOnWorkoutReceivedListener(null);
                         break;
@@ -275,12 +276,6 @@ String tag = "YOOOO";
                     case INSERT_EXERCISE:
                         exerciseDao.insert(exercise);
 
-                        id = exerciseDao.getId(exercise.getName(), exercise.getWorkoutId());
-                        Log.d("YOOOO", "Exercise:" + exercise.getName() + " id : " + id);
-                        for (Set set : exercise.getSets()) {
-                            set.setExerciseId(id);
-                            setRepoAsyncConfig(INSERT_SET, SETS_TXN, null, set);
-                        }
                         break;
 
                     case INSERT_SET:

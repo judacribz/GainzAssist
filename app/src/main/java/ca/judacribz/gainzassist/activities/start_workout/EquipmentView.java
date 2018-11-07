@@ -95,8 +95,8 @@ public class EquipmentView extends View{
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onDraw(Canvas canvas) {
-        this.height = canvas.getHeight();
-        int width = canvas.getWidth();
+        this.height = getHeight();
+        int width = getWidth();
         canvas.drawColor(Color.WHITE);
 
         // Draw the plate weights for the barbell

@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import butterknife.*;
 import java.util.ArrayList;
 
@@ -60,6 +61,7 @@ public class StartWorkout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
+
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
 
@@ -134,8 +136,7 @@ public class StartWorkout extends AppCompatActivity {
      */
 
     public void displaySets(int id,
-                            String exerciseName,
-                            ArrayList<Set> sets,
+                            Exercise exercise,
                             LinearLayout llSubtitle,
                             LinearLayout llSets) {
 
@@ -150,7 +151,7 @@ public class StartWorkout extends AppCompatActivity {
 
         // Set the title in the textView within the listView layout above
         tvExerciseName = (TextView) setsView.findViewById(R.id.tv_exercise_name);
-        tvExerciseName.setText(exerciseName);
+        tvExerciseName.setText(exercise.getName());
 
         // Set the recyclerView list to be horizontal and pass in the exercise sets through the
         // adapter
@@ -159,6 +160,7 @@ public class StartWorkout extends AppCompatActivity {
         setList.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL,
                 false));
-        setList.setAdapter(new SetsAdapter(sets));
+
+        setList.setAdapter(new SetsAdapter(exercise.getSetsList()));
     }
 }

@@ -31,7 +31,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
     private static final String TIMESTAMP     = "timestamp";
     private static final String EXERCISE_NAME = "exerciseName";
-    private static final String SETS          = "sets";
+    private static final String SETS          = "setsList";
 
 
     private static final String CREATE_STATEMENT = "CREATE TABLE %s";

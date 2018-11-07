@@ -279,9 +279,9 @@ Exercise ex;
     private void updateExerciseArea(String exName) {
         ex = workout.getExercise(exName);
         etExerciseName.setText(exName);
-        etNumSets.setText(String.valueOf(ex.getNumSets()));
-        etNumReps.setText(String.valueOf(ex.getAvgReps()));
-        etWeight.setText(String.valueOf(ex.getAvgWeight()));
+        etNumSets.setText(String.valueOf(ex.getSets()));
+        etNumReps.setText(String.valueOf(ex.getReps()));
+        etWeight.setText(String.valueOf(ex.getWeight()));
         sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex.getEquipment()));
         sprType.setSelection(EXERCISE_TYPES.indexOf(ex.getType()));
     }
@@ -357,16 +357,6 @@ Exercise ex;
     }
 
     private Exercise updateExerciseData(String exName) {
-        // add set objects matching the number of num_sets user chose
-        exSets = new ArrayList<>();
-        for (int i = 1; i <= getTextInt(etNumSets); i++) {
-            exSets.add(new Set(
-                    i,
-                    getTextInt(etNumReps),
-                    getTextFloat(etWeight)
-            ));
-        }
-
         etExerciseName.setText("");
 
         // add exercise to list
@@ -374,7 +364,9 @@ Exercise ex;
                 exName,
                 sprType.getSelectedItem().toString(),
                 sprEquipment.getSelectedItem().toString(),
-                exSets
+                getTextInt(etNumSets),
+                getTextInt(etNumReps),
+                getTextFloat(etWeight)
         );
     }
 

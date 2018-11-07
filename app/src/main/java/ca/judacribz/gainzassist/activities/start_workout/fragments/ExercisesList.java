@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
@@ -74,10 +75,10 @@ public class ExercisesList extends Fragment {
             if (workout != null) {
                 int i = 0;
                 for (Exercise exercise : workout.getExercises()) {
+
                     act.displaySets(
                             200 + i,
-                            exercise.getName(),
-                            exercise.getSets(),
+                            exercise,
                             llExSubInsert,
                             llExSetsInsert
                     );

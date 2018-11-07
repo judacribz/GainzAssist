@@ -77,6 +77,8 @@ dependencies {
     annotationProcessor 'org.parceler:parceler:1.1.11'
 
 
+    implementation 'com.bugfender.sdk:android:1.+'
+
     testImplementation 'junit:junit:4.12'
 }
 

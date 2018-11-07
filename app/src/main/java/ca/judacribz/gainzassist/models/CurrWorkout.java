@@ -1,8 +1,5 @@
 package ca.judacribz.gainzassist.models;
 
-import android.app.Activity;
-import ca.judacribz.gainzassist.activities.start_workout.fragments.WorkoutScreen;
-
 import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.models.Exercise.*;
@@ -84,20 +81,20 @@ public class CurrWorkout {
         this.exercises = exercises;
         this.currNumExs = exercises.size();
 
-        for (Exercise exs: exercises) {
-            exs.setSetsType(MAIN_SET);
-            equip = exs.getEquipment();
+        for (Exercise ex: exercises) {
+            ex.setSetsType(MAIN_SET);
+            equip = ex.getEquipment();
 
             minWeight = BARBELL.equals(equip.toLowerCase()) ? BB_MIN_WEIGHT : MIN_WEIGHT;
-            weight = exs.getAvgWeight();
+            weight = ex.getAvgWeight();
             if (weight == minWeight) {
-                allExs.add(exs);
+                allExs.add(ex);
                 continue;
             }
 
             //Todo: use onerepmax
-            oneRepMax = getOneRepMax(exs.getAvgReps(), exs.getAvgWeight());
-            reps = exs.getAvgReps();
+            oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
+            reps = ex.getAvgReps();
 
             setNum = 1;
             sets = new ArrayList<>();
@@ -116,10 +113,12 @@ public class CurrWorkout {
 
             } while (percWeight < 0.8f);
 
-            warmup = new Exercise(exs.getName(), exs.getType(), exs.getEquipment(), sets, WARMUP_SET);
+            warmup = new Exercise(
+                    ex.getName(), ex.getType(), ex.getEquipment(), sets, WARMUP_SET
+            );
             warmups.add(warmup);
             allExs.add(warmup);
-            allExs.add(exs);
+            allExs.add(ex);
         }
 
         setCurrWarmups(warmups);
@@ -171,7 +170,7 @@ public class CurrWorkout {
         setCurrEquip(this.currExercise.getEquipment());
         setCurrExType(this.currExercise.getType());
 
-        setCurrSets(this.currExercise.getSets());
+        setCurrSets(this.currExercise.getSetsList());
         setCurrSetsType(this.currExercise.getSetsType());
     }
 

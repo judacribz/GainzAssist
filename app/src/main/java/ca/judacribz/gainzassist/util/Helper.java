@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
+import android.util.Log;
+import android.widget.Toast;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
@@ -54,25 +57,10 @@ public class Helper {
         String setNum;
 
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
-            // Add set to sets list
-            sets = new ArrayList<>();
-            for (DataSnapshot setShot : exerciseShot.child("sets").getChildren()) {
-                set = setShot.getValue(Set.class);
-                if (set != null) {
-
-                    setNum = setShot.getKey();
-
-                    if (setNum != null) {
-                        set.setSetNumber(Integer.valueOf(setNum));
-                        sets.add(set);
-                    }
-                }
-            }
 
             // Adds sets to exercise object, and add exercise to exercises list
             exercise = exerciseShot.getValue(Exercise.class);
             if (exercise != null) {
-                exercise.setSets(sets);
                 exercises.add(exercise);
             }
         }

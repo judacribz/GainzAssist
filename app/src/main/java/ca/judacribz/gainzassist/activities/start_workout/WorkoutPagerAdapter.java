@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
+import android.util.Log;
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Workout;
@@ -36,8 +37,9 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     WorkoutPagerAdapter(FragmentManager fragmentManager, Workout workout, ArrayList<Exercise> warmups) {
         super(fragmentManager);
 
+//        Log.d("WARMUPS", "reps" + warmups.get(0).getSetsList().size());
         bundle.putParcelable(EXTRA_WORKOUT, Parcels.wrap(workout));
-        bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(new Workout("warmups", warmups)));
+        bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(warmups));
 
         for (Fragment fmt : FMTS) {
             fmt.setArguments(bundle);

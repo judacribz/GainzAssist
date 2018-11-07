@@ -67,7 +67,7 @@ public class Session {
             setMap.clear();
         }
 
-        session.put("sets", exMap);
+        session.put("setsList", exMap);
 
         return session;
     }

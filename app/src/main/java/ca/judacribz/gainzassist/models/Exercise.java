@@ -1,8 +1,8 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
+import android.support.annotation.Nullable;
 import org.parceler.Parcel;
-
 import java.util.*;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
@@ -37,12 +37,16 @@ public class Exercise {
 
     @ColumnInfo(name = "workout_id")
     int workoutId;
+
     String name;
     String type;
     String equipment;
+    int sets;
+    int reps;
+    float weight;
 
     @Ignore
-    ArrayList<Set> sets = new ArrayList<>();
+    ArrayList<Set> setsList = new ArrayList<>();
 
     public enum SetsType {
         WARMUP_SET,
@@ -60,15 +64,28 @@ public class Exercise {
         /* Required empty constructor for Firebase */
     }
 
-    public Exercise(String name, String type, String equipment, ArrayList<Set> sets) {
+    public Exercise(String name, String type, String equipment, ArrayList<Set> setsList, SetsType setsType) {
+        this.name      = name;
+        this.type      = type;
+        this.equipment = equipment;
+        this.setsList  = setsList;
+        setSetsType(setsType);
+    }
+
+
+    public Exercise(String name, String type, String equipment, int sets, int reps, float weight) {
         this.name      = name;
         this.type      = type;
         this.equipment = equipment;
         this.sets      = sets;
+        this.reps      = reps;
+        this.weight    = weight;
+
+        setSetsList(null);
     }
 
-    public Exercise(String name, String type, String equipment, ArrayList<Set> sets, SetsType setsType) {
-        this(name, type, equipment, sets);
+    public Exercise(String name, String type, String equipment, int sets, int reps, float weight, SetsType setsType) {
+        this(name, type, equipment, sets, reps, weight);
         setSetsType(setsType);
     }
     // ============================================================================================
@@ -114,16 +131,28 @@ public class Exercise {
         this.equipment = equipment;
     }
 
-    public ArrayList<Set> getSets() {
+    public int getSets() {
         return sets;
     }
 
-    public void setSets(ArrayList<Set> sets) {
+    public void setSets(int sets) {
         this.sets = sets;
     }
 
-    public int getNumSets() {
-        return sets.size();
+    public int getReps() {
+        return reps;
+    }
+
+    public void setReps(int reps) {
+        this.reps = reps;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(float weight) {
+        this.weight = weight;
     }
 
     public void setSetsType(SetsType setsType) {
@@ -134,26 +163,41 @@ public class Exercise {
         return setsType;
     }
 
+
+    public ArrayList<Set> getSetsList() {
+        return setsList;
+    }
+
+    public void setSetsList(@Nullable ArrayList<Set> setsList) {
+        if (setsList != null) {
+            this.setsList = setsList;
+        } else {
+            for (int i = 0; i < sets; i++) {
+                this.setsList.add(new Set(i+1, reps, weight));
+            }
+        }
+    }
+
     public void addSet(Set set) {
-        this.sets.add(set);
+        this.setsList.add(set);
     }
 
     public float getAvgWeight() {
         float weight = 0.0f;
-        for (Set set : sets) {
+        for (Set set : setsList) {
             weight += set.getWeight();
         }
 
-        return weight / (float) getNumSets();
+        return weight / (float) getSets();
     }
 
     public int getAvgReps() {
         int reps = 0;
-        for (Set set : sets) {
+        for (Set set : setsList) {
             reps += set.getReps();
         }
 
-        return reps / getNumSets();
+        return reps / getSets();
     }
     // ============================================================================================
 
@@ -165,14 +209,10 @@ public class Exercise {
         exercise.put("name",      name);
         exercise.put("type",      type);
         exercise.put("equipment", equipment);
+        exercise.put("sets", sets);
+        exercise.put("reps", reps);
+        exercise.put("weight", weight);
 
-        Map<String, Object> setMap = new HashMap<>();
-
-        for (Set set: sets) {
-            setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
-        }
-
-        exercise.put("sets", setMap);
 
         return exercise;
     }

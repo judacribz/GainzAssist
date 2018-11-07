@@ -108,7 +108,6 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
         super.onResume();
 
         setupEquipView();
-        updateUI();
     }
 
 
@@ -118,12 +117,6 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
         equipmentView = new EquipmentView(act);
         int p  = getResources().getDisplayMetrics().widthPixels;
 
-        equipmentView.post(new Runnable() {
-            @Override
-            public void run() {
-                equipmentView.setup(currWorkout.getCurrWeight(), currWorkout.getCurrEquip());
-            }
-        });
 
         equipmentView.setLayoutParams(new LayoutParams(
                         p/2,
@@ -131,6 +124,8 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
         ));
 
         vgEquipDisp.addView(equipmentView, 0);
+
+        updateUI();
     }
 
     @Override
@@ -309,11 +304,17 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
     private void setReps() {
         etCurrReps.setText(String.valueOf(currWorkout.getCurrReps()));
     }
-
+    float weight;
     public void setWeight() {
-        float weight = currWorkout.getCurrWeight();
-        etCurrWeight.setText(String.valueOf(currWorkout.getCurrWeight()));
-        equipmentView.setup(weight, currWorkout.getCurrEquip());
+        weight = currWorkout.getCurrWeight();
+        etCurrWeight.setText(String.valueOf(weight));
+
+        equipmentView.post(new Runnable() {
+            @Override
+            public void run() {
+                equipmentView.setup(weight, currWorkout.getCurrEquip());
+            }
+        });
     }
 
     //=Click=Handling===============================================================================
