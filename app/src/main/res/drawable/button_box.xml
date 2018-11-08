@@ -14,11 +14,11 @@
         android:centerY="50%"
         android:startColor="@color/colorBg"
         android:endColor="@color/colorAccent"
-        android:gradientRadius="1000"/>
+        android:gradientRadius="900"/>
 
     <stroke
         android:width="2dp"
-        android:color="@color/colorAccent" />
+        android:color="@color/colorLightAccent" />
     <corners
-        android:radius="5dp"/>
+        android:radius="15dp"/>
 </shape>
