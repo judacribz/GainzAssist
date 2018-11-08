@@ -1,20 +1,38 @@
 package ca.judacribz.gainzassist.models;
 
-import android.content.Context;
-import android.util.SparseArray;
+import android.arch.persistence.room.*;
+import ca.judacribz.gainzassist.models.db.WorkoutRepo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.arch.persistence.room.ForeignKey.SET_NULL;
+
+@Entity(tableName = "sessions",
+        foreignKeys =
+            @ForeignKey(
+                entity = Workout.class,
+                parentColumns = "id",
+                childColumns = "workout_id",
+                onDelete = SET_NULL),
+        indices = {@Index(value = {"workout_id", "timestamp"}, unique = true)})
 public class Session {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    private String workoutName;
-    private ArrayList<String> exerciseNames;
-    private long timestamp;
-    private ArrayList<ArrayList<Set>> allSets;
+    @PrimaryKey(autoGenerate = true)
+    int id;
+
+    @ColumnInfo(name = "workout_id")
+    int workoutId;
+    long timestamp;
+
+    @Ignore
+    Map<String, ArrayList<Set>> sessionSets = new HashMap<>();
+
+    @Ignore
+    String workoutName;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -25,50 +43,67 @@ public class Session {
     public Session() {
     }
 
-    public Session(Context context, String workoutName, ArrayList<ArrayList<Set>> allSets) {
+    public Session(int workoutId, long timestamp) {
+        this.workoutId = workoutId;
+        this.timestamp = timestamp;
+    }
+
+    // ######################################################################################### //
+
+
+    // Getters and setters
+    // ============================================================================================
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getWorkoutId() {
+        return workoutId;
+    }
+
+    public void setWorkoutId(int workoutId) {
+        this.workoutId = workoutId;
+    }
+
+    public void setWorkoutName(String workoutName) {
         this.workoutName = workoutName;
-        this.timestamp = System.currentTimeMillis()/1000;;
-        this.allSets = allSets;
-        this.exerciseNames = (new WorkoutHelper(context)).getAllExerciseNames(workoutName);
-    }
-
-    public String getWorkoutName() {
-        return workoutName;
-    }
-
-    public ArrayList<String> getExerciseNames() {
-        return exerciseNames;
     }
 
     public long getTimestamp() {
         return timestamp;
     }
 
-    public ArrayList<ArrayList<Set>> getAllSets() {
-        return allSets;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
+
+    // ============================================================================================
 
     /* Helper function used to store Session information in the firebase db */
     Map<String, Object> toMap() {
-        Map<String, Object> session = new HashMap<>();
-        session.put("workoutName", workoutName);
-        session.put("timestamp", timestamp);
-
-        Map<String, Object> setMap = new HashMap<>();
+        Map<String, Object> sessionMap = new HashMap<>();
         Map<String, Object> exMap = new HashMap<>();
+        Map<String, Object> setMap;
 
-        int i = 0;
-        for (ArrayList<Set> sets: allSets) {
-            for (Set set: sets) {
+        sessionMap.put("workoutName", workoutName);
+
+        for (Map.Entry<String, ArrayList<Set>> exSets : sessionSets.entrySet()){
+
+            setMap = new HashMap<>();
+            for (Set set : exSets.getValue()) {
                 setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
             }
-
-            exMap.put(exerciseNames.get(i++), setMap);
-            setMap.clear();
+            exMap.put(exSets.getKey(), setMap);
         }
 
-        session.put("setsList", exMap);
+        sessionMap.put("sets", exMap);
 
-        return session;
+        return  sessionMap;
+
     }
 }

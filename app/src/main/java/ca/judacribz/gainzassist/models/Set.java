@@ -3,30 +3,48 @@ package ca.judacribz.gainzassist.models;
 import android.arch.persistence.room.*;
 import org.parceler.Parcel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static android.arch.persistence.room.ForeignKey.SET_NULL;
 
 @Parcel
 @Entity(tableName = "sets",
-        primaryKeys = {"set_number", "exercise_id"},
-        foreignKeys = @ForeignKey(
+        foreignKeys = {
+            @ForeignKey(
+                entity = Session.class,
+                parentColumns = "id",
+                childColumns = "session_id",
+                onDelete = CASCADE,
+                onUpdate = CASCADE),
+            @ForeignKey(
                 entity = Exercise.class,
                 parentColumns = "id",
                 childColumns = "exercise_id",
-                onDelete = CASCADE),
-        indices = {@Index(value = {"exercise_id", "set_number"}, unique = true)})
+                onDelete = SET_NULL,
+                onUpdate = CASCADE)},
+        indices = {@Index(value = {"session_id", "exercise_id", "set_number"}, unique = true)})
 public class Set {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @ColumnInfo(name = "set_number")
-    int setNumber;
+    @PrimaryKey(autoGenerate = true)
+    int id;
+
+    @ColumnInfo(name = "session_id")
+    int sessionId;
     @ColumnInfo(name = "exercise_id")
     int exerciseId;
+
+    @ColumnInfo(name = "set_number")
+    int setNumber;
     int reps;
     float weight;
+
+    @Ignore
+    String exerciseName;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -46,12 +64,22 @@ public class Set {
 
     // Getters and setters
     // ============================================================================================
-    public int getSetNumber() {
-        return setNumber;
+
+
+    public int getId() {
+        return id;
     }
 
-    public void setSetNumber(int setNumber) {
-        this.setNumber = setNumber;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(int sessionId) {
+        this.sessionId = sessionId;
     }
 
     public int getExerciseId() {
@@ -60,6 +88,18 @@ public class Set {
 
     public void setExerciseId(int exerciseId) {
         this.exerciseId = exerciseId;
+    }
+
+    public void setExerciseName(String exerciseName) {
+        this.exerciseName = exerciseName;
+    }
+
+    public int getSetNumber() {
+        return setNumber;
+    }
+
+    public void setSetNumber(int setNumber) {
+        this.setNumber = setNumber;
     }
 
     public int getReps() {
@@ -83,11 +123,11 @@ public class Set {
 
     // Helper function used to store Set information in the firebase db
     Map<String, Object> toMap() {
-        Map<String, Object> set = new HashMap<>();
+        Map<String, Object> setMap = new HashMap<>();
 
-        set.put("reps", reps);
-        set.put("weight", weight);
+        setMap.put("reps", reps);
+        setMap.put("weight", weight);
 
-        return set;
+        return setMap;
     }
 }
