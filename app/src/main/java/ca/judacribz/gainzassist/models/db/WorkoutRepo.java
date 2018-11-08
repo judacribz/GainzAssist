@@ -23,6 +23,7 @@ public class WorkoutRepo {
     static private WorkoutDao workoutDao;
     static private ExerciseDao exerciseDao;
     static private SetDao setDao;
+    static private SessionDao sessionDao;
     private DataSnapshot workoutShot;
 
     public enum TableTxn {
@@ -56,6 +57,7 @@ public class WorkoutRepo {
         workoutDao = db.workoutDao();
         exerciseDao = db.exerciseDao();
         setDao = db.setDao();
+        sessionDao = db.sessionDao();
     }
 
 

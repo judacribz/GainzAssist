@@ -6,10 +6,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 
-@Database(entities = {Workout.class, Exercise.class, Set.class},
+@Database(entities = {Workout.class, Exercise.class, Set.class, Session.class},
           version = 1,
           exportSchema = false)
 public abstract class WorkoutDatabase extends RoomDatabase {
@@ -17,6 +18,7 @@ public abstract class WorkoutDatabase extends RoomDatabase {
     public abstract WorkoutDao workoutDao();
     public abstract ExerciseDao exerciseDao();
     public abstract SetDao setDao();
+    public abstract SessionDao sessionDao();
 
     private static volatile WorkoutDatabase INSTANCE;
 

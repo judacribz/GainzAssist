@@ -64,6 +64,7 @@ public class Exercise {
         /* Required empty constructor for Firebase */
     }
 
+    @Ignore
     public Exercise(String name, String type, String equipment, ArrayList<Set> setsList, SetsType setsType) {
         this.name      = name;
         this.type      = type;
@@ -72,7 +73,7 @@ public class Exercise {
         setSetsType(setsType);
     }
 
-
+    @Ignore
     public Exercise(String name, String type, String equipment, int sets, int reps, float weight) {
         this.name      = name;
         this.type      = type;

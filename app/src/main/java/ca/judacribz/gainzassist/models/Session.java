@@ -43,6 +43,7 @@ public class Session {
     public Session() {
     }
 
+    @Ignore
     public Session(int workoutId, long timestamp) {
         this.workoutId = workoutId;
         this.timestamp = timestamp;

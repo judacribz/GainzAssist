@@ -167,24 +167,24 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 
     /* Creates a db entry for the session
      */
-    public void addSession(Session session) {
-        db = this.getWritableDatabase();
-        cv.clear();
-
-        ArrayList<String> exerciseNames = session.getExerciseNames();
-        ArrayList<ArrayList<Set>> sets = session.getAllSets();
-
-        cv.put(TIMESTAMP, session.getTimestamp());
-        cv.put(WORKOUT_NAME, session.getWorkoutName());
-
-        for (int i = 0; i < exerciseNames.size(); i++) {
-            cv.put(EXERCISE_NAME, exerciseNames.get(i));
-            cv.put(SETS, getBlobFromSets(sets.get(i)));
-
-            db.insert(TABLE_SESSIONS, null, cv);
-            cv.clear();
-        }
-    }
+//    public void addSession(Session session) {
+//        db = this.getWritableDatabase();
+//        cv.clear();
+//
+//        ArrayList<String> exerciseNames = session.getExerciseNames();
+//        ArrayList<ArrayList<Set>> sets = session.getAllSets();
+//
+//        cv.put(TIMESTAMP, session.getTimestamp());
+//        cv.put(WORKOUT_NAME, session.getWorkoutName());
+//
+//        for (int i = 0; i < exerciseNames.size(); i++) {
+//            cv.put(EXERCISE_NAME, exerciseNames.get(i));
+//            cv.put(SETS, getBlobFromSets(sets.get(i)));
+//
+//            db.insert(TABLE_SESSIONS, null, cv);
+//            cv.clear();
+//        }
+//    }
     // --------------------------------------------------------------------------------------------
 
     // RETRIEVE
