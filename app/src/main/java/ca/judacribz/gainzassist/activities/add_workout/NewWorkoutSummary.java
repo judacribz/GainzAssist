@@ -1,10 +1,7 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
-import android.app.Activity;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,11 +10,9 @@ import android.view.View;
 import android.widget.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Set;
@@ -26,7 +21,7 @@ import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import org.parceler.Parcels;
 
-import static ca.judacribz.gainzassist.firebase.Database.addWorkoutFirebase;
+import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.models.CurrWorkout.*;
 import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;

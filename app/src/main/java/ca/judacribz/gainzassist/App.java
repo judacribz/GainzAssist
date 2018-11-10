@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.async;
+package ca.judacribz.gainzassist;
 
 import android.app.Application;
 import com.bugfender.android.BuildConfig;

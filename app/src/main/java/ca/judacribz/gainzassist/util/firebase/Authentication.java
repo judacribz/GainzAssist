@@ -1,13 +1,11 @@
-package ca.judacribz.gainzassist.firebase;
+package ca.judacribz.gainzassist.util.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.util.Patterns;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;

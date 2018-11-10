@@ -1,8 +1,8 @@
-package ca.judacribz.gainzassist.firebase;
+package ca.judacribz.gainzassist.util.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
-import ca.judacribz.gainzassist.async.FirebaseService;
+import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

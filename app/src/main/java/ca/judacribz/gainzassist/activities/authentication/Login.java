@@ -40,10 +40,10 @@ import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
 
-import static ca.judacribz.gainzassist.firebase.Authentication.*;
+import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
 
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
-import static ca.judacribz.gainzassist.firebase.Database.setUserInfo;
+import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
 import static ca.judacribz.gainzassist.util.Helper.setUserInfoInPref;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
 

@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.async;
+package ca.judacribz.gainzassist.background;
 
 import android.app.IntentService;
 import android.app.Service;
@@ -13,9 +13,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
-import java.util.ArrayList;
-
-import static ca.judacribz.gainzassist.firebase.Database.getWorkoutsRef;
+import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
 import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
 
 

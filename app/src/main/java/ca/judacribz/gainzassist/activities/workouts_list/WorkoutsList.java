@@ -33,12 +33,11 @@ import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import com.google.firebase.database.DataSnapshot;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
-import static ca.judacribz.gainzassist.firebase.Database.deleteWorkoutFirebase;
+import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
 public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
