@@ -12,16 +12,15 @@
 		android:layout_height="wrap_content">
 
 		<include
-				android:id="@+id/toolbar"
-				layout="@layout/partial_title_bar"/>
+			android:id="@+id/toolbar"
+			layout="@layout/partial_title_bar"/>
 
 		<com.miguelcatalan.materialsearchview.MaterialSearchView
-				android:id="@+id/msvWorkouts"
-				android:theme="@style/MaterialSearchViewStyle"
-				android:hint="@string/hint_search_workouts"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content" />
-
+			android:id="@+id/msvWorkouts"
+			android:theme="@style/MaterialSearchViewStyle"
+			android:hint="@string/hint_search_workouts"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
 	</FrameLayout>
 
     <LinearLayout
@@ -30,16 +29,6 @@
         android:layout_below="@id/toolbar_container"
         android:layout_margin="15dp"
         android:orientation="vertical">
-
-        <!--<EditText-->
-            <!--android:id="@+id/et_workouts_search"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="40dp"-->
-            <!--android:background="@drawable/search_text_box"-->
-            <!--android:hint="@string/hint_search_workouts"-->
-            <!--android:textAlignment="center"-->
-            <!--android:textColor="@color/colorTitle"-->
-            <!--android:textColorHint="@color/colorAccent"/>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_workout_btns"
