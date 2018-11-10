@@ -3,12 +3,14 @@ package ca.judacribz.gainzassist.activities.workouts_list;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.Menu;
@@ -33,6 +35,7 @@ import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
@@ -40,9 +43,10 @@ import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.
 import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
-public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver,
-                                                               TextWatcher,
-                                                               OnWorkoutReceivedListener {
+public class WorkoutsList extends AppCompatActivity
+    implements SingleItemAdapter.ItemClickObserver,
+               MaterialSearchView.OnQueryTextListener,
+               OnWorkoutReceivedListener {
 
     public static final String EXTRA_WORKOUT
             = "ca.judacribz.gainzassist.activities.workouts_list.EXTRA_WORKOUT";
@@ -61,7 +65,7 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     // ButterKnife Injections
     // --------------------------------------------------------------------------------------------
     @BindView(R.id.rv_workout_btns) RecyclerView workoutsList;
-    @BindView(R.id.et_workouts_search) EditText searchBar;
+    @BindView(R.id.msvWorkouts) MaterialSearchView searchView;
     // --------------------------------------------------------------------------------------------
 
     WorkoutViewModel workoutViewModel;
@@ -99,6 +103,10 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
                 }
             }
         });
+
+        searchView.setOnQueryTextListener(this);
+
+        searchView.setVoiceSearch(true);
     }
 
     @Override
@@ -126,10 +134,23 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         workoutAdapter.setItemClickObserver(this);
         workoutsList.setAdapter(workoutAdapter);
 
-        // Add the text watcher to the search bar
-        searchBar.addTextChangedListener(this);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == RESULT_OK) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && matches.size() > 0) {
+                String searchWrd = matches.get(0);
+                if (!TextUtils.isEmpty(searchWrd)) {
+                    searchView.setQuery(searchWrd, false);
+                }
+            }
+
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
     @Override
     protected void onStop() {
         super.onStop();
@@ -147,32 +168,28 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_workouts_list, menu);
 
+        MenuItem item = menu.findItem(R.id.act_search);
+        searchView.setMenuItem(item);
+
         return super.onCreateOptionsMenu(menu);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
     // TextWatcher Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        filteredWorkouts = new ArrayList<>();
-    }
+    public boolean onQueryTextChange(String newText) {
 
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        String filterWord = s.toString().toLowerCase();
+        filteredWorkouts = new ArrayList<>();
+        String filterWord = newText.toLowerCase();
 
         for (String workoutName : workoutNames) {
             if (workoutName.toLowerCase().contains(filterWord)) {
                 filteredWorkouts.add(workoutName);
             }
         }
-    }
 
-    @Override
-    public void afterTextChanged(Editable s) {
         workoutAdapter = new SingleItemAdapter(
                 this,
                 filteredWorkouts,
@@ -181,6 +198,14 @@ public class WorkoutsList extends AppCompatActivity implements SingleItemAdapter
         );
         workoutAdapter.setItemClickObserver(this);
         workoutsList.setAdapter(workoutAdapter);
+
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
     }
     //TextWatcher//Override////////////////////////////////////////////////////////////////////////
 

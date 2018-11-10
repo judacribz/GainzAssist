@@ -10,8 +10,14 @@
          https://www.freepik.com/free-icon/add-button-with-plus-symbol-in-a-black-circle_735567.htm -->
 
     <item
-        android:id="@+id/act_add_workout"
-        android:icon="@drawable/ic_plus"
-        android:title="@string/add_workout"
-        app:showAsAction="always"/>
+		android:id="@+id/act_search"
+		android:icon="@drawable/ic_search"
+		android:title="@string/hint_search_workouts"
+		app:showAsAction="always" />
+
+	<item
+		android:id="@+id/act_add_workout"
+		android:icon="@drawable/ic_plus"
+		android:title="@string/add_workout"
+		app:showAsAction="ifRoom"/>
 </menu>
