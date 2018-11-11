@@ -85,6 +85,9 @@ public class Session {
         this.timestamp = new Date().getTime();
     }
 
+    public Map<String, ArrayList<Set>> getSessionSets() {
+        return sessionSets;
+    }
     // ============================================================================================
 
     public void addExerciseSets(String exerciseName, ArrayList<Set> sets) {

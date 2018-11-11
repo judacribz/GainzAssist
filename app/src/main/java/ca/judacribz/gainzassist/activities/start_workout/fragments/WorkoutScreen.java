@@ -79,6 +79,7 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) context;
+        currWorkout.setContext(act);
 
         // init finished workout variables
         finExercises = new ArrayList<>();

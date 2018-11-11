@@ -55,10 +55,11 @@ public class Set {
     public Set() {
     }
 
-    public Set(int setNumber, int reps, float weight) {
-        this.setNumber = setNumber;
-        this.reps = reps;
-        this.weight = weight;
+    public Set(int exerciseId, int setNumber, int reps, float weight) {
+        setExerciseId(exerciseId);
+        setSetNumber(setNumber);
+        setReps(reps);
+        setWeight(weight);
     }
     // ######################################################################################### //
 

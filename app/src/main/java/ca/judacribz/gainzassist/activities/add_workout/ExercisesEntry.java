@@ -222,12 +222,12 @@ public class ExercisesEntry extends AppCompatActivity {
                         exerciseName
                 ));
             } else {
-                sets = new ArrayList<>();
+//                sets = new ArrayList<>();
                 num_reps = getTextInt(etNumReps);
                 num_sets = getTextInt(etNumSets);
-                for (int i = 1; i <= num_sets; i++) {
-                    sets.add(new Set(i, num_reps, weight));
-                }
+//                for (int i = 1; i <= num_sets; i++) {
+//                    sets.add(new Set(i, num_reps, weight));
+//                }
                 workout.addExercise(new Exercise(
                         exerciseName,
                         "Strength",

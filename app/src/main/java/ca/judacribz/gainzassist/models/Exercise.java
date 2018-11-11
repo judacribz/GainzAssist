@@ -174,7 +174,7 @@ public class Exercise {
             this.setsList = setsList;
         } else {
             for (int i = 0; i < sets; i++) {
-                this.setsList.add(new Set(i+1, reps, weight));
+                this.setsList.add(new Set(id, i+1, reps, weight));
             }
         }
     }

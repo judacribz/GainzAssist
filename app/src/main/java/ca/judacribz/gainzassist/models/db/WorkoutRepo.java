@@ -8,12 +8,14 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.TableTxn.*;
@@ -29,6 +31,7 @@ public class WorkoutRepo {
     public enum TableTxn {
         WORKOUTS_TXN,
         EXERCISES_TXN,
+        SESSIONS_TXN,
         SETS_TXN
     }
 
@@ -39,6 +42,7 @@ public class WorkoutRepo {
 
         INSERT_EXERCISE,
         INSERT_WORKOUT,
+        INSERT_SESSION,
         INSERT_SET,
 
         UPDATE_WORKOUT,
@@ -73,7 +77,11 @@ public class WorkoutRepo {
         setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
     }
 
-    void insertSet(Set set) {
+    void insertSession(Session session) {
+        setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session);
+    }
+
+    static void insertSet(Set set) {
         setRepoAsyncConfig(INSERT_SET, SETS_TXN, null, set);
     }
     // --------------------------------------------------------------------------------------------
@@ -182,6 +190,10 @@ public class WorkoutRepo {
             case EXERCISES_TXN:
                 repoAsyncTask.setExercise((Exercise) obj[0]);
                 break;
+            case SESSIONS_TXN:
+                repoAsyncTask.setSession((Session) obj[0]);
+                break;
+
 
             case SETS_TXN:
                 repoAsyncTask.setSet((Set) obj[0]);
@@ -203,6 +215,9 @@ public class WorkoutRepo {
         private Workout workout = null;
         private Exercise exercise = null;
         private Set set = null;
+        private Session session = null;
+        private long timestamp = -1;
+        private int workoutId = -1;
 
         private int id = -1;
 
@@ -223,6 +238,20 @@ public class WorkoutRepo {
 
         void setExercise(Exercise exercise) {
             this.exercise = exercise;
+        }
+
+        void setSession(Session session) {
+            this.session = session;
+            setTimestamp(session.getTimestamp());
+            setWorkoutId(session.getWorkoutId());
+        }
+
+        void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        void setWorkoutId(int workoutId) {
+            this.workoutId = workoutId;
         }
 
         void setSet(Set set) {
@@ -277,6 +306,20 @@ String tag = "YOOOO";
 
                     case INSERT_EXERCISE:
                         exerciseDao.insert(exercise);
+
+                        break;
+
+                    case INSERT_SESSION:
+                        sessionDao.insert(session);
+                        id = sessionDao.getId(timestamp);
+
+                        for (Map.Entry<String, ArrayList<Set>> exSets : session.getSessionSets().entrySet()){
+                            for (Set set : exSets.getValue()) {
+                                set.setSessionId(id);
+
+                                insertSet(set);
+                            }
+                        }
 
                         break;
 

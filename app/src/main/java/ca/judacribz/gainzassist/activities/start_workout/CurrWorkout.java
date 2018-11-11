@@ -1,9 +1,15 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
+import android.app.Activity;
+import android.app.Application;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 
 import java.util.ArrayList;
 
@@ -51,6 +57,8 @@ public class CurrWorkout {
     private Session currSession;
 
     private ArrayList<Set> finishedSets = new ArrayList<>();
+
+    private Context context;
     // --------------------------------------------------------------------------------------------
 
     private RestTimeSetListener restTimeSetListener;
@@ -80,6 +88,10 @@ public class CurrWorkout {
     }
     // ######################################################################################### //
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
 
     public void setCurrWorkout(Workout workout) {
         this.currWorkout = workout;
@@ -92,7 +104,7 @@ public class CurrWorkout {
         ArrayList<Exercise> warmups = new ArrayList<>();
         Exercise warmup;
         ArrayList<Set> sets;
-
+        int exId;
         float oneRepMax, minWeight, weight, percWeight, newWeight;
         int reps, setNum;
         String equip;
@@ -114,14 +126,15 @@ public class CurrWorkout {
             oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
             reps = ex.getAvgReps();
 
+            exId = ex.getId();
             setNum = 1;
             sets = new ArrayList<>();
-            sets.add(new Set(setNum++, reps, minWeight));
+            sets.add(new Set(exId, setNum++, reps, minWeight));
             percWeight = minWeight / weight;
             do {
                 newWeight = percWeight * weight;
                 newWeight -= newWeight % 5;
-                sets.add(new Set(setNum++, reps, newWeight));
+                sets.add(new Set(exId, setNum++, reps, newWeight));
 
                 percWeight += 0.2f;
                 if (reps - 2 > 0)
@@ -177,7 +190,10 @@ public class CurrWorkout {
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
                 currSession.setTimestamp();
+
                 addWorkoutSessionFirebase(currSession);
+                ViewModelProviders.of((FragmentActivity) context).get(WorkoutViewModel.class).insertSession(currSession);
+
                 return false;
 
             // Not end of all exercises, set next exercise

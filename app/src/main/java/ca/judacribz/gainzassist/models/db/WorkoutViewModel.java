@@ -5,6 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 
@@ -28,6 +29,11 @@ public class WorkoutViewModel extends AndroidViewModel {
     public void insertExercise(Exercise... exercises) {
         for (Exercise exercise : exercises)
             workoutRepo.insertExercise(exercise);
+    }
+
+    public void insertSession(Session... sessions) {
+        for (Session session : sessions)
+            workoutRepo.insertSession(session);
     }
 
     public void insertSet(Set... sets) {
