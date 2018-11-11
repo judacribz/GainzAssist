@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.util.firebase;
 import android.app.Activity;
 import android.content.Intent;
 import ca.judacribz.gainzassist.background.FirebaseService;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,14 +22,17 @@ public class Database {
     private final static String EMAIL = "email";
     private final static String USERNAME = "username";
     private final static String WORKOUTS = "workouts";
+    private final static String SESSIONS = "sessions";
     private final static String SETS = "sets";
 
     private final static String DEFAULT_WORKOUTS_PATH = "default_workouts";
     private static final String USER_PATH = "users/%s";
 
     private static FirebaseUser firebaseUser;
-    private static DatabaseReference userRef;
-    private static DatabaseReference userWorkoutsRef;
+    private static DatabaseReference
+            userRef,
+            userWorkoutsRef,
+            userWorkoutSessionsRef;
 
     // --------------------------------------------------------------------------------------------
 
@@ -48,6 +52,13 @@ public class Database {
         userRef = getUserRef();
 
         return (userRef != null) ? userRef.child(WORKOUTS) : null;
+    }
+
+    /* Gets firebase db reference for 'users/<uid>/sessions/' */
+    public static DatabaseReference getWorkoutSessionsRef() {
+        userRef = getUserRef();
+
+        return (userRef != null) ? userRef.child(SESSIONS) : null;
     }
 
 
@@ -116,6 +127,13 @@ public class Database {
         }
     }
 
+    public static void addWorkoutSessionFirebase(Session session) {
+        userWorkoutSessionsRef = getWorkoutSessionsRef();
+
+        if (userWorkoutSessionsRef != null) {
+            userWorkoutSessionsRef.child(String.valueOf(session.getTimestamp())).setValue(session.toMap());
+        }
+    }
     public static void deleteWorkoutFirebase(String workoutName) {
         userWorkoutsRef = getWorkoutsRef();
 

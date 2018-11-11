@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
+import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
 
 public class CurrWorkout {
 
@@ -47,7 +48,9 @@ public class CurrWorkout {
             numMains;
     private long currRestTime;
 
-    private Session session;
+    private Session currSession;
+
+    private ArrayList<Set> finishedSets = new ArrayList<>();
     // --------------------------------------------------------------------------------------------
 
     private RestTimeSetListener restTimeSetListener;
@@ -80,6 +83,7 @@ public class CurrWorkout {
 
     public void setCurrWorkout(Workout workout) {
         this.currWorkout = workout;
+        this.currSession = new Session(workout);
         genWarmups(workout.getExercises());
     }
 
@@ -158,14 +162,34 @@ public class CurrWorkout {
     public boolean finishCurrSet() {
         this.set_i++;
 
+        if (currExercise.getSetsType() == MAIN_SET) {
+            currSet.setReps(currReps);
+            currSet.setWeight(currWeight);
+            finishedSets.add(currSet);
+        }
+
+        // End of sets for an exercise
         if (atEndOfSets()) {
             this.ex_i++;
 
+            currSession.addExerciseSets(currExercise.getName(), finishedSets);
+
+            // End of all exercises for this workout session
             if (atEndOfExercises()) {
+                currSession.setTimestamp();
+                addWorkoutSessionFirebase(currSession);
                 return false;
+
+            // Not end of all exercises, set next exercise
             } else {
                 setCurrExercise(currWorkout.getExercise(this.ex_i));
             }
+
+            if (currExercise.getSetsType() == MAIN_SET) {
+                finishedSets = new ArrayList<>();
+            }
+
+        // End of set, set next set from current exercise
         } else {
             setCurrSet(currExercise.getSet(this.set_i));
         }
@@ -305,7 +329,7 @@ public class CurrWorkout {
 
 
     public boolean getIsWarmup() {
-        return WARMUP_SET.equals(currExercise.getSetsType());
+        return WARMUP_SET.equals(this.currExercise.getSetsType());
     }
 
 

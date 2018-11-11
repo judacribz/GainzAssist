@@ -4,6 +4,7 @@ import android.arch.persistence.room.*;
 import ca.judacribz.gainzassist.models.db.WorkoutRepo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,9 +45,10 @@ public class Session {
     }
 
     @Ignore
-    public Session(int workoutId, long timestamp) {
-        this.workoutId = workoutId;
-        this.timestamp = timestamp;
+    public Session(Workout workout) {
+        setWorkoutId(workout.getId());
+        setWorkoutName(workout.getName());
+        this.timestamp = new Date().getTime();
     }
 
     // ######################################################################################### //
@@ -79,14 +81,18 @@ public class Session {
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setTimestamp() {
+        this.timestamp = new Date().getTime();
     }
 
     // ============================================================================================
 
+    public void addExerciseSets(String exerciseName, ArrayList<Set> sets) {
+        sessionSets.put(exerciseName, sets);
+    }
+
     /* Helper function used to store Session information in the firebase db */
-    Map<String, Object> toMap() {
+    public Map<String, Object> toMap() {
         Map<String, Object> sessionMap = new HashMap<>();
         Map<String, Object> exMap = new HashMap<>();
         Map<String, Object> setMap;
