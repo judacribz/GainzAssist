@@ -22,7 +22,7 @@ import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutFirebase;
-import static ca.judacribz.gainzassist.models.CurrWorkout.*;
+import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.*;
 import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;

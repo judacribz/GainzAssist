@@ -20,11 +20,10 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
-import ca.judacribz.gainzassist.models.CurrWorkout;
+import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
 
-import static ca.judacribz.gainzassist.models.CurrWorkout.MIN_REPS;
+import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
 
 public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSetListener{
 

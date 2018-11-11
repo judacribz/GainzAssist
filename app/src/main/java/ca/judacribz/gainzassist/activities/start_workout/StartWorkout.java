@@ -1,11 +1,8 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Parcel;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.content.ContextCompat;
@@ -19,7 +16,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import android.widget.Toast;
 import butterknife.*;
 import java.util.ArrayList;
 
@@ -66,7 +62,7 @@ public class StartWorkout extends AppCompatActivity {
         setTheme(R.style.WorkoutTheme);
 
         currWorkout = CurrWorkout.getInstance();
-        currWorkout.setWorkout(workout);
+        currWorkout.setCurrWorkout(workout);
 
         setupPager();
 

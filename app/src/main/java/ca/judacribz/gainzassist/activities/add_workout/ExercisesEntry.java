@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.*;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.*;
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
-import static ca.judacribz.gainzassist.models.CurrWorkout.*;
+import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class ExercisesEntry extends AppCompatActivity {

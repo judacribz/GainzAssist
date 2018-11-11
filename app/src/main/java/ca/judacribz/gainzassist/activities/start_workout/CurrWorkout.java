@@ -1,8 +1,12 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.activities.start_workout;
+
+import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Session;
+import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.Workout;
 
 import java.util.ArrayList;
 
-import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 
@@ -24,33 +28,46 @@ public class CurrWorkout {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    private Workout workout;
-    private String workName, currExName, currExType, equip;
-    private Set currSet;
-    private int currSetNum, currReps;
-    private float currWeight, currMinWeight = MIN_WEIGHT, currWeightChange = WEIGHT_CHANGE;
-    private ArrayList<Exercise> currWarmups, exercises, allExs;
-    private ArrayList<Set> currSets;
+    private Workout currWorkout;
     private Exercise currExercise;
-    private int set_i, ex_i, currNumSets, currNumWarmups, currNumExs, currNumAllExs;
-    private SetsType currSetsType, prevSetsType;
+
+    private Set currSet;
+    private float
+            currWeight,
+            currMinWeight = MIN_WEIGHT,
+            currWeightChange = WEIGHT_CHANGE;
+
+    private ArrayList<Exercise> currWarmups, currMains;
+
+    private int
+            set_i,
+            ex_i,
+            currReps,
+            numWarmups,
+            numMains;
     private long currRestTime;
+
+    private Session session;
     // --------------------------------------------------------------------------------------------
 
     private RestTimeSetListener restTimeSetListener;
 
-    // Ideally, your interface should be declared inside ClassB.
+
     public interface RestTimeSetListener {
         public void startTimer(long timeInMillis);
     }
 
     public void setRestTimeSetListener(RestTimeSetListener restTimeSetListener) {
         this.restTimeSetListener = restTimeSetListener;
+        //TODO make deterministic
+        if (!timerSet) {
+            setTimer();
+        }
     }
 
 
     // ######################################################################################### //
-    // WorkoutScreen Constructor/Instance                                                     //
+    // WorkoutScreen Constructor/Instance                                                        //
     // ######################################################################################### //
     private CurrWorkout() {
     }
@@ -58,14 +75,12 @@ public class CurrWorkout {
     public static CurrWorkout getInstance() {
         return INST;
     }
+    // ######################################################################################### //
 
-    public void setWorkout(Workout workout) {
-        setWorkName(workout.getName());
+
+    public void setCurrWorkout(Workout workout) {
+        this.currWorkout = workout;
         genWarmups(workout.getExercises());
-    }
-
-    private void setWorkName(String workName) {
-        this.workName = workName;
     }
 
     private void genWarmups(ArrayList<Exercise> exercises) {
@@ -78,8 +93,7 @@ public class CurrWorkout {
         int reps, setNum;
         String equip;
 
-        this.exercises = exercises;
-        this.currNumExs = exercises.size();
+        setCurrMainExercises(exercises);
 
         for (Exercise ex: exercises) {
             ex.setSetsType(MAIN_SET);
@@ -121,20 +135,24 @@ public class CurrWorkout {
             allExs.add(ex);
         }
 
-        setCurrWarmups(warmups);
+        setCurrWarmupExercises(warmups);
         setCurrExercises(allExs);
     }
 
-    private void setCurrWarmups(ArrayList<Exercise> warmups) {
-        this.currWarmups = warmups;
-        this.currNumWarmups = warmups.size();
+    private void setCurrMainExercises(ArrayList<Exercise> exercises) {
+        this.currMains = exercises;
+        this.numMains = exercises.size();
+    }
+
+    private void setCurrWarmupExercises(ArrayList<Exercise> exercises) {
+        this.currWarmups = exercises;
+        this.numWarmups = exercises.size();
     }
 
     private void setCurrExercises(ArrayList<Exercise> allExercises) {
-        this.allExs = allExercises;
-        this.currNumAllExs = allExercises.size();
+        this.currWorkout.setExercises(allExercises);
         this.ex_i = 0;
-        setCurrExercise(allExercises.get(this.ex_i));
+        setCurrExercise(currWorkout.getExercise(this.ex_i));
     }
 
     public boolean finishCurrSet() {
@@ -146,41 +164,33 @@ public class CurrWorkout {
             if (atEndOfExercises()) {
                 return false;
             } else {
-                setCurrExercise(allExs.get(this.ex_i));
+                setCurrExercise(currWorkout.getExercise(this.ex_i));
             }
         } else {
-            setCurrSet(currSets.get(this.set_i));
+            setCurrSet(currExercise.getSet(this.set_i));
         }
 
         return true;
     }
 
     private boolean atEndOfSets() {
-        return this.set_i >= this.currNumSets;
+        return this.set_i >= this.currExercise.getNumSets();
     }
 
     private boolean atEndOfExercises() {
-        return (this.ex_i >= this.currNumAllExs);
+        return (this.ex_i >= this.currWorkout.getNumExercises());
     }
 
     private void setCurrExercise(Exercise exercise) {
         this.currExercise = exercise;
-
-        setCurrExName(this.currExercise.getName());
         setCurrEquip(this.currExercise.getEquipment());
-        setCurrExType(this.currExercise.getType());
 
-        setCurrSets(this.currExercise.getSetsList());
-        setCurrSetsType(this.currExercise.getSetsType());
-    }
-
-    private void setCurrExName(String currExName) {
-        this.currExName = currExName;
+        this.set_i = 0;
+        setCurrSet(this.currExercise.getSet(this.set_i));
     }
 
     private void setCurrEquip(String equip) {
-        this.equip = equip.toLowerCase();
-        if (BARBELL.equals(this.equip)) {
+        if (BARBELL.equals(equip.toLowerCase())) {
             this.currMinWeight = BB_MIN_WEIGHT;
             this.currWeightChange = BB_WEIGHT_CHANGE;
         } else {
@@ -189,31 +199,10 @@ public class CurrWorkout {
         }
     }
 
-    private void setCurrExType(String exType) {
-        this.currExType = exType;
-    }
-
-    private void setCurrSets(ArrayList<Set> currSets) {
-        this.currSets = currSets;
-        this.currNumSets = currSets.size();
-        this.set_i = 0;
-        setCurrSet(this.currSets.get(this.set_i));
-    }
-
-    private void setCurrSetsType(SetsType setsType) {
-        this.prevSetsType = this.currSetsType;
-        this.currSetsType = setsType;
-    }
-
     private void setCurrSet(Set set) {
         this.currSet = set;
-        this.currSetNum = this.currSet.getSetNumber();
         setCurrReps(this.currSet.getReps());
         this.currWeight = this.currSet.getWeight();
-    }
-
-    public String getWorkName() {
-        return workName;
     }
 
     public ArrayList<Exercise> getWarmups() {
@@ -221,39 +210,26 @@ public class CurrWorkout {
     }
 
     public int getCurrNumExs() {
-        if (this.currSetsType == WARMUP_SET) {
-            return this.currNumWarmups;
-        }
-
-        return this.currNumExs;
+        return (this.currExercise.getSetsType() == WARMUP_SET) ? this.numWarmups : this.numMains;
     }
 
     public int getCurrExNum() {
-        if (this.currSetsType == WARMUP_SET) {
-            return currWarmups.indexOf(currExercise) + 1;
-        }
-
-        return exercises.indexOf(currExercise) + 1;
+        return ((this.currExercise.getSetsType() == WARMUP_SET)
+                ? currWarmups.indexOf(currExercise)
+                : currMains.indexOf(currExercise))
+                + 1;
     }
 
     public String getCurrExName() {
-        return currExName;
-    }
-
-    public SetsType getCurrExType() {
-        return currSetsType;
+        return currExercise.getName();
     }
 
     public String getCurrEquip() {
-        return equip;
+        return currExercise.getEquipment();
     }
 
     public int getCurrNumSets() {
-        return currNumSets;
-    }
-
-    public Set getCurrSet() {
-        return currSet;
+        return currExercise.getNumSets();
     }
 
     public int getCurrSetNum() {
@@ -276,15 +252,26 @@ public class CurrWorkout {
     public boolean setCurrReps(int reps) {
         this.currReps = reps;
 
-        if (this.currSetsType == MAIN_SET) {
+        if (this.currExercise.getSetsType() == MAIN_SET) {
             setCurrRestTime();
         }
 
         return this.currReps == MIN_REPS;
     }
+    boolean timerSet;
     public void setCurrRestTime() {
-        this.currRestTime =  (this.currReps <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
-        restTimeSetListener.startTimer(this.currRestTime);
+        this.currRestTime =  (this.currSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
+
+        setTimer();
+    }
+
+    public void setTimer() {
+        if (restTimeSetListener != null) {
+            restTimeSetListener.startTimer(this.currRestTime);
+            timerSet = true;
+        } else {
+            timerSet = false;
+        }
     }
 
     public long getCurrRestTime() {

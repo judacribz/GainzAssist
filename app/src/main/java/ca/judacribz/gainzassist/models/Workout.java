@@ -118,5 +118,13 @@ public class Workout {
     public void setExercises(ArrayList<Exercise> exercises) {
         this.exercises = exercises;
     }
+
+    public Exercise getExercise(int exIndex) {
+        return this.exercises.get(exIndex);
+    }
+
+    public int getNumExercises() {
+        return this.exercises.size();
+    }
     // --------------------------------------------------------------------------------------------
 }

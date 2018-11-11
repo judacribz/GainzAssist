@@ -200,6 +200,14 @@ public class Exercise {
 
         return reps / getSets();
     }
+
+    public Set getSet(int setIndex) {
+        return this.setsList.get(setIndex);
+    }
+
+    public int getNumSets() {
+        return this.setsList.size();
+    }
     // ============================================================================================
 
 
