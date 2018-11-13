@@ -207,6 +207,7 @@ public class WorkoutRepo {
                         repoAsyncTask.setExercise((Exercise) obj[0]);
                         break;
                 }
+                break;
             case SESSIONS_TXN:
                 repoAsyncTask.setSession((Session) obj[0]);
                 break;
