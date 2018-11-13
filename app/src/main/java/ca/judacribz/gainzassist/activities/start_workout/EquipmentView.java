@@ -43,12 +43,12 @@ public class EquipmentView extends View{
     // ============================================================================================
     private final int TEXT_SIZE   = 30;
     private final int PLATE_WIDTH = 40;
-    private final int[] WEIGHTS   = new int[] {45, 25, 10, 5};
+    private final int[] WEIGHTS   = new int[] {450, 250, 100, 50, 25};
     // ============================================================================================
 
     // Global Vars
     // ============================================================================================
-    private int[] numWeights = new int[] {0, 0, 0, 0};
+    private int[] numWeights = new int[] {0, 0, 0, 0, 0};
 
     int height = 0;
     float weight = -1f;
@@ -113,7 +113,7 @@ public class EquipmentView extends View{
             for (int j = 0; j < numWeights.length; j++) {
 
                 if (numWeights[j] > 0) {
-                    text = String.valueOf(numWeights[j] + "x" +  WEIGHTS[j] + "lbs");
+                    text = String.valueOf(numWeights[j] + "x" +  ((float)WEIGHTS[j])/10f + "lbs");
                     canvas.drawText(text, width - text.length() * 20, i, paint);
                     i += textSpacing;
                 }
@@ -132,6 +132,7 @@ public class EquipmentView extends View{
         // Setup barbell with weights
         if (this.equipment.equals(context.getString(R.string.barbell))) {
             this.weight = (weight - 45f) / 2;
+            this.weight*=10;
 
             int startX = 10 , startY = 0;
             int newWeight = (int) this.weight;
@@ -150,7 +151,7 @@ public class EquipmentView extends View{
                 for (int i = 0; i < numWeights[j]; i++) {
 
                     // Sets weight based on fraction weight/45 multiplied by the length of 45
-                    int r = WEIGHTS[j] * diam45 / 45 + (45 - WEIGHTS[j]);
+                    int r = (WEIGHTS[j]/10) * diam45 / 45 + (45 - (WEIGHTS[j]/10));
 
                     // Sets the starting y position for drawing the plate weight
                     startY = 20 + (diam45 - r) / 2;

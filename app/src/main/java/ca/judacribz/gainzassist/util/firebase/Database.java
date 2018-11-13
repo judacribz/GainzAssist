@@ -2,6 +2,7 @@ package ca.judacribz.gainzassist.util.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.SparseArray;
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
@@ -12,6 +13,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Map;
 
 import static ca.judacribz.gainzassist.util.Helper.*;
 
@@ -133,6 +136,23 @@ public class Database {
         if (userWorkoutSessionsRef != null) {
             userWorkoutSessionsRef.child(String.valueOf(session.getTimestamp())).setValue(session.toMap());
         }
+
+
+        updateWorkoutWeights(session.getWorkoutName(), session.getAvgWeights());
+    }
+
+    public static void updateWorkoutWeights(String workoutName, Map<String, Float> newWeights) {
+        userWorkoutsRef = getWorkoutsRef();
+        if (userWorkoutsRef != null) {
+            DatabaseReference workoutRef = userWorkoutsRef.child(workoutName);
+
+            int i = 0;
+            for (Map.Entry<String, Float> entry : newWeights.entrySet()) {
+                workoutRef.child("exercises").child(String.valueOf(i)).child("weight").setValue(entry.getValue());
+                i++;
+            }
+        }
+
     }
     public static void deleteWorkoutFirebase(String workoutName) {
         userWorkoutsRef = getWorkoutsRef();

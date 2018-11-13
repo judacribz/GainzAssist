@@ -28,6 +28,10 @@ public interface ExerciseDao {
     @Query("SELECT id from  exercises WHERE name = :name AND workout_id = :workoutId")
     int getId(String name, int workoutId);
 
+
+    @Query("UPDATE exercises SET weight = :weight WHERE id = :id")
+    void updateWeight(float weight, int id);
+
     @Update
     void update(Exercise... exercise);
 

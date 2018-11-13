@@ -18,7 +18,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     // Constants
     // --------------------------------------------------------------------------------------------
     final public static String EXTRA_WARMUPS = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS";
-    final public static String EXTRA_WORKOUT = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WORKOUT";
+    final public static String EXTRA_MAIN_EXERCISES = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES";
     final private static Fragment[] FMTS = new Fragment[] {
             WarmupsList.newInstance(),
             WorkoutScreen.newInstance(),
@@ -34,12 +34,13 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     // ######################################################################################### //
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
-    WorkoutPagerAdapter(FragmentManager fragmentManager, Workout workout, ArrayList<Exercise> warmups) {
+    @SafeVarargs
+    WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Exercise>... exercises) {
         super(fragmentManager);
 
 //        Log.d("WARMUPS", "reps" + warmups.get(0).getSetsList().size());
-        bundle.putParcelable(EXTRA_WORKOUT, Parcels.wrap(workout));
-        bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(warmups));
+        bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]));
+        bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]));
 
         for (Fragment fmt : FMTS) {
             fmt.setArguments(bundle);

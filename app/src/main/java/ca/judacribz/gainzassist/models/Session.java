@@ -1,7 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
-import ca.judacribz.gainzassist.models.db.WorkoutRepo;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +31,9 @@ public class Session {
 
     @Ignore
     Map<String, ArrayList<Set>> sessionSets = new HashMap<>();
+
+    @Ignore
+    Map<String, Float> avgWeights = new HashMap<>();
 
     @Ignore
     String workoutName;
@@ -77,6 +80,10 @@ public class Session {
         this.workoutName = workoutName;
     }
 
+    public String getWorkoutName() {
+        return workoutName;
+    }
+
     public long getTimestamp() {
         return timestamp;
     }
@@ -88,10 +95,20 @@ public class Session {
     public Map<String, ArrayList<Set>> getSessionSets() {
         return sessionSets;
     }
+    public Map<String, Float> getAvgWeights() {
+        return avgWeights;
+    }
     // ============================================================================================
 
-    public void addExerciseSets(String exerciseName, ArrayList<Set> sets) {
+    public void addExerciseSets(String exerciseName, ArrayList<Set> sets, float weightChange) {
         sessionSets.put(exerciseName, sets);
+
+        float weight = 0.0f;
+        for (Set set : sets) {
+            weight += set.getWeight();
+        }
+
+        avgWeights.put(exerciseName, weight/sets.size() + weightChange);
     }
 
     /* Helper function used to store Session information in the firebase db */

@@ -29,8 +29,8 @@ public class CurrWorkout {
     public static final float BB_WEIGHT_CHANGE = 5.0f;
     public static final float WEIGHT_CHANGE = 2.5f;
     public static final int MIN_REPS = 0;
-    public static final long HEAVY_REST_TIME = 180000;
-    public static final long LIGHT_REST_TIME = 90000;
+    private static final long HEAVY_REST_TIME = 180000;
+    private static final long LIGHT_REST_TIME = 90000;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -44,7 +44,9 @@ public class CurrWorkout {
             currMinWeight = MIN_WEIGHT,
             currWeightChange = WEIGHT_CHANGE;
 
-    private ArrayList<Exercise> currWarmups, currMains;
+    private ArrayList<Exercise>
+            currWarmups,
+            currMains;
 
     private int
             set_i,
@@ -93,7 +95,7 @@ public class CurrWorkout {
     }
 
 
-    public void setCurrWorkout(Workout workout) {
+    void setCurrWorkout(Workout workout) {
         this.currWorkout = workout;
         this.currSession = new Session(workout);
         genWarmups(workout.getExercises());
@@ -185,13 +187,12 @@ public class CurrWorkout {
         if (atEndOfSets()) {
             this.ex_i++;
 
-            currSession.addExerciseSets(currExercise.getName(), finishedSets);
+            currSession.addExerciseSets(currExercise.getName(), finishedSets, currWeightChange);
 
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
                 currSession.setTimestamp();
 
-                addWorkoutSessionFirebase(currSession);
                 ViewModelProviders.of((FragmentActivity) context).get(WorkoutViewModel.class).insertSession(currSession);
 
                 return false;
@@ -299,13 +300,13 @@ public class CurrWorkout {
         return this.currReps == MIN_REPS;
     }
     boolean timerSet;
-    public void setCurrRestTime() {
+    private void setCurrRestTime() {
         this.currRestTime =  (this.currSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
 
         setTimer();
     }
 
-    public void setTimer() {
+    private void setTimer() {
         if (restTimeSetListener != null) {
             restTimeSetListener.startTimer(this.currRestTime);
             timerSet = true;
@@ -349,7 +350,7 @@ public class CurrWorkout {
     }
 
 
-    public void reset() {
+    void reset() {
         this.ex_i = 0;
         this.set_i = 0;
     }

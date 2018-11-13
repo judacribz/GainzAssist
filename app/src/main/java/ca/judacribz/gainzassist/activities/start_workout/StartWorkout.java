@@ -36,7 +36,7 @@ public class StartWorkout extends AppCompatActivity {
     // --------------------------------------------------------------------------------------------
     WorkoutHelper workoutHelper;
     Workout workout;
-    ArrayList<Exercise> warmups;
+    ArrayList<Exercise> warmups, mainExercises;
 
     LayoutInflater layInflater;
     View setsView;
@@ -57,6 +57,8 @@ public class StartWorkout extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
+        mainExercises = workout.getExercises();
+
 
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
@@ -104,7 +106,7 @@ public class StartWorkout extends AppCompatActivity {
 
         viewPager.setAdapter(new WorkoutPagerAdapter(
                 getSupportFragmentManager(),
-                workout,
+                mainExercises,
                 currWorkout.getWarmups())
         );
         viewPager.setCurrentItem(1);

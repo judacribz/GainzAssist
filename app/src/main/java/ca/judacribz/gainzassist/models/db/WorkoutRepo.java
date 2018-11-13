@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.SparseArray;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Session;
@@ -20,6 +21,7 @@ import java.util.Map;
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.TableTxn.*;
 import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
+import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
 
 public class WorkoutRepo {
     static private WorkoutDao workoutDao;
@@ -47,6 +49,7 @@ public class WorkoutRepo {
 
         UPDATE_WORKOUT,
         UPDATE_EXERCISE,
+        UPDATE_EXERCISE_WEIGHT,
         UPDATE_SET,
 
         DELETE_ALL_WORKOUTS,
@@ -78,6 +81,8 @@ public class WorkoutRepo {
     }
 
     void insertSession(Session session) {
+        addWorkoutSessionFirebase(session);
+
         setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session);
     }
 
@@ -125,12 +130,16 @@ public class WorkoutRepo {
 
     // UPDATE
     // --------------------------------------------------------------------------------------------
-    void updateWorkout(Workout workout) {
+    public void updateWorkout(Workout workout) {
         setRepoAsyncConfig(UPDATE_WORKOUT, WORKOUTS_TXN, null, workout);
     }
 
     void updateExercise(Exercise exercise) {
         setRepoAsyncConfig(UPDATE_EXERCISE, EXERCISES_TXN, null, exercise);
+    }
+
+    void updateExerciseWeight(SparseArray<Float> newWeights) {
+        setRepoAsyncConfig(UPDATE_EXERCISE_WEIGHT, EXERCISES_TXN, null, newWeights);
     }
 
     void updateSet(Set set) {
@@ -170,6 +179,7 @@ public class WorkoutRepo {
             case WORKOUTS_TXN:
                 switch (repoTask) {
                     case INSERT_WORKOUT:
+                    case UPDATE_WORKOUT:
                         repoAsyncTask.setWorkout((Workout) obj[0]);
                         break;
 
@@ -188,8 +198,15 @@ public class WorkoutRepo {
             break;
 
             case EXERCISES_TXN:
-                repoAsyncTask.setExercise((Exercise) obj[0]);
-                break;
+
+                switch (repoTask) {
+                    case UPDATE_EXERCISE_WEIGHT:
+//                        repoAsyncTask.setExerciseWeights((SparseArray<Float>) obj[0]);
+                        break;
+                    default:
+                        repoAsyncTask.setExercise((Exercise) obj[0]);
+                        break;
+                }
             case SESSIONS_TXN:
                 repoAsyncTask.setSession((Session) obj[0]);
                 break;
@@ -214,6 +231,7 @@ public class WorkoutRepo {
         private String workoutName = null;
         private Workout workout = null;
         private Exercise exercise = null;
+        private Map<String, Float> newWeights = null;
         private Set set = null;
         private Session session = null;
         private long timestamp = -1;
@@ -244,6 +262,11 @@ public class WorkoutRepo {
             this.session = session;
             setTimestamp(session.getTimestamp());
             setWorkoutId(session.getWorkoutId());
+            setExerciseWeights(session.getAvgWeights());
+        }
+
+        public void setExerciseWeights(Map<String, Float> newWeights) {
+            this.newWeights = newWeights;
         }
 
         void setTimestamp(long timestamp) {
@@ -321,6 +344,10 @@ String tag = "YOOOO";
                             }
                         }
 
+                        for (Map.Entry<String, Float> entry : newWeights.entrySet()) {
+                            exerciseDao.updateWeight(entry.getValue(), exerciseDao.getId(entry.getKey(), workoutId));
+                        }
+
                         break;
 
                     case INSERT_SET:
@@ -330,10 +357,17 @@ String tag = "YOOOO";
 
 
                     case UPDATE_WORKOUT:
+                        id = workoutDao.getId(workoutName);
+                        workout.setId(id);
                         workoutDao.update(workout);
+                        for (Exercise exercise : workout.getExercises()) {
+                            exercise.setWorkoutId(id);
+                            setRepoAsyncConfig(UPDATE_EXERCISE, EXERCISES_TXN, null, exercise);
+                        }
                         break;
 
                     case UPDATE_EXERCISE:
+                        exercise.setId(exerciseDao.getId(exercise.getName(), exercise.getWorkoutId()));
                         exerciseDao.update(exercise);
                         break;
 
@@ -362,6 +396,7 @@ String tag = "YOOOO";
 
             return null;
         }
+
 
 
     }

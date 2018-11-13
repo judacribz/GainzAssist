@@ -51,7 +51,7 @@ public class FirebaseService extends IntentService implements
                 @Override
                 public void onChildChanged(DataSnapshot workoutShot, String s) {
 
-                    workoutRepo.insertWorkout(extractWorkout(workoutShot));
+//                    workoutRepo.updateWorkout(extractWorkout(workoutShot));
 
                 }
 
