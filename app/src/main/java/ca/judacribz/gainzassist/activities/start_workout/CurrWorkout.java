@@ -191,7 +191,7 @@ public class CurrWorkout {
 
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
-                currSession.setTimestamp();
+                currSession.setTimestamp(-1);
 
                 ViewModelProviders.of((FragmentActivity) context).get(WorkoutViewModel.class).insertSession(currSession);
 

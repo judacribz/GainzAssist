@@ -285,7 +285,8 @@ public class WorkoutRepo {
         void setOnWorkoutReceivedListener(OnWorkoutReceivedListener onWorkoutReceivedListener) {
             this.onWorkoutReceivedListener = onWorkoutReceivedListener;
         }
-String tag = "YOOOO";
+
+
         @Override
         protected Void doInBackground(RepoTask... tasks) {
 
@@ -293,15 +294,10 @@ String tag = "YOOOO";
                 switch (task) {
                     case GET_WORKOUT_ID:
                         if (workoutDao.getId(workoutName) == 0) {
-
-                            Log.d(tag, "get id is 0");
                             onWorkoutReceivedListener.onWorkoutsReceived(extractWorkout(workoutShot));
-                        } else {
-
-                            Log.d(tag, "get id not 0");
                         }
 
-//                        setOnWorkoutReceivedListener(null);
+                        setOnWorkoutReceivedListener(null);
                         break;
 
 
@@ -314,7 +310,7 @@ String tag = "YOOOO";
                         }
 
                         onWorkoutReceivedListener.onWorkoutsReceived(workout);
-//                        setOnWorkoutReceivedListener(null);
+                        setOnWorkoutReceivedListener(null);
                         break;
 
 

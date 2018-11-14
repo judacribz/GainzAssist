@@ -9,11 +9,15 @@ import android.util.Log;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Helper {
     private static final String EMAIL = "email";
@@ -66,5 +70,27 @@ public class Helper {
         }
 
         return new Workout(workoutShot.getKey(), exercises);
+    }
+
+    public static Workout extractSession(DataSnapshot sessionShot) {
+
+
+        for (DataSnapshot exerciseShot : sessionShot.child("sets").getChildren()) {
+
+            for (DataSnapshot setShot : exerciseShot.getChildren()) {
+
+                Set set = setShot.getValue(Set.class);
+                if (set != null) {
+                    set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
+
+                    set.setExerciseName(exerciseShot.getKey());
+                    Logger.d(set.getSetNumber() + " " + set.getReps() + " " + set.getWeight());
+                }
+
+            }
+
+        }
+
+        return null;
     }
 }

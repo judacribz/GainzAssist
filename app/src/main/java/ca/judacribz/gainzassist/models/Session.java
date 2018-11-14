@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.models;
 import android.arch.persistence.room.*;
 import android.util.SparseArray;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +18,7 @@ import static android.arch.persistence.room.ForeignKey.SET_NULL;
                 parentColumns = "id",
                 childColumns = "workout_id",
                 onDelete = SET_NULL),
-        indices = {@Index(value = {"workout_id", "timestamp"}, unique = true)})
+        indices = {@Index(value = {"timestamp"}, unique = true)})
 public class Session {
 
     // Global Vars
@@ -51,7 +52,13 @@ public class Session {
     public Session(Workout workout) {
         setWorkoutId(workout.getId());
         setWorkoutName(workout.getName());
-        this.timestamp = new Date().getTime();
+        setTimestamp(-1);
+    }
+
+    @Ignore
+    public Session(long timestamp, String workoutName) {
+        setTimestamp(timestamp);
+        setWorkoutName(workoutName);
     }
 
     // ######################################################################################### //
@@ -88,8 +95,8 @@ public class Session {
         return timestamp;
     }
 
-    public void setTimestamp() {
-        this.timestamp = new Date().getTime();
+    public void setTimestamp(long timestamp) {
+            this.timestamp = (timestamp == -1) ? new Date().getTime() : timestamp;
     }
 
     public Map<String, ArrayList<Set>> getSessionSets() {

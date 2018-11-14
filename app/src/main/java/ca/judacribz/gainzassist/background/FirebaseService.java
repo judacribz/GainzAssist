@@ -14,7 +14,10 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.orhanobut.logger.Logger;
 
+import static ca.judacribz.gainzassist.util.Helper.extractSession;
+import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef;
 import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
 import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
 
@@ -38,6 +41,7 @@ public class FirebaseService extends IntentService implements
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         DatabaseReference userWorkoutsRef = getWorkoutsRef();
+        DatabaseReference userSessionRef = getWorkoutSessionsRef();
 
         if (userWorkoutsRef != null) {
             userWorkoutsRef.addChildEventListener(new ChildEventListener() {
@@ -50,7 +54,7 @@ public class FirebaseService extends IntentService implements
 
                 @Override
                 public void onChildChanged(DataSnapshot workoutShot, String s) {
-
+                    //TODO make this work
 //                    workoutRepo.updateWorkout(extractWorkout(workoutShot));
 
                 }
@@ -63,6 +67,33 @@ public class FirebaseService extends IntentService implements
 
                 @Override
                 public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+
+        if (userSessionRef != null) {
+            userSessionRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot sessionShot, String s) {
+                    extractSession(sessionShot);
+
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot sessionShot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot sessionShot) {
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot sessionShot, String s) {
                 }
 
                 @Override
