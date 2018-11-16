@@ -1,14 +1,15 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
+import com.google.api.client.util.NullValue;
 import org.parceler.Parcel;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-import static android.arch.persistence.room.ForeignKey.SET_NULL;
+import static android.arch.persistence.room.ForeignKey.*;
 
 @Parcel
 @Entity(tableName = "sets",
@@ -23,9 +24,12 @@ import static android.arch.persistence.room.ForeignKey.SET_NULL;
                 entity = Exercise.class,
                 parentColumns = "id",
                 childColumns = "exercise_id",
-                onDelete = SET_NULL,
+                onDelete = CASCADE,
                 onUpdate = CASCADE)},
-        indices = {@Index(value = {"session_id", "exercise_id", "set_number"}, unique = true)})
+        indices = {
+            @Index("session_id"),
+            @Index("exercise_id"),
+            @Index(value = {"session_id", "exercise_id", "set_number"})})
 public class Set {
 
     // Global Vars
@@ -35,6 +39,7 @@ public class Set {
 
     @ColumnInfo(name = "session_id")
     int sessionId;
+
     @ColumnInfo(name = "exercise_id")
     int exerciseId;
 
@@ -43,20 +48,25 @@ public class Set {
     int reps;
     float weight;
 
-    @Ignore
-    String exerciseName;
+    @ColumnInfo(name = "exercise_name")
+    public String exerciseName;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
     // Set Constructors                                                                          //
     // ######################################################################################### //
-    /* Required empty constructor for firebase */
-    @Ignore
     public Set() {
     }
 
-    public Set(int exerciseId, int setNumber, int reps, float weight) {
+    @Ignore
+    public Set(Exercise exercise, int setNumber, int reps, float weight) {
+        this(exercise.getId(), exercise.getName(), setNumber, reps, weight);
+    }
+
+    @Ignore
+    public Set(int exerciseId, String exerciseName, int setNumber, int reps, float weight) {
         setExerciseId(exerciseId);
+        setExerciseName(exerciseName);
         setSetNumber(setNumber);
         setReps(reps);
         setWeight(weight);
@@ -65,8 +75,6 @@ public class Set {
 
     // Getters and setters
     // ============================================================================================
-
-
     public int getId() {
         return id;
     }

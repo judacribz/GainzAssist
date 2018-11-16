@@ -128,15 +128,14 @@ public class CurrWorkout {
             oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
             reps = ex.getAvgReps();
 
-            exId = ex.getId();
             setNum = 1;
             sets = new ArrayList<>();
-            sets.add(new Set(exId, setNum++, reps, minWeight));
+            sets.add(new Set(ex, setNum++, reps, minWeight));
             percWeight = minWeight / weight;
             do {
                 newWeight = percWeight * weight;
                 newWeight -= newWeight % 5;
-                sets.add(new Set(exId, setNum++, reps, newWeight));
+                sets.add(new Set(ex, setNum++, reps, newWeight));
 
                 percWeight += 0.2f;
                 if (reps - 2 > 0)

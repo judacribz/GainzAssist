@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.arch.persistence.room.ForeignKey.SET_NULL;
+import static android.arch.persistence.room.ForeignKey.*;
 
 @Entity(tableName = "sessions",
         foreignKeys =
@@ -17,8 +17,11 @@ import static android.arch.persistence.room.ForeignKey.SET_NULL;
                 entity = Workout.class,
                 parentColumns = "id",
                 childColumns = "workout_id",
-                onDelete = SET_NULL),
-        indices = {@Index(value = {"timestamp"}, unique = true)})
+                onDelete = CASCADE,
+                onUpdate = CASCADE),
+        indices = {
+                @Index("workout_id"),
+                @Index(value = {"workout_id", "timestamp"})})
 public class Session {
 
     // Global Vars
@@ -28,7 +31,11 @@ public class Session {
 
     @ColumnInfo(name = "workout_id")
     int workoutId;
+
     long timestamp;
+
+    @ColumnInfo(name = "workout_name")
+    String workoutName;
 
     @Ignore
     Map<String, ArrayList<Set>> sessionSets = new HashMap<>();
@@ -36,15 +43,11 @@ public class Session {
     @Ignore
     Map<String, Float> avgWeights = new HashMap<>();
 
-    @Ignore
-    String workoutName;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
     // Session Constructors                                                                     //
     // ######################################################################################### //
-    // ######################################################################################### //
-    /* Required empty constructor for firebase */
     public Session() {
     }
 
@@ -54,19 +57,11 @@ public class Session {
         setWorkoutName(workout.getName());
         setTimestamp(-1);
     }
-
-    @Ignore
-    public Session(long timestamp, String workoutName) {
-        setTimestamp(timestamp);
-        setWorkoutName(workoutName);
-    }
-
     // ######################################################################################### //
 
 
     // Getters and setters
     // ============================================================================================
-
     public int getId() {
         return id;
     }
@@ -102,6 +97,7 @@ public class Session {
     public Map<String, ArrayList<Set>> getSessionSets() {
         return sessionSets;
     }
+
     public Map<String, Float> getAvgWeights() {
         return avgWeights;
     }

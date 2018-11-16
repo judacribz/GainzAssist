@@ -65,7 +65,11 @@ public class Exercise {
     }
 
     @Ignore
-    public Exercise(String name, String type, String equipment, ArrayList<Set> setsList, SetsType setsType) {
+    public Exercise(String name,
+                    String type,
+                    String equipment,
+                    ArrayList<Set> setsList,
+                    SetsType setsType) {
         this.name      = name;
         this.type      = type;
         this.equipment = equipment;
@@ -74,7 +78,12 @@ public class Exercise {
     }
 
     @Ignore
-    public Exercise(String name, String type, String equipment, int sets, int reps, float weight) {
+    public Exercise(String name,
+                    String type,
+                    String equipment,
+                    int sets,
+                    int reps,
+                    float weight) {
         this.name      = name;
         this.type      = type;
         this.equipment = equipment;
@@ -85,7 +94,14 @@ public class Exercise {
         setSetsList(null);
     }
 
-    public Exercise(String name, String type, String equipment, int sets, int reps, float weight, SetsType setsType) {
+    @Ignore
+    public Exercise(String name,
+                    String type,
+                    String equipment,
+                    int sets,
+                    int reps,
+                    float weight,
+                    SetsType setsType) {
         this(name, type, equipment, sets, reps, weight);
         setSetsType(setsType);
     }
@@ -174,7 +190,7 @@ public class Exercise {
             this.setsList = setsList;
         } else {
             for (int i = 0; i < sets; i++) {
-                this.setsList.add(new Set(id, i+1, reps, weight));
+                this.setsList.add(new Set(id, name, i+1, reps, weight));
             }
         }
     }

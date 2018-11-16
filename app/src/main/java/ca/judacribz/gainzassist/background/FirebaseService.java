@@ -14,7 +14,6 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.util.Helper.extractSession;
 import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef;
@@ -56,7 +55,6 @@ public class FirebaseService extends IntentService implements
                 public void onChildChanged(DataSnapshot workoutShot, String s) {
                     //TODO make this work
 //                    workoutRepo.updateWorkout(extractWorkout(workoutShot));
-
                 }
 
                 @Override
@@ -80,7 +78,6 @@ public class FirebaseService extends IntentService implements
                 @Override
                 public void onChildAdded(DataSnapshot sessionShot, String s) {
                     extractSession(sessionShot);
-
                 }
 
                 @Override

@@ -74,7 +74,6 @@ public class Helper {
 
     public static Workout extractSession(DataSnapshot sessionShot) {
 
-
         for (DataSnapshot exerciseShot : sessionShot.child("sets").getChildren()) {
 
             for (DataSnapshot setShot : exerciseShot.getChildren()) {
@@ -84,11 +83,9 @@ public class Helper {
                     set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
 
                     set.setExerciseName(exerciseShot.getKey());
-                    Logger.d(set.getSetNumber() + " " + set.getReps() + " " + set.getWeight());
                 }
 
             }
-
         }
 
         return null;
