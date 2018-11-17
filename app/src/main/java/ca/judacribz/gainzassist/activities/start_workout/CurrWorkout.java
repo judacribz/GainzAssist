@@ -146,7 +146,12 @@ public class CurrWorkout {
             } while (percWeight < 0.8f);
 
             warmup = new Exercise(
-                    ex.getName(), ex.getType(), ex.getEquipment(), sets, WARMUP_SET
+                    ex.getExerciseNumber(),
+                    ex.getName(),
+                    ex.getType(),
+                    ex.getEquipment(),
+                    sets,
+                    WARMUP_SET
             );
             warmups.add(warmup);
             allExs.add(warmup);

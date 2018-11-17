@@ -337,7 +337,7 @@ Exercise ex;
             if (workout.containsExercise(exName)) {
                 etExerciseName.setError(getString(R.string.err_exercise_exists));
             } else {
-                exercises.add(updateExerciseData(exName));
+                exercises.add(updateExerciseData(-1, exName));
                 updateAdapter();
             }
         }
@@ -346,16 +346,21 @@ Exercise ex;
     @OnClick(R.id.btn_update_exercise)
     public void updateExercise() {
         if (validateForm(this, formEntries)) {
-            exercises.set(exercises.indexOf(ex), updateExerciseData(ex.getName()));
+            int num = ex.getExerciseNumber();
+            exercises.set(num, updateExerciseData(num, ex.getName()));
             updateAdapter();
         }
     }
 
-    private Exercise updateExerciseData(String exName) {
+    private Exercise updateExerciseData(int exNumber, String exName) {
         etExerciseName.setText("");
+        if (exNumber == -1) {
+            exNumber = workout.getNumExercises();
+        }
 
         // add exercise to list
         return new Exercise(
+                exNumber,
                 exName,
                 sprType.getSelectedItem().toString(),
                 sprEquipment.getSelectedItem().toString(),

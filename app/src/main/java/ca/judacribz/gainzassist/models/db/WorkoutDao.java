@@ -32,7 +32,8 @@ public interface WorkoutDao {
     @Update
     void update(Workout... workout);
 
-    @Query("DELETE from workouts")
+
+    @Query("DELETE FROM workouts")
     void deleteAll();
 
     @Query("DELETE from workouts WHERE name = :name")

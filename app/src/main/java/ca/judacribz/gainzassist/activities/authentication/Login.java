@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
@@ -152,8 +153,6 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     public void onStart() {
         super.onStart();
         if (getIntent().getBooleanExtra(EXTRA_LOGOUT_USER, false)) {
-            WorkoutViewModel workoutViewModel = new WorkoutViewModel(getApplication());
-            workoutViewModel.deleteAllWorkouts();
             signOut(this, signInClient);
         }
         auth.addAuthStateListener(this);

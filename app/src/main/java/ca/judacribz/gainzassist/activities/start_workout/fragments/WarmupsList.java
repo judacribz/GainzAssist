@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,6 +76,8 @@ public class WarmupsList extends Fragment {
             ArrayList<Exercise> warmups = Parcels.unwrap(bundle.getParcelable(EXTRA_WARMUPS));
             if (warmups != null) {
                 int i = 0;
+
+                Collections.reverse(warmups);
                 for (Exercise exercise : warmups) {
                     act.displaySets(
                             100 + i++,

@@ -13,6 +13,7 @@ import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -374,6 +375,7 @@ public class WorkoutRepo {
 
 
                     case DELETE_ALL_WORKOUTS:
+                        Logger.d("YPPP");
                         workoutDao.deleteAll();
                         break;
 

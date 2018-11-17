@@ -86,7 +86,7 @@ public class Workout {
         Map<String, Object> exs = new HashMap<>();
 
         for (Exercise exercise: exercises) {
-            exs.put(String.valueOf(exercises.indexOf(exercise)), exercise.toMap());
+            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.toMap());
         }
 
         workout.put("exercises", exs);
@@ -104,6 +104,16 @@ public class Workout {
         }
 
         return false;
+    }
+
+    public int getExerciseNumber(String exerciseName) {
+        for (Exercise exercise : exercises) {
+            if (exercise.getName().toLowerCase().equals(exerciseName.toLowerCase())) {
+                return exercise.getExerciseNumber();
+            }
+        }
+
+        return -1;
     }
 
     public ArrayList<String> getExerciseNames() {

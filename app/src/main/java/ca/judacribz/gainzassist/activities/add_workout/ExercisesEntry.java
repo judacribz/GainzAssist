@@ -229,6 +229,7 @@ public class ExercisesEntry extends AppCompatActivity {
 //                    sets.add(new Set(i, num_reps, weight));
 //                }
                 workout.addExercise(new Exercise(
+                        ex_i,
                         exerciseName,
                         "Strength",
                         getTextString(sprEquipment),

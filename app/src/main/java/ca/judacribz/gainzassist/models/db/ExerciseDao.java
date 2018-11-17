@@ -16,7 +16,7 @@ public interface ExerciseDao {
     @Query("SELECT * from exercises WHERE workout_id = :workoutId")
     LiveData<List<Exercise>> getLiveFromWorkout(int workoutId);
 
-    @Query("SELECT * from exercises WHERE workout_id = :workoutId")
+    @Query("SELECT * from exercises WHERE workout_id = :workoutId ORDER BY exercise_number")
     List<Exercise> getFromWorkout(int workoutId);
 
     @Query("SELECT * from  exercises WHERE id = :id")

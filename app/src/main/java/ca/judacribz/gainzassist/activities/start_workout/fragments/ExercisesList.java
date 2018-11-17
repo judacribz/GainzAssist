@@ -19,6 +19,7 @@ import ca.judacribz.gainzassist.models.Workout;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_MAIN_EXERCISES;
 
@@ -76,6 +77,7 @@ public class ExercisesList extends Fragment {
             ArrayList<Exercise> exercises = Parcels.unwrap(bundle.getParcelable(EXTRA_MAIN_EXERCISES));
             if (exercises != null) {
                 int i = 0;
+                Collections.reverse(exercises);
                 for (Exercise exercise : exercises) {
 
                     act.displaySets(

@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -78,6 +79,8 @@ public class Main extends AppCompatActivity {
                 Intent logoutIntent = new Intent(this, Login.class);
                 logoutIntent.putExtra(EXTRA_LOGOUT_USER, true);
                 startActivity(logoutIntent);
+
+                ViewModelProviders.of(this).get(WorkoutViewModel.class).deleteAllWorkouts();
                 finish();
                 break;
         }

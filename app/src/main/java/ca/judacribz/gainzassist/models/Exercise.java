@@ -14,7 +14,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 parentColumns = "id",
                 childColumns = "workout_id",
                 onDelete = CASCADE),
-                indices = {@Index(value = {"workout_id", "name"}, unique = true)})
+                indices = {@Index(value = {"workout_id", "exercise_number"}, unique = true)})
 public class Exercise {
 
     @Ignore
@@ -37,6 +37,9 @@ public class Exercise {
 
     @ColumnInfo(name = "workout_id")
     int workoutId;
+
+    @ColumnInfo(name = "exercise_number")
+    int exerciseNumber;
 
     String name;
     String type;
@@ -65,44 +68,49 @@ public class Exercise {
     }
 
     @Ignore
-    public Exercise(String name,
+    public Exercise(int exerciseNumber,
+                    String name,
                     String type,
                     String equipment,
                     ArrayList<Set> setsList,
                     SetsType setsType) {
-        this.name      = name;
-        this.type      = type;
-        this.equipment = equipment;
-        this.setsList  = setsList;
+        this.exerciseNumber = exerciseNumber;
+        this.name           = name;
+        this.type           = type;
+        this.equipment      = equipment;
+        this.setsList       = setsList;
         setSetsType(setsType);
     }
 
     @Ignore
-    public Exercise(String name,
+    public Exercise(int exerciseNumber,
+                    String name,
                     String type,
                     String equipment,
                     int sets,
                     int reps,
                     float weight) {
-        this.name      = name;
-        this.type      = type;
-        this.equipment = equipment;
-        this.sets      = sets;
-        this.reps      = reps;
-        this.weight    = weight;
+        this.exerciseNumber = exerciseNumber;
+        this.name           = name;
+        this.type           = type;
+        this.equipment      = equipment;
+        this.sets           = sets;
+        this.reps           = reps;
+        this.weight         = weight;
 
         setSetsList(null);
     }
 
     @Ignore
-    public Exercise(String name,
+    public Exercise(int exerciseNumber,
+                    String name,
                     String type,
                     String equipment,
                     int sets,
                     int reps,
                     float weight,
                     SetsType setsType) {
-        this(name, type, equipment, sets, reps, weight);
+        this(exerciseNumber, name, type, equipment, sets, reps, weight);
         setSetsType(setsType);
     }
     // ============================================================================================
@@ -124,6 +132,15 @@ public class Exercise {
     public void setWorkoutId(int workoutId) {
         this.workoutId = workoutId;
     }
+
+    public int getExerciseNumber() {
+        return exerciseNumber;
+    }
+
+    public void setExerciseNumber(int exerciseNumber) {
+        this.exerciseNumber = exerciseNumber;
+    }
+
     public String getName() {
         return name;
     }

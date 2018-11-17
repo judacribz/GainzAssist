@@ -63,9 +63,14 @@ public class Helper {
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
 
             // Adds sets to exercise object, and add exercise to exercises list
-            exercise = exerciseShot.getValue(Exercise.class);
-            if (exercise != null) {
-                exercises.add(exercise);
+            if (exerciseShot != null) {
+                exercise = exerciseShot.getValue(Exercise.class);
+                if (exercise != null) {
+                    exercise.setExerciseNumber(
+                            Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()))
+                    );
+                    exercises.add(exercise);
+                }
             }
         }
 
