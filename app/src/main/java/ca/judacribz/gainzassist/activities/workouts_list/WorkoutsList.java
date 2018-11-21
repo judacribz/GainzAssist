@@ -80,7 +80,7 @@ public class WorkoutsList extends AppCompatActivity
 
         workoutNames = new ArrayList<>();
 
-        // Set the layout manager for the localWorkouts
+        // ExerciseSet the layout manager for the localWorkouts
         layoutManager = new LinearLayoutManager(this);
         workoutsList.setLayoutManager(layoutManager);
         workoutsList.setHasFixedSize(true);

@@ -1,9 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
-import android.util.SparseArray;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,10 +36,18 @@ public class Session {
     String workoutName;
 
     @Ignore
-    Map<String, ArrayList<Set>> sessionSets = new HashMap<>();
+    Map<String, ArrayList<ExerciseSet>> sessionSets = new HashMap<>();
 
     @Ignore
     Map<String, Float> avgWeights = new HashMap<>();
+
+
+    @Ignore
+    Workout currWorkout;
+    @Ignore
+    ArrayList<Exercise> currMains, currWarmups;
+    @Ignore
+    int exerciseIndex = -1;
 
     // --------------------------------------------------------------------------------------------
 
@@ -94,7 +100,40 @@ public class Session {
             this.timestamp = (timestamp == -1) ? new Date().getTime() : timestamp;
     }
 
-    public Map<String, ArrayList<Set>> getSessionSets() {
+
+    public Workout getCurrWorkout() {
+        return currWorkout;
+    }
+
+    public void setCurrWorkout(Workout currWorkout) {
+        this.currWorkout = currWorkout;
+    }
+
+    public ArrayList<Exercise> getCurrMains() {
+        return currMains;
+    }
+
+    public void setCurrMains(ArrayList<Exercise> currMains) {
+        this.currMains = currMains;
+    }
+
+    public ArrayList<Exercise> getCurrWarmups() {
+        return currWarmups;
+    }
+
+    public void setCurrWarmups(ArrayList<Exercise> currWarmups) {
+        this.currWarmups = currWarmups;
+    }
+
+    public int getExerciseIndex() {
+        return exerciseIndex;
+    }
+
+    public void setExerciseIndex(int exerciseIndex) {
+        this.exerciseIndex = exerciseIndex;
+    }
+
+    public Map<String, ArrayList<ExerciseSet>> getSessionSets() {
         return sessionSets;
     }
 
@@ -103,15 +142,15 @@ public class Session {
     }
     // ============================================================================================
 
-    public void addExerciseSets(String exerciseName, ArrayList<Set> sets, float weightChange) {
-        sessionSets.put(exerciseName, sets);
+    public void addExerciseSets(String exerciseName, ArrayList<ExerciseSet> exerciseSets, float weightChange) {
+        sessionSets.put(exerciseName, exerciseSets);
 
         float weight = 0.0f;
-        for (Set set : sets) {
-            weight += set.getWeight();
+        for (ExerciseSet exerciseSet : exerciseSets) {
+            weight += exerciseSet.getWeight();
         }
 
-        avgWeights.put(exerciseName, weight/sets.size() + weightChange);
+        avgWeights.put(exerciseName, weight/ exerciseSets.size() + weightChange);
     }
 
     /* Helper function used to store Session information in the firebase db */
@@ -122,11 +161,11 @@ public class Session {
 
         sessionMap.put("workoutName", workoutName);
 
-        for (Map.Entry<String, ArrayList<Set>> exSets : sessionSets.entrySet()){
+        for (Map.Entry<String, ArrayList<ExerciseSet>> exSets : sessionSets.entrySet()){
 
             setMap = new HashMap<>();
-            for (Set set : exSets.getValue()) {
-                setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
+            for (ExerciseSet exerciseSet : exSets.getValue()) {
+                setMap.put(String.valueOf(exerciseSet.getSetNumber()), exerciseSet.toMap());
             }
             exMap.put(exSets.getKey(), setMap);
         }

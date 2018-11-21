@@ -72,7 +72,7 @@ public class UI {
         return setToolbar(act, act.getResources().getString(titleId), setBackArrow);
     }
     public static String setToolbar(AppCompatActivity act, String title, boolean setBackArrow) {
-        // Set the partial_title_bar to the activity
+        // ExerciseSet the partial_title_bar to the activity
         act.setSupportActionBar((Toolbar) act.findViewById(R.id.toolbar));
 
 
@@ -87,7 +87,7 @@ public class UI {
             }
         }
 
-        // Set the title for the partial_title_bar
+        // ExerciseSet the title for the partial_title_bar
         ((TextView) act.findViewById(R.id.title)).setText(title);
 
         return title;

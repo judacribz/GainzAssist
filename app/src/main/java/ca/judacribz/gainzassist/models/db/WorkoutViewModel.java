@@ -5,8 +5,8 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 
 import java.util.List;
@@ -36,9 +36,9 @@ public class WorkoutViewModel extends AndroidViewModel {
             workoutRepo.insertSession(session);
     }
 
-    public void insertSet(Set... sets) {
-        for (Set set : sets)
-            workoutRepo.insertSet(set);
+    public void insertSet(ExerciseSet... exerciseSets) {
+        for (ExerciseSet exerciseSet : exerciseSets)
+            workoutRepo.insertSet(exerciseSet);
     }
     // --------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public class WorkoutViewModel extends AndroidViewModel {
         return workoutRepo.getAllUniqueExerciseNames();
     }
 
-    public LiveData<List<Set>> getSetsFromExercise(int exerciseId) {
+    public LiveData<List<ExerciseSet>> getSetsFromExercise(int exerciseId) {
         return workoutRepo.getSetsFromExercise(exerciseId);
     }
 
@@ -86,8 +86,8 @@ public class WorkoutViewModel extends AndroidViewModel {
         workoutRepo.updateExercise(exercise);
     }
 
-    void updateSet(Set set) {
-        workoutRepo.updateSet(set);
+    void updateSet(ExerciseSet exerciseSet) {
+        workoutRepo.updateSet(exerciseSet);
     }
     // --------------------------------------------------------------------------------------------
 
@@ -106,8 +106,8 @@ public class WorkoutViewModel extends AndroidViewModel {
         workoutRepo.deleteExercise(exercise);
     }
 
-    public void deleteSet(Set set) {
-        workoutRepo.deleteSet(set);
+    public void deleteSet(ExerciseSet exerciseSet) {
+        workoutRepo.deleteSet(exerciseSet);
     }
     // --------------------------------------------------------------------------------------------
 }

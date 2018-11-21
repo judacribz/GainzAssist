@@ -1,18 +1,15 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
-import com.google.api.client.util.NullValue;
 import org.parceler.Parcel;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.*;
 
 @Parcel
-@Entity(tableName = "sets",
+@Entity(tableName = "exercise_sets",
         foreignKeys = {
             @ForeignKey(
                 entity = Session.class,
@@ -30,7 +27,7 @@ import static android.arch.persistence.room.ForeignKey.*;
             @Index("session_id"),
             @Index("exercise_id"),
             @Index(value = {"session_id", "exercise_id", "set_number"})})
-public class Set {
+public class ExerciseSet {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
@@ -53,18 +50,18 @@ public class Set {
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // Set Constructors                                                                          //
+    // ExerciseSet Constructors                                                                          //
     // ######################################################################################### //
-    public Set() {
+    public ExerciseSet() {
     }
 
     @Ignore
-    public Set(Exercise exercise, int setNumber, int reps, float weight) {
+    public ExerciseSet(Exercise exercise, int setNumber, int reps, float weight) {
         this(exercise.getId(), exercise.getName(), setNumber, reps, weight);
     }
 
     @Ignore
-    public Set(int exerciseId, String exerciseName, int setNumber, int reps, float weight) {
+    public ExerciseSet(int exerciseId, String exerciseName, int setNumber, int reps, float weight) {
         setExerciseId(exerciseId);
         setExerciseName(exerciseName);
         setSetNumber(setNumber);
@@ -130,13 +127,13 @@ public class Set {
     // ============================================================================================
 
 
-    // Helper function used to store Set information in the firebase db
+    // Helper function used to store ExerciseSet information in the firebase db
     Map<String, Object> toMap() {
-        Map<String, Object> setMap = new HashMap<>();
+        Map<String, Object> exerciseSetMap = new HashMap<>();
 
-        setMap.put("reps", reps);
-        setMap.put("weight", weight);
+        exerciseSetMap.put("reps", reps);
+        exerciseSetMap.put("weight", weight);
 
-        return setMap;
+        return exerciseSetMap;
     }
 }

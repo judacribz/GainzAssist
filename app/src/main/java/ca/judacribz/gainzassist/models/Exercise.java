@@ -49,7 +49,7 @@ public class Exercise {
     float weight;
 
     @Ignore
-    ArrayList<Set> setsList = new ArrayList<>();
+    ArrayList<ExerciseSet> setsList = new ArrayList<>();
 
     public enum SetsType {
         WARMUP_SET,
@@ -72,7 +72,7 @@ public class Exercise {
                     String name,
                     String type,
                     String equipment,
-                    ArrayList<Set> setsList,
+                    ArrayList<ExerciseSet> setsList,
                     SetsType setsType) {
         this.exerciseNumber = exerciseNumber;
         this.name           = name;
@@ -198,28 +198,28 @@ public class Exercise {
     }
 
 
-    public ArrayList<Set> getSetsList() {
+    public ArrayList<ExerciseSet> getSetsList() {
         return setsList;
     }
 
-    public void setSetsList(@Nullable ArrayList<Set> setsList) {
+    public void setSetsList(@Nullable ArrayList<ExerciseSet> setsList) {
         if (setsList != null) {
             this.setsList = setsList;
         } else {
             for (int i = 0; i < sets; i++) {
-                this.setsList.add(new Set(id, name, i+1, reps, weight));
+                this.setsList.add(new ExerciseSet(id, name, i+1, reps, weight));
             }
         }
     }
 
-    public void addSet(Set set) {
-        this.setsList.add(set);
+    public void addSet(ExerciseSet exerciseSet) {
+        this.setsList.add(exerciseSet);
     }
 
     public float getAvgWeight() {
         float weight = 0.0f;
-        for (Set set : setsList) {
-            weight += set.getWeight();
+        for (ExerciseSet exerciseSet : setsList) {
+            weight += exerciseSet.getWeight();
         }
 
         return weight / (float) getSets();
@@ -227,14 +227,14 @@ public class Exercise {
 
     public int getAvgReps() {
         int reps = 0;
-        for (Set set : setsList) {
-            reps += set.getReps();
+        for (ExerciseSet exerciseSet : setsList) {
+            reps += exerciseSet.getReps();
         }
 
         return reps / getSets();
     }
 
-    public Set getSet(int setIndex) {
+    public ExerciseSet getSet(int setIndex) {
         return this.setsList.get(setIndex);
     }
 

@@ -9,8 +9,8 @@ import android.util.Log;
 import android.util.SparseArray;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
 import com.orhanobut.logger.Logger;
@@ -87,8 +87,8 @@ public class WorkoutRepo {
         setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session);
     }
 
-    static void insertSet(Set set) {
-        setRepoAsyncConfig(INSERT_SET, SETS_TXN, null, set);
+    static void insertSet(ExerciseSet exerciseSet) {
+        setRepoAsyncConfig(INSERT_SET, SETS_TXN, null, exerciseSet);
     }
     // --------------------------------------------------------------------------------------------
 
@@ -123,7 +123,7 @@ public class WorkoutRepo {
         return exerciseDao.getAllUniqueNames();
     }
 
-    LiveData<List<Set>> getSetsFromExercise(int exerciseId) {
+    LiveData<List<ExerciseSet>> getSetsFromExercise(int exerciseId) {
         return setDao.getLiveFromExercise(exerciseId);
     }
     // --------------------------------------------------------------------------------------------
@@ -143,8 +143,8 @@ public class WorkoutRepo {
         setRepoAsyncConfig(UPDATE_EXERCISE_WEIGHT, EXERCISES_TXN, null, newWeights);
     }
 
-    void updateSet(Set set) {
-        setRepoAsyncConfig(UPDATE_SET, SETS_TXN, null, set);
+    void updateSet(ExerciseSet exerciseSet) {
+        setRepoAsyncConfig(UPDATE_SET, SETS_TXN, null, exerciseSet);
     }
     // --------------------------------------------------------------------------------------------
 
@@ -163,8 +163,8 @@ public class WorkoutRepo {
         setRepoAsyncConfig(DELETE_EXERCISE, EXERCISES_TXN, null, exercise);
     }
 
-    void deleteSet(Set set) {
-        setRepoAsyncConfig(DELETE_SET, SETS_TXN, null, set);
+    void deleteSet(ExerciseSet exerciseSet) {
+        setRepoAsyncConfig(DELETE_SET, SETS_TXN, null, exerciseSet);
     }
     // --------------------------------------------------------------------------------------------
     // ============================================================================================
@@ -215,7 +215,7 @@ public class WorkoutRepo {
 
 
             case SETS_TXN:
-                repoAsyncTask.setSet((Set) obj[0]);
+                repoAsyncTask.setExerciseSet((ExerciseSet) obj[0]);
                 break;
         }
 
@@ -234,7 +234,7 @@ public class WorkoutRepo {
         private Workout workout = null;
         private Exercise exercise = null;
         private Map<String, Float> newWeights = null;
-        private Set set = null;
+        private ExerciseSet exerciseSet = null;
         private Session session = null;
         private long timestamp = -1;
         private int workoutId = -1;
@@ -279,8 +279,8 @@ public class WorkoutRepo {
             this.workoutId = workoutId;
         }
 
-        void setSet(Set set) {
-            this.set = set;
+        void setExerciseSet(ExerciseSet exerciseSet) {
+            this.exerciseSet = exerciseSet;
         }
 
         void setOnWorkoutReceivedListener(OnWorkoutReceivedListener onWorkoutReceivedListener) {
@@ -334,11 +334,11 @@ public class WorkoutRepo {
                         sessionDao.insert(session);
                         id = sessionDao.getId(timestamp);
 
-                        for (Map.Entry<String, ArrayList<Set>> exSets : session.getSessionSets().entrySet()){
-                            for (Set set : exSets.getValue()) {
-                                set.setSessionId(id);
+                        for (Map.Entry<String, ArrayList<ExerciseSet>> exSets : session.getSessionSets().entrySet()){
+                            for (ExerciseSet exerciseSet : exSets.getValue()) {
+                                exerciseSet.setSessionId(id);
 
-                                insertSet(set);
+                                insertSet(exerciseSet);
                             }
                         }
 
@@ -350,7 +350,7 @@ public class WorkoutRepo {
 
                     case INSERT_SET:
                         if (setDao != null)
-                            setDao.insert(set);
+                            setDao.insert(exerciseSet);
                         break;
 
 
@@ -370,7 +370,7 @@ public class WorkoutRepo {
                         break;
 
                     case UPDATE_SET:
-                        setDao.update(set);
+                        setDao.update(exerciseSet);
                         break;
 
 
@@ -388,7 +388,7 @@ public class WorkoutRepo {
                         break;
 
                     case DELETE_SET:
-                        setDao.delete(set);
+                        setDao.delete(exerciseSet);
                         break;
                 }
             }

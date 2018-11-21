@@ -1,7 +1,6 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
@@ -21,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;;
-import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -34,6 +32,8 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.io.IOException;
+import java.util.Objects;
+
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import butterknife.BindView;
@@ -45,7 +45,7 @@ import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
 
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
-import static ca.judacribz.gainzassist.util.Helper.setUserInfoInPref;
+import static ca.judacribz.gainzassist.util.Helper.setUserInfoPref;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
 
 public class Login extends AppCompatActivity implements /*FacebookCallback<LoginResult>,*/
@@ -169,7 +169,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
                             = GoogleSignIn.getSignedInAccountFromIntent(data);
                     try {
                         GoogleSignInAccount account = task.getResult(ApiException.class);
-                        googleCred = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+                        googleCred = GoogleAuthProvider.getCredential(Objects.requireNonNull(account).getIdToken(), null);
 
 
                         signIn(this, googleCred, signInClient);
@@ -227,7 +227,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
                     String.format(getString(R.string.txt_logged_in), fbUser.getEmail()),
                     Toast.LENGTH_SHORT
             ).show();
-            setUserInfoInPref(this, fbUser.getEmail(), fbUser.getUid());
+            setUserInfoPref(this, fbUser.getEmail(), fbUser.getUid());
 
 
             progressBar.setProgress(0);

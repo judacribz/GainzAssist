@@ -1,13 +1,11 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
-import android.app.Activity;
-import android.app.Application;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 
@@ -15,7 +13,6 @@ import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
-import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
 
 public class CurrWorkout {
 
@@ -38,7 +35,7 @@ public class CurrWorkout {
     private Workout currWorkout;
     private Exercise currExercise;
 
-    private Set currSet;
+    private ExerciseSet currExerciseSet;
     private float
             currWeight,
             currMinWeight = MIN_WEIGHT,
@@ -50,7 +47,7 @@ public class CurrWorkout {
 
     private int
             set_i,
-            ex_i,
+            ex_i = -1,
             currReps,
             numWarmups,
             numMains;
@@ -58,7 +55,7 @@ public class CurrWorkout {
 
     private Session currSession;
 
-    private ArrayList<Set> finishedSets = new ArrayList<>();
+    private ArrayList<ExerciseSet> finishedSets = new ArrayList<>();
 
     private Context context;
     // --------------------------------------------------------------------------------------------
@@ -101,11 +98,12 @@ public class CurrWorkout {
         genWarmups(workout.getExercises());
     }
 
+
     private void genWarmups(ArrayList<Exercise> exercises) {
         ArrayList<Exercise> allExs = new ArrayList<>();
         ArrayList<Exercise> warmups = new ArrayList<>();
         Exercise warmup;
-        ArrayList<Set> sets;
+        ArrayList<ExerciseSet> exerciseSets;
         int exId;
         float oneRepMax, minWeight, weight, percWeight, newWeight;
         int reps, setNum;
@@ -129,13 +127,13 @@ public class CurrWorkout {
             reps = ex.getAvgReps();
 
             setNum = 1;
-            sets = new ArrayList<>();
-            sets.add(new Set(ex, setNum++, reps, minWeight));
+            exerciseSets = new ArrayList<>();
+            exerciseSets.add(new ExerciseSet(ex, setNum++, reps, minWeight));
             percWeight = minWeight / weight;
             do {
                 newWeight = percWeight * weight;
                 newWeight -= newWeight % 5;
-                sets.add(new Set(ex, setNum++, reps, newWeight));
+                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
 
                 percWeight += 0.2f;
                 if (reps - 2 > 0)
@@ -150,7 +148,7 @@ public class CurrWorkout {
                     ex.getName(),
                     ex.getType(),
                     ex.getEquipment(),
-                    sets,
+                    exerciseSets,
                     WARMUP_SET
             );
             warmups.add(warmup);
@@ -159,22 +157,31 @@ public class CurrWorkout {
         }
 
         setCurrWarmupExercises(warmups);
-        setCurrExercises(allExs);
+        setAllCurrExercises(allExs);
     }
 
     private void setCurrMainExercises(ArrayList<Exercise> exercises) {
+        this.currSession.setCurrMains(exercises);
         this.currMains = exercises;
         this.numMains = exercises.size();
     }
 
     private void setCurrWarmupExercises(ArrayList<Exercise> exercises) {
+        this.currSession.setCurrWarmups(exercises);
         this.currWarmups = exercises;
         this.numWarmups = exercises.size();
     }
 
-    private void setCurrExercises(ArrayList<Exercise> allExercises) {
+    private void setAllCurrExercises(ArrayList<Exercise> allExercises ) {
+        this.currSession.setCurrWorkout(this.currWorkout);
         this.currWorkout.setExercises(allExercises);
-        this.ex_i = 0;
+
+
+        if (this.ex_i == -1) {
+            this.ex_i = 0;
+        }
+        this.currSession.setExerciseIndex(this.ex_i);
+
         setCurrExercise(currWorkout.getExercise(this.ex_i));
     }
 
@@ -182,13 +189,14 @@ public class CurrWorkout {
         this.set_i++;
 
         if (currExercise.getSetsType() == MAIN_SET) {
-            currSet.setReps(currReps);
-            currSet.setWeight(currWeight);
-            finishedSets.add(currSet);
+            currExerciseSet.setReps(currReps);
+            currExerciseSet.setWeight(currWeight);
+            finishedSets.add(currExerciseSet);
         }
 
         // End of sets for an exercise
         if (atEndOfSets()) {
+            currSession.setExerciseIndex(this.ex_i);
             this.ex_i++;
 
             currSession.addExerciseSets(currExercise.getName(), finishedSets, currWeightChange);
@@ -212,7 +220,7 @@ public class CurrWorkout {
 
         // End of set, set next set from current exercise
         } else {
-            setCurrSet(currExercise.getSet(this.set_i));
+            setCurrExerciseSet(currExercise.getSet(this.set_i));
         }
 
         return true;
@@ -226,12 +234,20 @@ public class CurrWorkout {
         return (this.ex_i >= this.currWorkout.getNumExercises());
     }
 
+    public int getExInd() {
+        return  this.ex_i;
+    }
+
+    public void setExInd(int ex_i) {
+        this.ex_i = ex_i;
+    }
+
     private void setCurrExercise(Exercise exercise) {
         this.currExercise = exercise;
         setCurrEquip(this.currExercise.getEquipment());
 
         this.set_i = 0;
-        setCurrSet(this.currExercise.getSet(this.set_i));
+        setCurrExerciseSet(this.currExercise.getSet(this.set_i));
     }
 
     private void setCurrEquip(String equip) {
@@ -244,14 +260,18 @@ public class CurrWorkout {
         }
     }
 
-    private void setCurrSet(Set set) {
-        this.currSet = set;
-        setCurrReps(this.currSet.getReps());
-        this.currWeight = this.currSet.getWeight();
+    private void setCurrExerciseSet(ExerciseSet exerciseSet) {
+        this.currExerciseSet = exerciseSet;
+        setCurrReps(this.currExerciseSet.getReps());
+        this.currWeight = this.currExerciseSet.getWeight();
     }
 
     public ArrayList<Exercise> getWarmups() {
         return currWarmups;
+    }
+
+    public String getWorkoutName() {
+        return currWorkout.getName();
     }
 
     public int getCurrNumExs() {
@@ -283,7 +303,7 @@ public class CurrWorkout {
 
     /* Reps------------------------------------------------------------------------------------- */
     public int getCurrReps() {
-        return currSet.getReps();
+        return currExerciseSet.getReps();
     }
 
     public void incReps() {
@@ -305,7 +325,7 @@ public class CurrWorkout {
     }
     boolean timerSet;
     private void setCurrRestTime() {
-        this.currRestTime =  (this.currSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
+        this.currRestTime =  (this.currExerciseSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
 
         setTimer();
     }
@@ -353,6 +373,9 @@ public class CurrWorkout {
         return WARMUP_SET.equals(this.currExercise.getSetsType());
     }
 
+    public Session getCurrSession() {
+        return this.currSession;
+    }
 
     void reset() {
         this.ex_i = 0;

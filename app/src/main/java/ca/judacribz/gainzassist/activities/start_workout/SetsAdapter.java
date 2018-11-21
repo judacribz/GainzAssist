@@ -10,18 +10,18 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 
 
 public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> {
 
     private int numberOfSets;
-    private ArrayList<Set> sets;
+    private ArrayList<ExerciseSet> exerciseSets;
 
     // Adapter Constructor
-    SetsAdapter(ArrayList<Set> sets) {
-        this.sets = sets;
-        this.numberOfSets = sets.size();
+    SetsAdapter(ArrayList<ExerciseSet> exerciseSets) {
+        this.exerciseSets = exerciseSets;
+        this.numberOfSets = exerciseSets.size();
     }
 
     // SetsAdapter @Override
@@ -38,8 +38,8 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     @Override
     public void onBindViewHolder(@NonNull SetsViewHolder holder, int position) {
 
-        Set set = sets.get(position);
-        holder.bind(set.getSetNumber(), set.getReps(), set.getWeight());
+        ExerciseSet exerciseSet = exerciseSets.get(position);
+        holder.bind(exerciseSet.getSetNumber(), exerciseSet.getReps(), exerciseSet.getWeight());
     }
 
     @Override
@@ -49,9 +49,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // Returns the list of sets
-    public ArrayList<Set> getArrayList() {
-        return sets;
+    // Returns the list of exerciseSets
+    public ArrayList<ExerciseSet> getArrayList() {
+        return exerciseSets;
     }
 
 

@@ -4,23 +4,26 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
-import android.util.Log;
-import android.widget.Toast;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Set;
 import ca.judacribz.gainzassist.models.Workout;
 import com.google.firebase.database.DataSnapshot;
-import com.orhanobut.logger.AndroidLogAdapter;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.orhanobut.logger.Logger;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Helper {
     private static final String EMAIL = "email";
+    private static final String INCOMPLETE_WORKOUTS = "incomplete workouts";
+    private static final String WORKOUT_EX_IND = "%s exercise index";
 
     @SuppressWarnings("deprecation")
     public static boolean isMyServiceRunning(Activity act, Class<?> serviceClass) {
@@ -35,34 +38,95 @@ public class Helper {
         return false;
     }
 
-    public static String getEmailFromPref(Context context) {
-        return context.getSharedPreferences(
-                context.getString(R.string.file_user_info),
-                Context.MODE_PRIVATE
-        ).getString(EMAIL, null);
+    public static String getEmailPref(Context context) {
+        return getSharedPref(context, R.string.file_user_info).getString(EMAIL, null);
     }
 
-    public static void setUserInfoInPref(Activity act, String email, String uid) {
-        SharedPreferences sharedPref = act.getSharedPreferences(
-                act.getString(R.string.file_user_info),
-                Context.MODE_PRIVATE
-        );
-        SharedPreferences.Editor editor = sharedPref.edit();
+    public static void setUserInfoPref(Context context, String email, String uid) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_user_info).edit();
         editor.putString(EMAIL, email);
         editor.apply();
+    }
 
+    public static void addIncompleteWorkoutPref(Context context, String workoutName) {
+        Set<String> incompleteWorkouts = getIncompleteWorkouts(context);
+        if (incompleteWorkouts == null) {
+            incompleteWorkouts = new HashSet<>();
+        }
+        incompleteWorkouts.add(workoutName);
+
+        Logger.d(incompleteWorkouts);
+
+        addIncompleteWorkoutPref(context, incompleteWorkouts);
+    }
+
+    public static void addIncompleteWorkoutPref(Context context, Set<String> incompleteWorkouts) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
+        editor.putStringSet(INCOMPLETE_WORKOUTS, incompleteWorkouts);
+        editor.apply();
+    }
+
+    private static Set<String> getIncompleteWorkouts(Context context) {
+        return getSharedPref(
+                context,
+                R.string.file_workout_info
+        ).getStringSet(INCOMPLETE_WORKOUTS, null);
+    }
+
+    public static boolean removeIncompleteWorkoutPref(Context context, String workoutName) {
+        Set<String> incompleteWorkouts = getIncompleteWorkouts(context);
+        if (incompleteWorkouts == null) {
+            return false;
+        }
+        boolean removed = incompleteWorkouts.remove(workoutName);
+
+        if (incompleteWorkouts.size() == 0) {
+            SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
+            editor.remove(INCOMPLETE_WORKOUTS);
+            editor.apply();
+        } else {
+            addIncompleteWorkoutPref(context, incompleteWorkouts);
+        }
+        return removed;
+    }
+
+    public static void addIncompleteSessionPref(Context context, String workoutName, int exInd) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
+        editor.putInt(String.format(WORKOUT_EX_IND, workoutName), exInd);
+        editor.apply();
+    }
+
+
+    public static int getIncompleteSessionPref(Context context, String workoutName) {
+        return getSharedPref(
+                context,
+                R.string.file_workout_info
+        ).getInt(String.format(WORKOUT_EX_IND, workoutName), -1);
+    }
+
+    public static void removeIncompleteSessionPref(Context context, String workoutName) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
+        editor.remove(String.format(WORKOUT_EX_IND, workoutName));
+        editor.apply();
+    }
+
+    public static SharedPreferences getSharedPref(Context context, int fileId) {
+        return context.getSharedPreferences(
+                context.getString(fileId),
+                Context.MODE_PRIVATE
+        );
     }
 
     public static Workout extractWorkout(DataSnapshot workoutShot) {
         ArrayList<Exercise> exercises = new ArrayList<>();
         Exercise exercise;
-        ArrayList<Set> sets;
-        Set set;
+        ArrayList<ExerciseSet> exerciseSets;
+        ExerciseSet exerciseSet;
         String setNum;
 
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
 
-            // Adds sets to exercise object, and add exercise to exercises list
+            // Adds exerciseSets to exercise object, and add exercise to exercises list
             if (exerciseShot != null) {
                 exercise = exerciseShot.getValue(Exercise.class);
                 if (exercise != null) {
@@ -83,11 +147,11 @@ public class Helper {
 
             for (DataSnapshot setShot : exerciseShot.getChildren()) {
 
-                Set set = setShot.getValue(Set.class);
-                if (set != null) {
-                    set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
+                ExerciseSet exerciseSet = setShot.getValue(ExerciseSet.class);
+                if (exerciseSet != null) {
+                    exerciseSet.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
 
-                    set.setExerciseName(exerciseShot.getKey());
+                    exerciseSet.setExerciseName(exerciseShot.getKey());
                 }
 
             }

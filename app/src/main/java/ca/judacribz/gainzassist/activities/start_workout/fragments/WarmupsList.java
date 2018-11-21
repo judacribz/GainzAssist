@@ -75,13 +75,11 @@ public class WarmupsList extends Fragment {
         if (bundle != null) {
             ArrayList<Exercise> warmups = Parcels.unwrap(bundle.getParcelable(EXTRA_WARMUPS));
             if (warmups != null) {
-                int i = 0;
 
-                Collections.reverse(warmups);
-                for (Exercise exercise : warmups) {
+                for (int i = warmups.size()-1; i >= 0; --i) {
                     act.displaySets(
-                            100 + i++,
-                            exercise,
+                            100 + i,
+                            warmups.get(i),
                             llExSubInsert,
                             llExSetsInsert
                     );

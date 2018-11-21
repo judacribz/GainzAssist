@@ -2,7 +2,7 @@ package ca.judacribz.gainzassist.models.db;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.*;
-import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 
 import java.util.List;
 
@@ -10,19 +10,19 @@ import java.util.List;
 public interface SetDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Set set);
+    void insert(ExerciseSet exerciseSet);
 
-    @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")
-    LiveData<List<Set>> getLiveFromExercise(int exerciseId);
+    @Query("SELECT * FROM exercise_sets WHERE exercise_id = :exerciseId")
+    LiveData<List<ExerciseSet>> getLiveFromExercise(int exerciseId);
 
-    @Query("SELECT * FROM sets WHERE exercise_id = :exerciseId")
-    List<Set> getFromExercise(int exerciseId);
+    @Query("SELECT * FROM exercise_sets WHERE exercise_id = :exerciseId")
+    List<ExerciseSet> getFromExercise(int exerciseId);
 
 
     @Update
-    void update(Set... sets);
+    void update(ExerciseSet... exerciseSets);
 
 
     @Delete
-    void delete(Set... sets);
+    void delete(ExerciseSet... exerciseSets);
 }

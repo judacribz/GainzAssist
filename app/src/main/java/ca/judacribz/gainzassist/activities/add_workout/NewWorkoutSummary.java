@@ -15,7 +15,7 @@ import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
@@ -56,7 +56,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     SingleItemAdapter exerciseAdapter;
 
     ArrayList<Exercise> exercises;
-    ArrayList<Set> exSets;
+    ArrayList<ExerciseSet> exSets;
     Workout workout;
 
     int num_reps, num_sets, minInt = 1; // for min num_reps/num_sets
@@ -118,7 +118,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         setSpinnerWithArray(this, R.array.exerciseType, sprType);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
-        // Set the layout manager
+        // ExerciseSet the layout manager
         rvExerciseList.setLayoutManager(new GridLayoutManager(
                 this,
                 getNumColumns(this),

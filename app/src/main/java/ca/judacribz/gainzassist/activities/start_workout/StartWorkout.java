@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -23,6 +24,7 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.*;
 import org.parceler.Parcels;
 
+import static ca.judacribz.gainzassist.util.Helper.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT;
 
@@ -63,8 +65,7 @@ public class StartWorkout extends AppCompatActivity {
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
 
-        currWorkout = CurrWorkout.getInstance();
-        currWorkout.setCurrWorkout(workout);
+        setCurrSession();
 
         setupPager();
 
@@ -125,6 +126,34 @@ public class StartWorkout extends AppCompatActivity {
 
         currWorkout.reset();
     }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+
+        addIncompleteWorkoutPref(this, workout.getName());
+        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        addIncompleteWorkoutPref(this, workout.getName());
+        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
+    }
+
+
+    public void setCurrSession() {
+        currWorkout = CurrWorkout.getInstance();
+
+        if (removeIncompleteWorkoutPref(this, workout.getName())) {
+            currWorkout.setExInd(getIncompleteSessionPref(this, workout.getName()));
+
+            removeIncompleteSessionPref(this, workout.getName());
+        }
+
+        currWorkout.setCurrWorkout(workout);
+    }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
@@ -133,12 +162,13 @@ public class StartWorkout extends AppCompatActivity {
      * Called in ExercisesList and WarmupsList
      */
 
+    @SuppressLint("InflateParams")
     public void displaySets(int id,
                             Exercise exercise,
                             LinearLayout llSubtitle,
                             LinearLayout llSets) {
 
-        // Add subtitle layout which includes "Set #", "Reps" and "Weight"
+        // Add subtitle layout which includes "ExerciseSet #", "Reps" and "Weight"
         setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
         llSubtitle.addView(setsView, 0);
 
@@ -147,11 +177,11 @@ public class StartWorkout extends AppCompatActivity {
         setsView.setId(id);
         llSets.addView(setsView, 0);
 
-        // Set the title in the textView within the listView layout above
+        // ExerciseSet the title in the textView within the listView layout above
         tvExerciseName = (TextView) setsView.findViewById(R.id.tv_exercise_name);
         tvExerciseName.setText(exercise.getName());
 
-        // Set the recyclerView list to be horizontal and pass in the exercise sets through the
+        // ExerciseSet the recyclerView list to be horizontal and pass in the exercise sets through the
         // adapter
         setList = (RecyclerView) setsView.findViewById(R.id.rv_exercise_sets);
         setList.setHasFixedSize(true);

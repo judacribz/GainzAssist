@@ -6,16 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import ca.judacribz.gainzassist.R;
-
-import static ca.judacribz.gainzassist.util.Helper.getEmailFromPref;
 
 public class WorkoutHelper extends SQLiteOpenHelper {
 
@@ -121,13 +116,13 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     }
 
     /* Convert Exercise ArrayList to Blob format */
-    private byte[] getBlobFromSets(ArrayList<Set> sets) {
-        return gson.toJson(sets).getBytes();
+    private byte[] getBlobFromSets(ArrayList<ExerciseSet> exerciseSets) {
+        return gson.toJson(exerciseSets).getBytes();
     }
 
     /* Convert Blob of Exercises to Exercise ArrayList format */
-    private ArrayList<Set> getSetsFromBlob(byte[] blob) {
-        return gson.fromJson(new String(blob), new TypeToken<ArrayList<Set>>() {}.getType());
+    private ArrayList<ExerciseSet> getSetsFromBlob(byte[] blob) {
+        return gson.fromJson(new String(blob), new TypeToken<ArrayList<ExerciseSet>>() {}.getType());
     }
 
     /* Checks to see if the database exists */
@@ -172,7 +167,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 //        cv.clear();
 //
 //        ArrayList<String> exerciseNames = session.getExerciseNames();
-//        ArrayList<ArrayList<Set>> sets = session.getAllSets();
+//        ArrayList<ArrayList<ExerciseSet>> sets = session.getAllSets();
 //
 //        cv.put(TIMESTAMP, session.getTimestamp());
 //        cv.put(WORKOUT_NAME, session.getWorkoutName());

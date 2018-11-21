@@ -11,7 +11,7 @@ import android.widget.Spinner;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Set;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Workout;
 import org.parceler.Parcels;
 
@@ -34,7 +34,7 @@ public class ExercisesEntry extends AppCompatActivity {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     Workout workout;
-    ArrayList<Set> sets;
+    ArrayList<ExerciseSet> exerciseSets;
     String workoutName, exerciseName;
 
     int numExs, num_reps, num_sets, ex_i = 0, minInt = 1; // for min num_reps/num_sets
@@ -222,11 +222,11 @@ public class ExercisesEntry extends AppCompatActivity {
                         exerciseName
                 ));
             } else {
-//                sets = new ArrayList<>();
+//                exerciseSets = new ArrayList<>();
                 num_reps = getTextInt(etNumReps);
                 num_sets = getTextInt(etNumSets);
 //                for (int i = 1; i <= num_sets; i++) {
-//                    sets.add(new Set(i, num_reps, weight));
+//                    exerciseSets.add(new ExerciseSet(i, num_reps, weight));
 //                }
                 workout.addExercise(new Exercise(
                         ex_i,

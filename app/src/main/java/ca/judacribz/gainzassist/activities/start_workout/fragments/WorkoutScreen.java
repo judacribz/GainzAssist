@@ -24,6 +24,9 @@ import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 
 import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
+import static ca.judacribz.gainzassist.util.Helper.getIncompleteSessionPref;
+import static ca.judacribz.gainzassist.util.Helper.removeIncompleteSessionPref;
+import static ca.judacribz.gainzassist.util.Helper.removeIncompleteWorkoutPref;
 
 public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSetListener{
 
@@ -111,7 +114,7 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
     }
 
 
-    // Set up the custom view (EquipmentView) to display the equipment. View added dynamically
+    // ExerciseSet up the custom view (EquipmentView) to display the equipment. View added dynamically
     // to trigger onDraw method
     public void setupEquipView() {
         equipmentView = new EquipmentView(act);
@@ -264,6 +267,10 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
         if (currWorkout.finishCurrSet()) {
             updateUI();
         } else {
+            if (removeIncompleteWorkoutPref(act, currWorkout.getWorkoutName())) {
+                removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
+            }
+
             act.finish();
         }
     }

@@ -76,13 +76,12 @@ public class ExercisesList extends Fragment {
         if (bundle != null) {
             ArrayList<Exercise> exercises = Parcels.unwrap(bundle.getParcelable(EXTRA_MAIN_EXERCISES));
             if (exercises != null) {
-                int i = 0;
-                Collections.reverse(exercises);
-                for (Exercise exercise : exercises) {
+
+                for (int i = exercises.size()-1; i >= 0; --i) {
 
                     act.displaySets(
                             200 + i,
-                            exercise,
+                            exercises.get(i),
                             llExSubInsert,
                             llExSetsInsert
                     );

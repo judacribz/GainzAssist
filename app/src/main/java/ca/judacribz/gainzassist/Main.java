@@ -1,7 +1,6 @@
 package ca.judacribz.gainzassist;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.Toast;
 
 import butterknife.*;
 
@@ -17,7 +15,7 @@ import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 
-import static ca.judacribz.gainzassist.util.Helper.getEmailFromPref;
+import static ca.judacribz.gainzassist.util.Helper.getSharedPref;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class Main extends AppCompatActivity {
@@ -48,8 +46,12 @@ public class Main extends AppCompatActivity {
         btnWorkouts.setText(R.string.workouts);
         btnStepCounter.setText(R.string.step_counter);
 
+
+        SharedPreferences.Editor editor = getSharedPref(this, R.string.file_workout_info).edit();
+        editor.remove("incomplete workouts");
+        editor.apply();
         //TODO remove
-//        Toast.makeText(this, "shared pref says " + getEmailFromPref(this), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "shared pref says " + getEmailPref(this), Toast.LENGTH_SHORT).show();
     }
 
     @Override
