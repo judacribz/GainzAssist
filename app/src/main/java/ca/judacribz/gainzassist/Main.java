@@ -47,9 +47,6 @@ public class Main extends AppCompatActivity {
         btnStepCounter.setText(R.string.step_counter);
 
 
-        SharedPreferences.Editor editor = getSharedPref(this, R.string.file_workout_info).edit();
-        editor.remove("incomplete workouts");
-        editor.apply();
         //TODO remove
 //        Toast.makeText(this, "shared pref says " + getEmailPref(this), Toast.LENGTH_SHORT).show();
     }

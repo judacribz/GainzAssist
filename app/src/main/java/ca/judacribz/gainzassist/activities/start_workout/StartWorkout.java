@@ -133,6 +133,7 @@ public class StartWorkout extends AppCompatActivity {
 
         addIncompleteWorkoutPref(this, workout.getName());
         addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
+        finish();
     }
 
     @Override
