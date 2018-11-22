@@ -122,7 +122,7 @@ public class WorkoutsList extends AppCompatActivity
 //        displayWorkoutList(workoutNames);
     }
 
-    /* Helper function to display button list of workouts */
+    /* Misc function to display button list of workouts */
     public void displayWorkoutList(ArrayList<String> workouts) {
         filteredWorkouts = workouts;
         workoutAdapter = new SingleItemAdapter(

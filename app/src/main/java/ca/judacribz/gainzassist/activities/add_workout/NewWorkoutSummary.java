@@ -371,7 +371,7 @@ Exercise ex;
     }
 
 
-    /* Helper function to update the GridLayout exercises display */
+    /* Misc function to update the GridLayout exercises display */
     public void updateAdapter() {
         exerciseAdapter = new SingleItemAdapter(
                 this,

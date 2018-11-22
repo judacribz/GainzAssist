@@ -24,11 +24,9 @@ import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 
 import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
-import static ca.judacribz.gainzassist.util.Helper.getIncompleteSessionPref;
-import static ca.judacribz.gainzassist.util.Helper.removeIncompleteSessionPref;
-import static ca.judacribz.gainzassist.util.Helper.removeIncompleteWorkoutPref;
+import static ca.judacribz.gainzassist.util.Preferences.*;
 
-public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSetListener{
+public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -101,7 +99,7 @@ public class WorkoutScreen extends Fragment  implements  CurrWorkout.RestTimeSet
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
 
-        currWorkout.setRestTimeSetListener((CurrWorkout.RestTimeSetListener) this);
+        currWorkout.setTimerListener(this);
 
         return view;
     }

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.TableTxn.*;
-import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
+import static ca.judacribz.gainzassist.util.Misc.extractWorkout;
 import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
 
 public class WorkoutRepo {

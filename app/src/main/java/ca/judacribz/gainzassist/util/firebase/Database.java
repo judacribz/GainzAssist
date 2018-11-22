@@ -2,7 +2,6 @@ package ca.judacribz.gainzassist.util.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.SparseArray;
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
@@ -16,7 +15,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
-import static ca.judacribz.gainzassist.util.Helper.*;
+import static ca.judacribz.gainzassist.util.Misc.*;
 
 public class Database {
 

@@ -2,7 +2,6 @@ package ca.judacribz.gainzassist;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,7 +14,6 @@ import ca.judacribz.gainzassist.activities.authentication.Login;
 import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 
-import static ca.judacribz.gainzassist.util.Helper.getSharedPref;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class Main extends AppCompatActivity {

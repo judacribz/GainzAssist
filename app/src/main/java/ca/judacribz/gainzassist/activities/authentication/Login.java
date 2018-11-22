@@ -45,7 +45,7 @@ import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
 
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
-import static ca.judacribz.gainzassist.util.Helper.setUserInfoPref;
+import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
 
 public class Login extends AppCompatActivity implements /*FacebookCallback<LoginResult>,*/

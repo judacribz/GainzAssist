@@ -24,11 +24,11 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.*;
 import org.parceler.Parcels;
 
-import static ca.judacribz.gainzassist.util.Helper.*;
+import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT;
 
-public class StartWorkout extends AppCompatActivity {
+public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataListener {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -36,14 +36,13 @@ public class StartWorkout extends AppCompatActivity {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    WorkoutHelper workoutHelper;
     Workout workout;
-    ArrayList<Exercise> warmups, mainExercises;
+    ArrayList<Exercise> exercises;
 
     LayoutInflater layInflater;
     View setsView;
 
-    CurrWorkout currWorkout;
+    CurrWorkout currWorkout = CurrWorkout.getInstance();
 
     TextView tvExerciseName;
     RecyclerView setList;
@@ -58,21 +57,74 @@ public class StartWorkout extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
-        mainExercises = workout.getExercises();
-
-
+        workout = Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
+        exercises = workout.getExercises();
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
 
+        currWorkout.setContext(this);
+
         setCurrSession();
+    }
 
-        setupPager();
 
+    public void setCurrSession() {
+        currWorkout.setDataListener(this);
+
+        if (removeIncompleteWorkoutPref(this, workout.getName())) {
+//            currWorkout.setExInd(getIncompleteSessionPref(this, workout.getName()));
+            currWorkout.retrieveCurrWorkout(workout);
+
+            removeIncompleteSessionPref(this, workout.getName());
+        } //else {
+        currWorkout.setCurrWorkout(workout);
+//        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        currWorkout.reset();
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+
+        currWorkout.saveSessionState();
+
+        addIncompleteWorkoutPref(this, workout.getName());
+//        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        currWorkout.saveSessionState();
+
+        addIncompleteWorkoutPref(this, workout.getName());
+//        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
+    }
+    //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
+
+
+    // CurrWorkout.DataListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void warmupsGenerated(ArrayList<Exercise> warmups) {
+        setupPager(warmups);
     }
 
     /* Setup fragments with page with icons for the tab bar */
-    private void setupPager() {
+    private void setupPager(ArrayList<Exercise> warmups) {
         layInflater = getLayoutInflater();
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -107,59 +159,14 @@ public class StartWorkout extends AppCompatActivity {
 
         viewPager.setAdapter(new WorkoutPagerAdapter(
                 getSupportFragmentManager(),
-                mainExercises,
-                currWorkout.getWarmups())
-        );
+                exercises,
+                warmups
+        ));
         viewPager.setCurrentItem(1);
         viewPager.setOffscreenPageLimit(3);
     }
+    //CurrWorkout.DataListener//Override//////////////////////////////////////////////////////////
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return super.onSupportNavigateUp();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        currWorkout.reset();
-    }
-
-    @Override
-    protected void onUserLeaveHint() {
-        super.onUserLeaveHint();
-
-        currWorkout.saveSessionState();
-
-        addIncompleteWorkoutPref(this, workout.getName());
-        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
-        finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        currWorkout.saveSessionState();
-
-        addIncompleteWorkoutPref(this, workout.getName());
-        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
-    }
-
-
-    public void setCurrSession() {
-        currWorkout = CurrWorkout.getInstance();
-
-        if (removeIncompleteWorkoutPref(this, workout.getName())) {
-            currWorkout.setExInd(getIncompleteSessionPref(this, workout.getName()));
-
-            removeIncompleteSessionPref(this, workout.getName());
-        }
-
-        currWorkout.setCurrWorkout(workout);
-    }
-    //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds

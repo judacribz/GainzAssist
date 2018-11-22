@@ -244,7 +244,7 @@ public class Exercise {
     // ============================================================================================
 
 
-    /* Helper function used to store Exercise information in the firebase db */
+    /* Misc function used to store Exercise information in the firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object> exercise = new HashMap<>();
 
@@ -254,6 +254,25 @@ public class Exercise {
         exercise.put("sets", sets);
         exercise.put("reps", reps);
         exercise.put("weight", weight);
+
+
+        return exercise;
+    }
+
+    public Map<String, Object> setsToMap() {
+        Map<String, Object>
+                exercise = new HashMap<>(),
+                setMap = new HashMap<>();
+
+        exercise.put("name",      name);
+        exercise.put("type",      type);
+        exercise.put("equipment", equipment);
+
+        for (ExerciseSet set : setsList) {
+            setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
+        }
+
+        exercise.put("sets", setMap);
 
 
         return exercise;

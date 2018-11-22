@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ca.judacribz.gainzassist.util.Helper.exerciseToMap;
+import static ca.judacribz.gainzassist.util.Misc.exerciseToMap;
 
 @Parcel
 @Entity(tableName = "workouts",
@@ -80,9 +80,9 @@ public class Workout {
     // ============================================================================================
 
 
-    // Helper functions
+    // Misc functions
     // --------------------------------------------------------------------------------------------
-    /* Helper function used to store Workout information in the Firebase db */
+    /* Misc function used to store Workout information in the Firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();
         Map<String, Object> exs = exerciseToMap(exercises);

@@ -127,7 +127,7 @@ public class ExerciseSet {
     // ============================================================================================
 
 
-    // Helper function used to store ExerciseSet information in the firebase db
+    // Misc function used to store ExerciseSet information in the firebase db
     Map<String, Object> toMap() {
         Map<String, Object> exerciseSetMap = new HashMap<>();
 

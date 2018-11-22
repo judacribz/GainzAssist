@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.*;
-import static ca.judacribz.gainzassist.util.Helper.exerciseToMap;
+import static ca.judacribz.gainzassist.util.Misc.exerciseSetsToMap;
+import static ca.judacribz.gainzassist.util.Misc.exerciseToMap;
+import static ca.judacribz.gainzassist.util.Preferences.*;
 
 @Entity(tableName = "sessions",
         foreignKeys =
@@ -116,7 +118,7 @@ public class Session {
         avgWeights.put(exerciseName, weight/ exerciseSets.size() + weightChange);
     }
 
-    /* Helper function used to store Session information in the firebase db */
+    /* Misc function used to store Session information in the firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object>
                 sessionMap = new HashMap<>(),
@@ -142,19 +144,20 @@ public class Session {
 
     public Map<String, Object> sessionStateMap(ArrayList<Exercise> mains,
                                                ArrayList<Exercise> warmups,
-                                               int exerciseIndex) {
+                                               int exerciseIndex,
+                                               int setIndex) {
         Map<String, Object>
                 sessionStateMap = new HashMap<>(),
                 sessionMap = this.toMap(),
                 mainsMap = exerciseToMap(mains),
-                warmupsMap = exerciseToMap(warmups);
+                warmupsMap = exerciseSetsToMap(warmups);
 
-        sessionStateMap.put("session", sessionMap);
-        sessionStateMap.put("main exercises", mainsMap);
-        sessionStateMap.put("warmup exercises", warmupsMap);
-        sessionStateMap.put("exercise index", exerciseIndex);
+        sessionStateMap.put(SESSION, sessionMap);
+        sessionStateMap.put(MAIN_EXERCISES, mainsMap);
+        sessionStateMap.put(WARMUP_EXERCISES, warmupsMap);
+        sessionStateMap.put(EXERCISE_INDEX, exerciseIndex);
+        sessionStateMap.put(SET_INDEX, setIndex);
 
         return  sessionStateMap;
-
     }
 }

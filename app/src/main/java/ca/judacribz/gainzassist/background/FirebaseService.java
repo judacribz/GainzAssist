@@ -3,22 +3,19 @@ package ca.judacribz.gainzassist.background;
 import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.*;
 import ca.judacribz.gainzassist.models.db.WorkoutRepo;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
-import static ca.judacribz.gainzassist.util.Helper.extractSession;
+import static ca.judacribz.gainzassist.util.Misc.extractSession;
 import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef;
 import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
-import static ca.judacribz.gainzassist.util.Helper.extractWorkout;
 
 
 public class FirebaseService extends IntentService implements

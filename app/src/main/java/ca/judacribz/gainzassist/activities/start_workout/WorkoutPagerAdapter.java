@@ -17,8 +17,10 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    final public static String EXTRA_WARMUPS = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS";
-    final public static String EXTRA_MAIN_EXERCISES = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES";
+    final public static String EXTRA_WARMUPS =
+            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS";
+    final public static String EXTRA_MAIN_EXERCISES =
+            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES";
     final private static Fragment[] FMTS = new Fragment[] {
             WarmupsList.newInstance(),
             WorkoutScreen.newInstance(),
