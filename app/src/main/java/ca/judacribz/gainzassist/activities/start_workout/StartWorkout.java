@@ -131,6 +131,8 @@ public class StartWorkout extends AppCompatActivity {
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
 
+        currWorkout.saveSessionState();
+
         addIncompleteWorkoutPref(this, workout.getName());
         addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
         finish();
@@ -139,6 +141,8 @@ public class StartWorkout extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        currWorkout.saveSessionState();
+
         addIncompleteWorkoutPref(this, workout.getName());
         addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
     }

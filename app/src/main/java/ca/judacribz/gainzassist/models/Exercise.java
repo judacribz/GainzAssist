@@ -245,7 +245,7 @@ public class Exercise {
 
 
     /* Helper function used to store Exercise information in the firebase db */
-    Map<String, Object> toMap() {
+    public Map<String, Object> toMap() {
         Map<String, Object> exercise = new HashMap<>();
 
         exercise.put("name",      name);

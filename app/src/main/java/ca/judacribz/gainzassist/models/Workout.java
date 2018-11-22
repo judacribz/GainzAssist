@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static ca.judacribz.gainzassist.util.Helper.exerciseToMap;
+
 @Parcel
 @Entity(tableName = "workouts",
         indices = {@Index(value = {"name"}, unique = true)})
@@ -83,11 +85,7 @@ public class Workout {
     /* Helper function used to store Workout information in the Firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();
-        Map<String, Object> exs = new HashMap<>();
-
-        for (Exercise exercise: exercises) {
-            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.toMap());
-        }
+        Map<String, Object> exs = exerciseToMap(exercises);
 
         workout.put("exercises", exs);
 

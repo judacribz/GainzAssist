@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.*;
+import static ca.judacribz.gainzassist.util.Helper.exerciseToMap;
 
 @Entity(tableName = "sessions",
         foreignKeys =
@@ -42,12 +43,6 @@ public class Session {
     Map<String, Float> avgWeights = new HashMap<>();
 
 
-    @Ignore
-    Workout currWorkout;
-    @Ignore
-    ArrayList<Exercise> currMains, currWarmups;
-    @Ignore
-    int exerciseIndex = -1;
 
     // --------------------------------------------------------------------------------------------
 
@@ -101,38 +96,6 @@ public class Session {
     }
 
 
-    public Workout getCurrWorkout() {
-        return currWorkout;
-    }
-
-    public void setCurrWorkout(Workout currWorkout) {
-        this.currWorkout = currWorkout;
-    }
-
-    public ArrayList<Exercise> getCurrMains() {
-        return currMains;
-    }
-
-    public void setCurrMains(ArrayList<Exercise> currMains) {
-        this.currMains = currMains;
-    }
-
-    public ArrayList<Exercise> getCurrWarmups() {
-        return currWarmups;
-    }
-
-    public void setCurrWarmups(ArrayList<Exercise> currWarmups) {
-        this.currWarmups = currWarmups;
-    }
-
-    public int getExerciseIndex() {
-        return exerciseIndex;
-    }
-
-    public void setExerciseIndex(int exerciseIndex) {
-        this.exerciseIndex = exerciseIndex;
-    }
-
     public Map<String, ArrayList<ExerciseSet>> getSessionSets() {
         return sessionSets;
     }
@@ -155,9 +118,10 @@ public class Session {
 
     /* Helper function used to store Session information in the firebase db */
     public Map<String, Object> toMap() {
-        Map<String, Object> sessionMap = new HashMap<>();
-        Map<String, Object> exMap = new HashMap<>();
-        Map<String, Object> setMap;
+        Map<String, Object>
+                sessionMap = new HashMap<>(),
+                exMap = new HashMap<>(),
+                setMap;
 
         sessionMap.put("workoutName", workoutName);
 
@@ -173,6 +137,24 @@ public class Session {
         sessionMap.put("sets", exMap);
 
         return  sessionMap;
+
+    }
+
+    public Map<String, Object> sessionStateMap(ArrayList<Exercise> mains,
+                                               ArrayList<Exercise> warmups,
+                                               int exerciseIndex) {
+        Map<String, Object>
+                sessionStateMap = new HashMap<>(),
+                sessionMap = this.toMap(),
+                mainsMap = exerciseToMap(mains),
+                warmupsMap = exerciseToMap(warmups);
+
+        sessionStateMap.put("session", sessionMap);
+        sessionStateMap.put("main exercises", mainsMap);
+        sessionStateMap.put("warmup exercises", warmupsMap);
+        sessionStateMap.put("exercise index", exerciseIndex);
+
+        return  sessionStateMap;
 
     }
 }

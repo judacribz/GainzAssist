@@ -8,8 +8,12 @@ import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
@@ -161,26 +165,22 @@ public class CurrWorkout {
     }
 
     private void setCurrMainExercises(ArrayList<Exercise> exercises) {
-        this.currSession.setCurrMains(exercises);
         this.currMains = exercises;
         this.numMains = exercises.size();
     }
 
     private void setCurrWarmupExercises(ArrayList<Exercise> exercises) {
-        this.currSession.setCurrWarmups(exercises);
         this.currWarmups = exercises;
         this.numWarmups = exercises.size();
     }
 
     private void setAllCurrExercises(ArrayList<Exercise> allExercises ) {
-        this.currSession.setCurrWorkout(this.currWorkout);
         this.currWorkout.setExercises(allExercises);
 
 
         if (this.ex_i == -1) {
             this.ex_i = 0;
         }
-        this.currSession.setExerciseIndex(this.ex_i);
 
         setCurrExercise(currWorkout.getExercise(this.ex_i));
     }
@@ -196,16 +196,17 @@ public class CurrWorkout {
 
         // End of sets for an exercise
         if (atEndOfSets()) {
-            currSession.setExerciseIndex(this.ex_i);
             this.ex_i++;
 
-            currSession.addExerciseSets(currExercise.getName(), finishedSets, currWeightChange);
+            this.currSession.addExerciseSets(currExercise.getName(), finishedSets, currWeightChange);
 
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
-                currSession.setTimestamp(-1);
+                this.currSession.setTimestamp(-1);
 
-                ViewModelProviders.of((FragmentActivity) context).get(WorkoutViewModel.class).insertSession(currSession);
+                ViewModelProviders.of((FragmentActivity) context)
+                        .get(WorkoutViewModel.class)
+                        .insertSession(this.currSession);
 
                 return false;
 
@@ -380,5 +381,17 @@ public class CurrWorkout {
     void reset() {
         this.ex_i = 0;
         this.set_i = 0;
+    }
+
+    public void saveSessionState() {
+        try {
+            String json = new ObjectMapper().writeValueAsString((this.currSession.sessionStateMap(currMains, currWarmups, ex_i)));
+            com.orhanobut.logger.Logger.d(json);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+
+
     }
 }

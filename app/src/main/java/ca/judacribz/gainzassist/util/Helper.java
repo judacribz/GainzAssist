@@ -15,10 +15,7 @@ import com.google.gson.reflect.TypeToken;
 import com.orhanobut.logger.Logger;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Helper {
     private static final String EMAIL = "email";
@@ -158,5 +155,15 @@ public class Helper {
         }
 
         return null;
+    }
+
+
+    public static Map<String, Object> exerciseToMap(ArrayList<Exercise> exercises)  {
+        Map<String, Object> exs = new HashMap<>();
+        for (Exercise exercise: exercises) {
+            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.toMap());
+        }
+
+        return exs;
     }
 }
