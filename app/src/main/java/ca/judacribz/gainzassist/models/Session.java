@@ -142,19 +142,12 @@ public class Session {
 
     }
 
-    public Map<String, Object> sessionStateMap(ArrayList<Exercise> mains,
-                                               ArrayList<Exercise> warmups,
-                                               int exerciseIndex,
-                                               int setIndex) {
+    public Map<String, Object> sessionStateMap(int exerciseIndex, int setIndex) {
         Map<String, Object>
                 sessionStateMap = new HashMap<>(),
-                sessionMap = this.toMap(),
-                mainsMap = exerciseToMap(mains),
-                warmupsMap = exerciseSetsToMap(warmups);
+                sessionMap = this.toMap();
 
         sessionStateMap.put(SESSION, sessionMap);
-        sessionStateMap.put(MAIN_EXERCISES, mainsMap);
-        sessionStateMap.put(WARMUP_EXERCISES, warmupsMap);
         sessionStateMap.put(EXERCISE_INDEX, exerciseIndex);
         sessionStateMap.put(SET_INDEX, setIndex);
 

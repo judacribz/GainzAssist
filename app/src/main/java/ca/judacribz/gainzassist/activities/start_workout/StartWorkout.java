@@ -76,9 +76,9 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
             currWorkout.retrieveCurrWorkout(workout);
 
             removeIncompleteSessionPref(this, workout.getName());
-        } //else {
-        currWorkout.setCurrWorkout(workout);
-//        }
+        } else {
+            currWorkout.setCurrWorkout(workout);
+        }
     }
 
     @Override

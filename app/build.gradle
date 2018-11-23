@@ -84,6 +84,7 @@ dependencies {
 
 
     implementation 'com.orhanobut:logger:2.2.0'
+    implementation 'me.grantland:autofittextview:0.2.1'
 
     testImplementation 'junit:junit:4.12'
 }

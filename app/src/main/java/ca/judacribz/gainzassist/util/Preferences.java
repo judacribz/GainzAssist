@@ -18,6 +18,9 @@ public class Preferences {
     public static final String EXERCISE_INDEX = "exercise index";
     public static final String SET_INDEX = "set index";
     public static final String SESSION = "session";
+    public static final String SETS = "sets";
+    public static final String REPS = "reps";
+    public static final String WEIGHT = "weight";
 
     // User Info
     // -------------------------------------------------------------------------------------------

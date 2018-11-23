@@ -8,7 +8,6 @@ import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -19,7 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
@@ -111,6 +111,61 @@ public class CurrWorkout {
         this.context = context;
     }
 
+    void retrieveCurrWorkout(Workout workout) {
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            map = mapper.readValue(
+                    getIncompleteSessionPref(context, workout.getName()),
+                    new TypeReference<Map<String, Object>>(){}
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            setRetrievedWorkout(map, workout);
+        }
+    }
+
+    private void setRetrievedWorkout(Map<String, Object> map, Workout workout) {
+        Map<String, Object> sessionMap;
+        Map<String, Object> exMap, setMap;
+        ArrayList<ExerciseSet> warmupSets;
+
+        currWarmups = new ArrayList<>();
+        this.currWorkout = workout;
+        this.currSession = new Session(workout);
+
+        this.ex_i = Integer.valueOf(String.valueOf(map.get(EXERCISE_INDEX)));
+        this.set_i = Integer.valueOf(String.valueOf(map.get(SET_INDEX)));
+
+        sessionMap =  readValue(readValue(map.get(SESSION)).get(SETS));
+        for (int i = 0; i < this.ex_i; i++) {
+            //TODO index is for allexes...change
+            Exercise exercise = workout.getExercise(i);
+            setCurrEquip(exercise.getEquipment());
+            exMap = readValue(sessionMap.get(exercise.getName()));
+
+            this.finishedSets = new ArrayList<>();
+            for (Map.Entry<String, Object> exEntry : exMap.entrySet()) {
+                setMap = readValue(exEntry.getValue());
+                this.finishedSets.add(new ExerciseSet(
+                        exercise,
+                        Integer.valueOf(exEntry.getKey()),
+                        Integer.valueOf(String.valueOf(setMap.get(REPS))),
+                        Float.valueOf(String.valueOf(setMap.get(WEIGHT)))
+                ));
+            }
+
+            this.currSession.addExerciseSets(
+                    exercise.getName(),
+                    this.finishedSets,
+                    this.currWeightChange
+            );
+        }
+
+
+        genWarmups(workout.getExercises());
+    }
 
     void setCurrWorkout(Workout workout) {
         this.currWorkout = workout;
@@ -179,68 +234,6 @@ public class CurrWorkout {
 
         setCurrWarmupExercises(warmups);
         setAllCurrExercises(allExs);
-    }
-
-    void retrieveCurrWorkout(Workout workout) {
-        this.currWorkout = workout;
-        Map<String, Object> map = new HashMap<>();
-
-        try {
-            map = mapper.readValue(
-                    getIncompleteSessionPref(context, workout.getName()),
-                    new TypeReference<Map<String, Object>>(){}
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            setRetrievedWorkout(map);
-        }
-    }
-
-    private void setRetrievedWorkout(Map<String, Object> map) {
-        Map<String, Object>
-                warmupsMap,
-                sessionMap,
-                mainsMap;
-        Map<String, Object> exMap, setsMap, setMap;
-        ArrayList<ExerciseSet> warmupSets;
-
-        currWarmups = new ArrayList<>();
-
-        warmupsMap =  readValue(map.get(WARMUP_EXERCISES));
-        mainsMap =  readValue(map.get(MAIN_EXERCISES));
-        sessionMap =  readValue(map.get(SESSION));
-        this.ex_i = Integer.valueOf(String.valueOf(map.get(EXERCISE_INDEX)));
-        this.set_i = Integer.valueOf(String.valueOf(map.get(SET_INDEX)));
-
-        for (Map.Entry<String, Object> warmupEntry : warmupsMap.entrySet()) {
-            exMap = readValue(warmupEntry.getValue());
-
-            warmupSets = new ArrayList<>();
-            setsMap = readValue(exMap.get("sets"));
-            String exerciseName = String.valueOf(exMap.get("name"));
-            for (Map.Entry<String, Object> setEntry : setsMap.entrySet()) {
-                setMap = readValue(setEntry.getValue());
-
-                warmupSets.add(new ExerciseSet(
-                        -1,
-                        exerciseName,
-                        Integer.valueOf(setEntry.getKey()),
-                        Integer.valueOf(String.valueOf(setMap.get("reps"))),
-                        Float.valueOf(String.valueOf(setMap.get("weight")))
-                ));
-            }
-
-            currWarmups.add(new Exercise(
-                    Integer.valueOf(warmupEntry.getKey()),
-                    exerciseName,
-                    String.valueOf(exMap.get("type")),
-                    String.valueOf(exMap.get("equipment")),
-                    warmupSets,
-                    WARMUP_SET
-            ));
-        }
-
     }
 
     private void setCurrMainExercises(ArrayList<Exercise> exercises) {
@@ -469,8 +462,6 @@ public class CurrWorkout {
     void saveSessionState() {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         String jsonStr = writeValueAsString(this.currSession.sessionStateMap(
-                currMains,
-                currWarmups,
                 ex_i,
                 set_i
         ));
