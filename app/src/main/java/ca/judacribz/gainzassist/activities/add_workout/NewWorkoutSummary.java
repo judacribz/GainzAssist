@@ -272,7 +272,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     }
 Exercise ex;
     private void updateExerciseArea(String exName) {
-        ex = workout.getExercise(exName);
+        ex = workout.getExerciseFromName(exName);
         etExerciseName.setText(exName);
         etNumSets.setText(String.valueOf(ex.getSets()));
         etNumReps.setText(String.valueOf(ex.getReps()));

@@ -59,16 +59,25 @@ public class Workout {
         exercises.add(exercise);
     }
 
-    public Exercise getExercise(String exName) {
-            for (Exercise exercise : exercises) {
-                if (exercise.getName().equals(exName)) {
-                    return exercise;
-                }
-            }
+    public int getExerciseNumber(String exerciseName) {
+        Exercise ex = getExerciseFromName(exerciseName);
 
-            return null;
+        return (ex != null) ? ex.getExerciseNumber() : -1;
     }
 
+    public Exercise getExerciseFromName(String exName) {
+        for (Exercise exercise : exercises) {
+            if (exercise.getName().equals(exName)) {
+                return exercise;
+            }
+        }
+
+        return null;
+    }
+
+    public Exercise getExerciseFromIndex(int exIndex) {
+        return this.exercises.get(exIndex);
+    }
 
     public ArrayList<Exercise> getExercises() {
         return exercises;
@@ -104,16 +113,6 @@ public class Workout {
         return false;
     }
 
-    public int getExerciseNumber(String exerciseName) {
-        for (Exercise exercise : exercises) {
-            if (exercise.getName().toLowerCase().equals(exerciseName.toLowerCase())) {
-                return exercise.getExerciseNumber();
-            }
-        }
-
-        return -1;
-    }
-
     public ArrayList<String> getExerciseNames() {
         ArrayList<String> exerciseNames = new ArrayList<>();
         for (Exercise exercise : exercises) {
@@ -125,10 +124,6 @@ public class Workout {
 
     public void setExercises(ArrayList<Exercise> exercises) {
         this.exercises = exercises;
-    }
-
-    public Exercise getExercise(int exIndex) {
-        return this.exercises.get(exIndex);
     }
 
     public int getNumExercises() {

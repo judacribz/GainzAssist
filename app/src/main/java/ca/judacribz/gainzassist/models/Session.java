@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,8 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.*;
-import static ca.judacribz.gainzassist.util.Misc.exerciseSetsToMap;
-import static ca.judacribz.gainzassist.util.Misc.exerciseToMap;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 
 @Entity(tableName = "sessions",
@@ -39,7 +38,7 @@ public class Session {
     String workoutName;
 
     @Ignore
-    Map<String, ArrayList<ExerciseSet>> sessionSets = new HashMap<>();
+    SparseArray<ArrayList<ExerciseSet>> sessionSets = new SparseArray<>();
 
     @Ignore
     Map<String, Float> avgWeights = new HashMap<>();
@@ -98,7 +97,7 @@ public class Session {
     }
 
 
-    public Map<String, ArrayList<ExerciseSet>> getSessionSets() {
+    public SparseArray<ArrayList<ExerciseSet>> getSessionSets() {
         return sessionSets;
     }
 
@@ -107,15 +106,15 @@ public class Session {
     }
     // ============================================================================================
 
-    public void addExerciseSets(String exerciseName, ArrayList<ExerciseSet> exerciseSets, float weightChange) {
-        sessionSets.put(exerciseName, exerciseSets);
+    public void addExerciseSets(Exercise exercise, ArrayList<ExerciseSet> exerciseSets, float weightChange) {
+        this.sessionSets.put(exercise.getExerciseNumber(), exerciseSets);
 
         float weight = 0.0f;
         for (ExerciseSet exerciseSet : exerciseSets) {
             weight += exerciseSet.getWeight();
         }
 
-        avgWeights.put(exerciseName, weight/ exerciseSets.size() + weightChange);
+        this.avgWeights.put(exercise.getName(), weight/ exerciseSets.size() + weightChange);
     }
 
     /* Misc function used to store Session information in the firebase db */
@@ -127,16 +126,16 @@ public class Session {
 
         sessionMap.put("workoutName", workoutName);
 
-        for (Map.Entry<String, ArrayList<ExerciseSet>> exSets : sessionSets.entrySet()){
+        for (int i = 0; i < sessionSets.size(); i++){
 
             setMap = new HashMap<>();
-            for (ExerciseSet exerciseSet : exSets.getValue()) {
+            for (ExerciseSet exerciseSet : sessionSets.get(i)) {
                 setMap.put(String.valueOf(exerciseSet.getSetNumber()), exerciseSet.toMap());
             }
-            exMap.put(exSets.getKey(), setMap);
+            exMap.put(String.valueOf(i), setMap);
         }
 
-        sessionMap.put("sets", exMap);
+        sessionMap.put(SETS, exMap);
 
         return  sessionMap;
 

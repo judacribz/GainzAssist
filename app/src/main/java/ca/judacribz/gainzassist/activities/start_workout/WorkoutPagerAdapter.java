@@ -26,13 +26,18 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
             WorkoutScreen.newInstance(),
             ExercisesList.newInstance()
     };
+
+    final private static Fragment[] FMTS_NO_WARMUPS = new Fragment[] {
+            WorkoutScreen.newInstance(),
+            ExercisesList.newInstance()
+    };
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
     private Bundle bundle = new Bundle();
     // --------------------------------------------------------------------------------------------
-
+    Fragment[] fmts = FMTS;
     // ######################################################################################### //
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
@@ -42,9 +47,14 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
 //        Log.d("WARMUPS", "reps" + warmups.get(0).getSetsList().size());
         bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]));
-        bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]));
+        ArrayList<Exercise> warmups = exercises[1];
 
-        for (Fragment fmt : FMTS) {
+        if (warmups.size() > 0) {
+            bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]));
+        } else {
+            fmts = FMTS_NO_WARMUPS;
+        }
+        for (Fragment fmt : fmts) {
             fmt.setArguments(bundle);
         }
     }
@@ -55,13 +65,14 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     /* Returns total number of pages */
     @Override
     public int getCount() {
-        return FMTS.length;
+        return fmts.length;
     }
 
     /* Returns the fragment to display for that page */
     @Override
     public Fragment getItem(int position) {
-        return FMTS[position];
+        return fmts[position];
     }
     //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
+
 }

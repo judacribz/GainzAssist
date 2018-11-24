@@ -8,19 +8,15 @@ import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.orhanobut.logger.Logger;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
 import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
+import static ca.judacribz.gainzassist.util.Misc.enablePrettyMapper;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
 import static ca.judacribz.gainzassist.util.Preferences.*;
@@ -64,17 +60,17 @@ public class CurrWorkout {
             numMains;
     private long currRestTime;
 
-    private Session currSession;
+    private Session currSession = null;
     private ArrayList<ExerciseSet> finishedSets = new ArrayList<>();
 
     private Context context;
-    private ObjectMapper mapper = new ObjectMapper();
     // --------------------------------------------------------------------------------------------
 
 
     // Interfaces
     // --------------------------------------------------------------------------------------------
     private TimerListener timerListener;
+
     public interface TimerListener {
         public void startTimer(long timeInMillis);
     }
@@ -112,18 +108,8 @@ public class CurrWorkout {
     }
 
     void retrieveCurrWorkout(Workout workout) {
-        Map<String, Object> map = new HashMap<>();
+            setRetrievedWorkout(readValue(getIncompleteSessionPref(context, workout.getName())), workout);
 
-        try {
-            map = mapper.readValue(
-                    getIncompleteSessionPref(context, workout.getName()),
-                    new TypeReference<Map<String, Object>>(){}
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            setRetrievedWorkout(map, workout);
-        }
     }
 
     private void setRetrievedWorkout(Map<String, Object> map, Workout workout) {
@@ -139,11 +125,11 @@ public class CurrWorkout {
         this.set_i = Integer.valueOf(String.valueOf(map.get(SET_INDEX)));
 
         sessionMap =  readValue(readValue(map.get(SESSION)).get(SETS));
-        for (int i = 0; i < this.ex_i; i++) {
-            //TODO index is for allexes...change
-            Exercise exercise = workout.getExercise(i);
+        for (Map.Entry<String, Object> sessEntry : sessionMap.entrySet()) {
+            String exNum = sessEntry.getKey();
+            Exercise exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
             setCurrEquip(exercise.getEquipment());
-            exMap = readValue(sessionMap.get(exercise.getName()));
+            exMap = readValue(sessionMap.get(exNum));
 
             this.finishedSets = new ArrayList<>();
             for (Map.Entry<String, Object> exEntry : exMap.entrySet()) {
@@ -157,14 +143,19 @@ public class CurrWorkout {
             }
 
             this.currSession.addExerciseSets(
-                    exercise.getName(),
+                    exercise,
                     this.finishedSets,
                     this.currWeightChange
             );
         }
 
-
         genWarmups(workout.getExercises());
+
+        enablePrettyMapper();
+        writeValueAsString(this.currSession.sessionStateMap(
+                ex_i,
+                set_i
+        ));
     }
 
     void setCurrWorkout(Workout workout) {
@@ -255,16 +246,17 @@ public class CurrWorkout {
             this.ex_i = 0;
         }
 
-        setCurrExercise(currWorkout.getExercise(this.ex_i));
+        setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
     }
 
     public boolean finishCurrSet() {
         this.set_i++;
 
-        if (currExercise.getSetsType() == MAIN_SET) {
+        if (!getIsWarmup()) {
             currExerciseSet.setReps(currReps);
             currExerciseSet.setWeight(currWeight);
             finishedSets.add(currExerciseSet);
+            Logger.d("I should not be in here");
         }
 
         // End of sets for an exercise
@@ -272,7 +264,8 @@ public class CurrWorkout {
             this.set_i = 0;
             this.ex_i++;
 
-            this.currSession.addExerciseSets(currExercise.getName(), finishedSets, currWeightChange);
+            Logger.d(this.currExercise.getName());
+            this.currSession.addExerciseSets(this.currExercise, finishedSets, currWeightChange);
 
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
@@ -282,16 +275,17 @@ public class CurrWorkout {
                         .get(WorkoutViewModel.class)
                         .insertSession(this.currSession);
 
+                removeSessPrefAndSetWorkout();
                 return false;
 
             // Not end of all exercises, set next exercise
             } else {
-                setCurrExercise(currWorkout.getExercise(this.ex_i));
-            }
-
-            if (currExercise.getSetsType() == MAIN_SET) {
+                setCurrExercise(currWorkout.getExerciseFromIndex(this.ex_i));
                 finishedSets = new ArrayList<>();
             }
+
+
+
 
         // End of set, set next set from current exercise
         } else {
@@ -319,6 +313,14 @@ public class CurrWorkout {
 
     private void setCurrExercise(Exercise exercise) {
         this.currExercise = exercise;
+        if (getIsWarmup()) {
+            this.finishedSets = new ArrayList<>();
+        } else {
+            if (this.finishedSets.size() - 1 == this.set_i) {
+                this.finishedSets = new ArrayList<>();
+            }
+        }
+
         setCurrEquip(this.currExercise.getEquipment());
 
         if (this.set_i == -1) {
@@ -460,7 +462,12 @@ public class CurrWorkout {
     }
 
     void saveSessionState() {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        if (!getIsWarmup() && !finishedSets.isEmpty()) {
+            this.currSession.addExerciseSets(this.currExercise, this.finishedSets, this.currWeightChange);
+        }
+
+        enablePrettyMapper();
         String jsonStr = writeValueAsString(this.currSession.sessionStateMap(
                 ex_i,
                 set_i
@@ -472,8 +479,13 @@ public class CurrWorkout {
                     getWorkoutName(),
                     jsonStr
             );
-            Logger.d(jsonStr);
         }
 
+    }
+
+    private void removeSessPrefAndSetWorkout() {
+        if (removeIncompleteWorkoutPref(context, currWorkout.getName())) {
+            removeIncompleteSessionPref(context, currWorkout.getName());
+        }
     }
 }

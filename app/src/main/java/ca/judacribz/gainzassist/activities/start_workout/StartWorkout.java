@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import butterknife.*;
 import java.util.ArrayList;
 
@@ -63,16 +64,21 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         setTheme(R.style.WorkoutTheme);
 
         currWorkout.setContext(this);
-
-        setCurrSession();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (viewPager.getAdapter() == null) {
+            setCurrSession();
+        }
+    }
 
     public void setCurrSession() {
         currWorkout.setDataListener(this);
 
         if (removeIncompleteWorkoutPref(this, workout.getName())) {
-//            currWorkout.setExInd(getIncompleteSessionPref(this, workout.getName()));
             currWorkout.retrieveCurrWorkout(workout);
 
             removeIncompleteSessionPref(this, workout.getName());
@@ -90,8 +96,6 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     @Override
     protected void onStop() {
         super.onStop();
-
-        currWorkout.reset();
     }
 
     @Override
@@ -102,7 +106,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
 
         addIncompleteWorkoutPref(this, workout.getName());
 //        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
-        finish();
+//        finish();
     }
 
     @Override
@@ -157,12 +161,16 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
             }
         });
 
+        if (warmups.size() == 0) {
+            tabLayout.removeTabAt(0);
+        }
+
         viewPager.setAdapter(new WorkoutPagerAdapter(
                 getSupportFragmentManager(),
                 exercises,
                 warmups
         ));
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(tabLayout.getTabCount() - 2);
         viewPager.setOffscreenPageLimit(3);
     }
     //CurrWorkout.DataListener//Override//////////////////////////////////////////////////////////

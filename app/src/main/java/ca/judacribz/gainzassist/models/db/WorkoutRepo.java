@@ -334,8 +334,9 @@ public class WorkoutRepo {
                         sessionDao.insert(session);
                         id = sessionDao.getId(timestamp);
 
-                        for (Map.Entry<String, ArrayList<ExerciseSet>> exSets : session.getSessionSets().entrySet()){
-                            for (ExerciseSet exerciseSet : exSets.getValue()) {
+                        SparseArray<ArrayList<ExerciseSet>> exSets = session.getSessionSets();
+                        for (int i = 0; i < exSets.size(); i++){
+                            for (ExerciseSet exerciseSet : exSets.get(i)) {
                                 exerciseSet.setSessionId(id);
 
                                 insertSet(exerciseSet);

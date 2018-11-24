@@ -44,9 +44,6 @@ public class Preferences {
             incompleteWorkouts = new HashSet<>();
         }
         incompleteWorkouts.add(workoutName);
-
-        Logger.d(incompleteWorkouts);
-
         addIncompleteWorkoutPref(context, incompleteWorkouts);
     }
 

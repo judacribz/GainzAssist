@@ -9,13 +9,17 @@ import ca.judacribz.gainzassist.models.Workout;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.firebase.database.DataSnapshot;
+import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.util.*;
 
 
 public class Misc {
+
+    private static ObjectMapper mapper = new ObjectMapper();
 
     @SuppressWarnings("deprecation")
     public static boolean isMyServiceRunning(Activity act, Class<?> serviceClass) {
@@ -92,7 +96,7 @@ public class Misc {
 
         return exs;
     }
-    private static ObjectMapper mapper = new ObjectMapper();
+
 
     public static String writeValueAsString(Object object) {
         String jsonStr = "";
@@ -103,16 +107,23 @@ public class Misc {
             e.printStackTrace();
         }
 
+        Logger.d(jsonStr);
         return  jsonStr;
     }
-
+    public static void enablePrettyMapper() {
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
 
     public static Map<String, Object> readValue(Object childObj) {
+        return readValue(writeValueAsString(childObj));
+    }
+
+    public static Map<String, Object> readValue(String childStr) {
         Map<String, Object> childMap = new HashMap<>();
 
         try {
-            mapper.readValue(
-                    writeValueAsString(childObj),
+            childMap = mapper.readValue(
+                    childStr,
                     new TypeReference<Map<String, Object>>() {}
             );
         } catch (IOException ioe) {
