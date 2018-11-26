@@ -59,6 +59,7 @@ public class CurrWorkout {
             numWarmups,
             numMains;
     private long currRestTime;
+    private boolean timerSet;
 
     private Session currSession = null;
     private ArrayList<ExerciseSet> finishedSets = new ArrayList<>();
@@ -72,7 +73,7 @@ public class CurrWorkout {
     private TimerListener timerListener;
 
     public interface TimerListener {
-        public void startTimer(long timeInMillis);
+        void startTimer(long timeInMillis);
     }
     public void setTimerListener(TimerListener timerListener) {
         this.timerListener = timerListener;
@@ -270,12 +271,13 @@ public class CurrWorkout {
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
                 this.currSession.setTimestamp(-1);
-
                 ViewModelProviders.of((FragmentActivity) context)
                         .get(WorkoutViewModel.class)
                         .insertSession(this.currSession);
 
                 removeSessPrefAndSetWorkout();
+                resetIndices();
+
                 return false;
 
             // Not end of all exercises, set next exercise
@@ -402,7 +404,7 @@ public class CurrWorkout {
 
         return this.currReps == MIN_REPS;
     }
-    boolean timerSet;
+
     private void setCurrRestTime() {
         this.currRestTime =  (this.currExerciseSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
 
@@ -456,7 +458,7 @@ public class CurrWorkout {
         return this.currSession;
     }
 
-    void reset() {
+    private void resetIndices() {
         this.ex_i = 0;
         this.set_i = 0;
     }
