@@ -39,10 +39,6 @@
     <string name="hint_reps"><i>Reps</i></string>
     <string name="hint_sets"><i>Sets</i></string>
 
-    <!-- Facebook Login Config -->
-    <string name="fb_app_id">529898790716957</string>
-    <string name="fb_login_protocol_scheme">fb529898790716957</string>
-
     <!-- Phrases -->
     <string name="txt_no_account">Don\'t have an account?\ </string>
     <string name="txt_sign_up_here">Sign up here!</string>

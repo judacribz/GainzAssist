@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -16,6 +17,10 @@ import android.widget.Toast;
 import butterknife.ButterKnife;
 
 import ca.judacribz.gainzassist.R;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringSystem;
+import com.facebook.rebound.SpringUtil;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class UI {
@@ -174,4 +179,33 @@ public class UI {
 //
 //            return dbFile.exists();
 //        }
+
+    public static Spring setSpring(final View view) {
+        // Create a system to run the physics loop for a set of springs.
+        SpringSystem springSystem = SpringSystem.create();
+
+        // Add a spring to the system.
+        Spring spring = springSystem.createSpring();
+        // Add a listener to observe the motion of the spring.
+        spring.addListener(new SimpleSpringListener() {
+
+            @Override
+            public void onSpringUpdate(Spring spring) {
+                // You can observe the updates in the spring
+                // state by asking its current value in onSpringUpdate.
+                float value = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1, 1, 0);
+//                float value = (float) spring.getCurrentValue();
+//                float scale = 1f - (value * 0.9f);
+                view.setScaleX(value);
+                view.setScaleY(value);
+
+                if (spring.isAtRest()) {
+                    spring.setEndValue(0);
+                }
+            }
+        });
+
+        // Set the spring in motion; moving from 0 to 1
+        return spring;
+    }
 }

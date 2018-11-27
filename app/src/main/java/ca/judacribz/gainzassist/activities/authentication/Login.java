@@ -20,6 +20,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;;
+import com.facebook.*;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.facebook.rebound.Spring;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -27,28 +32,25 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.EmailAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import java.io.IOException;
-import java.util.Objects;
+import com.google.firebase.auth.*;
 
-import com.google.firebase.auth.GoogleAuthProvider;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
-
+import ca.judacribz.gainzassist.R;
+import static ca.judacribz.gainzassist.util.UI.setSpring;
 import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
-
 import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
 
-public class Login extends AppCompatActivity implements /*FacebookCallback<LoginResult>,*/
+public class Login extends AppCompatActivity implements FacebookCallback<LoginResult>,
                                                         FirebaseAuth.AuthStateListener {
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -62,10 +64,10 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     // Global Vars
     // --------------------------------------------------------------------------------------------
     FirebaseAuth auth;
-    AuthCredential credential;
-    AuthCredential googleCred;
+    AuthCredential credential, googleCred;
     GoogleSignInOptions signInOptions;
     GoogleSignInClient signInClient;
+    CallbackManager callbackManager;
 
     String email, password;
     Animation slide_end;
@@ -84,7 +86,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     @BindView(R.id.iv_sign_up_image) ImageView ivSignUpImg;
 
     @BindView(R.id.btn_google_sign_in) SignInButton btnGoogle;
-//    @BindView(R.id.btn_facebook_login) LoginButton btnFacebook;
+    @BindView(R.id.btn_facebook_sign_in) LoginButton btnFacebook;
     @BindView(R.id.btn_login) Button btnLogin;
     @BindView(R.id.btn_sign_up) Button btnSignUp;
 
@@ -115,7 +117,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
             }
         });
     }
-
+    boolean isLoggedIn;
     private void setupSignInMethods() {
         auth = FirebaseAuth.getInstance();
 
@@ -126,22 +128,28 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
                 .build();
         signInClient = GoogleSignIn.getClient(this, signInOptions);
 
-//        // Configure Facebook Login
-//        callBackManager = CallbackManager.Factory.create();
-//        btnFacebook.setReadPermissions("email");
-//        btnFacebook.registerCallback(callBackManager, this);
-    }
+        // Configure Facebook Login
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager, this);
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        isLoggedIn = accessToken != null && !accessToken.isExpired();
 
+//        btnFacebook.setReadPermissions("email");
+//        btnFacebook.registerCallback(callbackManager, this);
+    }
+Spring spring, spring2;
     private void setupMainImages() {
         AssetManager assetManager = getAssets();
         try {
             ivLoginImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(LOGIN_IMG)));
+            spring = setSpring(ivLoginImg);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         try {
             ivSignUpImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(SIGN_UP_IMG)));
+            spring2 = setSpring(ivSignUpImg);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -154,6 +162,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
         super.onStart();
         if (getIntent().getBooleanExtra(EXTRA_LOGOUT_USER, false)) {
             signOut(this, signInClient);
+            LoginManager.getInstance().logOut();
         }
         auth.addAuthStateListener(this);
     }
@@ -178,9 +187,9 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
                         ex.printStackTrace();
                     }
                     break;
-//                default:
-//                    callBackManager.onActivityResult(requestCode, resultCode, data);
-//                    break;
+                default:
+                    callbackManager.onActivityResult(requestCode, resultCode, data);
+                    break;
             }
         }
     }
@@ -196,20 +205,20 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 
     // FacebookCallback Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
-//    @Override
-//    public void onSuccess(LoginResult loginResult) {
-//        credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
-//        signIn(this, credential);
-//    }
-//
-//    @Override
-//    public void onCancel() {
-//    }
-//
-//    @Override
-//    public void onError(FacebookException ex) {
-//        ex.printStackTrace();
-//    }
+    @Override
+    public void onSuccess(LoginResult loginResult) {
+        credential = FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken());
+        signIn(this, credential, signInClient);
+    }
+
+    @Override
+    public void onCancel() {
+    }
+
+    @Override
+    public void onError(FacebookException ex) {
+        ex.printStackTrace();
+    }
     //FacebookCallback//Override///////////////////////////////////////////////////////////////////
 
 
@@ -218,17 +227,21 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
     /* Listener to handle all login types through firebase if successful */
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        FirebaseUser fbUser = firebaseAuth.getCurrentUser();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
 
         // Current User is signed in
-        if (fbUser != null) {
+        if (firebaseUser != null) {
             Toast.makeText(
                     this,
-                    String.format(getString(R.string.txt_logged_in), fbUser.getEmail()),
+                    String.format(getString(R.string.txt_logged_in), firebaseUser.getEmail()),
                     Toast.LENGTH_SHORT
             ).show();
-            setUserInfoPref(this, fbUser.getEmail(), fbUser.getUid());
 
+            if (linkGoogle) {
+                linkUser(this, credential, firebaseUser);
+            }
+
+            setUserInfoPref(this, firebaseUser.getEmail(), firebaseUser.getUid());
 
             progressBar.setProgress(0);
             progressBar.setVisibility(View.VISIBLE);
@@ -274,8 +287,13 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
 
 
     @OnClick(R.id.btn_google_sign_in)
-    public void googSignIn() {
-        googleSignIn(this, signInClient);
+    public void googleLogin() {
+       googleSignIn(this, signInClient);
+    }
+
+    @OnClick(R.id.btn_facebook_sign_in)
+    public void facebookLogin() {
+//        facebookSignIn(this);
     }
 
     @OnClick(R.id.btn_login)
@@ -286,6 +304,7 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
             // Email/Password login to firebase
             credential = EmailAuthProvider.getCredential(email, password);
             signIn(this, credential, signInClient);
+            spring.setEndValue(0.9);
         }
     }
     @OnClick(R.id.btn_sign_up)
@@ -296,6 +315,8 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
             credential = EmailAuthProvider.getCredential(email, password);
             // Email/Password sign up in firebase
             createUser(this, email, password, signInClient);
+
+            spring2.setEndValue(0.9);
         }
     }
 
@@ -306,6 +327,13 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
         animateView(tvSignUpQuest, tvLoginQuest, tvLoginHere);
         tvSignUpHere.setVisibility(View.INVISIBLE);
     }
+
+    @OnClick({R.id.iv_login_image, R.id.iv_sign_up_image})
+    public void bounceImg() {
+        spring.setEndValue(0.3);
+        spring2.setEndValue(0.9);
+    }
+
 
     @OnClick(R.id.tv_login_here)
     public void loginScreen() {
@@ -350,5 +378,4 @@ public class Login extends AppCompatActivity implements /*FacebookCallback<Login
             navTextView.startAnimation(slide_end);
         }
     }
-
 }

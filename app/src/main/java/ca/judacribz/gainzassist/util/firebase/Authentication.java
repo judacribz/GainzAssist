@@ -7,19 +7,17 @@ import android.widget.Toast;
 
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseNetworkException;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.*;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.authentication.Login;
+
+import java.util.Arrays;
 
 
 public class Authentication {
@@ -44,24 +42,7 @@ public class Authentication {
 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        String msg;
-
-                        // Sign up success
-                        if (task.isSuccessful()) {
-                            userCreated = true;
-                            msg = act.getString(R.string.sign_up_success);
-
-                            // Sign up fail
-                        } else {
-                            userCreated = false;
-                            msg = getExceptionMsg(act, task.getException());
-                        }
-
-                        Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
-                        if (msg.equals(act.getString(R.string.txt_email_registered))) {
-                            googleSignIn(act, signInClient);
-                            ((Login) act).linkGoogle = true;
-                        }
+                        handleOnComplete(act, signInClient, task);
                     }
                 });
     }
@@ -73,16 +54,44 @@ public class Authentication {
 
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        // If sign in successful, handle in AuthStateListener in the activity
-                        if (!task.isSuccessful()) {
-                            String msg = getExceptionMsg(act, task.getException());
-//
-//                            if (msg.equals(act.getString(R.string.txt_email_registered))) {
-//                                googleSignIn(act, signInClient);
-//                            }
+                        handleOnComplete(act, signInClient, task);
+                    }
+                });
+    }
 
+    private static void handleOnComplete(
+            Activity act,
+            GoogleSignInClient signInClient,
+            @NonNull Task<AuthResult> task) {
+        String msg;
 
-                            Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
+        // Sign up success
+        if (task.isSuccessful()) {
+            userCreated = true;
+            msg = act.getString(R.string.sign_up_success);
+
+            // Sign up fail
+        } else {
+            userCreated = false;
+            msg = getExceptionMsg(act, task.getException());
+        }
+
+        Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
+        if (msg.equals(act.getString(R.string.txt_email_registered))) {
+            ((Login) act).linkGoogle = true;
+            googleSignIn(act, signInClient);
+        }
+    }
+
+    public static void linkUser(final Activity act, AuthCredential cred, FirebaseUser currUser) {
+        currUser.linkWithCredential(cred)
+                .addOnCompleteListener(act, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(act, "Linked!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(act, "linkWithCredential:failure" + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -93,6 +102,13 @@ public class Authentication {
         Intent signInIntent = signInClient.getSignInIntent();
         act.startActivityForResult(signInIntent, RC_SIGN_IN);
     }
+
+//    public static void facebookSignIn(Activity act) {
+//        LoginManager.getInstance().logInWithReadPermissions(
+//                act,
+//                Arrays.asList("email", "public_profile")
+//        );
+//    }
 
     /* Wrapper function to sign out user */
     public static void signOut(Activity act, GoogleSignInClient signInClient) {

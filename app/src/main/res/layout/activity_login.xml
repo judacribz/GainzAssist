@@ -19,39 +19,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
-        android:layout_alignEnd="@id/et_email"
-        android:layout_alignStart="@id/et_email"
+        android:layout_alignEnd="@id/tiLay_email"
+        android:layout_alignStart="@id/tiLay_email"
         android:layout_marginTop="20dp"
         android:background="@color/colorBg"/>
 
-    <!-- Facebook Login Button-->
-    <!--<FrameLayout-->
-        <!--android:id="@+id/flay_facebook_login"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@id/btn_google_sign_in"-->
-        <!--android:layout_alignEnd="@id/et_email"-->
-        <!--android:layout_alignStart="@id/et_email"-->
-        <!--android:layout_marginTop="20dp"-->
-        <!--android:layout_marginBottom="20dp"-->
-        <!--android:background="@color/colorBg">-->
+	 <!--Facebook Login Button-->
+    <FrameLayout
+        android:id="@+id/flay_facebook_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_google_sign_in"
+        android:layout_alignEnd="@id/tiLay_email"
+        android:layout_alignStart="@id/tiLay_email"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/colorBg">
 
-        <!--<com.facebook.login.widget.LoginButton-->
-            <!--android:id="@+id/btn_facebook_login"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:layout_margin="4dp"-->
-            <!--android:textColor="@color/colorBg"/>-->
-    <!--</FrameLayout>-->
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/btn_facebook_sign_in"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:textColor="@color/colorBg"/>
+    </FrameLayout>
 
     <!-- Image for login -->
     <ImageView
         android:id="@+id/iv_login_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/btn_google_sign_in"
-        android:layout_above="@id/et_email"
+        android:layout_below="@id/flay_facebook_login"
+        android:layout_above="@id/tiLay_email"
         android:layout_centerHorizontal="true"
         android:contentDescription="@string/cd_login_img"
         android:tint="@color/colorBg"/>
@@ -61,8 +61,8 @@
         android:id="@+id/iv_sign_up_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/btn_google_sign_in"
-        android:layout_above="@id/et_email"
+        android:layout_below="@id/flay_facebook_login"
+        android:layout_above="@id/tiLay_email"
         android:layout_centerHorizontal="true"
         android:paddingTop="5dp"
         android:contentDescription="@string/cd_sign_up_img"
@@ -70,30 +70,42 @@
         android:visibility="invisible"/>
 
     <!-- Email text field -->
-    <EditText
-        android:id="@+id/et_email"
-        android:layout_width="275dp"
-        android:layout_height="50dp"
-        android:layout_above="@id/et_password"
-        android:layout_centerHorizontal="true"
-        android:hint="@string/hint_email"
-        android:inputType="textEmailAddress"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat"
-        android:textColorHint="@color/colorTitle"/>
+	<android.support.design.widget.TextInputLayout
+		android:id="@+id/tiLay_email"
+		android:layout_width="275dp"
+		android:layout_height="50dp"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:layout_above="@id/tiLay_password"
+		android:layout_centerHorizontal="true"
+		android:layout_marginBottom="10dp">
+
+		<EditText
+			android:id="@+id/et_email"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:hint="@string/hint_email"
+			android:inputType="textEmailAddress"/>
+	</android.support.design.widget.TextInputLayout>
 
     <!-- Password text field -->
-    <EditText
-        android:id="@+id/et_password"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_above="@id/btn_login"
-        android:layout_alignEnd="@id/et_email"
-        android:layout_alignStart="@id/et_email"
-        android:layout_marginBottom="10dp"
-        android:hint="@string/hint_password"
-        android:inputType="textPassword"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat"
-        android:textColorHint="@color/colorTitle" />
+	<android.support.design.widget.TextInputLayout
+		android:id="@+id/tiLay_password"
+		android:layout_width="275dp"
+		android:layout_height="50dp"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:layout_above="@id/btn_login"
+		android:layout_marginBottom="10dp"
+		android:textAppearance="@style/Base.TextAppearance.AppCompat">
+
+		<EditText
+			android:id="@+id/et_password"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:hint="@string/hint_password"
+			android:inputType="textPassword" />
+	</android.support.design.widget.TextInputLayout>
 
     <!-- Login button -->
     <Button
@@ -101,8 +113,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/rlay_login_content"
-        android:layout_alignEnd="@id/et_email"
-        android:layout_alignStart="@id/et_email"
+        android:layout_alignEnd="@id/tiLay_email"
+        android:layout_alignStart="@id/tiLay_email"
         android:background="@drawable/anim_button_ripple"
         android:text="@string/login"
         android:textColor="@drawable/selector_btn_text_default"/>
@@ -113,8 +125,8 @@
         android:layout_width="275dp"
         android:layout_height="wrap_content"
         android:layout_above="@id/rlay_login_content"
-        android:layout_alignEnd="@id/et_email"
-        android:layout_alignStart="@id/et_email"
+        android:layout_alignEnd="@id/tiLay_email"
+        android:layout_alignStart="@id/tiLay_email"
         android:background="@drawable/anim_button_ripple"
         android:text="@string/sign_up"
         android:textColor="@drawable/selector_btn_text_default"
