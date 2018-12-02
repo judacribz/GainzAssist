@@ -164,21 +164,10 @@ public class UI {
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        int noOfColumns = (int) (dpWidth / 180);
-        return noOfColumns;
+
+        return (int) (dpWidth / 180);
     }
 
-
-//        /* Checks to see if the database exists */
-//        public static boolean exists(Context context) {
-//            File dbFile = new File(context.getDatabasePath(
-//                    context.getResources().getString(
-//                            R.string.workouts
-//                    ).toLowerCase()
-//            ).toString());
-//
-//            return dbFile.exists();
-//        }
 
     public static Spring setSpring(final View view) {
         // Create a system to run the physics loop for a set of springs.

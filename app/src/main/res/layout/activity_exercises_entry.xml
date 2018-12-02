@@ -14,16 +14,24 @@
 
     <!-- Exercise Name EditText -->
     <!--========================================================================================-->
-    <EditText
-        android:id="@+id/et_exercise_name"
-        android:layout_width="match_parent"
+
+    <android.support.design.widget.TextInputLayout
         android:layout_height="0dp"
+        android:layout_width="match_parent"
         android:layout_weight="@integer/ll_md_weight"
-        android:layout_margin="10dp"
-        android:backgroundTint="@color/colorLightAccent"
-        android:hint="@string/hint_exercise_name"
-        android:inputType="text"
-        android:textColorHint="@color/colorLightAccent" />
+        android:textAppearance="@style/Base.TextAppearance.AppCompat">
+
+        <EditText
+            android:id="@+id/et_exercise_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:backgroundTint="@color/colorLightAccent"
+            android:hint="@string/hint_exercise_name"
+            android:inputType="text"
+            android:textColorHint="@color/colorLightAccent" />
+    </android.support.design.widget.TextInputLayout>
+
     <!--Workout=Name============================================================================-->
 
 

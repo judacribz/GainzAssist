@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.activities.add_workout;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -50,6 +51,9 @@ public class ExercisesEntry extends AppCompatActivity {
     @BindView(R.id.ibtn_dec_sets) ImageButton ibtnDecSets;
 
     @BindView(R.id.spr_equipment) Spinner sprEquipment;
+
+    @BindViews({R.id.et_exercise_name, R.id.et_weight, R.id.et_num_reps, R.id.et_num_sets})
+    EditText[] formEntries;
     // --------------------------------------------------------------------------------------------
 
     @Override
@@ -83,11 +87,9 @@ public class ExercisesEntry extends AppCompatActivity {
                 break;
         }
 
-
-        if (!ibtnDecWeight.isEnabled() || weight < minWeight){
+        if (!ibtnDecWeight.isEnabled() || weight < minWeight) {
             etWeight.setText(String.valueOf(minWeight));
         }
-
     }
 
 
@@ -116,13 +118,9 @@ public class ExercisesEntry extends AppCompatActivity {
         if (weight <= minWeight) {
             ibtnDecWeight.setEnabled(false);
             ibtnDecWeight.setVisibility(View.GONE);
-
-            if (weight < minWeight)
-                etWeight.setText(String.valueOf(minWeight));
         }
 
     }
-
 
     @OnTextChanged(value = R.id.et_num_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
@@ -146,7 +144,7 @@ public class ExercisesEntry extends AppCompatActivity {
                               int start,
                               int before,
                               int count) {
-        num_reps = onNumChanged(etNumReps, ibtnDecReps, s.toString());
+        num_reps = onNumChanged(ibtnDecReps, s.toString());
     }
 
     @OnTextChanged(R.id.et_num_sets)
@@ -154,18 +152,15 @@ public class ExercisesEntry extends AppCompatActivity {
                               int start,
                               int before,
                               int count) {
-        num_sets = onNumChanged(etNumSets, ibtnDecSets, s.toString());
+        num_sets = onNumChanged(ibtnDecSets, s.toString());
     }
 
-    public int onNumChanged(EditText etNum, ImageButton ibtnDec, String str) {
+    public int onNumChanged(ImageButton ibtnDec, String str) {
         int value = (str.isEmpty()) ? minInt : Integer.valueOf(str);
 
         if (value <= minInt) {
             ibtnDec.setEnabled(false);
             ibtnDec.setVisibility(View.GONE);
-
-            if (value < minInt)
-                etNum.setText(String.valueOf(minInt));
         }
 
         return value;
@@ -177,42 +172,42 @@ public class ExercisesEntry extends AppCompatActivity {
     /* Increase weight */
     @OnClick(R.id.ibtn_inc_weight)
     public void incNumWeight() {
-        etWeight.setText(String.valueOf(getTextFloat(etWeight) + weightChange));
+        etWeight.setText(String.valueOf(weight + weightChange));
 
     }
     /* Decrease weight */
     @OnClick(R.id.ibtn_dec_weight)
     public void decNumWeight() {
-        etWeight.setText(String.valueOf(Math.max(getTextFloat(etWeight) - weightChange, minWeight)));
+        etWeight.setText(String.valueOf(Math.max(weight - weightChange, minWeight)));
     }
     /* Increase num_reps */
     @OnClick(R.id.ibtn_inc_reps)
     public void incNumReps() {
-        etNumReps.setText(String.valueOf(getTextInt(etNumReps) + 1));
+        etNumReps.setText(String.valueOf(num_reps + 1));
     }
 
     /* Decrease num_reps */
     @OnClick(R.id.ibtn_dec_reps)
     public void decNumReps() {
-        etNumReps.setText(String.valueOf(getTextInt(etNumReps) - 1));
+        etNumReps.setText(String.valueOf(num_reps - 1));
     }
 
     /* Increase num_sets */
     @OnClick(R.id.ibtn_inc_sets)
     public void incNumSets() {
-        etNumSets.setText(String.valueOf(getTextInt(etNumSets) + 1));
+        etNumSets.setText(String.valueOf(num_sets + 1));
     }
 
     /* Decrease num_sets */
     @OnClick(R.id.ibtn_dec_sets)
     public void decNumSets() {
-        etNumSets.setText(String.valueOf(getTextInt(etNumSets) - 1));
+        etNumSets.setText(String.valueOf(num_sets - 1));
     }
 
     @OnClick(R.id.btn_enter)
     public void enterExercise() {
 
-        if (validateFormEntry(this, etExerciseName)) {
+        if (validateForm(this, formEntries)) {
             exerciseName = getTextString(etExerciseName);
 
             // Check if exercise already added
@@ -222,12 +217,9 @@ public class ExercisesEntry extends AppCompatActivity {
                         exerciseName
                 ));
             } else {
-//                exerciseSets = new ArrayList<>();
                 num_reps = getTextInt(etNumReps);
                 num_sets = getTextInt(etNumSets);
-//                for (int i = 1; i <= num_sets; i++) {
-//                    exerciseSets.add(new ExerciseSet(i, num_reps, weight));
-//                }
+
                 workout.addExercise(new Exercise(
                         ex_i,
                         exerciseName,

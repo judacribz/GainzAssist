@@ -33,19 +33,17 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
-
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.*;
 import ca.judacribz.gainzassist.R;
+
+import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.UI.setSpring;
 import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
-import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.setInitView;
@@ -71,8 +69,9 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
     String email, password;
     Animation slide_end;
-
+    boolean isLoggedIn;
     public boolean linkGoogle;
+    Spring loginSpring, signUpSpring;
 
     @BindView(R.id.tv_sign_up_here) TextView tvSignUpHere;
     @BindView(R.id.tv_login_here) TextView tvLoginHere;
@@ -90,9 +89,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     @BindView(R.id.btn_login) Button btnLogin;
     @BindView(R.id.btn_sign_up) Button btnSignUp;
 
-
-    @BindView(R.id.progress_bar)
-    ProgressBar progressBar;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
     // --------------------------------------------------------------------------------------------
 
 
@@ -104,11 +101,36 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         setInitView(this, R.layout.activity_login, R.string.app_name,  false);
 
         progressBar.setMax(10);
+
         // Get firebase instance and setup google and facebook sign in
-        setupSignInMethods();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                setupSignInMethods();
+            }
+        }).start();
 
         // Setup main images
-        setupMainImages();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                setupMainImages();
+            }
+        }).start();
+
+        ivLoginImg.post(new Runnable() {
+            @Override
+            public void run() {
+                loginSpring = setSpring(ivLoginImg);
+            }
+        });
+
+        ivSignUpImg.post(new Runnable() {
+            @Override
+            public void run() {
+                signUpSpring = setSpring(ivSignUpImg);
+            }
+        });
 
         tvSignUpHere.post(new Runnable() {
             @Override
@@ -117,7 +139,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
             }
         });
     }
-    boolean isLoggedIn;
+
     private void setupSignInMethods() {
         auth = FirebaseAuth.getInstance();
 
@@ -133,25 +155,20 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         LoginManager.getInstance().registerCallback(callbackManager, this);
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         isLoggedIn = accessToken != null && !accessToken.isExpired();
-
-//        btnFacebook.setReadPermissions("email");
-//        btnFacebook.registerCallback(callbackManager, this);
     }
-Spring spring, spring2;
+
     private void setupMainImages() {
         AssetManager assetManager = getAssets();
         try {
             ivLoginImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(LOGIN_IMG)));
-            spring = setSpring(ivLoginImg);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
         try {
             ivSignUpImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(SIGN_UP_IMG)));
-            spring2 = setSpring(ivSignUpImg);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
         slide_end = AnimationUtils.loadAnimation(this, R.anim.slide_end);
@@ -304,7 +321,7 @@ Spring spring, spring2;
             // Email/Password login to firebase
             credential = EmailAuthProvider.getCredential(email, password);
             signIn(this, credential, signInClient);
-            spring.setEndValue(0.9);
+            loginSpring.setEndValue(0.9);
         }
     }
     @OnClick(R.id.btn_sign_up)
@@ -316,7 +333,7 @@ Spring spring, spring2;
             // Email/Password sign up in firebase
             createUser(this, email, password, signInClient);
 
-            spring2.setEndValue(0.9);
+            signUpSpring.setEndValue(0.9);
         }
     }
 
@@ -330,8 +347,8 @@ Spring spring, spring2;
 
     @OnClick({R.id.iv_login_image, R.id.iv_sign_up_image})
     public void bounceImg() {
-        spring.setEndValue(0.3);
-        spring2.setEndValue(0.9);
+        loginSpring.setEndValue(0.3);
+        signUpSpring.setEndValue(0.9);
     }
 
 

@@ -29,7 +29,7 @@ public class CurrWorkout {
 
     private static final String BARBELL = "barbell";
     public static final float BB_MIN_WEIGHT = 45.0f;
-    public static final float MIN_WEIGHT = 0.0f;
+    public static final float MIN_WEIGHT = 2.5f;
     public static final float BB_WEIGHT_CHANGE = 5.0f;
     public static final float WEIGHT_CHANGE = 2.5f;
     public static final int MIN_REPS = 0;

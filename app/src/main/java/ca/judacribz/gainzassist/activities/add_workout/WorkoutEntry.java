@@ -120,16 +120,18 @@ public class WorkoutEntry extends AppCompatActivity{
 
     @OnClick(R.id.btn_enter)
     public void enterWorkoutName() {
-        Intent exercisesEntry = new Intent(this, ExercisesEntry.class);
+        if (validateFormEntry(this, etNumExercises)) {
+            Intent exercisesEntry = new Intent(this, ExercisesEntry.class);
 
-        if (!isEmpty) {
-            Toast.makeText(this, "" + getTextString(etWorkoutName), Toast.LENGTH_SHORT).show();
-            exercisesEntry.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName));
+            if (!isEmpty) {
+                Toast.makeText(this, "" + getTextString(etWorkoutName), Toast.LENGTH_SHORT).show();
+                exercisesEntry.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName));
+            }
+
+
+            exercisesEntry.putExtra(EXTRA_NUM_EXERCISES, getTextInt(etNumExercises));
+            startActivityForResult(exercisesEntry, REQ_EXERCISE_ENTRY);
         }
-
-
-        exercisesEntry.putExtra(EXTRA_NUM_EXERCISES, getTextInt(etNumExercises));
-        startActivityForResult(exercisesEntry, REQ_EXERCISE_ENTRY);
     }
 
     @OnClick(R.id.btn_cancel)
