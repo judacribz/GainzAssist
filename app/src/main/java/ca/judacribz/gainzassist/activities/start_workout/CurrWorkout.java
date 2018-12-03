@@ -356,7 +356,7 @@ public class CurrWorkout {
     }
 
     public int getCurrNumExs() {
-        return (this.currExercise.getSetsType() == WARMUP_SET) ? this.numWarmups : this.numMains;
+        return (getIsWarmup()) ? this.numWarmups : this.numMains;
     }
 
     public int getCurrExNum() {

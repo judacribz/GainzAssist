@@ -4,10 +4,10 @@
 
     <item
         android:state_selected="true"
-        android:color="@color/colorTitle"/>
+        android:color="@color/colorBg"/>
     <item
         android:state_pressed="true"
-        android:color="@color/colorTitle"/>
+        android:color="@color/colorBg"/>
     <item
         android:color="@color/colorText"/>
 </selector>

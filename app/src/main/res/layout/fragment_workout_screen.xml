@@ -1,9 +1,13 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  xmlns:tools="http://schemas.android.com/tools"
-			  android:layout_width="match_parent"
-			  android:layout_height="match_parent" xmlns:autofit="http://schemas.android.com/apk/res-auto"
-			  android:orientation="vertical"
-			  tools:context=".activities.start_workout.fragments.WorkoutScreen">
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	xmlns:autofit="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:padding="5dp"
+	android:background="@color/colorBg"
+	tools:context=".activities.start_workout.fragments.WorkoutScreen">
 
     <!--Resources:
         http://www.fontspace.com/category/athletic -->
@@ -11,10 +15,11 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+		android:background="@color/colorLightBg"
+		android:layout_margin="5dp"
         android:layout_weight="5">
 
         <!-- How to do exercise button-->
-
         <Button
             android:id="@+id/btn_how_to"
             android:layout_width="wrap_content"
@@ -38,6 +43,7 @@
             android:layout_alignTop="@id/btn_how_to"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/btn_how_to"
+			android:background="@color/colorLightBg"
 			android:layout_margin="1dp"
             android:gravity="center"
 			android:maxLines="2"
@@ -45,18 +51,23 @@
 			autofit:minTextSize="16sp"
             android:fontFamily="@font/fnl"/>
 
-		<!-- Timer -->
-		<me.grantland.widget.AutofitTextView
-				android:id="@+id/tv_timer"
-				android:layout_width="250dp"
-				android:layout_height="wrap_content"
-				android:layout_alignTop="@id/ll_info"
-				android:layout_alignParentEnd="true"
-				android:layout_alignParentBottom="true"
-				android:longClickable="false"
-				android:gravity="center"
-				android:textSize="50sp"
-				autofit:minTextSize="16sp"/>
+		<!--<com.anton46.stepsview.StepsView-->
+			<!--android:id="@+id/svExs"-->
+			<!--android:layout_width="250dp"-->
+			<!--android:layout_height="50dp"-->
+			<!--android:background="@color/colorLightBg"-->
+			<!--android:layout_below="@id/tv_exercise_title"-->
+			<!--android:layout_alignParentEnd="true"/>-->
+
+		<!--<com.anton46.stepsview.StepsView-->
+			<!--android:id="@+id/svSets"-->
+			<!--android:layout_width="250dp"-->
+			<!--android:layout_height="50dp"-->
+			<!--android:background="@color/colorLightBg"-->
+			<!--android:layout_below="@id/tv_exercise_title"-->
+			<!--android:layout_alignParentEnd="true"-->
+			<!--android:layout_alignParentBottom="true"/>-->
+
 
         <!-- Exercise/ExerciseSet number -->
         <LinearLayout
@@ -65,31 +76,37 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-			android:layout_alignStart="@id/tv_timer"
+			android:layout_alignStart="@id/svSets"
             android:layout_below="@id/btn_how_to"
+			android:background="@color/colorLightBg"
             android:orientation="vertical"
             android:paddingBottom="5dp">
 
-            <TextView
+			<me.grantland.widget.AutofitTextView
                 android:id="@+id/tv_ex_info"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+				android:background="@color/colorLightBg"
                 android:gravity="center"
 				android:layout_gravity="center"
                 android:textColor="@android:color/holo_red_dark"
-				android:textSize="25sp"/>
+				android:maxLines="1"
+				android:textSize="20sp"
+				autofit:minTextSize="12sp"/>
 
             <me.grantland.widget.AutofitTextView
                 android:id="@+id/tv_set_info"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+				android:background="@color/colorLightBg"
                 android:gravity="center"
 				android:layout_gravity="center"
                 android:textColor="@android:color/holo_red_dark"
-				android:textSize="25sp"
-				autofit:minTextSize="16sp"/>
+				android:maxLines="1"
+				android:textSize="20sp"
+				autofit:minTextSize="12sp"/>
         </LinearLayout>
     </RelativeLayout>
 
@@ -99,14 +116,29 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
-        android:background="@color/colorText">
-    </RelativeLayout>
+		android:layout_margin="5dp"
+		android:background="@color/colorLightBg">
+
+		<!-- Timer -->
+		<me.grantland.widget.AutofitTextView
+			android:id="@+id/tv_timer"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_alignParentEnd="true"
+			android:background="@color/colorLightBg"
+			android:longClickable="false"
+			android:gravity="center"
+			android:textSize="50sp"
+			autofit:minTextSize="16sp"/>
+	</RelativeLayout>
 
     <!-- TODO fix edittext heights (make identical)-->
     <!-- Exercise reps and weight control -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+		android:background="@color/colorLightBg"
+		android:layout_margin="5dp"
         android:layout_weight="5"
         android:gravity="center">
 
@@ -116,11 +148,9 @@
             android:layout_height="50dp"
             android:layout_centerHorizontal="true"
             android:layout_margin="10dp"
-            android:background="@color/colorBg"
             android:inputType="number"
             android:minWidth="100dp"
-            android:selectAllOnFocus="true"
-            android:textColor="@color/colorText"/>
+            android:selectAllOnFocus="true"/>
 
         <ImageButton
             android:id="@+id/btn_dec_reps"
@@ -129,7 +159,6 @@
             android:layout_alignTop="@id/et_curr_reps"
             android:layout_alignBottom="@id/et_curr_reps"
             android:layout_toStartOf="@id/et_curr_reps"
-            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
@@ -139,7 +168,6 @@
             android:layout_alignTop="@id/et_curr_reps"
             android:layout_alignBottom="@id/et_curr_reps"
             android:layout_toEndOf="@id/et_curr_reps"
-            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_plus"/>
 
         <EditText
@@ -149,11 +177,9 @@
             android:layout_below="@id/et_curr_reps"
             android:layout_centerHorizontal="true"
             android:layout_margin="10dp"
-            android:background="@color/colorBg"
             android:inputType="number"
             android:minWidth="100dp"
-            android:selectAllOnFocus="true"
-            android:textColor="@color/colorText"/>
+            android:selectAllOnFocus="true"/>
 
         <ImageButton
             android:id="@+id/btn_dec_weight"
@@ -162,7 +188,6 @@
             android:layout_alignTop="@id/et_curr_weight"
             android:layout_alignBottom="@id/et_curr_weight"
             android:layout_toStartOf="@id/et_curr_weight"
-            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
@@ -172,7 +197,6 @@
             android:layout_alignTop="@id/et_curr_weight"
             android:layout_alignBottom="@id/et_curr_weight"
             android:layout_toEndOf="@id/et_curr_weight"
-            android:background="@drawable/anim_button_ripple"
             android:src="@drawable/ic_plus"/>
     </RelativeLayout>
 
@@ -182,28 +206,15 @@
         android:layout_height="0dp"
         android:layout_weight="2"
         android:gravity="center"
+		android:background="@color/colorLightBg"
+		android:layout_margin="5dp"
         android:padding="3dp">
 
         <Button
-            android:id="@+id/btnCancelSet"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:background="@drawable/anim_button_ripple"
-            android:gravity="center"
-            android:text="@string/cancel_set"
-            android:textColor="@drawable/selector_btn_text_default"
-            android:textSize="20sp"/>
-
-        <Button
             android:id="@+id/btn_finish_set"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
             android:background="@drawable/anim_button_ripple"
-            android:gravity="center"
             android:text="@string/finish_set"
             android:textColor="@drawable/selector_btn_text_default"
             android:textSize="20sp"/>

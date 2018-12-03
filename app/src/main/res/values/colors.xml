@@ -5,11 +5,14 @@
     <color name="colorAccent">#444444</color>
 
     <color name="colorBg">@color/colorPrimaryDark</color>
+    <color name="colorLightBg">#FFFFFF</color>
     <color name="colorText">@android:color/white</color>
     <color name="colorDarkText">#333333</color>
     <color name="colorTitle">#FF0000</color>
     <color name="colorLink">#0000EE</color>
     <color name="colorLightAccent">#cccccc</color>
+    <color name="colorBlue">#039bd5</color>
+    <color name="colorGreen">#16A85A</color>
 
     <!-- YouTube icon colors -->
     <color name="ic_youtube_bg">@color/colorText</color>

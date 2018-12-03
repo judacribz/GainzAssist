@@ -18,13 +18,13 @@
         <item name="android:shadowRadius">5</item>
         <item name="android:shadowDx">1</item>
         <item name="android:shadowDy">1</item>
-        <item name="android:fontFamily">@font/lobster</item>
-        <item name="android:textColor">@color/colorText</item>
+        <item name="android:textColor">@color/colorBg</item>
         <item name="android:textSize">35sp</item>
     </style>
 
     <style name="WorkoutTheme" parent="AppTheme">
         <item name="editTextStyle">@style/EditTextStyle</item>
+        <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="imageButtonStyle">@style/ImageButtonStyle</item>
     </style>

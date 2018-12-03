@@ -22,6 +22,7 @@ import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
+import com.anton46.stepsview.StepsView;
 
 import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
 import static ca.judacribz.gainzassist.util.Preferences.*;
@@ -60,6 +61,8 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     @BindView(R.id.et_curr_reps) EditText etCurrReps;
     @BindView(R.id.et_curr_weight) EditText etCurrWeight;
+//    @BindView(R.id.svExs) StepsView svExs;
+//    @BindView(R.id.svSets) StepsView svSets;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -107,10 +110,32 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @Override
     public void onResume() {
         super.onResume();
-
         setupEquipView();
+//        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
+//        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
     }
 
+//    String[] setStrs, exStrs;
+//    void setProgress(StepsView sv, String[] labels, int progLen, int pos) {
+//        if (labels == null) {
+//            labels = new String[progLen];
+//            for (int i = 0; i < progLen; i++) {
+//                labels[i] = String.valueOf(i + 1);
+//            }
+//        } else if(labels.length != progLen) {
+//
+//            labels = new String[progLen];
+//            for (int i = 0; i < progLen; i++) {
+//                labels[i] = String.valueOf(i + 1);
+//            }
+//        }
+//        sv.setLabels(labels)
+//                .setBarColorIndicator(getContext().getResources().getColor(R.color.material_blue_grey_800))
+//                .setProgressColorIndicator(getContext().getResources().getColor(R.color.colorGreen))
+//                .setLabelColorIndicator(getContext().getResources().getColor(R.color.colorGreen))
+//                .setCompletedPosition(pos-1)
+//                .drawView();
+//    }
 
     // ExerciseSet up the custom view (EquipmentView) to display the equipment. View added dynamically
     // to trigger onDraw method
@@ -124,8 +149,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                         LayoutParams.MATCH_PARENT
         ));
 
-        vgEquipDisp.addView(equipmentView, 0);
 
+        vgEquipDisp.addView(equipmentView, 0);
+        tvTimer.setWidth(p/2);
         updateUI();
     }
 
@@ -301,6 +327,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 currWorkout.getCurrSetNum(),
                 currWorkout.getCurrNumSets())
         );
+
+//        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
+//        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
+
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
 
