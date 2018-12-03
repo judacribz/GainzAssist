@@ -25,7 +25,6 @@
 
     <style name="WorkoutTheme" parent="AppTheme">
         <item name="editTextStyle">@style/EditTextStyle</item>
-        <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="imageButtonStyle">@style/ImageButtonStyle</item>
     </style>
