@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:theme="@style/AddWorkoutTheme"
     tools:context=".activities.add_workout.WorkoutEntry">
 
@@ -13,83 +15,98 @@
 
     <!-- Workout Name EditText -->
     <!--========================================================================================-->
-    <EditText
-        android:id="@+id/et_workout_name"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_above="@id/et_num_exercises"
-        android:backgroundTint="@color/colorLightAccent"
-        android:hint="@string/hint_workout_name"
-        android:inputType="text"
-        android:textColorHint="@color/colorLightAccent" />
+        android:layout_height="0dp"
+        android:layout_weight="@integer/ll_sm_weight">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_height="75dp"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:layout_centerInParent="true"
+            app:hintTextAppearance="@style/HintTextAppearance">
+
+            <EditText
+                android:id="@+id/et_workout_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/hint_workout_name"
+                android:inputType="text"
+                android:textColorHint="@color/colorLightAccent"
+                android:translationY="2dp"/>
+        </android.support.design.widget.TextInputLayout>
+    </RelativeLayout>
     <!--Workout=Name============================================================================-->
 
-    <EditText
-        android:id="@+id/et_num_exercises"
-        android:layout_width="wrap_content"
-        android:layout_height="51dp"
-        android:layout_centerInParent="true"
-        android:layout_margin="10dp"
-        android:background="@color/colorBg"
-        android:textAlignment="center"
-        android:ems="5"
-        android:inputType="number"
-        android:text="@string/initial_num_exercises"
-        android:textColor="@color/colorText" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="@integer/ll_lg_weight">
 
-    <ImageButton
-        android:id="@+id/ibtn_inc_exercises"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
-        android:layout_alignBottom="@id/et_num_exercises"
-        android:layout_toEndOf="@id/et_num_exercises"
-        android:background="@drawable/anim_button_ripple"
-        android:src="@drawable/ic_plus"/>
+        <EditText
+            android:id="@+id/et_num_exercises"
+            android:layout_width="wrap_content"
+            android:layout_height="51dp"
+            android:layout_centerInParent="true"
+            android:layout_margin="10dp"
+            android:textAlignment="center"
+            android:ems="5"
+            android:inputType="number"
+            android:text="@string/initial_num_exercises"/>
 
-    <ImageButton
-        android:id="@+id/ibtn_dec_exercises"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="5dp"
-        android:layout_alignBottom="@id/et_num_exercises"
-        android:layout_toStartOf="@id/et_num_exercises"
-        android:background="@drawable/anim_button_ripple"
-        android:src="@drawable/ic_minus"/>
+        <ImageButton
+            android:id="@+id/ibtn_inc_exercises"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_alignBottom="@id/et_num_exercises"
+            android:layout_toEndOf="@id/et_num_exercises"
+            android:src="@drawable/ic_plus"/>
 
-    <TextView
-        android:id="@+id/tv_num_exercises"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/et_num_exercises"
-        android:layout_marginTop="-10dp"
-        android:layout_centerHorizontal="true"
-        android:text="@string/hint_exercises"/>
+        <ImageButton
+            android:id="@+id/ibtn_dec_exercises"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_alignBottom="@id/et_num_exercises"
+            android:layout_toStartOf="@id/et_num_exercises"
+            android:src="@drawable/ic_minus"/>
 
-    <Button
-        android:id="@+id/btn_enter"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/tv_num_exercises"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-        android:background="@drawable/anim_button_ripple"
-        android:text="@string/skip"
-        android:textColor="@drawable/selector_btn_text_default"
-        android:textSize="20sp"/>
+        <TextView
+            android:id="@+id/tv_num_exercises"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_num_exercises"
+            android:layout_marginTop="-10dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/hint_exercises"/>
+    </RelativeLayout>
 
-    <Button
-        android:id="@+id/btn_cancel"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_below="@id/tv_num_exercises"
-        android:padding="10dp"
-        android:background="@drawable/anim_button_ripple"
-        android:text="@string/cancel"
-        android:textColor="@drawable/selector_btn_text_default"
-        android:textSize="20sp"/>
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="@integer/ll_sm_weight"
+        android:gravity="bottom">
+        <Button
+            android:id="@+id/btn_enter"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:text="@string/skip"
+            android:textColor="@drawable/selector_btn_text_default"
+            android:textSize="20sp"/>
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:text="@string/cancel"
+            android:textColor="@drawable/selector_btn_text_default"
+            android:textSize="20sp"/>
+    </RelativeLayout>
+</LinearLayout>

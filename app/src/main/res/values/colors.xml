@@ -6,6 +6,7 @@
 
     <color name="colorBg">@color/colorPrimaryDark</color>
     <color name="colorText">@android:color/white</color>
+    <color name="colorDarkText">#333333</color>
     <color name="colorTitle">#FF0000</color>
     <color name="colorLink">#0000EE</color>
     <color name="colorLightAccent">#cccccc</color>

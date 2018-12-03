@@ -37,13 +37,13 @@
     </style>
 
     <style name="ImageButtonStyle" parent="Base.Widget.AppCompat.ImageButton">
-        <item name="android:background">@drawable/anim_button_ripple</item>
+        <item name="android:background">@drawable/anim_circ_button_ripple</item>
     </style>
 
     <style name="ButtonStyle" parent="Base.TextAppearance.AppCompat.Widget.Button">
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:background">@drawable/button_box</item>
+        <item name="android:background">@drawable/anim_button_ripple</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingStart">20dp</item>
@@ -59,7 +59,8 @@
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/edit_text_box</item>
-        <item name="android:textColorHighlight">@color/colorText</item>
+        <item name="android:textColorHighlight">@color/colorDarkText</item>
+        <item name="android:textColor">@color/colorDarkText</item>
         <item name="android:inputType">textNoSuggestions</item>
         <item name="android:padding">10dp</item>
         <item name="android:textAlignment">center</item>
@@ -67,7 +68,7 @@
     </style>
 
     <style name="EditTextRipple" parent="Widget.AppCompat.EditText">
-        <item name="android:background">@drawable/anim_button_ripple</item>
+        <item name="android:background">@drawable/anim_edit_text_ripple</item>
         <item name="android:textColorHighlight">@color/colorText</item>
         <item name="colorAccent">@color/colorText</item>
         <item name="android:inputType">textNoSuggestions</item>
@@ -76,8 +77,13 @@
         <item name="android:textCursorDrawable">@null</item>
     </style>
 
+    <style name="HintTextAppearance" parent="@android:style/TextAppearance">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
     <style name="MaterialSearchViewStyle">
-        <!-- Background for the search bar -->
         <item name="searchBackground">@drawable/search_text_box</item>
         <item name="searchVoiceIcon">@drawable/ic_action_voice_search_inverted</item>
         <item name="searchCloseIcon">@drawable/ic_action_navigation_close_inverted</item>
@@ -85,7 +91,5 @@
         <item name="android:textColor">@color/colorTitle</item>
         <item name="android:textAlignment">center</item>
         <item name="android:textColorHint">@color/colorAccent</item>
-
     </style>
-
 </resources>
