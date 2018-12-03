@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
 		android:background="@color/colorLightBg"
-		android:layout_margin="5dp"
+		android:layout_margin="2dp"
         android:layout_weight="5">
 
         <!-- How to do exercise button-->
@@ -27,11 +27,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
 			android:layout_margin="2.2dp"
-            android:background="@drawable/anim_button_ripple"
             android:gravity="center"
             android:padding="1dp"
             android:text="@string/how_to"
-            android:textColor="@drawable/selector_btn_text_default"
             android:textSize="20sp"/>
 
         <!-- Exercise name -->
@@ -76,7 +74,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-			android:layout_alignStart="@id/svSets"
             android:layout_below="@id/btn_how_to"
 			android:background="@color/colorLightBg"
             android:orientation="vertical"
@@ -116,7 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
-		android:layout_margin="5dp"
+		android:layout_margin="2dp"
 		android:background="@color/colorLightBg">
 
 		<!-- Timer -->
@@ -138,7 +135,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
 		android:background="@color/colorLightBg"
-		android:layout_margin="5dp"
+		android:layout_margin="2dp"
         android:layout_weight="5"
         android:gravity="center">
 
@@ -207,16 +204,17 @@
         android:layout_weight="2"
         android:gravity="center"
 		android:background="@color/colorLightBg"
-		android:layout_margin="5dp"
-        android:padding="3dp">
+		android:layout_margin="2dp"
+        android:paddingTop="2dp"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp">
 
         <Button
             android:id="@+id/btn_finish_set"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/anim_button_ripple"
             android:text="@string/finish_set"
-            android:textColor="@drawable/selector_btn_text_default"
+			android:gravity="center"
             android:textSize="20sp"/>
     </RelativeLayout>
 </LinearLayout>

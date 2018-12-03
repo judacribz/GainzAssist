@@ -141,7 +141,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
                 icon = tab.getIcon();
                 if (icon != null) {
                     icon.setColorFilter(
-                            ContextCompat.getColor(getApplicationContext(), R.color.colorTitle),
+                            ContextCompat.getColor(getApplicationContext(), R.color.colorBg),
                             PorterDuff.Mode.SRC_IN
                     );
                 }
@@ -154,7 +154,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
                 icon = tab.getIcon();
                 if (icon != null) {
                     icon.setColorFilter(
-                            ContextCompat.getColor(getApplicationContext(), R.color.colorText),
+                            ContextCompat.getColor(getApplicationContext(), R.color.colorGreen),
                             PorterDuff.Mode.SRC_IN
                     );
                 }

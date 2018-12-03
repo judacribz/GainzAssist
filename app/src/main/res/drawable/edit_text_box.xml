@@ -17,16 +17,16 @@
 
         <gradient
             android:type="linear"
-            android:startColor="#FFE500"
-            android:endColor="#FFE500"
+            android:startColor="@color/colorYellow"
+            android:endColor="@color/colorYellow"
             android:angle="45"/>
 
         <gradient
             android:type="radial"
             android:centerX="50%"
             android:centerY="50%"
-            android:startColor="#FFE500"
-            android:endColor="#FFE500"
+            android:startColor="@color/colorYellow"
+            android:endColor="@color/colorYellow"
             android:gradientRadius="900"/>
 
         <stroke

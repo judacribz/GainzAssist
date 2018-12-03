@@ -32,10 +32,10 @@
             app:tabPadding="2dp"
             android:layout_height="wrap_content"
             app:tabBackground="@drawable/anim_tab_ripple"
-            app:tabIndicatorColor="@color/colorTitle"
+            app:tabIndicatorColor="@color/colorGreen"
             app:tabIndicatorHeight="2dp"
-            app:tabSelectedTextColor="@color/colorTitle"
-            app:tabTextColor="@color/colorText">
+            app:tabSelectedTextColor="@color/colorGreen"
+            app:tabTextColor="@color/colorBg">
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tab_warmups"
