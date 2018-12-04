@@ -333,7 +333,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
-
     }
 
     private void setReps() {

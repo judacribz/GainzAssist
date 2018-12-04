@@ -384,15 +384,15 @@ public class CurrWorkout {
 
     /* Reps------------------------------------------------------------------------------------- */
     public int getCurrReps() {
-        return currExerciseSet.getReps();
+        return this.currReps;
     }
 
     public void incReps() {
-        setCurrReps(++currReps);
+        setCurrReps(++this.currReps);
     }
 
     public void decReps() {
-        setCurrReps(--currReps);
+        setCurrReps(--this.currReps);
     }
 
     public boolean setCurrReps(int reps) {
@@ -458,9 +458,9 @@ public class CurrWorkout {
         return this.currSession;
     }
 
-    private void resetIndices() {
-        this.ex_i = 0;
-        this.set_i = 0;
+    void resetIndices() {
+        this.ex_i = -1;
+        this.set_i = -1;
     }
 
     void saveSessionState() {

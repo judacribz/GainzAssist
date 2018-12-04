@@ -91,7 +91,7 @@ public class Workout {
 
     // Misc functions
     // --------------------------------------------------------------------------------------------
-    /* Misc function used to store Workout information in the Firebase db */
+    /* Misc function used to store Workout information in the FireBase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();
         Map<String, Object> exs = exerciseToMap(exercises);

@@ -35,7 +35,7 @@
             app:tabIndicatorColor="@color/colorGreen"
             app:tabIndicatorHeight="2dp"
             app:tabSelectedTextColor="@color/colorGreen"
-            app:tabTextColor="@color/colorBg">
+            app:tabTextColor="@color/colorLightBg">
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tab_warmups"
@@ -48,6 +48,7 @@
                 android:id="@+id/tab_workout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@color/colorBg"
                 android:icon="@drawable/ic_workout"
                 android:text="@string/workout"/>
 

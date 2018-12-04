@@ -96,26 +96,25 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     @Override
     protected void onStop() {
         super.onStop();
+        currWorkout.resetIndices();
     }
 
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-
-        currWorkout.saveSessionState();
-
-        addIncompleteWorkoutPref(this, workout.getName());
-//        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
-//        finish();
+        handleLeavingScreen();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        currWorkout.saveSessionState();
-
-        addIncompleteWorkoutPref(this, workout.getName());
+        handleLeavingScreen();
 //        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
+    }
+
+    public void handleLeavingScreen() {
+        currWorkout.saveSessionState();
+        addIncompleteWorkoutPref(this, workout.getName());
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
@@ -138,26 +137,26 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
             @Override
             public void onTabSelected(Tab tab) {
                 super.onTabSelected(tab);
-                icon = tab.getIcon();
-                if (icon != null) {
-                    icon.setColorFilter(
-                            ContextCompat.getColor(getApplicationContext(), R.color.colorBg),
-                            PorterDuff.Mode.SRC_IN
-                    );
-                }
+//                icon = tab.getIcon();
+//                if (icon != null) {
+//                    icon.setColorFilter(
+//                            ContextCompat.getColor(getApplicationContext(), R.color.colorBg),
+//                            PorterDuff.Mode.SRC_IN
+//                    );
+//                }
             }
 
             @Override
             public void onTabUnselected(Tab tab) {
                 super.onTabUnselected(tab);
 
-                icon = tab.getIcon();
-                if (icon != null) {
-                    icon.setColorFilter(
-                            ContextCompat.getColor(getApplicationContext(), R.color.colorGreen),
-                            PorterDuff.Mode.SRC_IN
-                    );
-                }
+//                icon = tab.getIcon();
+//                if (icon != null) {
+//                    icon.setColorFilter(
+//                            ContextCompat.getColor(getApplicationContext(), R.color.colorGreen),
+//                            PorterDuff.Mode.SRC_IN
+//                    );
+//                }
             }
         });
 
@@ -176,12 +175,10 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     //CurrWorkout.DataListener//Override//////////////////////////////////////////////////////////
 
 
-
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds
      * dynamically to the view.
      * Called in ExercisesList and WarmupsList
      */
-
     @SuppressLint("InflateParams")
     public void displaySets(int id,
                             Exercise exercise,
