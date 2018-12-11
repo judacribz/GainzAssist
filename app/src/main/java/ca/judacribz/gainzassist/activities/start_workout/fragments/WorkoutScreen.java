@@ -110,7 +110,13 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @Override
     public void onResume() {
         super.onResume();
-        setupEquipView();
+        if (equipmentView == null) {
+            setupEquipView();
+
+            Toast.makeText(act, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
+        }
+
+        updateUI();
 //        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
 //        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
     }
@@ -141,7 +147,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     // to trigger onDraw method
     public void setupEquipView() {
         equipmentView = new EquipmentView(act);
-        int p  = getResources().getDisplayMetrics().widthPixels;
+        int p = getResources().getDisplayMetrics().widthPixels;
 
 
         equipmentView.setLayoutParams(new LayoutParams(
@@ -152,7 +158,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
         vgEquipDisp.addView(equipmentView, 0);
         tvTimer.setWidth(p/2);
-        updateUI();
     }
 
     @Override

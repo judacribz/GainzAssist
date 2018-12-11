@@ -82,8 +82,6 @@ public class WorkoutRepo {
     }
 
     void insertSession(Session session) {
-        addWorkoutSessionFirebase(session);
-
         setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session);
     }
 
@@ -228,7 +226,6 @@ public class WorkoutRepo {
 
         OnWorkoutReceivedListener onWorkoutReceivedListener = null;
 
-
         private DataSnapshot workoutShot = null;
         private String workoutName = null;
         private Workout workout = null;
@@ -333,12 +330,12 @@ public class WorkoutRepo {
                     case INSERT_SESSION:
                         sessionDao.insert(session);
                         id = sessionDao.getId(timestamp);
-
-                        SparseArray<ArrayList<ExerciseSet>> exSets = session.getSessionSets();
-                        for (int i = 0; i < exSets.size(); i++){
-                            for (ExerciseSet exerciseSet : exSets.get(i)) {
+                        session.setId(id);
+                        addWorkoutSessionFirebase(session);
+                        ArrayList<Exercise> exSets = session.getSessionSets();
+                        for (Exercise ex : exSets){
+                            for (ExerciseSet exerciseSet : ex.getSetsList()) {
                                 exerciseSet.setSessionId(id);
-
                                 insertSet(exerciseSet);
                             }
                         }

@@ -99,7 +99,9 @@ public class ExerciseSet {
     public void setExerciseName(String exerciseName) {
         this.exerciseName = exerciseName;
     }
-
+    public String getExerciseName() {
+        return exerciseName;
+    }
     public int getSetNumber() {
         return setNumber;
     }
@@ -131,6 +133,9 @@ public class ExerciseSet {
     Map<String, Object> toMap() {
         Map<String, Object> exerciseSetMap = new HashMap<>();
 
+        if (id != -1) {
+            exerciseSetMap.put("id", id);
+        }
         exerciseSetMap.put("reps", reps);
         exerciseSetMap.put("weight", weight);
 

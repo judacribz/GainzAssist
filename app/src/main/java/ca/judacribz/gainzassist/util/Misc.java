@@ -120,11 +120,11 @@ public class Misc {
 
     public static Map<String, Object> readValue(String childStr) {
         Map<String, Object> childMap = new HashMap<>();
-
+Logger.d(childStr);
         try {
             childMap = mapper.readValue(
                     childStr,
-                    new TypeReference<Map<String, Object>>() {}
+                    new TypeReference<HashMap<String, Object>>() {}
             );
         } catch (IOException ioe) {
             ioe.printStackTrace();

@@ -246,35 +246,32 @@ public class Exercise {
 
     /* Misc function used to store Exercise information in the firebase db */
     public Map<String, Object> toMap() {
-        Map<String, Object> exercise = new HashMap<>();
-
-        exercise.put("name",      name);
-        exercise.put("type",      type);
-        exercise.put("equipment", equipment);
-        exercise.put("sets", sets);
-        exercise.put("reps", reps);
-        exercise.put("weight", weight);
-
-
-        return exercise;
+        return new HashMap<String, Object>() {{
+            put("name", name);
+            put("type", type);
+            put("equipment", equipment);
+            put("sets", sets);
+            put("reps", reps);
+            put("weight", weight);
+        }};
     }
 
     public Map<String, Object> setsToMap() {
         Map<String, Object>
-                exercise = new HashMap<>(),
-                setMap = new HashMap<>();
+                setMap = new HashMap<>(),
+                exMap = new HashMap<String, Object>() {{
+                    put("id",      id);
+                    put("name",      name);
+                    put("type",      type);
+                    put("equipment", equipment);
+                }};
 
-        exercise.put("name",      name);
-        exercise.put("type",      type);
-        exercise.put("equipment", equipment);
-
-        for (ExerciseSet set : setsList) {
+        for (ExerciseSet set : this.setsList) {
             setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
         }
 
-        exercise.put("sets", setMap);
+        exMap.put("sets", setMap);
 
-
-        return exercise;
+        return exMap;
     }
 }

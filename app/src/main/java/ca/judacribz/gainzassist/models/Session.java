@@ -38,13 +38,10 @@ public class Session {
     String workoutName;
 
     @Ignore
-    SparseArray<ArrayList<ExerciseSet>> sessionSets = new SparseArray<>();
+    ArrayList<Exercise> sessionSets = new ArrayList<>();
 
     @Ignore
     Map<String, Float> avgWeights = new HashMap<>();
-
-
-
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -97,7 +94,7 @@ public class Session {
     }
 
 
-    public SparseArray<ArrayList<ExerciseSet>> getSessionSets() {
+    public ArrayList<Exercise> getSessionSets() {
         return sessionSets;
     }
 
@@ -106,39 +103,33 @@ public class Session {
     }
     // ============================================================================================
 
-    public void addExerciseSets(Exercise exercise, ArrayList<ExerciseSet> exerciseSets, float weightChange) {
-        this.sessionSets.put(exercise.getExerciseNumber(), exerciseSets);
-
+    public void addExercise(Exercise exercise, float weightChange) {
         float weight = 0.0f;
-        for (ExerciseSet exerciseSet : exerciseSets) {
+        for (ExerciseSet exerciseSet : exercise.getSetsList()) {
             weight += exerciseSet.getWeight();
         }
 
-        this.avgWeights.put(exercise.getName(), weight/ exerciseSets.size() + weightChange);
+        this.sessionSets.add(exercise);
+
+        this.avgWeights.put(exercise.getName(), weight/ exercise.getSetsList().size() + weightChange);
     }
 
     /* Misc function used to store Session information in the firebase db */
     public Map<String, Object> toMap() {
         Map<String, Object>
-                sessionMap = new HashMap<>(),
-                exMap = new HashMap<>(),
-                setMap;
+                exsMap = new HashMap<>(),
+                sessionMap = new HashMap<String, Object>() {{
+                    put(SESSION_ID, id);
+                    put(WORKOUT_NAME, workoutName);
+                    put(WORKOUT_ID, workoutId);
+                }};
 
-        sessionMap.put("workoutName", workoutName);
-
-        for (int i = 0; i < sessionSets.size(); i++){
-
-            setMap = new HashMap<>();
-            for (ExerciseSet exerciseSet : sessionSets.get(i)) {
-                setMap.put(String.valueOf(exerciseSet.getSetNumber()), exerciseSet.toMap());
-            }
-            exMap.put(String.valueOf(i), setMap);
+        for (Exercise exSets : sessionSets){
+            exsMap.put(String.valueOf(exSets.getExerciseNumber()), exSets.setsToMap());
         }
-
-        sessionMap.put(SETS, exMap);
+        sessionMap.put(EXERCISES, exsMap);
 
         return  sessionMap;
-
     }
 
     public Map<String, Object> sessionStateMap(int exerciseIndex, int setIndex) {

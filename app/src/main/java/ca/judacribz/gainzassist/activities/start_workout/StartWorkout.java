@@ -94,8 +94,9 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(this, "dest", Toast.LENGTH_SHORT).show();
         currWorkout.resetIndices();
     }
 

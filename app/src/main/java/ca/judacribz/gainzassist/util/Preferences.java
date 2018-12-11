@@ -17,8 +17,14 @@ public class Preferences {
     public static final String WARMUP_EXERCISES = "warmup exercises";
     public static final String EXERCISE_INDEX = "exercise index";
     public static final String SET_INDEX = "set index";
+
+    public static final String WORKOUT_NAME = "workoutName";
+    public static final String WORKOUT_ID = "workoutId";
     public static final String SESSION = "session";
+    public static final String SESSION_ID = "sessionId";
     public static final String SETS = "sets";
+    public static final String EXERCISES = "exercises";
+    public static final String EXERCISE_ID = "exerciseId";
     public static final String REPS = "reps";
     public static final String WEIGHT = "weight";
 
