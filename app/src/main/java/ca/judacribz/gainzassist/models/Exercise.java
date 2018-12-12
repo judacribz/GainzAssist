@@ -126,7 +126,7 @@ public class Exercise {
     }
 
     public int getWorkoutId() {
-        return workoutId;
+        return this.workoutId;
     }
 
     public void setWorkoutId(int workoutId) {
@@ -134,7 +134,7 @@ public class Exercise {
     }
 
     public int getExerciseNumber() {
-        return exerciseNumber;
+        return this.exerciseNumber;
     }
 
     public void setExerciseNumber(int exerciseNumber) {

@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist.activities.start_workout;
+package ca.judacribz.gainzassist.adapters;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,10 +7,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
-import android.util.Log;
+import ca.judacribz.gainzassist.activities.add_workout.ExEntry;
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Workout;
 import org.parceler.Parcels;
 
 public class WorkoutPagerAdapter extends FragmentPagerAdapter {
@@ -21,16 +20,19 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
             "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS";
     final public static String EXTRA_MAIN_EXERCISES =
             "ca.judacribz.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES";
-    final private static Fragment[] FMTS = new Fragment[] {
-            WarmupsList.newInstance(),
-            WorkoutScreen.newInstance(),
-            ExercisesList.newInstance()
-    };
+    final public static String EXTRA_EX_INDEX =
+            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_EX_INDEX";
 
-    final private static Fragment[] FMTS_NO_WARMUPS = new Fragment[] {
-            WorkoutScreen.newInstance(),
-            ExercisesList.newInstance()
+    final private static Fragment[] FMTS = new Fragment[] {
+            WarmupsList.getInstance(),
+            WorkoutScreen.getInstance(),
+            ExercisesList.getInstance()
     };
+    final private static Fragment[] FMTS_NO_WARMUPS = new Fragment[] {
+            WorkoutScreen.getInstance(),
+            ExercisesList.getInstance()
+    };
+    private int numExs;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -42,7 +44,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
     @SafeVarargs
-    WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Exercise>... exercises) {
+    public WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Exercise>... exercises) {
         super(fragmentManager);
 
 //        Log.d("WARMUPS", "reps" + warmups.get(0).getSetsList().size());
@@ -57,6 +59,29 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         for (Fragment fmt : fmts) {
             fmt.setArguments(bundle);
         }
+    }
+
+    public WorkoutPagerAdapter(FragmentManager fragmentManager, int numExs) {
+        super(fragmentManager);
+        this.numExs = numExs;
+        fmts = new Fragment[numExs];
+
+        for (int i = 0; i < fmts.length; i++) {
+            fmts[i] = new ExEntry();
+            ((ExEntry) fmts[i]).setInd(i);
+        }
+    }
+    public void addTab() {
+        this.numExs++;
+        Fragment[] tempFmts = new Fragment[this.numExs];
+
+        System.arraycopy(fmts, 0, tempFmts, 0, fmts.length);
+        tempFmts[fmts.length] = new ExEntry();
+        ((ExEntry) tempFmts[fmts.length]).setInd(fmts.length);
+        fmts = new Fragment[this.numExs];
+
+        System.arraycopy(tempFmts, 0, fmts, 0, fmts.length);
+        fmts = tempFmts;
     }
     // ######################################################################################### //
 

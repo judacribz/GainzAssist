@@ -10,17 +10,15 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Workout;
 import org.parceler.Parcels;
 
-import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_WARMUPS;
+import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_WARMUPS;
 
 public class WarmupsList extends Fragment {
 
@@ -44,7 +42,7 @@ public class WarmupsList extends Fragment {
         // Required empty public constructor
     }
 
-    public static WarmupsList newInstance() {
+    public static WarmupsList getInstance() {
         return new WarmupsList();
     }
 

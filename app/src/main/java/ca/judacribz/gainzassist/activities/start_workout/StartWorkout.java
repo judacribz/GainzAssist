@@ -2,11 +2,9 @@ package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.TabLayout.Tab;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -16,13 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import android.widget.Toast;
 import butterknife.*;
-import java.util.ArrayList;
-
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
 import ca.judacribz.gainzassist.models.*;
+import java.util.ArrayList;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.util.Preferences.*;

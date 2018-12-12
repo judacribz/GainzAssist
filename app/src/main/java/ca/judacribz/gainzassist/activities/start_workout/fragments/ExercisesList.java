@@ -9,19 +9,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Workout;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
-import static ca.judacribz.gainzassist.activities.start_workout.WorkoutPagerAdapter.EXTRA_MAIN_EXERCISES;
+import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_MAIN_EXERCISES;
 
 public class ExercisesList extends Fragment {
 
@@ -45,7 +42,7 @@ public class ExercisesList extends Fragment {
         // Required empty public constructor
     }
 
-    public static ExercisesList newInstance() {
+    public static ExercisesList getInstance() {
         return new ExercisesList();
     }
     // ######################################################################################### //

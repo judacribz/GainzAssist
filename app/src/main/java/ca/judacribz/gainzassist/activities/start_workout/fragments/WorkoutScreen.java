@@ -72,7 +72,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         // Required empty public constructor
     }
 
-    public static WorkoutScreen newInstance() {
+    public static WorkoutScreen getInstance() {
         return new WorkoutScreen();
     }
     // ######################################################################################### //
