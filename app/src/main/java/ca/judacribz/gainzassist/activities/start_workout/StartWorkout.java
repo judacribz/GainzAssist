@@ -69,16 +69,16 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         super.onResume();
         if (viewPager.getAdapter() == null) {
             setCurrSession();
+            Toast.makeText(this, "viewpager null", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void setCurrSession() {
         currWorkout.setDataListener(this);
+        Toast.makeText(this, "setsession", Toast.LENGTH_SHORT).show();
 
         if (removeIncompleteWorkoutPref(this, workout.getName())) {
             currWorkout.retrieveCurrWorkout(workout);
-
-            removeIncompleteSessionPref(this, workout.getName());
         } else {
             currWorkout.setCurrWorkout(workout);
         }
@@ -93,7 +93,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "dest", Toast.LENGTH_SHORT).show();
+
         currWorkout.resetIndices();
     }
 

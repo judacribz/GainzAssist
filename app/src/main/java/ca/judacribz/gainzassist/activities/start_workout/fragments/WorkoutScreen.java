@@ -23,6 +23,7 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
 import com.anton46.stepsview.StepsView;
+import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
 import static ca.judacribz.gainzassist.util.Preferences.*;
@@ -110,11 +111,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @Override
     public void onResume() {
         super.onResume();
-        if (equipmentView == null) {
+//        if (equipmentView == null) {
             setupEquipView();
-
-            Toast.makeText(act, "sdfsdfsdf", Toast.LENGTH_SHORT).show();
-        }
+//        }
 
         updateUI();
 //        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
@@ -333,6 +332,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 currWorkout.getCurrNumSets())
         );
 
+        Logger.d(currWorkout.getCurrNumSets());
 //        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
 //        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
 

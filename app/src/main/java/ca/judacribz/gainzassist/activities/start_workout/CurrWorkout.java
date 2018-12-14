@@ -109,11 +109,13 @@ public class CurrWorkout {
     }
 
     void retrieveCurrWorkout(Workout workout) {
-        setRetrievedWorkout(readValue(getIncompleteSessionPref(context, workout.getName())), workout);
+        setRetrievedWorkout(readValue(getIncompleteSessionPref(this.context, workout.getName())), workout);
+
+        removeIncompleteSessionPref(this.context, workout.getName());
     }
 
     private void setRetrievedWorkout(Map<String, Object> map, Workout workout) {
-        Map<String, Object> exsMap;
+        Map<String, Object> exsMap, exMap;
         Map<String, Object> setsMap, setMap;
 
         currWarmups = new ArrayList<>();
@@ -121,13 +123,27 @@ public class CurrWorkout {
         this.currSession = new Session(workout);
 
         this.ex_i = Integer.valueOf(String.valueOf(map.get(EXERCISE_INDEX)));
-        Logger.d("yooooo" + this.ex_i);
+        //TODO remove
+//        Logger.d("yooooo" + this.ex_i);
         this.set_i = Integer.valueOf(String.valueOf(map.get(SET_INDEX)));
 
         exsMap =  readValue(readValue(map.get(SESSION)).get(EXERCISES));
         for (Map.Entry<String, Object> exEntry : exsMap.entrySet()) {
             String exNum = exEntry.getKey();
-            Exercise exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
+            exMap = readValue(exEntry.getValue());
+            //TODO test without using map
+            Exercise ex = workout.getExerciseFromIndex(Integer.valueOf(exNum));
+            Exercise exercise = new Exercise(
+                    Integer.valueOf(exNum),
+                    String.valueOf(exMap.get("name")),
+                    String.valueOf(exMap.get("type")),
+                    String.valueOf(exMap.get("equipment")),
+                    ex.getNumSets(),
+                    ex.getReps(),
+                    ex.getWeight(),
+                    MAIN_SET);
+            exercise.setId(ex.getId());
+//            exercise.setSetsType(MAIN_SET);
             setsMap = readValue(readValue(exEntry.getValue()).get(SETS));
 
             this.finishedSets = new ArrayList<>();
@@ -140,6 +156,7 @@ public class CurrWorkout {
                         Float.valueOf(String.valueOf(setMap.get(WEIGHT)))
                 ));
             }
+            exercise.setSetsList(this.finishedSets);
 
             this.currSession.addExercise(
                     exercise,
@@ -150,10 +167,10 @@ public class CurrWorkout {
         genWarmups(workout.getExercises());
 
         enablePrettyMapper();
-        writeValueAsString(this.currSession.sessionStateMap(
+        Logger.d(writeValueAsString(this.currSession.sessionStateMap(
                 ex_i,
                 set_i
-        ));
+        )));
     }
 
     void setCurrWorkout(Workout workout) {
@@ -279,7 +296,7 @@ public class CurrWorkout {
 
             // Not end of all exercises, set next exercise
             } else {
-                setCurrExercise(currWorkout.getExerciseFromIndex(this.ex_i));
+                setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
                 finishedSets = new ArrayList<>();
             }
 
@@ -315,20 +332,16 @@ public class CurrWorkout {
     }
 
     private void setCurrExercise(Exercise exercise) {
-        this.currExercise = exercise;
-        if (getIsWarmup()) {
-            this.finishedSets = new ArrayList<>();
-        } else {
-            if (this.finishedSets.size() - 1 == this.set_i) {
-                this.finishedSets = new ArrayList<>();
-            }
-        }
-
-        setCurrEquip(this.currExercise.getEquipment());
-
         if (this.set_i == -1) {
             this.set_i = 0;
         }
+
+        this.currExercise = exercise;
+        if (getIsWarmup() || this.set_i == 0) {
+            this.finishedSets = new ArrayList<>();
+        }
+
+        setCurrEquip(this.currExercise.getEquipment());
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
     }
 
@@ -467,8 +480,9 @@ public class CurrWorkout {
     void saveSessionState() {
 
         if (!getIsWarmup() && !finishedSets.isEmpty()) {
-            this.currExercise.setSetsList(this.finishedSets);
-            this.currSession.addExercise(this.currExercise, this.currWeightChange);
+            Exercise ex = this.currExercise;
+            ex.setSetsList(this.finishedSets);
+            this.currSession.addExercise(ex, this.currWeightChange);
         }
 
         enablePrettyMapper();
@@ -477,6 +491,7 @@ public class CurrWorkout {
                 set_i
         ));
 
+        Logger.d("leave" + jsonStr);
         if (!jsonStr.isEmpty()) {
             addIncompleteSessionPref(
                     context,

@@ -25,8 +25,7 @@ import static android.arch.persistence.room.ForeignKey.*;
                 onUpdate = CASCADE)},
         indices = {
             @Index("session_id"),
-            @Index("exercise_id"),
-            @Index(value = {"session_id", "exercise_id", "set_number"})})
+            @Index("exercise_id")})
 public class ExerciseSet {
 
     // Global Vars

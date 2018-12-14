@@ -111,7 +111,14 @@ public class Session {
 
         this.sessionSets.add(exercise);
 
-        this.avgWeights.put(exercise.getName(), weight/ exercise.getSetsList().size() + weightChange);
+//        this.avgWeights.put(exercise.getName(), weight/ exercise.getSetsList().size() + weightChange);
+    }
+
+    public void remLastExercise() {
+
+        this.sessionSets.remove(this.sessionSets.size() - 1);
+
+//        this.avgWeights.put(exercise.getName(), weight/ exercise.getSetsList().size() + weightChange);
     }
 
     /* Misc function used to store Session information in the firebase db */
