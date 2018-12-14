@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
@@ -36,13 +37,11 @@ public class ExEntry extends Fragment {
         void cancelWorkout();
     }
 
-    Bundle bundle;
-    ArrayList<ExerciseSet> exerciseSets;
+
     String exerciseName;
 
     int num_reps, num_sets, ex_i = 0, minInt = 1; // for min num_reps/num_sets
     float weight, minWeight, weightChange;
-
 
     @BindView(R.id.et_exercise_name)
     EditText etExerciseName;
@@ -91,6 +90,9 @@ public class ExEntry extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
         ButterKnife.bind(this, view);
 
+        num_reps = Integer.valueOf(getString(R.string.starting_reps));
+        num_sets = Integer.valueOf(getString(R.string.starting_sets));
+
         setSpinnerWithArray(getActivity(), R.array.exerciseEquipment, sprEquipment);
 
         return view;
@@ -105,7 +107,7 @@ public class ExEntry extends Fragment {
 
 
     @OnItemSelected(R.id.spr_equipment)
-    public void equipmentSelected(Spinner spinner, int position) {
+    public void equipmentSelected(int position) {
         switch (position) {
             case 0:
                 minWeight = BB_MIN_WEIGHT;
@@ -117,12 +119,25 @@ public class ExEntry extends Fragment {
                 break;
         }
 
-        if (!ibtnDecWeight.isEnabled() || weight < minWeight) {
+
+        if (weight > minWeight) {
+
+            if (!ibtnDecWeight.isEnabled()) {
+                ibtnDecWeight.setEnabled(true);
+                ibtnDecWeight.setVisibility(View.VISIBLE);
+            }
+        } else {
             etWeight.setText(String.valueOf(minWeight));
+
+            if (ibtnDecWeight.isEnabled()) {
+                ibtnDecWeight.setEnabled(false);
+                ibtnDecWeight.setVisibility(View.GONE);
+            }
         }
+
     }
 
-    // TextWatcher Handling
+    // OnTextChanged Handling
     // =============================================================================================
     @OnTextChanged(value = R.id.et_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeNumExercisesChanged() {
@@ -187,7 +202,34 @@ public class ExEntry extends Fragment {
 
         return value;
     }
-    // =TextWatcher=Handling========================================================================
+    // =OnTextChanged=Handling======================================================================
+
+    // OnFocusChanged Handling
+    // =============================================================================================
+    @OnFocusChange({R.id.et_num_reps, R.id.et_num_sets, R.id.et_weight})
+    void onFocusLeft(EditText et, boolean hasFocus) {
+        if (!hasFocus) {
+            Number min = 0, res = 0;
+            switch (et.getId()) {
+                case R.id.et_weight:
+                    res = weight;
+                    min = minWeight;
+                    break;
+                case R.id.et_num_reps:
+                    res = num_reps;
+                    min = minInt;
+                    break;
+                case R.id.et_num_sets:
+                    res = num_sets;
+                    min = minInt;
+                    break;
+            }
+
+            handleFocusLeft(et, min, res);
+        }
+
+    }
+    // =OnFocusChanged=Handling=====================================================================
 
     // Click Handling
     // =============================================================================================

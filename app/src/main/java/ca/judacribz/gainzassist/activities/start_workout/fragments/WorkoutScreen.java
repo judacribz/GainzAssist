@@ -27,6 +27,8 @@ import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
 import static ca.judacribz.gainzassist.util.Preferences.*;
+import static ca.judacribz.gainzassist.util.UI.getTextString;
+import static ca.judacribz.gainzassist.util.UI.handleFocusLeft;
 
 public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener {
 
@@ -240,6 +242,29 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
             btnDecWeight.setEnabled(false);
     }
     // =TextWatcher=Handling========================================================================
+
+    // OnFocusChanged Handling
+    // =============================================================================================
+    @OnFocusChange({R.id.et_curr_reps, R.id.et_curr_weight})
+    void onFocusLeft(EditText et, boolean hasFocus) {
+        if (!hasFocus) {
+            Number min, res;
+            switch (et.getId()) {
+                case R.id.et_curr_weight:
+                    min = currWorkout.getCurrMinWeight();
+                    res = currWorkout.getCurrWeight();
+                    break;
+                default:
+                    min = MIN_REPS;
+                    res = currWorkout.getCurrReps();
+                    break;
+            }
+
+            handleFocusLeft(et, min, res);
+         }
+    }
+    // =OnFocusChanged=Handling=====================================================================
+
 
     // Click Handling
     // =============================================================================================

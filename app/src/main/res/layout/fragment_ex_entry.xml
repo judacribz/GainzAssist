@@ -59,7 +59,9 @@
 			android:layout_centerInParent="true"
 			android:textAlignment="center"
 			android:minEms="4"
-			android:inputType="numberDecimal"/>
+			android:inputType="numberDecimal"
+			android:text="@string/starting_weight"
+			android:selectAllOnFocus="true"/>
 
 		<ImageButton
 			android:id="@+id/ibtn_inc_weight"
@@ -109,7 +111,8 @@
 			android:textAlignment="center"
 			android:ems="4"
 			android:inputType="number"
-			android:text="@string/min"/>
+			android:text="@string/starting_reps"
+			android:selectAllOnFocus="true"/>
 
 		<ImageButton
 			android:id="@+id/ibtn_inc_reps"
@@ -156,7 +159,8 @@
 			android:textAlignment="center"
 			android:ems="4"
 			android:inputType="number"
-			android:text="@string/starting_sets" />
+			android:text="@string/starting_sets"
+			android:selectAllOnFocus="true" />
 
 		<ImageButton
 			android:id="@+id/ibtn_inc_sets"

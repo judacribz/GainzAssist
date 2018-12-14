@@ -203,15 +203,13 @@ public class Exercise {
     }
 
     public void setSetsList(@Nullable ArrayList<ExerciseSet> setsList) {
-        this.setsList = new ArrayList<>();
-        for (int i = 0; i < sets; i++) {
-            addSet(new ExerciseSet(id, name, i+1, reps, weight));
-        }
-
         if (setsList != null) {
-
             for (ExerciseSet set : setsList) {
                 updateSet(set);
+            }
+        } else {
+            for (int i = 0; i < sets; i++) {
+                addSet(new ExerciseSet(id, name, i+1, reps, weight));
             }
         }
     }

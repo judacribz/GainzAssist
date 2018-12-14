@@ -197,4 +197,15 @@ public class UI {
         // Set the spring in motion; moving from 0 to 1
         return spring;
     }
+
+
+    public static void handleFocusLeft(EditText et, Number min, Number res) {
+        String etStr = getTextString(et);
+
+        if (etStr.isEmpty()) {
+            et.setText(String.valueOf(res));
+        } else if(Float.valueOf(etStr) < min.floatValue()) {
+            et.setText(String.valueOf(min));
+        }
+    }
 }

@@ -132,18 +132,18 @@ public class CurrWorkout {
             String exNum = exEntry.getKey();
             exMap = readValue(exEntry.getValue());
             //TODO test without using map
-            Exercise ex = workout.getExerciseFromIndex(Integer.valueOf(exNum));
-            Exercise exercise = new Exercise(
-                    Integer.valueOf(exNum),
-                    String.valueOf(exMap.get("name")),
-                    String.valueOf(exMap.get("type")),
-                    String.valueOf(exMap.get("equipment")),
-                    ex.getNumSets(),
-                    ex.getReps(),
-                    ex.getWeight(),
-                    MAIN_SET);
-            exercise.setId(ex.getId());
-//            exercise.setSetsType(MAIN_SET);
+            Exercise exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
+//            Exercise exercise = new Exercise(
+//                    Integer.valueOf(exNum),
+//                    String.valueOf(exMap.get("name")),
+//                    String.valueOf(exMap.get("type")),
+//                    String.valueOf(exMap.get("equipment")),
+//                    ex.getNumSets(),
+//                    ex.getReps(),
+//                    ex.getWeight(),
+//                    MAIN_SET);
+//            exercise.setId(ex.getId());
+            exercise.setSetsType(MAIN_SET);
             setsMap = readValue(readValue(exEntry.getValue()).get(SETS));
 
             this.finishedSets = new ArrayList<>();
