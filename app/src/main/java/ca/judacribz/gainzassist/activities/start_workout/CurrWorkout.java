@@ -214,7 +214,7 @@ public class CurrWorkout {
             percWeight = minWeight / weight;
             do {
                 newWeight = percWeight * weight;
-                newWeight -= newWeight % 5;
+                newWeight -= newWeight % minWeight;
                 exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
 
                 percWeight += 0.2f;
@@ -275,7 +275,6 @@ public class CurrWorkout {
             this.set_i = 0;
             this.ex_i++;
 
-            Logger.d(this.currExercise.getName());
             this.currExercise.setSetsList(this.finishedSets);
             this.currSession.addExercise(
                     this.currExercise,

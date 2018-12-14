@@ -105,20 +105,21 @@ public class Session {
 
     public void addExercise(Exercise exercise, float weightChange) {
         float weight = 0.0f;
+        float expectedReps = (float)exercise.getReps();
         for (ExerciseSet exerciseSet : exercise.getSetsList()) {
-            weight += exerciseSet.getWeight();
+            weight += exerciseSet.getWeight() * (float)exerciseSet.getReps()/expectedReps;
         }
+        weight = weight / exercise.getSetsList().size() + weightChange;
+        weight -= weight % weightChange;
 
         this.sessionSets.add(exercise);
 
-//        this.avgWeights.put(exercise.getName(), weight/ exercise.getSetsList().size() + weightChange);
+        this.avgWeights.put(exercise.getName(), weight);
     }
 
     public void remLastExercise() {
 
         this.sessionSets.remove(this.sessionSets.size() - 1);
-
-//        this.avgWeights.put(exercise.getName(), weight/ exercise.getSetsList().size() + weightChange);
     }
 
     /* Misc function used to store Session information in the firebase db */
