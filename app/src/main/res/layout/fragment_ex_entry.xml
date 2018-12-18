@@ -6,6 +6,8 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical"
+	android:padding="4dp"
+	android:background="@color/colorBg"
 	android:theme="@style/AddWorkoutTheme"
 	tools:context=".activities.add_workout.ExercisesEntry">
 
@@ -14,12 +16,14 @@
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
-		android:layout_weight="@integer/ll_lg_weight">
+		android:layout_weight="@integer/ll_lg_weight"
+		android:layout_margin="2dp"
+		android:background="@color/colorLightBg">
 
 		<android.support.design.widget.TextInputLayout
-			android:layout_height="75dp"
+			android:layout_height="match_parent"
 			android:layout_width="match_parent"
-			android:layout_margin="10dp"
+			android:layout_margin="4dp"
 			android:layout_centerInParent="true"
 			app:hintTextAppearance="@style/HintTextAppearance">
 
@@ -36,174 +40,220 @@
 	<!--Exercise=Name===========================================================================-->
 
 	<!-- Exercise equipment spinner -->
-	<Spinner
-		android:id="@+id/spr_equipment"
+	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
-		android:layout_weight="@integer/ll_md_weight"
-		android:layout_margin="10dp"
-		android:textColor="@color/colorText" />
+		android:layout_weight="@integer/ll_sm_weight"
+		android:layout_margin="2dp"
+		android:padding="4dp"
+		android:background="@color/colorLightBg">
+
+		<TextView
+			android:id="@+id/tv_equipment"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:layout_margin="2dp"
+			android:gravity="center"
+			android:text="@string/equipment"/>
+
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:layout_toEndOf="@id/tv_equipment"
+			android:layout_margin="2dp"
+			android:background="@drawable/spinner_box">
+
+			<Spinner
+				android:id="@+id/spr_equipment"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:gravity="center"
+				android:textAlignment="center"
+				android:background="@color/colorLightBg"
+				android:textColor="@color/colorText"
+			style="@style/Widget.AppCompat.Spinner"/>
+
+			<ImageView
+				android:layout_width="wrap_content"
+				android:layout_height="match_parent"
+				android:layout_alignParentEnd="true"
+				android:layout_centerVertical="true"
+				android:layout_gravity="center"
+				android:src="@drawable/ic_drop_dark" />
+		</RelativeLayout>
+
+	</RelativeLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+	  	android:layout_height="wrap_content"
+		android:layout_weight="@integer/ll_lg_weight"
+		android:orientation="vertical"
+  		android:layout_margin="2dp"
+  		android:background="@color/colorLightBg">
 
 	<!-- Weight -->
 	<!--========================================================================================-->
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="@integer/ll_lg_weight">
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="@integer/ll_sm_weight"
+			android:padding="2dp">
 
-		<EditText
-			android:id="@+id/et_weight"
-			android:layout_width="wrap_content"
-			android:layout_height="51dp"
-			android:layout_margin="10dp"
-			android:layout_centerInParent="true"
-			android:textAlignment="center"
-			android:minEms="4"
-			android:inputType="numberDecimal"
-			android:text="@string/starting_weight"
-			android:selectAllOnFocus="true"/>
+			<EditText
+				android:id="@+id/et_weight"
+				android:layout_width="wrap_content"
+				android:layout_height="51dp"
+				android:layout_margin="10dp"
+				android:layout_centerInParent="true"
+				android:textAlignment="center"
+				android:minEms="4"
+				android:inputType="numberDecimal"
+				android:text="@string/starting_weight"
+				android:selectAllOnFocus="true"/>
 
-		<ImageButton
-			android:id="@+id/ibtn_inc_weight"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_margin="5dp"
-			android:layout_alignBottom="@id/et_weight"
-			android:layout_toEndOf="@id/et_weight"
-			android:src="@drawable/ic_plus"/>
+			<ImageButton
+				android:id="@+id/ibtn_inc_weight"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_margin="5dp"
+				android:layout_alignBottom="@id/et_weight"
+				android:layout_toEndOf="@id/et_weight"
+				android:src="@drawable/ic_plus"/>
 
-		<ImageButton
-			android:id="@+id/ibtn_dec_weight"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_margin="5dp"
-			android:layout_alignBottom="@id/et_weight"
-			android:layout_toStartOf="@id/et_weight"
-			android:src="@drawable/ic_minus"
-			android:visibility="gone" />
+			<ImageButton
+				android:id="@+id/ibtn_dec_weight"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_margin="5dp"
+				android:layout_alignBottom="@id/et_weight"
+				android:layout_toStartOf="@id/et_weight"
+				android:src="@drawable/ic_minus"
+				android:visibility="gone" />
 
-		<TextView
-			android:id="@+id/tv_num_weight"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_marginTop="-10dp"
-			android:layout_below="@id/et_weight"
-			android:layout_centerHorizontal="true"
-			android:text="@string/hint_lbs"/>
-	</RelativeLayout>
-	<!--WEight==================================================================================-->
-
+			<TextView
+				android:id="@+id/tv_num_weight"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="-10dp"
+				android:layout_below="@id/et_weight"
+				android:layout_centerHorizontal="true"
+				android:text="@string/hint_lbs"/>
+		</RelativeLayout>
+	<!--Weight==================================================================================-->
 
 	<!-- Number of Reps -->
 	<!--========================================================================================-->
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="@integer/ll_lg_weight"
-		tools:ignore="NestedWeights">
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="@integer/ll_sm_weight"
+			tools:ignore="NestedWeights">
 
-		<EditText
-			android:id="@+id/et_num_reps"
-			android:layout_width="wrap_content"
-			android:layout_height="51dp"
-			android:layout_margin="10dp"
-			android:layout_centerInParent="true"
-			android:textAlignment="center"
-			android:ems="4"
-			android:inputType="number"
-			android:text="@string/starting_reps"
-			android:selectAllOnFocus="true"/>
+			<EditText
+				android:id="@+id/et_num_reps"
+				android:layout_width="wrap_content"
+				android:layout_height="51dp"
+				android:layout_margin="10dp"
+				android:layout_centerInParent="true"
+				android:textAlignment="center"
+				android:ems="4"
+				android:inputType="number"
+				android:text="@string/starting_reps"
+				android:selectAllOnFocus="true"/>
 
-		<ImageButton
-			android:id="@+id/ibtn_inc_reps"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_margin="5dp"
-			android:layout_alignBottom="@id/et_num_reps"
-			android:layout_toEndOf="@id/et_num_reps"
-			android:src="@drawable/ic_plus"/>
+			<ImageButton
+				android:id="@+id/ibtn_inc_reps"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_margin="5dp"
+				android:layout_alignBottom="@id/et_num_reps"
+				android:layout_toEndOf="@id/et_num_reps"
+				android:src="@drawable/ic_plus"/>
 
-		<ImageButton
-			android:id="@+id/ibtn_dec_reps"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_margin="5dp"
-			android:layout_alignBottom="@id/et_num_reps"
-			android:layout_toStartOf="@id/et_num_reps"
-			android:src="@drawable/ic_minus"/>
+			<ImageButton
+				android:id="@+id/ibtn_dec_reps"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_margin="5dp"
+				android:layout_alignBottom="@id/et_num_reps"
+				android:layout_toStartOf="@id/et_num_reps"
+				android:src="@drawable/ic_minus"/>
 
-		<TextView
-			android:id="@+id/tv_num_reps"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/et_num_reps"
-			android:layout_marginTop="-10dp"
-			android:layout_centerHorizontal="true"
-			android:text="@string/hint_reps"/>
-	</RelativeLayout>
+			<TextView
+				android:id="@+id/tv_num_reps"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/et_num_reps"
+				android:layout_marginTop="-10dp"
+				android:layout_centerHorizontal="true"
+				android:text="@string/hint_reps"/>
+		</RelativeLayout>
 	<!--Number=of=Sets==========================================================================-->
 
 	<!-- Number of Sets -->
 	<!--========================================================================================-->
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="0dp"
-		android:layout_weight="@integer/ll_lg_weight">
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="@integer/ll_sm_weight">
 
-		<EditText
-			android:id="@+id/et_num_sets"
-			android:layout_width="wrap_content"
-			android:layout_height="51dp"
-			android:layout_margin="10dp"
-			android:layout_centerInParent="true"
-			android:textAlignment="center"
-			android:ems="4"
-			android:inputType="number"
-			android:text="@string/starting_sets"
-			android:selectAllOnFocus="true" />
+			<EditText
+				android:id="@+id/et_num_sets"
+				android:layout_width="wrap_content"
+				android:layout_height="51dp"
+				android:layout_margin="10dp"
+				android:layout_centerInParent="true"
+				android:textAlignment="center"
+				android:ems="4"
+				android:inputType="number"
+				android:text="@string/starting_sets"
+				android:selectAllOnFocus="true" />
 
-		<ImageButton
-			android:id="@+id/ibtn_inc_sets"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_margin="5dp"
-			android:layout_alignBottom="@id/et_num_sets"
-			android:layout_toEndOf="@id/et_num_sets"
-			android:src="@drawable/ic_plus"/>
+			<ImageButton
+				android:id="@+id/ibtn_inc_sets"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_margin="5dp"
+				android:layout_alignBottom="@id/et_num_sets"
+				android:layout_toEndOf="@id/et_num_sets"
+				android:src="@drawable/ic_plus"/>
 
-		<ImageButton
-			android:id="@+id/ibtn_dec_sets"
-			android:layout_width="40dp"
-			android:layout_height="40dp"
-			android:layout_margin="5dp"
-			android:layout_alignBottom="@id/et_num_sets"
-			android:layout_toStartOf="@id/et_num_sets"
-			android:src="@drawable/ic_minus"/>
+			<ImageButton
+				android:id="@+id/ibtn_dec_sets"
+				android:layout_width="40dp"
+				android:layout_height="40dp"
+				android:layout_margin="5dp"
+				android:layout_alignBottom="@id/et_num_sets"
+				android:layout_toStartOf="@id/et_num_sets"
+				android:src="@drawable/ic_minus"/>
 
-		<TextView
-			android:id="@+id/tv_num_sets"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_below="@id/et_num_sets"
-			android:layout_marginTop="-10dp"
-			android:layout_centerHorizontal="true"
-			android:text="@string/hint_sets"/>
-	</RelativeLayout>
+			<TextView
+				android:id="@+id/tv_num_sets"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_below="@id/et_num_sets"
+				android:layout_marginTop="-10dp"
+				android:layout_centerHorizontal="true"
+				android:text="@string/hint_sets"/>
+		</RelativeLayout>
 	<!--Number=of=Sets==========================================================================-->
+	</LinearLayout>
 
 	<RelativeLayout
 		android:layout_width="match_parent"
 		android:layout_height="0dp"
 		android:layout_weight="@integer/ll_lg_weight"
-		android:gravity="bottom">
+		android:gravity="center"
+		android:layout_margin="2dp"
+		android:padding="2dp"
+		android:background="@color/colorLightBg">
 
 		<Button
 			android:id="@+id/btn_enter"
 			android:layout_width="150dp"
-			android:layout_height="wrap_content"
+			android:layout_height="match_parent"
 			android:layout_alignParentEnd="true"
-			android:layout_margin="10dp"
-			android:padding="10dp"
 			android:text="@string/enter"
 			android:textColor="@drawable/selector_btn_text_default"
 			android:textSize="20sp"/>
@@ -211,9 +261,7 @@
 		<Button
 			android:id="@+id/btn_cancel"
 			android:layout_width="150dp"
-			android:layout_height="wrap_content"
-			android:layout_margin="10dp"
-			android:padding="10dp"
+			android:layout_height="match_parent"
 			android:text="@string/cancel"
 			android:textColor="@drawable/selector_btn_text_default"
 			android:textSize="20sp"/>
