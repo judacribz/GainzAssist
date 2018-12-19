@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import ca.judacribz.gainzassist.activities.add_workout.ExEntry;
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
@@ -32,6 +34,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
             WorkoutScreen.getInstance(),
             ExercisesList.getInstance()
     };
+    FragmentManager fragmentManager;
     private int numExs;
     // --------------------------------------------------------------------------------------------
 
@@ -39,13 +42,14 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     // --------------------------------------------------------------------------------------------
     private Bundle bundle = new Bundle();
     // --------------------------------------------------------------------------------------------
-    Fragment[] fmts = FMTS;
+    List<Fragment> fmts = Arrays.asList(FMTS);
     // ######################################################################################### //
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
     @SafeVarargs
     public WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Exercise>... exercises) {
         super(fragmentManager);
+        this.fragmentManager = fragmentManager;
 
 //        Log.d("WARMUPS", "reps" + warmups.get(0).getSetsList().size());
         bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]));
@@ -54,7 +58,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         if (warmups.size() > 0) {
             bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]));
         } else {
-            fmts = FMTS_NO_WARMUPS;
+            fmts =  Arrays.asList(FMTS_NO_WARMUPS);
         }
         for (Fragment fmt : fmts) {
             fmt.setArguments(bundle);
@@ -64,24 +68,26 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     public WorkoutPagerAdapter(FragmentManager fragmentManager, int numExs) {
         super(fragmentManager);
         this.numExs = numExs;
-        fmts = new Fragment[numExs];
+        fmts = new ArrayList<>();
 
-        for (int i = 0; i < fmts.length; i++) {
-            fmts[i] = new ExEntry();
-            ((ExEntry) fmts[i]).setInd(i);
+        for (int i = 0; i < this.numExs; i++) {
+            newEntry(i);
         }
     }
     public void addTab() {
         this.numExs++;
-        Fragment[] tempFmts = new Fragment[this.numExs];
+        newEntry(getCount());
+    }
 
-        System.arraycopy(fmts, 0, tempFmts, 0, fmts.length);
-        tempFmts[fmts.length] = new ExEntry();
-        ((ExEntry) tempFmts[fmts.length]).setInd(fmts.length);
-        fmts = new Fragment[this.numExs];
+    public void newEntry(int index) {
+        Fragment fmt = new ExEntry();
+        ((ExEntry) fmt).setInd(index);
+        fmts.add(fmt);
+    }
 
-        System.arraycopy(tempFmts, 0, fmts, 0, fmts.length);
-        fmts = tempFmts;
+    public void removeTabFragment(int index) {
+        this.numExs--;
+        fmts.remove(getCount() - index - 1);
     }
     // ######################################################################################### //
 
@@ -90,13 +96,22 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     /* Returns total number of pages */
     @Override
     public int getCount() {
-        return fmts.length;
+        return fmts.size();
     }
 
     /* Returns the fragment to display for that page */
     @Override
     public Fragment getItem(int position) {
-        return fmts[position];
+        return fmts.get(position);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+
+        for (int i = 0; i < this.numExs; i++) {
+            ((ExEntry) fmts.get(i)).setInd(i);
+        }
     }
     //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
 

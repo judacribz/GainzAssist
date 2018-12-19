@@ -5,15 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.*;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
@@ -34,17 +32,17 @@ public class ExEntry extends Fragment {
     public interface ExEntryDataListener {
         boolean checkExerciseExists(ExEntry fmt, String exerciseName);
         void exerciseDataReceived(Exercise exercise);
+        void deleteExercise(@Nullable Exercise exercise, int index);
         void cancelWorkout();
     }
 
-
+    Exercise exercise = null;
     String exerciseName;
 
     int num_reps, num_sets, ex_i = 0, minInt = 1; // for min num_reps/num_sets
     float weight, minWeight, weightChange;
 
-    @BindView(R.id.et_exercise_name)
-    EditText etExerciseName;
+    @BindView(R.id.et_exercise_name) EditText etExerciseName;
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_num_reps) EditText etNumReps;
     @BindView(R.id.et_num_sets) EditText etNumSets;
@@ -54,6 +52,8 @@ public class ExEntry extends Fragment {
     @BindView(R.id.ibtn_dec_sets) ImageButton ibtnDecSets;
 
     @BindView(R.id.spr_equipment) Spinner sprEquipment;
+
+    @BindView(R.id.btn_update) Button btnUpdate;
 
     @BindViews({R.id.et_exercise_name, R.id.et_weight, R.id.et_num_reps, R.id.et_num_sets})
     EditText[] formEntries;
@@ -271,20 +271,20 @@ public class ExEntry extends Fragment {
     }
 
     @OnClick(R.id.btn_enter)
-    public void enterExercise() {
+    public void enterExercise(Button btnEnter) {
 
         if (validateForm(getActivity(), formEntries)) {
             exerciseName = getTextString(etExerciseName);
 
             // Check if exercise already added
-
-
             if (!exEntryDataListener.checkExerciseExists(this, exerciseName)) {
+                btnEnter.setVisibility(View.GONE);
+                btnUpdate.setVisibility(View.VISIBLE);
+
                 num_reps = getTextInt(etNumReps);
                 num_sets = getTextInt(etNumSets);
 
-
-                exEntryDataListener.exerciseDataReceived(new Exercise(
+                exEntryDataListener.exerciseDataReceived(exercise = new Exercise(
                         this.ex_i,
                         exerciseName,
                         "Strength",
@@ -302,6 +302,16 @@ public class ExEntry extends Fragment {
                 getString(R.string.err_exercise_exists),
                 exerciseName
         ));
+    }
+
+    @OnClick(R.id.btn_update)
+    public void updateExercise() {
+    }
+
+    @OnClick(R.id.btn_delete)
+    public void deleteExercise() {
+        etExerciseName.setText("");
+        exEntryDataListener.deleteExercise(exercise, this.ex_i);
     }
 
     @OnClick(R.id.btn_cancel)

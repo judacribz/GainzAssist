@@ -59,6 +59,13 @@ public class Workout {
         exercises.add(exercise);
     }
 
+    public void removeExercise(Exercise exercise) {
+        exercises.remove(exercise);
+        for (Exercise ex : exercises) {
+            ex.setExerciseNumber(exercises.indexOf(ex));
+        }
+    }
+
     public int getExerciseNumber(String exerciseName) {
         Exercise ex = getExerciseFromName(exerciseName);
 
@@ -128,6 +135,16 @@ public class Workout {
 
     public int getNumExercises() {
         return this.exercises.size();
+    }
+
+    public boolean exerciseAtNumExists(int i) {
+        for (Exercise ex : exercises) {
+            if (ex.getExerciseNumber() == i) {
+                return true;
+            }
+        }
+
+        return  false;
     }
     // --------------------------------------------------------------------------------------------
 }

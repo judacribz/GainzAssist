@@ -116,4 +116,5 @@
 	<string name="file_user_info">user_info.file</string>
 	<string name="file_workout_info">workout_info.file</string>
 	<string name="equipment">Equipment</string>
+	<string name="update">update</string>
 </resources>

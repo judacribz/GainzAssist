@@ -11,30 +11,31 @@
         android:id="@+id/toolbar"
         layout="@layout/partial_title_bar"/>
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/vp_fmt_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/appbar"
-        android:layout_below="@id/toolbar"/>
-
     <!-- Naviagtion Tabs -->
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBg"
-        android:layout_alignParentBottom="true">
+        android:layout_below="@id/toolbar"
+        android:background="@color/colorBg">
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tlay_navbar"
             android:layout_width="match_parent"
-            app:tabPadding="2dp"
-            android:layout_height="wrap_content"
-            app:tabBackground="@drawable/anim_tab_ripple"
+            android:layout_height="match_parent"
+            app:tabBackground="@drawable/anim_tab_ripple_reverse"
             app:tabIndicatorColor="@color/colorGreen"
             app:tabIndicatorHeight="2dp"
+            app:tabIndicatorGravity="top"
+            app:tabMode="scrollable"
             app:tabSelectedTextColor="@color/colorGreen"
-            app:tabTextColor="@color/colorLightBg"/>
+            app:tabTextColor="@color/colorLightBg"
+            app:tabPaddingBottom="-10dp"/>
     </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vp_fmt_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/appbar"/>
 </RelativeLayout>
