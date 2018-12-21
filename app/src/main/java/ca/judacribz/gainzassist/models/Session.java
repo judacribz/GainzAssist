@@ -37,7 +37,7 @@ public class Session {
     String workoutName;
 
     @Ignore
-    ArrayList<Exercise> sessionSets = new ArrayList<>();
+    ArrayList<Exercise> sessionExs = new ArrayList<>();
 
     @Ignore
     Map<String, Float> avgWeights = new HashMap<>();
@@ -93,8 +93,8 @@ public class Session {
     }
 
 
-    public ArrayList<Exercise> getSessionSets() {
-        return sessionSets;
+    public ArrayList<Exercise> getSessionExs() {
+        return sessionExs;
     }
 
     public Map<String, Float> getAvgWeights() {
@@ -114,14 +114,18 @@ public class Session {
         weight = weight / exercise.getSetsList().size() + weightChange;
         weight -= weight % weightChange;
 
-        this.sessionSets.add(exercise);
+        if (avgWeights.containsKey(exercise.getName())) {
+            this.sessionExs.set(this.sessionExs.size()-1, exercise);
+        } else {
+            this.sessionExs.add(exercise);
+        }
 
         this.avgWeights.put(exercise.getName(), weight);
     }
 
     public void remLastExercise() {
 
-        this.sessionSets.remove(this.sessionSets.size() - 1);
+        this.sessionExs.remove(this.sessionExs.size() - 1);
     }
 
     /* Misc function used to store Session information in the firebase db */
@@ -134,8 +138,8 @@ public class Session {
                     put(WORKOUT_ID, workoutId);
                 }};
 
-        for (Exercise exSets : sessionSets){
-            exsMap.put(String.valueOf(exSets.getExerciseNumber()), exSets.setsToMap());
+        for (Exercise ex : sessionExs){
+            exsMap.put(String.valueOf(ex.getExerciseNumber()), ex.setsToMap());
         }
         sessionMap.put(EXERCISES, exsMap);
 

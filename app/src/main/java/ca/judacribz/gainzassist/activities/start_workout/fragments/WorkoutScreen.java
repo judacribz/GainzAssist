@@ -112,16 +112,23 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @Override
     public void onResume() {
         super.onResume();
-//        if (equipmentView == null) {
+        if (equipmentView == null) {
             setupEquipView();
-//        }
+        }
 
         updateUI();
 //        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
 //        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
     }
 
-//    String[] setStrs, exStrs;
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        vgEquipDisp.removeView(equipmentView);
+        equipmentView = null;
+    }
+
+    //    String[] setStrs, exStrs;
 //    void setProgress(StepsView sv, String[] labels, int progLen, int pos) {
 //        if (labels == null) {
 //            labels = new String[progLen];
