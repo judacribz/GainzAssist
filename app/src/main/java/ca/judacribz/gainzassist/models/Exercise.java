@@ -50,6 +50,8 @@ public class Exercise {
 
     @Ignore
     ArrayList<ExerciseSet> setsList = new ArrayList<>();
+    @Ignore
+    ArrayList<ExerciseSet> finSets = new ArrayList<>();
 
     public enum SetsType {
         WARMUP_SET,
@@ -204,22 +206,20 @@ public class Exercise {
 
     public void setSetsList(@Nullable ArrayList<ExerciseSet> setsList) {
         if (setsList != null) {
-            for (ExerciseSet set : setsList) {
-                updateSet(set);
-            }
+            this.setsList = setsList;
         } else {
             for (int i = 0; i < sets; i++) {
-                addSet(new ExerciseSet(id, name, i+1, reps, weight));
+                this.setsList.add(new ExerciseSet(id, name, i+1, reps, weight));
             }
         }
     }
     public void updateSet(ExerciseSet set) {
-        this.setsList.set(set.getSetNumber() - 1, set);
+        this.finSets.set(set.getSetNumber() - 1, set);
 
     }
 
-    public void addSet(ExerciseSet exerciseSet) {
-        this.setsList.add(exerciseSet);
+    public void addSet(ExerciseSet set) {
+        this.finSets.add(set);
     }
 
     public float getAvgWeight() {
@@ -272,7 +272,7 @@ public class Exercise {
                     put("equipment", equipment);
                 }};
 
-        for (ExerciseSet set : this.setsList) {
+        for (ExerciseSet set : this.finSets) {
             setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
         }
 

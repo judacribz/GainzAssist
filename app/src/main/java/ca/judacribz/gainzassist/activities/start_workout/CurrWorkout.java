@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.activities.start_workout;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
@@ -62,7 +63,6 @@ public class CurrWorkout {
     private boolean timerSet;
 
     private Session currSession = null;
-    private ArrayList<ExerciseSet> finishedSets = new ArrayList<>();
 
     private Context context;
     // --------------------------------------------------------------------------------------------
@@ -131,32 +131,24 @@ public class CurrWorkout {
         for (Map.Entry<String, Object> exEntry : exsMap.entrySet()) {
             String exNum = exEntry.getKey();
             exMap = readValue(exEntry.getValue());
+
             //TODO test without using map
             Exercise exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
-//            Exercise exercise = new Exercise(
-//                    Integer.valueOf(exNum),
-//                    String.valueOf(exMap.get("name")),
-//                    String.valueOf(exMap.get("type")),
-//                    String.valueOf(exMap.get("equipment")),
-//                    ex.getNumSets(),
-//                    ex.getReps(),
-//                    ex.getWeight(),
-//                    MAIN_SET);
-//            exercise.setId(ex.getId());
+            Logger.d("ex id = " + exercise.getId() +  " " + exercise.getNumSets());
+
+            exercise.setId(Integer.valueOf(String.valueOf(exMap.get("id"))));
             exercise.setSetsType(MAIN_SET);
             setsMap = readValue(readValue(exEntry.getValue()).get(SETS));
 
-            this.finishedSets = new ArrayList<>();
             for (Map.Entry<String, Object> setEntry : setsMap.entrySet()) {
                 setMap = readValue(setEntry.getValue());
-                this.finishedSets.add(new ExerciseSet(
+                exercise.addSet(new ExerciseSet(
                         exercise,
                         Integer.valueOf(setEntry.getKey()),
                         Integer.valueOf(String.valueOf(setMap.get(REPS))),
                         Float.valueOf(String.valueOf(setMap.get(WEIGHT)))
                 ));
             }
-            exercise.setSetsList(this.finishedSets);
 
             this.currSession.addExercise(
                     exercise,
@@ -275,7 +267,6 @@ public class CurrWorkout {
             this.set_i = 0;
             this.ex_i++;
 
-            this.currExercise.setSetsList(this.finishedSets);
             this.currSession.addExercise(
                     this.currExercise,
                     this.currWeightChange
@@ -296,7 +287,6 @@ public class CurrWorkout {
             // Not end of all exercises, set next exercise
             } else {
                 setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
-                finishedSets = new ArrayList<>();
             }
 
         // End of set, set next set from current exercise
@@ -310,8 +300,7 @@ public class CurrWorkout {
     public void addCurrSet() {
         this.currExerciseSet.setReps(this.currReps);
         this.currExerciseSet.setWeight(this.currWeight);
-//        this.currExercise.addSet(this.currExerciseSet);
-        this.finishedSets.add(this.currExerciseSet);
+        this.currExercise.addSet(this.currExerciseSet);
     }
 
     private boolean atEndOfSets() {
@@ -336,10 +325,6 @@ public class CurrWorkout {
         }
 
         this.currExercise = exercise;
-        if (getIsWarmup() || this.set_i == 0) {
-            this.finishedSets = new ArrayList<>();
-        }
-
         setCurrEquip(this.currExercise.getEquipment());
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
     }
@@ -478,9 +463,9 @@ public class CurrWorkout {
 
     void saveSessionState() {
 
-        if (!getIsWarmup() && !finishedSets.isEmpty()) {
+        if (!getIsWarmup()) {
+            Toast.makeText(context, "IN CONDITION", Toast.LENGTH_SHORT).show();
             Exercise ex = this.currExercise;
-            ex.setSetsList(this.finishedSets);
             this.currSession.addExercise(ex, this.currWeightChange);
         }
 

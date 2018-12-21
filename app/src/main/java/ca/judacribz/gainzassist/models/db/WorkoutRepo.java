@@ -332,7 +332,7 @@ public class WorkoutRepo {
                         id = sessionDao.getId(timestamp);
                         session.setId(id);
                         addWorkoutSessionFirebase(session);
-                        ArrayList<Exercise> exSets = session.getSessionSets();
+                        ArrayList<Exercise> exSets = session.getSessionExs();
                         for (Exercise ex : exSets){
                             for (ExerciseSet exerciseSet : ex.getSetsList()) {
                                 exerciseSet.setSessionId(id);
