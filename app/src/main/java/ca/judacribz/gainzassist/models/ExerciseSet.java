@@ -132,9 +132,6 @@ public class ExerciseSet {
     Map<String, Object> toMap() {
         Map<String, Object> exerciseSetMap = new HashMap<>();
 
-        if (id != -1) {
-            exerciseSetMap.put("id", id);
-        }
         exerciseSetMap.put("reps", reps);
         exerciseSetMap.put("weight", weight);
 

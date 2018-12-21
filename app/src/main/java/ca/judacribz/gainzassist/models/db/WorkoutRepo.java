@@ -314,7 +314,7 @@ public class WorkoutRepo {
 
                     case INSERT_WORKOUT:
                         workoutDao.insert(workout);
-                        Log.d("YOOOO", "Workout:" + workout.getName() + " id : " + workoutDao.getId(workoutName));
+                        Log.d("YOOOO", "ExerciseConst:" + workout.getName() + " id : " + workoutDao.getId(workoutName));
                         id = workoutDao.getId(workoutName);
                         for (Exercise exercise : workout.getExercises()) {
                             exercise.setWorkoutId(id);

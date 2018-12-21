@@ -13,7 +13,7 @@
         android:id="@+id/toolbar"
         layout="@layout/partial_title_bar" />
 
-    <!-- Workout Name EditText -->
+    <!-- ExerciseConst Name EditText -->
     <!--========================================================================================-->
     <RelativeLayout
         android:layout_width="match_parent"
@@ -37,7 +37,7 @@
                 android:translationY="2dp"/>
         </android.support.design.widget.TextInputLayout>
     </RelativeLayout>
-    <!--Workout=Name============================================================================-->
+    <!--ExerciseConst=Name============================================================================-->
 
     <RelativeLayout
         android:layout_width="match_parent"

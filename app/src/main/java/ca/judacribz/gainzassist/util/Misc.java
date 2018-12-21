@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,6 +16,8 @@ import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.util.*;
+
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 
 public class Misc {
@@ -59,23 +62,36 @@ public class Misc {
         return new Workout(workoutShot.getKey(), exercises);
     }
 
-    public static Workout extractSession(DataSnapshot sessionShot) {
+    public static Session extractSession(DataSnapshot sessionShot) {
+        Session session = sessionShot.getValue(Session.class);
 
-        for (DataSnapshot exerciseShot : sessionShot.child("sets").getChildren()) {
+        if (session != null) {
+            Exercise exercise;
+            ExerciseSet set;
+            session.setTimestamp(Long.valueOf(Objects.requireNonNull(sessionShot.getKey())));
 
-            for (DataSnapshot setShot : exerciseShot.getChildren()) {
+            for (DataSnapshot exerciseShot : sessionShot.child(EXERCISES).getChildren()) {
+                exercise = sessionShot.getValue(Exercise.class);
 
-                ExerciseSet exerciseSet = setShot.getValue(ExerciseSet.class);
-                if (exerciseSet != null) {
-                    exerciseSet.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
+                if (exercise != null) {
+                    exercise.setExerciseNumber(Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey())));
 
-                    exerciseSet.setExerciseName(exerciseShot.getKey());
+                    for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
+                        set = sessionShot.getValue(ExerciseSet.class);
+
+                        if (set != null) {
+                            set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
+                            exercise.addSet(set);
+                        }
+                    }
+
+                    session.addExercise(exercise);
                 }
-
             }
         }
 
-        return null;
+        Logger.d(session.toMap());
+        return session;
     }
 
 

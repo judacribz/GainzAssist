@@ -3,30 +3,14 @@ package ca.judacribz.gainzassist.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import ca.judacribz.gainzassist.R;
-import com.orhanobut.logger.Logger;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
+import static ca.judacribz.gainzassist.constants.AccountConst.*;
+
 public class Preferences {
-    private static final String EMAIL = "email";
-    private static final String INCOMPLETE_WORKOUTS = "incomplete workouts";
-    private static final String WORKOUT_EX_IND = "%s exercise index";
-
-    public static final String MAIN_EXERCISES = "main exercises";
-    public static final String WARMUP_EXERCISES = "warmup exercises";
-    public static final String EXERCISE_INDEX = "exercise index";
-    public static final String SET_INDEX = "set index";
-
-    public static final String WORKOUT_NAME = "workoutName";
-    public static final String WORKOUT_ID = "workoutId";
-    public static final String SESSION = "session";
-    public static final String SESSION_ID = "sessionId";
-    public static final String SETS = "sets";
-    public static final String EXERCISES = "exercises";
-    public static final String EXERCISE_ID = "exerciseId";
-    public static final String REPS = "reps";
-    public static final String WEIGHT = "weight";
 
     // User Info
     // -------------------------------------------------------------------------------------------
@@ -85,7 +69,7 @@ public class Preferences {
     // -------------------------------------------------------------------------------------------
 
 
-    // Workout Sessions    // Workouts
+    // ExerciseConst Sessions    // Workouts
     //    // -------------------------------------------------------------------------------------------
     public static void addIncompleteSessionPref(Context context, String workoutName, String sessionJson) {
         SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();

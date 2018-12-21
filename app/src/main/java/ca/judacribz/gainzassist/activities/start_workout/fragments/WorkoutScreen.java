@@ -22,13 +22,12 @@ import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
-import com.anton46.stepsview.StepsView;
 import com.orhanobut.logger.Logger;
 
-import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.MIN_REPS;
+
 import static ca.judacribz.gainzassist.util.Preferences.*;
-import static ca.judacribz.gainzassist.util.UI.getTextString;
 import static ca.judacribz.gainzassist.util.UI.handleFocusLeft;
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener {
 

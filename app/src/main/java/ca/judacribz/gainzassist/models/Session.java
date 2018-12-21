@@ -1,7 +1,6 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
-import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.*;
-import static ca.judacribz.gainzassist.util.Preferences.*;
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 @Entity(tableName = "sessions",
         foreignKeys =
@@ -103,9 +102,12 @@ public class Session {
     }
     // ============================================================================================
 
-    public void addExercise(Exercise exercise, float weightChange) {
-        float weight = 0.0f;
-        float expectedReps = (float)exercise.getReps();
+    public void addExercise(Exercise exercise) {
+        float
+                weight = 0.0f,
+                weightChange = exercise.getWeightChange(),
+                expectedReps = (float)exercise.getReps();
+
         for (ExerciseSet exerciseSet : exercise.getSetsList()) {
             weight += exerciseSet.getWeight() * (float)exerciseSet.getReps()/expectedReps;
         }
@@ -127,7 +129,7 @@ public class Session {
         Map<String, Object>
                 exsMap = new HashMap<>(),
                 sessionMap = new HashMap<String, Object>() {{
-                    put(SESSION_ID, id);
+                    put(ID, id);
                     put(WORKOUT_NAME, workoutName);
                     put(WORKOUT_ID, workoutId);
                 }};

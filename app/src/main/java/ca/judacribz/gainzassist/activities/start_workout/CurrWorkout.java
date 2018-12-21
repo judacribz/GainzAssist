@@ -20,21 +20,13 @@ import static ca.judacribz.gainzassist.util.Misc.enablePrettyMapper;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
 import static ca.judacribz.gainzassist.util.Preferences.*;
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 public class CurrWorkout {
 
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final CurrWorkout INST = new CurrWorkout();
-
-    private static final String BARBELL = "barbell";
-    public static final float BB_MIN_WEIGHT = 45.0f;
-    public static final float MIN_WEIGHT = 2.5f;
-    public static final float BB_WEIGHT_CHANGE = 5.0f;
-    public static final float WEIGHT_CHANGE = 2.5f;
-    public static final int MIN_REPS = 0;
-    private static final long HEAVY_REST_TIME = 180000;
-    private static final long LIGHT_REST_TIME = 90000;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -144,7 +136,7 @@ public class CurrWorkout {
 //                    MAIN_SET);
 //            exercise.setId(ex.getId());
             exercise.setSetsType(MAIN_SET);
-            setsMap = readValue(readValue(exEntry.getValue()).get(SETS));
+            setsMap = readValue(readValue(exEntry.getValue()).get(SET_LIST));
 
             this.finishedSets = new ArrayList<>();
             for (Map.Entry<String, Object> setEntry : setsMap.entrySet()) {
@@ -158,10 +150,7 @@ public class CurrWorkout {
             }
             exercise.setSetsList(this.finishedSets);
 
-            this.currSession.addExercise(
-                    exercise,
-                    this.currWeightChange
-            );
+            this.currSession.addExercise(exercise);
         }
 
         genWarmups(workout.getExercises());
@@ -194,10 +183,9 @@ public class CurrWorkout {
         setCurrMainExercises(exercises);
 
         for (Exercise ex: exercises) {
-            ex.setSetsType(MAIN_SET);
-            equip = ex.getEquipment();
+//            ex.setSetsList(null);
 
-            minWeight = BARBELL.equals(equip.toLowerCase()) ? BB_MIN_WEIGHT : MIN_WEIGHT;
+            minWeight = ex.getMinWeight();
             weight = ex.getAvgWeight();
             if (weight == minWeight) {
                 allExs.add(ex);
@@ -208,7 +196,7 @@ public class CurrWorkout {
             oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
             reps = ex.getAvgReps();
 
-            setNum = 1;
+            setNum = 0;
             exerciseSets = new ArrayList<>();
             exerciseSets.add(new ExerciseSet(ex, setNum++, reps, minWeight));
             percWeight = minWeight / weight;
@@ -223,7 +211,7 @@ public class CurrWorkout {
                 else if (reps - 1 > 0)
                     --reps;
 
-            } while (percWeight < 0.8f);
+            } while (percWeight < 0.9f);
 
             warmup = new Exercise(
                     ex.getExerciseNumber(),
@@ -276,10 +264,7 @@ public class CurrWorkout {
             this.ex_i++;
 
             this.currExercise.setSetsList(this.finishedSets);
-            this.currSession.addExercise(
-                    this.currExercise,
-                    this.currWeightChange
-            );
+            this.currSession.addExercise(this.currExercise);
 
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
@@ -340,18 +325,10 @@ public class CurrWorkout {
             this.finishedSets = new ArrayList<>();
         }
 
-        setCurrEquip(this.currExercise.getEquipment());
-        setCurrExerciseSet(this.currExercise.getSet(this.set_i));
-    }
 
-    private void setCurrEquip(String equip) {
-        if (BARBELL.equals(equip.toLowerCase())) {
-            this.currMinWeight = BB_MIN_WEIGHT;
-            this.currWeightChange = BB_WEIGHT_CHANGE;
-        } else {
-            this.currMinWeight = MIN_WEIGHT;
-            this.currWeightChange = WEIGHT_CHANGE;
-        }
+        this.currMinWeight = this.currExercise.getMinWeight();
+        this.currWeightChange = this.currExercise.getWeightChange();
+        setCurrExerciseSet(this.currExercise.getSet(this.set_i));
     }
 
     private void setCurrExerciseSet(ExerciseSet exerciseSet) {
@@ -392,7 +369,7 @@ public class CurrWorkout {
     }
 
     public int getCurrSetNum() {
-        return set_i + 1;
+        return this.set_i + 1;
     }
 
     /* Reps------------------------------------------------------------------------------------- */
@@ -481,7 +458,7 @@ public class CurrWorkout {
         if (!getIsWarmup() && !finishedSets.isEmpty()) {
             Exercise ex = this.currExercise;
             ex.setSetsList(this.finishedSets);
-            this.currSession.addExercise(ex, this.currWeightChange);
+            this.currSession.addExercise(ex);
         }
 
         enablePrettyMapper();

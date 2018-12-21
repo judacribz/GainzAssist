@@ -111,7 +111,7 @@ public class UI {
 
     /* Gets string value from EditText element */
     public static String getTextString(Spinner spr) {
-        return spr.getSelectedItem().toString();
+        return spr.getSelectedItem().toString().toLowerCase();
     }
 
     public static String getTextString(EditText et) {

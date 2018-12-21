@@ -2,10 +2,12 @@ package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
 import android.support.annotation.Nullable;
+import com.orhanobut.logger.Logger;
 import org.parceler.Parcel;
 import java.util.*;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 @Parcel
 @Entity(tableName = "exercises",
@@ -19,15 +21,15 @@ public class Exercise {
 
     @Ignore
     public static final ArrayList<String> EQUIPMENT_TYPES = new ArrayList<>(Arrays.asList(
-            "Barbell",
-            "Dumbbell",
-            "N/A"
+            BARBELL,
+            DUMBBELL,
+            NA
     ));
     @Ignore
     public static final ArrayList<String> EXERCISE_TYPES = new ArrayList<>(Arrays.asList(
-            "Strength",
-            "Cardiovascular",
-            "Plyometrics"
+            STRENGTH,
+            CARDIOVASCULAR,
+            PLYOMETRICS
     ));
 
     // Global Vars
@@ -49,12 +51,16 @@ public class Exercise {
     float weight;
 
     @Ignore
+    private float weightChange, minWeight;
+
+    @Ignore
     ArrayList<ExerciseSet> setsList = new ArrayList<>();
 
     public enum SetsType {
         WARMUP_SET,
         MAIN_SET
     }
+
     @Ignore
     SetsType setsType = null;
     // --------------------------------------------------------------------------------------------
@@ -72,33 +78,11 @@ public class Exercise {
                     String name,
                     String type,
                     String equipment,
-                    ArrayList<ExerciseSet> setsList,
+                    @Nullable ArrayList<ExerciseSet> setsList,
                     SetsType setsType) {
-        this.exerciseNumber = exerciseNumber;
-        this.name           = name;
-        this.type           = type;
-        this.equipment      = equipment;
-        this.setsList       = setsList;
+        setExerciseBase(exerciseNumber, name, type, equipment);
+        setSetsList(setsList);
         setSetsType(setsType);
-    }
-
-    @Ignore
-    public Exercise(int exerciseNumber,
-                    String name,
-                    String type,
-                    String equipment,
-                    int sets,
-                    int reps,
-                    float weight) {
-        this.exerciseNumber = exerciseNumber;
-        this.name           = name;
-        this.type           = type;
-        this.equipment      = equipment;
-        this.sets           = sets;
-        this.reps           = reps;
-        this.weight         = weight;
-
-        setSetsList(null);
     }
 
     @Ignore
@@ -110,8 +94,21 @@ public class Exercise {
                     int reps,
                     float weight,
                     SetsType setsType) {
-        this(exerciseNumber, name, type, equipment, sets, reps, weight);
+        setExerciseBase(exerciseNumber, name, type, equipment);
+        setSets(sets);
+        setReps(reps);
+        setWeight(weight);
         setSetsType(setsType);
+    }
+
+    private void setExerciseBase(int exerciseNumber,
+                                String name,
+                                String type,
+                                String equipment) {
+        setExerciseNumber(exerciseNumber);
+        setName(name);
+        setType(type);
+        setEquipment(equipment);
     }
     // ============================================================================================
 
@@ -163,6 +160,17 @@ public class Exercise {
 
     public void setEquipment(String equipment) {
         this.equipment = equipment;
+
+        if (BARBELL.equals(this.equipment)) {
+            minWeight = BB_MIN_WEIGHT;
+            weightChange = BB_WEIGHT_CHANGE;
+        } else if (DUMBBELL.equals(this.equipment)) {
+            minWeight = DB_MIN_WEIGHT;
+            weightChange = DB_WEIGHT_CHANGE;
+        } else {
+            minWeight = MIN_WEIGHT;
+            weightChange = WEIGHT_CHANGE;
+        }
     }
 
     public int getSets() {
@@ -174,7 +182,7 @@ public class Exercise {
     }
 
     public int getReps() {
-        return reps;
+        return this.reps;
     }
 
     public void setReps(int reps) {
@@ -182,11 +190,19 @@ public class Exercise {
     }
 
     public float getWeight() {
-        return weight;
+        return this.weight;
     }
 
     public void setWeight(float weight) {
         this.weight = weight;
+    }
+
+    public float getMinWeight() {
+        return this.minWeight;
+    }
+
+    public float getWeightChange() {
+        return this.weightChange;
     }
 
     public void setSetsType(SetsType setsType) {
@@ -194,32 +210,36 @@ public class Exercise {
     }
 
     public SetsType getSetsType() {
-        return setsType;
+        return this.setsType;
     }
 
-
     public ArrayList<ExerciseSet> getSetsList() {
-        return setsList;
+        return this.setsList;
     }
 
     public void setSetsList(@Nullable ArrayList<ExerciseSet> setsList) {
         if (setsList != null) {
-            for (ExerciseSet set : setsList) {
+            if (this.setsList.size() < setsList.size()) {
+                setSetsList(null);
+            }
+            for (ExerciseSet set: setsList) {
                 updateSet(set);
             }
         } else {
             for (int i = 0; i < sets; i++) {
-                addSet(new ExerciseSet(id, name, i+1, reps, weight));
+                addSet(new ExerciseSet(id, name, i, reps, weight));
             }
         }
     }
     public void updateSet(ExerciseSet set) {
-        this.setsList.set(set.getSetNumber() - 1, set);
+        this.setsList.set(set.getSetNumber(), set);
 
     }
 
     public void addSet(ExerciseSet exerciseSet) {
         this.setsList.add(exerciseSet);
+
+        Logger.d("size of sets = " + this.setsList.size());
     }
 
     public float getAvgWeight() {
@@ -276,7 +296,7 @@ public class Exercise {
             setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
         }
 
-        exMap.put("sets", setMap);
+        exMap.put("setList", setMap);
 
         return exMap;
     }

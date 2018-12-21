@@ -15,16 +15,9 @@ import android.widget.*;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.ExerciseSet;
-import org.parceler.Parcels;
 
-import java.util.ArrayList;
-
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.EXERCISES_ENTRY;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_WORKOUT;
-import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.*;
-import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_EX_INDEX;
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class ExEntry extends Fragment {
@@ -113,6 +106,9 @@ public class ExEntry extends Fragment {
                 minWeight = BB_MIN_WEIGHT;
                 weightChange = BB_WEIGHT_CHANGE;
                 break;
+            case 1:
+                minWeight = DB_MIN_WEIGHT;
+                weightChange = DB_WEIGHT_CHANGE;
             default:
                 minWeight = MIN_WEIGHT;
                 weightChange = WEIGHT_CHANGE;
@@ -291,7 +287,8 @@ public class ExEntry extends Fragment {
                         getTextString(sprEquipment),
                         getTextInt(etNumSets),
                         getTextInt(etNumReps),
-                        getTextFloat(etWeight)
+                        getTextFloat(etWeight),
+                        MAIN_SET
                 ));
             }
         }

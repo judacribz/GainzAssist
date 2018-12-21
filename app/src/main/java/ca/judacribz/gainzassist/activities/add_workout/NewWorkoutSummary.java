@@ -21,8 +21,9 @@ import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import org.parceler.Parcels;
 
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutFirebase;
-import static ca.judacribz.gainzassist.activities.start_workout.CurrWorkout.*;
 import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -152,6 +153,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
                 minWeight = BB_MIN_WEIGHT;
                 weightChange = BB_WEIGHT_CHANGE;
                 break;
+            case 1:
+                minWeight = DB_MIN_WEIGHT;
+                weightChange = DB_WEIGHT_CHANGE;
             default:
                 minWeight = MIN_WEIGHT;
                 weightChange = WEIGHT_CHANGE;
@@ -362,11 +366,12 @@ Exercise ex;
         return new Exercise(
                 exNumber,
                 exName,
-                sprType.getSelectedItem().toString(),
-                sprEquipment.getSelectedItem().toString(),
+                sprType.getSelectedItem().toString().toLowerCase(),
+                sprEquipment.getSelectedItem().toString().toLowerCase(),
                 getTextInt(etNumSets),
                 getTextInt(etNumReps),
-                getTextFloat(etWeight)
+                getTextFloat(etWeight),
+                MAIN_SET
         );
     }
 

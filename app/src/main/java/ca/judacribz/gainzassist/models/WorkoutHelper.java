@@ -137,12 +137,12 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     // --------------------------------------------------------------------------------------------
     /* Creates a db entry for each workout in the provided ArrayList
      */
-//    public void addWorkouts(ArrayList<Workout> workouts) {
+//    public void addWorkouts(ArrayList<ExerciseConst> workouts) {
 //        db = this.getWritableDatabase();
 //        cv.clear();
 //        cv.put(EMAIL, email);
 //
-//        for (Workout workout : workouts) {
+//        for (ExerciseConst workout : workouts) {
 //            addWorkout(workout, true);
 //        }
 //    }
@@ -212,7 +212,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         return exerciseNames;
     }
 
-    /* Get a Workout object using the workout name
+    /* Get a ExerciseConst object using the workout name
      */
     public Workout getWorkout(String workoutName) {
         ArrayList<Exercise> exercises;
@@ -238,7 +238,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         return workout;
     }
 
-    /* Gets all workouts in the db and returns a list of Workout objects
+    /* Gets all workouts in the db and returns a list of ExerciseConst objects
      */
     public ArrayList<Workout> getAllWorkouts() {
         db = this.getReadableDatabase();

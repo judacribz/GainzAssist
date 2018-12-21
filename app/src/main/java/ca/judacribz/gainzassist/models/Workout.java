@@ -26,7 +26,7 @@ public class Workout {
 
 
     // ######################################################################################### //
-    // Workout Constructor                                                                       //
+    // ExerciseConst Constructor                                                                       //
     // ######################################################################################### //
     public Workout() {
     }
@@ -98,7 +98,7 @@ public class Workout {
 
     // Misc functions
     // --------------------------------------------------------------------------------------------
-    /* Misc function used to store Workout information in the FireBase db */
+    /* Misc function used to store ExerciseConst information in the FireBase db */
     public Map<String, Object> toMap() {
         Map<String, Object> workout = new HashMap<>();
         Map<String, Object> exs = exerciseToMap(exercises);

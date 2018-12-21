@@ -11,7 +11,7 @@
         layout="@layout/partial_title_bar" />
 
 
-    <!-- Workout Name EditText -->
+    <!-- ExerciseConst Name EditText -->
     <!--========================================================================================-->
     <EditText
         android:id="@+id/et_workout_name"
@@ -24,7 +24,7 @@
         android:hint="@string/hint_workout_name"
         android:inputType="text"
         android:textColorHint="@color/colorLightAccent" />
-    <!--Workout=Name============================================================================-->
+    <!--ExerciseConst=Name============================================================================-->
 
 
     <!-- View for Exercise Details Input -->
@@ -283,7 +283,7 @@
     <!--List=of=Added=Exercises=================================================================-->
 
 
-    <!-- Workout Discard/Add Buttons -->
+    <!-- ExerciseConst Discard/Add Buttons -->
     <!--========================================================================================-->
     <Button
         android:id="@+id/btn_discard_workout"
@@ -303,5 +303,5 @@
         android:background="@drawable/anim_button_ripple"
         android:text="@string/add_workout"
         android:textColor="@color/colorText"/>
-    <!--Workout=Discard/Add=Buttons=============================================================-->
+    <!--ExerciseConst=Discard/Add=Buttons=============================================================-->
 </RelativeLayout>
