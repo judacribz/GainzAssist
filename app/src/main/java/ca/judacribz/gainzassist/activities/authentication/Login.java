@@ -103,12 +103,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         progressBar.setMax(10);
 
         // Get firebase instance and setup google and facebook sign in
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                setupSignInMethods();
-            }
-        }).start();
+        setupSignInMethods();
 
         // Setup main images
         new Thread(new Runnable() {

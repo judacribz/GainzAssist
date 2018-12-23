@@ -33,7 +33,7 @@ public class WorkoutViewModel extends AndroidViewModel {
 
     public void insertSession(Session... sessions) {
         for (Session session : sessions)
-            workoutRepo.insertSession(session);
+            workoutRepo.insertSession(session, true);
     }
 
     public void insertSet(ExerciseSet... exerciseSets) {
@@ -48,6 +48,12 @@ public class WorkoutViewModel extends AndroidViewModel {
     public LiveData<List<Workout>> getAllWorkouts() {
         return workoutRepo.getAllWorkoutsLive();
     }
+    public LiveData<List<Session>> getAllSessions() {
+        return workoutRepo.getAllSessionsLive();
+    }
+    public LiveData<List<ExerciseSet>> getAllSets() {
+        return workoutRepo.getAllSetsLive();
+    }
 
     public LiveData<Workout> getWorkout(int id) {
         return workoutRepo.getWorkout(id);
@@ -61,7 +67,7 @@ public class WorkoutViewModel extends AndroidViewModel {
         return workoutRepo.getExercisesFromWorkout(workoutId);
     }
 
-    public LiveData<Exercise> getExercise(int id) {
+    public LiveData<Exercise> getExercise(long id) {
         return workoutRepo.getExercise(id);
     }
 
@@ -69,7 +75,7 @@ public class WorkoutViewModel extends AndroidViewModel {
         return workoutRepo.getAllUniqueExerciseNames();
     }
 
-    public LiveData<List<ExerciseSet>> getSetsFromExercise(int exerciseId) {
+    public LiveData<List<ExerciseSet>> getSetsFromExercise(long exerciseId) {
         return workoutRepo.getSetsFromExercise(exerciseId);
     }
 

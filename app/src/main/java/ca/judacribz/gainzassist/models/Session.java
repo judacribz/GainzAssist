@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,13 +12,6 @@ import static android.arch.persistence.room.ForeignKey.*;
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 @Entity(tableName = "sessions",
-        foreignKeys =
-            @ForeignKey(
-                entity = Workout.class,
-                parentColumns = "id",
-                childColumns = "workout_id",
-                onDelete = CASCADE,
-                onUpdate = CASCADE),
         indices = {
                 @Index("workout_id"),
                 @Index(value = {"workout_id", "timestamp"})})
@@ -25,13 +19,11 @@ public class Session {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @PrimaryKey(autoGenerate = true)
-    int id;
+    @PrimaryKey
+    long timestamp;
 
     @ColumnInfo(name = "workout_id")
-    int workoutId;
-
-    long timestamp;
+    long workoutId;
 
     @ColumnInfo(name = "workout_name")
     String workoutName;
@@ -51,28 +43,20 @@ public class Session {
 
     @Ignore
     public Session(Workout workout) {
+        setTimestamp(-1);
         setWorkoutId(workout.getId());
         setWorkoutName(workout.getName());
-        setTimestamp(-1);
     }
     // ######################################################################################### //
 
 
     // Getters and setters
     // ============================================================================================
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getWorkoutId() {
+    public long getWorkoutId() {
         return workoutId;
     }
 
-    public void setWorkoutId(int workoutId) {
+    public void setWorkoutId(long workoutId) {
         this.workoutId = workoutId;
     }
 
@@ -98,7 +82,7 @@ public class Session {
     }
 
     public Map<String, Float> getAvgWeights() {
-        return avgWeights;
+        return this.avgWeights;
     }
     // ============================================================================================
 
@@ -107,11 +91,12 @@ public class Session {
                 weight = 0.0f,
                 weightChange = exercise.getWeightChange(),
                 expectedReps = (float)exercise.getReps();
-
-        for (ExerciseSet exerciseSet : exercise.getSetsList()) {
+        for (ExerciseSet exerciseSet : exercise.getFinishedSetsList()) {
             weight += exerciseSet.getWeight() * (float)exerciseSet.getReps()/expectedReps;
         }
-        weight = weight / exercise.getSetsList().size() + weightChange;
+
+        Logger.d(weight + "yo");
+        weight = weight / exercise.getFinishedSetsList().size() + weightChange;
         weight -= weight % weightChange;
 
         if (avgWeights.containsKey(exercise.getName())) {
@@ -133,7 +118,6 @@ public class Session {
         Map<String, Object>
                 exsMap = new HashMap<>(),
                 sessionMap = new HashMap<String, Object>() {{
-                    put(ID, id);
                     put(WORKOUT_NAME, workoutName);
                     put(WORKOUT_ID, workoutId);
                 }};

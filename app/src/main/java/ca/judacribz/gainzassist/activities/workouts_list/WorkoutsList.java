@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -100,6 +101,24 @@ public class WorkoutsList extends AppCompatActivity
                         workoutNames.add(workout.getName());
                     }
                     displayWorkoutList(workoutNames);
+                }
+            }
+        });
+
+        workoutViewModel.getAllSessions().observe(this, new Observer<List<Session>>() {
+            @Override
+            public void onChanged(@Nullable List<Session> sessions) {
+                if (sessions != null) {
+                    com.orhanobut.logger.Logger.d( "num sess" + sessions.size());
+                }
+            }
+        });
+
+        workoutViewModel.getAllSets().observe(this, new Observer<List<ExerciseSet>>() {
+            @Override
+            public void onChanged(@Nullable List<ExerciseSet> sets) {
+                if (sets != null) {
+                    com.orhanobut.logger.Logger.d( "num setss" + sets.size());
                 }
             }
         });

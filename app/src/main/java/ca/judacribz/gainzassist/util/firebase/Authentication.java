@@ -114,6 +114,7 @@ public class Authentication {
     public static void signOut(Activity act, GoogleSignInClient signInClient) {
         FirebaseAuth.getInstance().signOut();
 
+
         signInClient.signOut().addOnCompleteListener(
                 act,
                 new OnCompleteListener<Void>() {

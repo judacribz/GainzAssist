@@ -4,6 +4,7 @@ import android.arch.persistence.room.*;
 import org.parceler.Parcel;
 import android.support.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,8 +17,8 @@ public class Workout {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @PrimaryKey(autoGenerate = true)
-    int id;
+    @PrimaryKey
+    long id;
     String name;
 
     @Ignore
@@ -26,13 +27,14 @@ public class Workout {
 
 
     // ######################################################################################### //
-    // ExerciseConst Constructor                                                                       //
+    // ExerciseConst Constructor                                                                 //
     // ######################################################################################### //
     public Workout() {
     }
 
 
     public Workout(String name, @Nullable ArrayList<Exercise> exercises) {
+        setId(-1);
         setName(name);
         if (exercises != null){
             this.exercises = exercises;
@@ -43,12 +45,12 @@ public class Workout {
 
     // Getters and setters
     // ============================================================================================
-    public int getId() {
+    public long getId() {
         return this.id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(long id) {
+        this.id = (id == -1) ? new Date().getTime() : id;
     }
 
     public void setName(String name) {

@@ -173,8 +173,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
 //        cv.put(WORKOUT_NAME, session.getWorkoutName());
 //
 //        for (int i = 0; i < exerciseNames.size(); i++) {
-//            cv.put(EXERCISE_NAME, exerciseNames.get(i));
-//            cv.put(SETS, getBlobFromSets(sets.get(i)));
+//            cv.put(EXERCISE_NAME, exerciseNames.getLive(i));
+//            cv.put(SETS, getBlobFromSets(sets.getLive(i)));
 //
 //            db.insert(TABLE_SESSIONS, null, cv);
 //            cv.clear();

@@ -2,6 +2,7 @@ package ca.judacribz.gainzassist.util.firebase;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
@@ -32,13 +33,12 @@ public class Database {
 
     private static FirebaseUser firebaseUser;
     private static DatabaseReference
-            userRef,
-            userWorkoutsRef,
-            userWorkoutSessionsRef;
+            userRef;
+    private static DatabaseReference userWorkoutsRef;
 
     // --------------------------------------------------------------------------------------------
 
-    //TODO change to get ref for a specific user when friends/chatting added
+    //TODO change to getLive ref for a specific user when friends/chatting added
     /* Gets firebase db reference for 'users/<uid>/' */
     private static DatabaseReference getUserRef() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -76,7 +76,7 @@ public class Database {
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
-                    public void onDataChange(DataSnapshot userShot) {
+                    public void onDataChange(@NonNull DataSnapshot userShot) {
 
                         // If newly added user
                         if (!userShot.hasChildren()) {
@@ -92,7 +92,7 @@ public class Database {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
             }
@@ -105,15 +105,15 @@ public class Database {
         DatabaseReference defaultWorkoutsRef = FirebaseDatabase.getInstance().getReference(DEFAULT_WORKOUTS_PATH);
         userWorkoutsRef = getWorkoutsRef();
 
-        if (defaultWorkoutsRef != null && userWorkoutsRef != null) {
+        if (userWorkoutsRef != null) {
             defaultWorkoutsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot defaultWorkoutsShot) {
+                public void onDataChange(@NonNull DataSnapshot defaultWorkoutsShot) {
                     userWorkoutsRef.setValue(defaultWorkoutsShot.getValue());
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
+                public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
             });
         }
@@ -130,7 +130,7 @@ public class Database {
     }
 
     public static void addWorkoutSessionFirebase(Session session) {
-        userWorkoutSessionsRef = getWorkoutSessionsRef();
+        DatabaseReference userWorkoutSessionsRef = getWorkoutSessionsRef();
 
         if (userWorkoutSessionsRef != null) {
             userWorkoutSessionsRef.child(String.valueOf(session.getTimestamp())).setValue(session.toMap());

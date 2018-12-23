@@ -17,7 +17,7 @@ public interface WorkoutDao {
     LiveData<List<Workout>> getAll();
 
     @Query("SELECT * from  workouts WHERE id = :id")
-    LiveData<Workout> get(int id);
+    LiveData<Workout> get(long id);
 
     @Query("SELECT * from  workouts WHERE name = :name")
     LiveData<Workout> getLiveFromName(String name);
@@ -26,7 +26,7 @@ public interface WorkoutDao {
     Workout getFromName(String name);
 
     @Query("SELECT id from  workouts WHERE name = :name")
-    int getId(String name);
+    long getId(String name);
 
 
     @Update

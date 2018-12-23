@@ -3,41 +3,26 @@ package ca.judacribz.gainzassist.models;
 import android.arch.persistence.room.*;
 import org.parceler.Parcel;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static android.arch.persistence.room.ForeignKey.*;
 
 @Parcel
-@Entity(tableName = "exercise_sets",
-        foreignKeys = {
-            @ForeignKey(
-                entity = Session.class,
-                parentColumns = "id",
-                childColumns = "session_id",
-                onDelete = CASCADE,
-                onUpdate = CASCADE),
-            @ForeignKey(
-                entity = Exercise.class,
-                parentColumns = "id",
-                childColumns = "exercise_id",
-                onDelete = CASCADE,
-                onUpdate = CASCADE)},
-        indices = {
-            @Index("session_id"),
-            @Index("exercise_id")})
+@Entity(tableName = "exercise_sets")
 public class ExerciseSet {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @PrimaryKey(autoGenerate = true)
-    int id;
+    @PrimaryKey
+    long id = -1;
 
     @ColumnInfo(name = "session_id")
-    int sessionId;
+    long sessionId;
 
     @ColumnInfo(name = "exercise_id")
-    int exerciseId;
+    long exerciseId;
 
     @ColumnInfo(name = "set_number")
     int setNumber;
@@ -60,7 +45,8 @@ public class ExerciseSet {
     }
 
     @Ignore
-    public ExerciseSet(int exerciseId, String exerciseName, int setNumber, int reps, float weight) {
+    public ExerciseSet(long exerciseId, String exerciseName, int setNumber, int reps, float weight) {
+        setId(-1);
         setExerciseId(exerciseId);
         setExerciseName(exerciseName);
         setSetNumber(setNumber);
@@ -71,27 +57,27 @@ public class ExerciseSet {
 
     // Getters and setters
     // ============================================================================================
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(long id) {
+        this.id = (id == -1) ? new Date().getTime() : id;
     }
 
-    public int getSessionId() {
+    public long getSessionId() {
         return sessionId;
     }
 
-    public void setSessionId(int sessionId) {
+    public void setSessionId(long sessionId) {
         this.sessionId = sessionId;
     }
 
-    public int getExerciseId() {
+    public long getExerciseId() {
         return exerciseId;
     }
 
-    public void setExerciseId(int exerciseId) {
+    public void setExerciseId(long exerciseId) {
         this.exerciseId = exerciseId;
     }
 
@@ -128,10 +114,11 @@ public class ExerciseSet {
     // ============================================================================================
 
 
-    // Misc function used to store ExerciseSet information in the firebase db
+    // Misc function used to store ExerciseSet information in the FireBase db
     Map<String, Object> toMap() {
         Map<String, Object> exerciseSetMap = new HashMap<>();
 
+        exerciseSetMap.put("id", id);
         exerciseSetMap.put("reps", reps);
         exerciseSetMap.put("weight", weight);
 

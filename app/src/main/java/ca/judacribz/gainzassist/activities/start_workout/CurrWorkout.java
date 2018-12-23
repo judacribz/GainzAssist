@@ -126,7 +126,6 @@ public class CurrWorkout {
 
             //TODO test without using map
             Exercise exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
-            exercise.setId(Integer.valueOf(String.valueOf(exMap.get("id"))));
             exercise.setSetsType(MAIN_SET);
 
             setsMap = readValue(readValue(exEntry.getValue()).get(SET_LIST));
@@ -137,7 +136,7 @@ public class CurrWorkout {
                         Integer.valueOf(setEntry.getKey()),
                         Integer.valueOf(String.valueOf(setMap.get(REPS))),
                         Float.valueOf(String.valueOf(setMap.get(WEIGHT)))
-                ));
+                ), false);
             }
 
             this.currSession.addExercise(exercise);
@@ -282,7 +281,7 @@ public class CurrWorkout {
     public void addCurrSet() {
         this.currExerciseSet.setReps(this.currReps);
         this.currExerciseSet.setWeight(this.currWeight);
-        this.currExercise.addSet(this.currExerciseSet);
+        this.currExercise.addSet(this.currExerciseSet, true);
     }
 
     private boolean atEndOfSets() {

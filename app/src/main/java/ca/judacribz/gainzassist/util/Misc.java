@@ -45,11 +45,13 @@ public class Misc {
         ExerciseSet exerciseSet;
         String setNum;
 
+
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
 
             // Adds exerciseSets to exercise object, and add exercise to exercises list
             if (exerciseShot != null) {
                 exercise = exerciseShot.getValue(Exercise.class);
+
                 if (exercise != null) {
                     exercise.setExerciseNumber(
                             Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()))
@@ -58,30 +60,43 @@ public class Misc {
                 }
             }
         }
+        Workout workout = new Workout(workoutShot.getKey(), exercises);
+        workout.setId(Long.valueOf(String.valueOf(workoutShot.child("id").getValue())));
 
-        return new Workout(workoutShot.getKey(), exercises);
+        return workout;
     }
 
     public static Session extractSession(DataSnapshot sessionShot) {
         Session session = sessionShot.getValue(Session.class);
+        Logger.d(session.getWorkoutId() + "workoutid");
 
         if (session != null) {
+            long timestamp = session.getTimestamp();
             Exercise exercise;
             ExerciseSet set;
             session.setTimestamp(Long.valueOf(Objects.requireNonNull(sessionShot.getKey())));
 
+            String exerciseName;
+            long exerciseId;
+            long workoutId;
             for (DataSnapshot exerciseShot : sessionShot.child(EXERCISES).getChildren()) {
-                exercise = sessionShot.getValue(Exercise.class);
+                exercise = exerciseShot.getValue(Exercise.class);
 
                 if (exercise != null) {
+                    exerciseId = exercise.getId();
+                    exerciseName = exercise.getName();
+
                     exercise.setExerciseNumber(Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey())));
 
-                    for (DataSnapshot setShot : exerciseShot.child(SETS).getChildren()) {
-                        set = sessionShot.getValue(ExerciseSet.class);
+                    for (DataSnapshot setShot : exerciseShot.child(SET_LIST).getChildren()) {
+                        set = setShot.getValue(ExerciseSet.class);
 
                         if (set != null) {
                             set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
-                            exercise.addSet(set);
+                            set.setExerciseId(exerciseId);
+                            set.setExerciseName(exerciseName);
+                            set.setSessionId(timestamp);
+                            exercise.addSet(set, false);
                         }
                     }
 
@@ -90,7 +105,8 @@ public class Misc {
             }
         }
 
-        Logger.d(session.toMap());
+        Logger.d(session.sessionStateMap(1, 1));
+        Logger.d(sessionShot.toString());
         return session;
     }
 

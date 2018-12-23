@@ -74,7 +74,7 @@ public class FirebaseService extends IntentService implements
             userSessionRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot sessionShot, String s) {
-                    extractSession(sessionShot);
+                    workoutRepo.insertSession(extractSession(sessionShot), false);
                 }
 
                 @Override

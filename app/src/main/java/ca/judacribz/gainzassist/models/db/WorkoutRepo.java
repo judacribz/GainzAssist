@@ -5,7 +5,6 @@ import android.arch.lifecycle.LiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.util.SparseArray;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.Exercise;
@@ -16,6 +15,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +30,8 @@ public class WorkoutRepo {
     static private SetDao setDao;
     static private SessionDao sessionDao;
     private DataSnapshot workoutShot;
+
+
 
     public enum TableTxn {
         WORKOUTS_TXN,
@@ -81,8 +83,11 @@ public class WorkoutRepo {
         setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
     }
 
-    void insertSession(Session session) {
-        setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session);
+    public void insertSession(Session session, boolean toFireBase) {
+        setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session, toFireBase);
+        if (toFireBase) {
+            addWorkoutSessionFirebase(session);
+        }
     }
 
     static void insertSet(ExerciseSet exerciseSet) {
@@ -96,8 +101,15 @@ public class WorkoutRepo {
     LiveData<List<Workout>> getAllWorkoutsLive() {
         return workoutDao.getAll();
     }
+    LiveData<List<Session>> getAllSessionsLive() {
+        return sessionDao.getAll();
+    }
 
-    LiveData<Workout> getWorkout(int id) {
+    LiveData<List<ExerciseSet>> getAllSetsLive() {
+        return setDao.getAll();
+    }
+
+    LiveData<Workout> getWorkout(long id) {
         return workoutDao.get(id);
     }
 
@@ -109,19 +121,19 @@ public class WorkoutRepo {
         setRepoAsyncConfig(GET_WORKOUT_ID, WORKOUTS_TXN, context, workoutShot.getKey(), workoutShot);
     }
 
-    LiveData<List<Exercise>> getExercisesFromWorkout(int workoutId) {
+    LiveData<List<Exercise>> getExercisesFromWorkout(long workoutId) {
         return exerciseDao.getLiveFromWorkout(workoutId);
     }
 
-    LiveData<Exercise> getExercise(int id) {
-        return exerciseDao.get(id);
+    LiveData<Exercise> getExercise(long id) {
+        return exerciseDao.getLive(id);
     }
 
     LiveData<List<String>> getAllUniqueExerciseNames() {
         return exerciseDao.getAllUniqueNames();
     }
 
-    LiveData<List<ExerciseSet>> getSetsFromExercise(int exerciseId) {
+    LiveData<List<ExerciseSet>> getSetsFromExercise(long exerciseId) {
         return setDao.getLiveFromExercise(exerciseId);
     }
     // --------------------------------------------------------------------------------------------
@@ -234,9 +246,9 @@ public class WorkoutRepo {
         private ExerciseSet exerciseSet = null;
         private Session session = null;
         private long timestamp = -1;
-        private int workoutId = -1;
+        private long workoutId = -1;
 
-        private int id = -1;
+        private long id = -1;
 
         RepoAsyncTask() {
         }
@@ -272,7 +284,7 @@ public class WorkoutRepo {
             this.timestamp = timestamp;
         }
 
-        void setWorkoutId(int workoutId) {
+        void setWorkoutId(long workoutId) {
             this.workoutId = workoutId;
         }
 
@@ -314,41 +326,44 @@ public class WorkoutRepo {
 
                     case INSERT_WORKOUT:
                         workoutDao.insert(workout);
-                        Log.d("YOOOO", "ExerciseConst:" + workout.getName() + " id : " + workoutDao.getId(workoutName));
-                        id = workoutDao.getId(workoutName);
+                        id = workout.getId();
+                        Logger.d("ExerciseConst:" + workout.getName() + " id : " + workoutDao.getId(workoutName));
+                        long exid = new Date().getTime();
                         for (Exercise exercise : workout.getExercises()) {
+                            exercise.setId(exid++);
                             exercise.setWorkoutId(id);
                             setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
                         }
                         break;
 
                     case INSERT_EXERCISE:
-                        exerciseDao.insert(exercise);
+                        if (exerciseDao.get(exercise.getId()) == null) {
+                            exerciseDao.insert(exercise);
+                        }
 
                         break;
 
                     case INSERT_SESSION:
                         sessionDao.insert(session);
-                        id = sessionDao.getId(timestamp);
-                        session.setId(id);
-                        addWorkoutSessionFirebase(session);
-                        ArrayList<Exercise> exSets = session.getSessionExs();
-                        for (Exercise ex : exSets){
-                            for (ExerciseSet exerciseSet : ex.getSetsList()) {
-                                exerciseSet.setSessionId(id);
+                        ArrayList<Exercise> sessExs = session.getSessionExs();
+                        for (Exercise ex : sessExs){
+                            for (ExerciseSet exerciseSet : ex.getFinishedSetsList()) {
+                                exerciseSet.setSessionId(session.getTimestamp());
                                 insertSet(exerciseSet);
                             }
                         }
 
                         for (Map.Entry<String, Float> entry : newWeights.entrySet()) {
+//                            Logger.d("failing weight" + Float.valueOf(entry.getValue()));
                             exerciseDao.updateWeight(entry.getValue(), exerciseDao.getId(entry.getKey(), workoutId));
                         }
 
                         break;
 
                     case INSERT_SET:
-                        if (setDao != null)
+                        if (setDao.getId(exerciseSet.getId()) == null) {
                             setDao.insert(exerciseSet);
+                        }
                         break;
 
 
@@ -373,7 +388,6 @@ public class WorkoutRepo {
 
 
                     case DELETE_ALL_WORKOUTS:
-                        Logger.d("YPPP");
                         workoutDao.deleteAll();
                         break;
 

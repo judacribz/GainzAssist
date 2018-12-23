@@ -16,7 +16,7 @@ import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
                 parentColumns = "id",
                 childColumns = "workout_id",
                 onDelete = CASCADE),
-                indices = {@Index(value = {"workout_id", "exercise_number"}, unique = true)})
+                indices = {@Index(value = {"workout_id", "exercise_number"})})
 public class Exercise {
 
     @Ignore
@@ -34,11 +34,11 @@ public class Exercise {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    @PrimaryKey(autoGenerate = true)
-    int id;
+    @PrimaryKey
+    long id = -1;
 
     @ColumnInfo(name = "workout_id")
-    int workoutId;
+    long workoutId;
 
     @ColumnInfo(name = "exercise_number")
     int exerciseNumber;
@@ -51,7 +51,7 @@ public class Exercise {
     float weight;
 
     @Ignore
-    private float weightChange, minWeight;
+    float weightChange, minWeight;
 
     @Ignore
     ArrayList<ExerciseSet> setsList = new ArrayList<>();
@@ -107,6 +107,7 @@ public class Exercise {
                                 String name,
                                 String type,
                                 String equipment) {
+        setId(-1);
         setExerciseNumber(exerciseNumber);
         setName(name);
         setType(type);
@@ -116,19 +117,19 @@ public class Exercise {
 
     // Getters and setters
     // ============================================================================================
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(long id) {
+        this.id = (id == -1) ? new Date().getTime() : id;
     }
 
-    public int getWorkoutId() {
+    public long getWorkoutId() {
         return this.workoutId;
     }
 
-    public void setWorkoutId(int workoutId) {
+    public void setWorkoutId(long workoutId) {
         this.workoutId = workoutId;
     }
 
@@ -164,14 +165,14 @@ public class Exercise {
         this.equipment = equipment;
 
         if (BARBELL.equals(this.equipment)) {
-            minWeight = BB_MIN_WEIGHT;
-            weightChange = BB_WEIGHT_CHANGE;
+            this.minWeight = BB_MIN_WEIGHT;
+            this.weightChange = BB_WEIGHT_CHANGE;
         } else if (DUMBBELL.equals(this.equipment)) {
-            minWeight = DB_MIN_WEIGHT;
-            weightChange = DB_WEIGHT_CHANGE;
+            this.minWeight = DB_MIN_WEIGHT;
+            this.weightChange = DB_WEIGHT_CHANGE;
         } else {
-            minWeight = MIN_WEIGHT;
-            weightChange = WEIGHT_CHANGE;
+            this.minWeight = MIN_WEIGHT;
+            this.weightChange = WEIGHT_CHANGE;
         }
     }
 
@@ -219,6 +220,10 @@ public class Exercise {
         return this.setsList;
     }
 
+    public ArrayList<ExerciseSet> getFinishedSetsList() {
+        return this.finSets;
+    }
+
     public void setSetsList(@Nullable ArrayList<ExerciseSet> setsList) {
         if (setsList != null) {
             this.setsList = setsList;
@@ -233,7 +238,10 @@ public class Exercise {
         this.finSets.set(set.getSetNumber(), set);
     }
 
-    public void addSet(ExerciseSet set) {
+    public void addSet(ExerciseSet set, boolean genId) {
+        if (genId) {
+            set.setId(-1);
+        }
         this.finSets.add(set);
     }
 
@@ -285,6 +293,9 @@ public class Exercise {
                     put("name",      name);
                     put("type",      type);
                     put("equipment", equipment);
+                    put("sets", sets);
+                    put("reps", reps);
+                    put("weight", weight);
                 }};
 
         for (ExerciseSet set : this.finSets) {
