@@ -164,19 +164,16 @@ public class CurrWorkout {
         ArrayList<ExerciseSet> exerciseSets;
         Exercise warmup;
 
-        int exId;
-        float oneRepMax, minWeight, weight, weightChange, newWeight;
-        int reps, setNum;
+        float oneRepMax, minWeight, weight;
         String equip;
 
         setCurrMainExercises(exercises);
 
         for (Exercise ex: exercises) {
+            equip = ex.getEquipment();
             minWeight = ex.getMinWeight();
-            weightChange = ex.getWeightChange();
-//            ex.setSetsList(null);
             weight = ex.getAvgWeight();
-            Logger.d("weight  - " + weight);
+
             if (weight == minWeight) {
                 allExs.add(ex);
                 continue;
@@ -184,61 +181,12 @@ public class CurrWorkout {
 
             //Todo: use onerepmax
             oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
-            reps = ex.getAvgReps();
 
-            setNum = 0;
-            float weightInc = 40f;
-            exerciseSets = new ArrayList<>();
-            newWeight = minWeight;
-
-            exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
-            exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
-            newWeight += 50f;
-
-            while (newWeight <= 0.85f*weight) {
-                if (newWeight > 0.70f*weight) {
-                    reps = (1 + (reps / 2));
-                }
-
-                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
-                newWeight += weightInc;
+            if (BARBELL.equals(equip)) {
+                exerciseSets = genBBWarmups(ex);
+            } else {
+                exerciseSets = genWarmups(ex);
             }
-
-
-            do {
-                if (weightInc < weightChange) {
-                    break;
-                }
-
-                if (newWeight < 0.91f * weight && newWeight > 0.85f * weight) {
-                    reps = (1 + reps / 2);
-                    exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
-                    newWeight += weightInc;
-                } else if (newWeight > 0.91f * weight) {
-                    newWeight -= weightInc;
-                    weightInc -= weightChange;
-                    newWeight += weightInc;
-                }
-            } while (true);
-
-//                newWeight = 0.9f * weight;
-//                newWeight -= newWeight % ex.getWeightChange();
-
-//                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
-//            percWeight = minWeight / weight;
-//            do {
-//                newWeight = percWeight * weight;
-//                newWeight -= newWeight % ex.getWeightChange();
-//                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
-//
-//
-//                percWeight += 0.2f;
-//                if (reps - 2 > 0)
-//                    reps -= 2;
-//                else if (reps - 1 > 0)
-//                    --reps;
-//
-//            } while (percWeight < 0.9f);
 
             warmup = new Exercise(
                     ex.getExerciseNumber(),
@@ -255,6 +203,111 @@ public class CurrWorkout {
 
         setCurrWarmupExercises(warmups);
         setAllCurrExercises(allExs);
+    }
+
+    private ArrayList<ExerciseSet> genBBWarmups(Exercise ex) {
+        ArrayList<ExerciseSet> exerciseSets = new ArrayList<>();
+        int
+                setNum = 0,
+                reps = ex.getAvgReps();
+        float
+                minWeight = ex.getMinWeight(),
+                weightChange = ex.getWeightChange(),
+                weight = ex.getAvgWeight(),
+                weightInc;
+
+        float newWeight = minWeight;
+
+        exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
+        exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
+
+        if (weight >= 405f) {
+            weightInc = 90f;
+            newWeight += 90f;
+            while (newWeight <= 0.85f * weight) {
+                if (newWeight >= 0.75f * weight) {
+                    reps = ex.getReps()/4 + 1;
+                }else if (newWeight > 0.65f * weight) {
+                    reps = ex.getReps()/2 + 1;
+                }
+
+                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
+                newWeight += weightInc;
+            }
+        } else {
+            newWeight += 50f;
+            weightInc = 40f;
+            while (newWeight <= 0.85f * weight) {
+
+                if (newWeight >= 0.75f * weight) {
+                    reps = ex.getReps()/4 + 1;
+                }else if (newWeight > 0.65f * weight) {
+                    reps = ex.getReps()/2 + 1;
+                }
+
+                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
+                newWeight += weightInc;
+            }
+        }
+
+        reps = reps/2 + 1;
+        do {
+            if (weightInc < weightChange) {
+                return exerciseSets;
+            }
+
+            if (newWeight < 0.91f * weight && newWeight > 0.85f * weight) {
+                exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
+                newWeight += weightInc;
+
+                reps /=2;
+            } else if (newWeight > 0.91f * weight) {
+                newWeight -= weightInc;
+                weightInc -= weightChange;
+                newWeight += weightInc;
+            }
+        } while (true);
+    }
+
+    private ArrayList<ExerciseSet> genWarmups(Exercise ex) {
+        ArrayList<ExerciseSet> exerciseSets = new ArrayList<>();
+        int
+                setNum = 0,
+                reps = ex.getAvgReps();
+        float
+                minWeight = ex.getMinWeight(),
+                weightChange = ex.getWeightChange(),
+                weight = ex.getAvgWeight();
+
+        float newWeight = minWeight;
+
+        float diff = weight - minWeight;
+
+        if (diff == 0f) {
+            return exerciseSets;
+        }
+
+        int sets =  Math.min(5, (int)diff / (int)(weightChange * 2));
+        sets += weight % 100f;
+        float percInc = 0.91f/(float)sets;
+        float perc = percInc;
+
+        for (int i = 0; i < sets; i++) {
+            newWeight = perc*weight;
+            newWeight -= newWeight % (weightChange*2);
+            if (newWeight >= 0.65f * weight) {
+                reps = (reps/2 + 1);
+            }
+
+            exerciseSets.add(new ExerciseSet(
+                    ex,
+                    setNum++,
+                    reps,
+                    newWeight));
+            perc += percInc;
+        }
+
+        return  exerciseSets;
     }
 
     private void setCurrMainExercises(ArrayList<Exercise> exercises) {
