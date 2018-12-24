@@ -105,6 +105,7 @@ public class Workout {
         Map<String, Object> workout = new HashMap<>();
         Map<String, Object> exs = exerciseToMap(exercises);
 
+        workout.put("id", id);
         workout.put("exercises", exs);
 
         return workout;

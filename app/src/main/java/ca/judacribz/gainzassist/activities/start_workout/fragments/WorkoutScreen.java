@@ -1,11 +1,13 @@
 package ca.judacribz.gainzassist.activities.start_workout.fragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
 
 
@@ -85,7 +88,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (StartWorkout) context;
-        currWorkout.setContext(act);
 
         // init finished workout variables
         finExercises = new ArrayList<>();
@@ -326,6 +328,13 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         if (currWorkout.finishCurrSet()) {
             updateUI();
         } else {
+            if (removeIncompleteWorkoutPref(act, currWorkout.getWorkoutName())) {
+                removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
+            }
+
+            ViewModelProviders.of(act)
+                    .get(WorkoutViewModel.class)
+                    .insertSession(currWorkout.getCurrSession());
             if (removeIncompleteWorkoutPref(act, currWorkout.getWorkoutName())) {
                 removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
             }

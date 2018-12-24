@@ -2,17 +2,22 @@ package ca.judacribz.gainzassist;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Button;
 
+import android.view.MenuItem;
 import butterknife.*;
 
 import ca.judacribz.gainzassist.activities.authentication.Login;
-import ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList;
+import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+
+import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.util.UI.*;
 
@@ -25,11 +30,12 @@ public class Main extends AppCompatActivity {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    LayoutInflater layInflater;
 
-    // UI Elements
-    @BindView(R.id.btn_resume_workout) Button btnResumeWorkout;
-    @BindView(R.id.btn_workouts) Button btnWorkouts;
-    @BindView(R.id.btn_step_counter) Button btnStepCounter;
+
+
+    @BindView(R.id.tlay_navbar) TabLayout tabLayout;
+    @BindView(R.id.vp_fmt_container) ViewPager viewPager;
     // --------------------------------------------------------------------------------------------
 
     // AppCompatActivity Override
@@ -40,15 +46,36 @@ public class Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_main, R.string.app_name, false);
 
-        btnResumeWorkout.setText(R.string.resume_workout);
-        btnWorkouts.setText(R.string.workouts);
-        btnStepCounter.setText(R.string.step_counter);
-
-
-        //TODO remove
-//        Toast.makeText(this, "shared pref says " + getEmailPref(this), Toast.LENGTH_SHORT).show();
+        setupPager();
     }
 
+    private void setupPager() {
+        layInflater = getLayoutInflater();
+
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                super.onTabSelected(tab);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                super.onTabUnselected(tab);
+            }
+        });
+
+        ArrayList<Fragment> fmts = new ArrayList<>();
+        fmts.add(Resume.getInstance());
+        fmts.add(Home.getInstance());
+        fmts.add(Settings.getInstance());
+        viewPager.setAdapter(new WorkoutPagerAdapter(
+                getSupportFragmentManager(),
+                fmts
+        ));
+        viewPager.setCurrentItem(1);
+    }
     @Override
     public void onBackPressed() {
         handleBackButton(this);
@@ -62,9 +89,6 @@ public class Main extends AppCompatActivity {
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    // Click Handling
-    // ============================================================================================
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -84,9 +108,4 @@ public class Main extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.btn_workouts)
-    public void startWorkoutsList() {
-        startActivity(new Intent(this, WorkoutsList.class));
-    }
-    //=Click=Handling==============================================================================
 }

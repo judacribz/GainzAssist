@@ -22,6 +22,7 @@ import ca.judacribz.gainzassist.models.*;
 import java.util.ArrayList;
 import org.parceler.Parcels;
 
+import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT;
@@ -59,8 +60,6 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         exercises = workout.getExercises();
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
-
-        currWorkout.setContext(this);
     }
 
 
@@ -78,7 +77,12 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         Toast.makeText(this, "setsession", Toast.LENGTH_SHORT).show();
 
         if (removeIncompleteWorkoutPref(this, workout.getName())) {
-            currWorkout.retrieveCurrWorkout(workout);
+            currWorkout.setRetrievedWorkout(
+                    readValue(getIncompleteSessionPref(this, workout.getName())),
+                    workout
+            );
+
+            removeIncompleteSessionPref(this, workout.getName());
         } else {
             currWorkout.setCurrWorkout(workout);
         }
@@ -111,7 +115,14 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     }
 
     public void handleLeavingScreen() {
-        currWorkout.saveSessionState();
+        String jsonStr = currWorkout.saveSessionState();
+        if (!jsonStr.isEmpty()) {
+            addIncompleteSessionPref(
+                    this,
+                    workout.getName(),
+                    jsonStr
+            );
+        }
         addIncompleteWorkoutPref(this, workout.getName());
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////

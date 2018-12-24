@@ -55,8 +55,6 @@ public class CurrWorkout {
     private boolean timerSet;
 
     private Session currSession = null;
-
-    private Context context;
     // --------------------------------------------------------------------------------------------
 
 
@@ -95,18 +93,7 @@ public class CurrWorkout {
         return INST;
     }
     // ######################################################################################### //
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    void retrieveCurrWorkout(Workout workout) {
-        setRetrievedWorkout(readValue(getIncompleteSessionPref(this.context, workout.getName())), workout);
-
-        removeIncompleteSessionPref(this.context, workout.getName());
-    }
-
-    private void setRetrievedWorkout(Map<String, Object> map, Workout workout) {
+    public void setRetrievedWorkout(Map<String, Object> map, Workout workout) {
         Map<String, Object> exsMap, exMap;
         Map<String, Object> setsMap, setMap;
 
@@ -348,11 +335,7 @@ public class CurrWorkout {
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
                 this.currSession.setTimestamp(-1);
-                ViewModelProviders.of((FragmentActivity) context)
-                        .get(WorkoutViewModel.class)
-                        .insertSession(this.currSession);
 
-                removeSessPrefAndSetWorkout();
                 resetIndices();
 
                 return false;
@@ -523,12 +506,10 @@ public class CurrWorkout {
         this.set_i = -1;
     }
 
-    void saveSessionState() {
+    String saveSessionState() {
 
         if (!getIsWarmup()) {
-            Toast.makeText(context, "IN CONDITION", Toast.LENGTH_SHORT).show();
             Exercise ex = this.currExercise;
-
             this.currSession.addExercise(ex);
         }
 
@@ -539,19 +520,7 @@ public class CurrWorkout {
         ));
 
         Logger.d("leave" + jsonStr);
-        if (!jsonStr.isEmpty()) {
-            addIncompleteSessionPref(
-                    context,
-                    getWorkoutName(),
-                    jsonStr
-            );
-        }
-
+        return jsonStr;
     }
 
-    private void removeSessPrefAndSetWorkout() {
-        if (removeIncompleteWorkoutPref(context, currWorkout.getName())) {
-            removeIncompleteSessionPref(context, currWorkout.getName());
-        }
-    }
 }

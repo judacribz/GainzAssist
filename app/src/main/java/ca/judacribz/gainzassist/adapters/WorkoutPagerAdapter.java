@@ -74,20 +74,10 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
             newEntry(i);
         }
     }
-    public void addTab() {
-        this.numExs++;
-        newEntry(getCount());
-    }
 
-    public void newEntry(int index) {
-        Fragment fmt = new ExEntry();
-        ((ExEntry) fmt).setInd(index);
-        fmts.add(fmt);
-    }
-
-    public void removeTabFragment(int index) {
-        this.numExs--;
-        fmts.remove(getCount() - index - 1);
+    public WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Fragment> fmts) {
+        super(fragmentManager);
+        this.fmts = fmts;
     }
     // ######################################################################################### //
 
@@ -114,5 +104,21 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         }
     }
     //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
+
+    public void addTab() {
+        this.numExs++;
+        newEntry(getCount());
+    }
+
+    public void newEntry(int index) {
+        Fragment fmt = new ExEntry();
+        ((ExEntry) fmt).setInd(index);
+        fmts.add(fmt);
+    }
+
+    public void removeTabFragment(int index) {
+        this.numExs--;
+        fmts.remove(getCount() - index - 1);
+    }
 
 }
