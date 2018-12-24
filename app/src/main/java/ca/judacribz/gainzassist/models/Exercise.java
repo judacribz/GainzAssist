@@ -250,7 +250,7 @@ public class Exercise {
         for (ExerciseSet exerciseSet : setsList) {
             weight += exerciseSet.getWeight();
         }
-
+Logger.d("setlist size " + setsList.size());
         return weight / (float) getSets();
     }
 

@@ -173,6 +173,7 @@ public class CurrWorkout {
 
         for (Exercise ex: exercises) {
             minWeight = ex.getMinWeight();
+//            ex.setSetsList(null);
             weight = ex.getAvgWeight();
             Logger.d("weight  - " + weight);
             if (weight == minWeight) {
@@ -190,8 +191,9 @@ public class CurrWorkout {
             percWeight = minWeight / weight;
             do {
                 newWeight = percWeight * weight;
-                newWeight -= newWeight % minWeight;
+                newWeight -= newWeight % ex.getWeightChange();
                 exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
+
 
                 percWeight += 0.2f;
                 if (reps - 2 > 0)
