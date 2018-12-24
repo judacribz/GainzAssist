@@ -149,6 +149,9 @@ public class EquipmentView extends View{
 
                 // Sets the plate diameter using a fraction
                 for (int i = 0; i < numWeights[j]; i++) {
+                    if (j == 0 && i > 4) {
+                        continue;
+                    }
 
                     // Sets weight based on fraction weight/45 multiplied by the length of 45
                     int r = (WEIGHTS[j]/10) * diam45 / 45 + (45 - (WEIGHTS[j]/10));

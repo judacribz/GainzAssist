@@ -288,7 +288,7 @@ public class CurrWorkout {
         }
 
         int sets =  Math.min(5, (int)diff / (int)(weightChange * 2));
-        sets += weight % 100f;
+        sets += (int)weight / 100;
         float percInc = 0.91f/(float)sets;
         float perc = percInc;
 
