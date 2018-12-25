@@ -43,7 +43,7 @@ public class Preferences {
         editor.apply();
     }
 
-    private static Set<String> getIncompleteWorkouts(Context context) {
+    public static Set<String> getIncompleteWorkouts(Context context) {
         return getSharedPref(
                 context,
                 R.string.file_workout_info

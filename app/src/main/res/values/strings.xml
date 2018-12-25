@@ -119,4 +119,6 @@
 	<string name="update">update</string>
 	<string name="home">Home</string>
 	<string name="resume">Resume</string>
+	<string name="workout_list">Workout List</string>
+	<string name="incomplete_workouts">Incomplete Workouts</string>
 </resources>

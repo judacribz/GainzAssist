@@ -23,27 +23,20 @@ import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
 import ca.judacribz.gainzassist.activities.main.Main;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
-import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
-import ca.judacribz.gainzassist.models.ExerciseSet;
-import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 
-public class Home extends Fragment implements
-        SingleItemAdapter.ItemClickObserver {
+public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObserver {
 
     // Constants
     // --------------------------------------------------------------------------------------------
-
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -52,29 +45,31 @@ public class Home extends Fragment implements
     SingleItemAdapter workoutAdapter;
     LinearLayoutManager layoutManager;
 
-    ArrayList<String> workoutNames;
-    ArrayList<String> filteredWorkouts;
-
     WorkoutViewModel workoutViewModel;
 
+    ArrayList<String>
+            workoutNames,
+            filteredWorkouts;
+
+    public Intent intent;
+    public String extraKey;
+
     // UI Elements
-    @BindView(R.id.rv_workout_btns)
-    RecyclerView workoutsList;
-//    @BindView(R.id.msvWorkouts) MaterialSearchView searchView;
+    @BindView(R.id.rv_workout_btns) RecyclerView workoutsList;
     // --------------------------------------------------------------------------------------------
 
-    // ######################################################################################### //
-    // WarmupsList Constructor/Instance                                                        //
-    // ######################################################################################### //
-    public Home() {
-        // Required empty public constructor
-    }
-
-    public static Home getInstance() {
-        return new Home();
-    }
 
     // ######################################################################################### //
+    // WarmupsList Constructor/Instance                                                          //
+    // ######################################################################################### //
+    public Workouts() {
+    }
+
+    public static Workouts getInstance() {
+        return new Workouts();
+    }
+    // ######################################################################################### //
+
 
     // Fragment Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,7 +89,7 @@ public class Home extends Fragment implements
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_home, container, false);
+        View view =  inflater.inflate(R.layout.fragment_workouts, container, false);
         ButterKnife.bind(this, view);
 
         workoutNames = new ArrayList<>();
@@ -113,20 +108,35 @@ public class Home extends Fragment implements
                     for (Workout workout : workouts) {
                         workoutNames.add(workout.getName());
                     }
-                    displayWorkoutList(workoutNames);
+                    if (workoutAdapter == null) {
+                        displayWorkoutList(workoutNames);
+                    } else {
+                        workoutAdapter.setItems(workoutNames);
+                        workoutAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         });
 
-
-//        searchView.setOnQueryTextListener(this);
-//
-//        searchView.setVoiceSearch(true);
-
-
         return view;
     }
+
+    /* Helper function to display button list of workouts */
+    public void displayWorkoutList(@Nullable  ArrayList<String> workouts) {
+        if (workouts != null) {
+            filteredWorkouts = workouts;
+        }
+        workoutAdapter = new SingleItemAdapter(
+                act,
+                filteredWorkouts,
+                R.layout.part_button,
+                R.id.btnListItem
+        );
+        workoutAdapter.setItemClickObserver(this);
+        workoutsList.setAdapter(workoutAdapter);
+    }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
+
 
     // SingleItemAdapter.ItemClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +148,7 @@ public class Home extends Fragment implements
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 
-    public Intent intent;
-    public String extraKey;
+
     // SingleItemAdapter.ItemLongClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
 //TODO change to dialogbar
@@ -178,8 +187,6 @@ public class Home extends Fragment implements
         // If the PopupWindow should be focusable
         popupWindow.setFocusable(true);
 
-
-
         // If you need the PopupWindow to dismiss when when touched outside
 //        popupWindow.setBackgroundDrawable(new ColorDrawable());
         // Get the View's(the one that was clicked in the Fragment) location
@@ -195,41 +202,21 @@ public class Home extends Fragment implements
     //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////
 
 
-    /* Helper function to display button list of workouts */
-    public void displayWorkoutList(ArrayList<String> workouts) {
-        filteredWorkouts = workouts;
-        workoutAdapter = new SingleItemAdapter(
-                act,
-                workouts,
-                R.layout.part_button,
-                R.id.btnListItem
-        );
-        workoutAdapter.setItemClickObserver(this);
-        workoutsList.setAdapter(workoutAdapter);
-    }
-
-
     public void onQueryTextChange(String newText) {
-        filteredWorkouts = new ArrayList<>();
         String filterWord = newText.toLowerCase();
 
+        filteredWorkouts = new ArrayList<>();
         for (String workoutName : workoutNames) {
             if (workoutName.toLowerCase().contains(filterWord)) {
                 filteredWorkouts.add(workoutName);
             }
         }
 
-        workoutAdapter = new SingleItemAdapter(
-                act,
-                filteredWorkouts,
-                R.layout.part_button,
-                R.id.btnListItem
-        );
-        workoutAdapter.setItemClickObserver(this);
-        workoutsList.setAdapter(workoutAdapter);
+        workoutAdapter.setItems(filteredWorkouts);
+        workoutAdapter.notifyDataSetChanged();
     }
+
     // Click Handling
     // ============================================================================================
-
     //=Click=Handling==============================================================================
 }

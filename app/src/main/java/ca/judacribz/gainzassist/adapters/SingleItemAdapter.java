@@ -26,14 +26,13 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
 
     // --------------------------------------------------------------------------------------------
 
-    private int numItems, listItemLayout, listItemId;
+    private int listItemLayout, listItemId;
     private ArrayList<String> itemNames;
     private LayoutInflater inflater;
 
     // Adapter Constructor
     public SingleItemAdapter(Context context, ArrayList<String> itemNames, int listItemLayout, int listItemId) {
         this.inflater = LayoutInflater.from(context);
-        this.numItems = itemNames.size();
         this.itemNames = itemNames;
         this.listItemLayout = listItemLayout;
         this.listItemId = listItemId;
@@ -56,10 +55,13 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
 
     @Override
     public int getItemCount() {
-        return numItems;
+        return itemNames.size();
     }
     //RecyclerView.Adapter<SingleItemAdapter.ButtonViewHolder>//Override///////////////////////////////
 
+    public void setItems(ArrayList<String> itemNames) {
+        this.itemNames = itemNames;
+    }
 
     // Custom ViewHolder class for the recyclerView
     // ============================================================================================

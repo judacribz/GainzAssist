@@ -45,7 +45,6 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     private static final int POS_CARDIO = 1;
 
     private static final int POS_NA = 2;
-
     public enum CALLING_ACTIVITY {
         WORKOUTS_LIST,
         EXERCISES_ENTRY
@@ -60,6 +59,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     ArrayList<ExerciseSet> exSets;
     Workout workout;
 
+    long id = -1;
     int num_reps, num_sets, minInt = 1; // for min num_reps/num_sets
     float weight, minWeight, weightChange;
 
@@ -102,6 +102,10 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
         Intent intent = getIntent();
         workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
+        long id = workout.getId();
+        if (id != -1) {
+            this.id = id;
+        }
         switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {
             case WORKOUTS_LIST:
                 btnAddWorkout.setText(getString(R.string.update_workout));
@@ -399,6 +403,7 @@ Exercise ex;
             } else {
 
                 workout = new Workout(getTextString(etWorkoutName), exercises);
+                workout.setId(this.id);
 
                 addWorkoutFirebase(workout);
 

@@ -18,7 +18,7 @@ public class Workout {
     // Global Vars
     // --------------------------------------------------------------------------------------------
     @PrimaryKey
-    long id;
+    long id = -1;
     String name;
 
     @Ignore
@@ -34,7 +34,8 @@ public class Workout {
 
 
     public Workout(String name, @Nullable ArrayList<Exercise> exercises) {
-        setId(-1);
+        if (id == -1)
+            setId(-1);
         setName(name);
         if (exercises != null){
             this.exercises = exercises;

@@ -13,7 +13,7 @@ public interface WorkoutDao {
     Long insert(Workout workout);
 
 
-    @Query("SELECT * from  workouts")
+    @Query("SELECT * from workouts ORDER BY id")
     LiveData<List<Workout>> getAll();
 
     @Query("SELECT * from  workouts WHERE id = :id")

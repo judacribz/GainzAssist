@@ -18,10 +18,9 @@ import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;
 import ca.judacribz.gainzassist.activities.authentication.Login;
-import ca.judacribz.gainzassist.activities.main.fragments.Home;
+import ca.judacribz.gainzassist.activities.main.fragments.Workouts;
 import ca.judacribz.gainzassist.activities.main.fragments.Resume;
 import ca.judacribz.gainzassist.activities.main.fragments.Settings;
-import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.Workout;
@@ -46,7 +45,7 @@ public class Main extends AppCompatActivity implements
             = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT";
     public final Fragment[] fmts = new Fragment[] {
             Resume.getInstance(),
-            Home.getInstance(),
+            Workouts.getInstance(),
             Settings.getInstance()
     };
     // --------------------------------------------------------------------------------------------
@@ -73,7 +72,7 @@ public class Main extends AppCompatActivity implements
         searchView.setOnQueryTextListener(this);
         searchView.setVoiceSearch(true);
     }
-
+int pos;
     private void setupPager() {
         layInflater = getLayoutInflater();
 
@@ -83,6 +82,20 @@ public class Main extends AppCompatActivity implements
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
+pos = tab.getPosition();
+                if (search != null && addWorkout != null) {
+                    switch (tab.getPosition()) {
+                        case 2:
+                            search.setVisible(false);
+                        case 0:
+                            addWorkout.setVisible(false);
+                            break;
+                        case 1:
+                            search.setVisible(true);
+                            addWorkout.setVisible(true);
+                            break;
+                    }
+                }
             }
 
             @Override
@@ -102,12 +115,14 @@ public class Main extends AppCompatActivity implements
         handleBackButton(this);
     }
 
+    MenuItem search, addWorkout;
     @Override
     public boolean onCreateOptionsMenu(Menu mainMenu) {
-        getMenuInflater().inflate(ca.judacribz.gainzassist.R.menu.menu_main, mainMenu);
+        getMenuInflater().inflate(R.menu.menu_main, mainMenu);
 
-        MenuItem item = mainMenu.findItem(R.id.act_search);
-        searchView.setMenuItem(item);
+        search = mainMenu.findItem(R.id.act_search);
+        searchView.setMenuItem(search);
+        addWorkout = mainMenu.findItem(R.id.act_add_workout);
 
         return super.onCreateOptionsMenu(mainMenu);
     }
@@ -134,7 +149,7 @@ public class Main extends AppCompatActivity implements
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean onQueryTextChange(String newText) {
-        ((Home)fmts[1]).onQueryTextChange(newText);
+        ((Workouts)fmts[1]).onQueryTextChange(newText);
         return false;
     }
 
@@ -167,7 +182,23 @@ public class Main extends AppCompatActivity implements
 
     @Override
     public void onWorkoutsReceived(Workout workout) {
-        ((Home)fmts[1]).intent.putExtra(((Home)fmts[1]).extraKey, Parcels.wrap(workout));
-        startActivity(((Home)fmts[1]).intent);
+        Intent intent = null;
+        String extraKey = null;
+        switch (pos) {
+            case 0:
+                intent = ((Resume)fmts[0]).intent;
+                extraKey = ((Resume)fmts[0]).extraKey;
+                break;
+
+            case 1:
+                intent = ((Workouts)fmts[1]).intent;
+                extraKey = ((Workouts)fmts[1]).extraKey;
+                break;
+        }
+
+        if (intent != null) {
+            intent.putExtra(extraKey, Parcels.wrap(workout));
+            startActivity(intent);
+        }
     }
 }
