@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;;
+import ca.judacribz.gainzassist.activities.main.Main;
 import com.facebook.*;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -38,10 +39,9 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-import ca.judacribz.gainzassist.*;
 import ca.judacribz.gainzassist.R;
 
-import static ca.judacribz.gainzassist.Main.EXTRA_LOGOUT_USER;
+import static ca.judacribz.gainzassist.activities.main.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.UI.setSpring;
 import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
 import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;

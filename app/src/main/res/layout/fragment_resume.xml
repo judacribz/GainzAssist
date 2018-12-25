@@ -6,7 +6,7 @@
 	android:layout_height="match_parent"
 	android:padding="15dp"
 	android:orientation="vertical"
-	tools:context=".Resume">
+	tools:context=".activities.main.fragments.Resume">
 
 	<include
 		android:id="@+id/btn_workouts"

@@ -22,10 +22,10 @@ import ca.judacribz.gainzassist.models.*;
 import java.util.ArrayList;
 import org.parceler.Parcels;
 
+import static ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
-import static ca.judacribz.gainzassist.activities.workouts_list.WorkoutsList.EXTRA_WORKOUT;
 
 public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataListener {
 

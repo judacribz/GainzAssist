@@ -50,17 +50,13 @@
 
 
         <!-- Main Activity -->
-        <activity android:name=".Main"/>
+        <activity android:name=".activities.main.Main"
+                  android:windowSoftInputMode="adjustPan|stateHidden"/>
 
         <!-- HowToVideos Activity -->
         <activity
                 android:name=".activities.how_to_videos.HowToVideos"
                 android:configChanges="orientation|keyboardHidden|screenSize"/>
-
-        <!-- WorkoutsList Activity -->
-        <activity
-                android:name=".activities.workouts_list.WorkoutsList"
-                android:windowSoftInputMode="adjustPan|stateHidden"/>
 
         <!-- StartWorkout Activity -->
         <activity

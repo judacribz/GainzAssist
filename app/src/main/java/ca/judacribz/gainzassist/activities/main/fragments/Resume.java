@@ -1,4 +1,4 @@
-package ca.judacribz.gainzassist;
+package ca.judacribz.gainzassist.activities.main.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -8,9 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import butterknife.ButterKnife;
 
-public class Settings extends Fragment {
+import butterknife.ButterKnife;
+import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.activities.main.Main;
+
+public class Resume extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -21,18 +24,17 @@ public class Settings extends Fragment {
     Main act;
 
     // UI Elements
-    Button btnWorkouts;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
     // WarmupsList Constructor/Instance                                                        //
     // ######################################################################################### //
-    public Settings() {
+    public Resume() {
         // Required empty public constructor
     }
 
-    public static Settings getInstance() {
-        return new Settings();
+    public static Resume getInstance() {
+        return new Resume();
     }
 
     // ######################################################################################### //
@@ -55,7 +57,7 @@ public class Settings extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_settings, container, false);
+        View view =  inflater.inflate(R.layout.fragment_resume, container, false);
         ButterKnife.bind(this, view);
 
         return view;

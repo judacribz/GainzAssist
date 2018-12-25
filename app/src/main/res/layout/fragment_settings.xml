@@ -6,7 +6,7 @@
 	android:layout_height="match_parent"
 	android:padding="15dp"
 	android:orientation="vertical"
-	tools:context=".Settings">
+	tools:context=".activities.main.fragments.Settings">
 
 
 </LinearLayout>

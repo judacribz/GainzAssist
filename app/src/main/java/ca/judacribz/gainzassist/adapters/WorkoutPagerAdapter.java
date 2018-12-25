@@ -75,7 +75,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Fragment> fmts) {
+    public WorkoutPagerAdapter(FragmentManager fragmentManager, List<Fragment> fmts) {
         super(fragmentManager);
         this.fmts = fmts;
     }

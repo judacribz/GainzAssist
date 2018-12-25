@@ -6,14 +6,23 @@
     tools:context="ca.uoit.mobileapp.fitnessapp.MainActivity">
 
     <item
-        android:id="@+id/act_logout"
+        android:id="@+id/act_search"
         android:orderInCategory="1"
-        android:title="@string/logout"
-        app:showAsAction="never"/>
+        android:icon="@drawable/ic_search_dark"
+        android:title="@string/hint_search_workouts"
+        app:showAsAction="always" />
 
     <item
-        android:id="@+id/act_settings"
+        android:id="@+id/act_add_workout"
         android:orderInCategory="2"
-        android:title="@string/settings"
-        app:showAsAction="never"/>
+        android:icon="@drawable/ic_add_dark"
+        android:title="@string/add_workout"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/act_logout"
+        android:orderInCategory="3"
+        android:icon="@drawable/ic_logout_dark"
+        android:title="@string/logout"
+        app:showAsAction="ifRoom"/>
 </menu>

@@ -5,18 +5,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Main">
+    tools:context=".activities.main.Main">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/partial_title_bar"/>
+    <FrameLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/partial_title_bar"/>
+
+        <com.miguelcatalan.materialsearchview.MaterialSearchView
+            android:id="@+id/msvWorkouts"
+            android:theme="@style/MaterialSearchViewStyle"
+            android:hint="@string/hint_search_workouts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vp_fmt_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/appbar"
-        android:layout_below="@id/toolbar"/>
+        android:layout_below="@id/toolbar_container"/>
 
     <!-- Naviagtion Tabs -->
     <android.support.design.widget.AppBarLayout
