@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.main.fragments;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -85,14 +86,19 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
+View view;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_workouts, container, false);
+if (view != null) {
+    return  view;
+}
+         view =  inflater.inflate(R.layout.fragment_workouts, container, false);
         ButterKnife.bind(this, view);
+
+
 
         workoutNames = new ArrayList<>();
 
@@ -100,9 +106,9 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
         layoutManager = new LinearLayoutManager(act);
         workoutsList.setLayoutManager(layoutManager);
         workoutsList.setHasFixedSize(true);
-
         workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel.class);
-        workoutViewModel.getAllWorkouts().observe(act, new Observer<List<Workout>>() {
+
+        workObs = new Observer<List<Workout>>() {
             @Override
             public void onChanged(@Nullable List<Workout> workouts) {
                 if (workouts != null) {
@@ -118,9 +124,25 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
                     }
                 }
             }
-        });
-
+        };
+        workLiv = workoutViewModel.getAllWorkouts();
+         setRetainInstance(true);
         return view;
+    }
+Observer<List<Workout>> workObs;
+    LiveData<List<Workout>> workLiv;
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+            workLiv.observe(act, workObs);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        workLiv.removeObserver(workObs);
     }
 
     /* Helper function to display button list of workouts */

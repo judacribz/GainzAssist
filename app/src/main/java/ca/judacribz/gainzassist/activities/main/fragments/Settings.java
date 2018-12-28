@@ -60,6 +60,7 @@ public class Settings extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_settings, container, false);
         ButterKnife.bind(this, view);
 
+
         return view;
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////

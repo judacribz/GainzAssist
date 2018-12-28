@@ -69,23 +69,13 @@ public class Main extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         UI.setInitView(this, ca.judacribz.gainzassist.R.layout.activity_main, ca.judacribz.gainzassist.R.string.app_name, false);
 
-//        Logger.d("dfdf");
-        setupPager();
-
-        searchView.setOnQueryTextListener(this);
-        searchView.setVoiceSearch(true);
-    }
-
-    private void setupPager() {
-        layInflater = getLayoutInflater();
-
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+        tabLayoutOnPageChangeListener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
+        f = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
-pos = tab.getPosition();
+                pos = tab.getPosition();
                 if (search != null && addWorkout != null) {
                     switch (tab.getPosition()) {
                         case 2:
@@ -105,7 +95,35 @@ pos = tab.getPosition();
             public void onTabUnselected(TabLayout.Tab tab) {
                 super.onTabUnselected(tab);
             }
-        });
+        };
+
+//        Logger.d("dfdf");
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupPager();
+
+        searchView.setOnQueryTextListener(this);
+        searchView.setVoiceSearch(true);
+    }
+TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
+    TabLayout.ViewPagerOnTabSelectedListener f;
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        viewPager.removeOnPageChangeListener(tabLayoutOnPageChangeListener);
+        tabLayout.removeOnTabSelectedListener(f);
+    }
+
+    private void setupPager() {
+        layInflater = getLayoutInflater();
+
+        viewPager.addOnPageChangeListener(tabLayoutOnPageChangeListener);
+        tabLayout.addOnTabSelectedListener(f);
 
         viewPager.setAdapter(new WorkoutPagerAdapter(
                 getSupportFragmentManager(),
@@ -113,7 +131,6 @@ pos = tab.getPosition();
         ));
         viewPager.setCurrentItem(1);
     }
-
     @Override
     public void onBackPressed() {
         handleBackButton(this);
