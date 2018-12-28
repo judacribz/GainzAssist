@@ -27,6 +27,7 @@ import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import ca.judacribz.gainzassist.util.UI;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ public class Main extends AppCompatActivity implements
     // Global Vars
     // --------------------------------------------------------------------------------------------
     LayoutInflater layInflater;
+    int pos;
 
     @BindView(ca.judacribz.gainzassist.R.id.tlay_navbar) TabLayout tabLayout;
     @BindView(ca.judacribz.gainzassist.R.id.vp_fmt_container) ViewPager viewPager;
@@ -67,12 +69,13 @@ public class Main extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         UI.setInitView(this, ca.judacribz.gainzassist.R.layout.activity_main, ca.judacribz.gainzassist.R.string.app_name, false);
 
+//        Logger.d("dfdf");
         setupPager();
 
         searchView.setOnQueryTextListener(this);
         searchView.setVoiceSearch(true);
     }
-int pos;
+
     private void setupPager() {
         layInflater = getLayoutInflater();
 
@@ -110,6 +113,7 @@ pos = tab.getPosition();
         ));
         viewPager.setCurrentItem(1);
     }
+
     @Override
     public void onBackPressed() {
         handleBackButton(this);

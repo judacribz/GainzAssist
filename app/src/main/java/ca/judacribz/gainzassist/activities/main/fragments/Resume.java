@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,6 +30,7 @@ public class Resume extends Fragment implements SingleItemAdapter.ItemClickObser
 
     // Constants
     // --------------------------------------------------------------------------------------------
+    private static final Resume INST = new Resume();
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -56,13 +56,11 @@ public class Resume extends Fragment implements SingleItemAdapter.ItemClickObser
     // WarmupsList Constructor/Instance                                                        //
     // ######################################################################################### //
     public Resume() {
-        // Required empty public constructor
     }
 
     public static Resume getInstance() {
-        return new Resume();
+        return INST;
     }
-
     // ######################################################################################### //
 
     // Fragment Override

@@ -16,6 +16,8 @@ public class Settings extends Fragment {
 
     // Constants
     // --------------------------------------------------------------------------------------------
+
+    private static final Settings INST = new Settings();
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -30,13 +32,11 @@ public class Settings extends Fragment {
     // WarmupsList Constructor/Instance                                                        //
     // ######################################################################################### //
     public Settings() {
-        // Required empty public constructor
     }
 
     public static Settings getInstance() {
-        return new Settings();
+        return INST;
     }
-
     // ######################################################################################### //
 
     // Fragment Override
