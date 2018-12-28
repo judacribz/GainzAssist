@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -173,7 +174,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     public void startTimer(long timeInMillis) {
         if (countDownTimer != null) {
             countDownTimer.cancel();
+            Logger.d("CANCEL TIME");
         }
+
         countDownTimer = getCountDownTimer(timeInMillis);
         countDownTimer.start();
     }
@@ -194,7 +197,8 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 minutes = seconds / 60;
                 seconds = seconds % 60;
 
-                tvTimer.setText((minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds)));
+                String time = minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds);
+                tvTimer.setText(time);
             }
 
             // Changes the timer text, when it gets to 0:00, to "Start the next set"
@@ -210,8 +214,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     // =============================================================================================
     @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
-        if (!btnDecReps.isEnabled())
+        if (!btnDecReps.isEnabled()) {
             btnDecReps.setEnabled(true);
+            btnDecReps.setVisibility(View.VISIBLE);
+        }
     }
 
     @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)
@@ -223,8 +229,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         else
             reps = MIN_REPS;
 
-        if (currWorkout.setCurrReps(reps))
+        if (currWorkout.isMinReps()) {
             btnDecReps.setEnabled(false);
+            btnDecReps.setVisibility(View.GONE);
+        }
     }
 
     // TextWatcher for weight ET
@@ -232,8 +240,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
             value = R.id.et_curr_weight,
             callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeWeightChanged() {
-        if (!btnDecWeight.isEnabled())
+        if (!btnDecWeight.isEnabled()) {
             btnDecWeight.setEnabled(true);
+            btnDecWeight.setVisibility(View.VISIBLE);
+        }
     }
 
     @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
@@ -246,8 +256,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         } else
             weight = currWorkout.getCurrMinWeight();
 
-        if (currWorkout.setWeight(weight))
+        if (currWorkout.isMinWeight() || weight <= currWorkout.getCurrMinWeight()) {
             btnDecWeight.setEnabled(false);
+            btnDecWeight.setVisibility(View.GONE);
+        }
     }
     // =TextWatcher=Handling========================================================================
 
@@ -345,13 +357,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     public void updateUI() {
         String setType;
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
 
         if (currWorkout.getIsWarmup()) {
             setType = "Warmup";
-            tvTimer.setText(R.string.start_next_set);
         } else {
             setType = "Main";
         }

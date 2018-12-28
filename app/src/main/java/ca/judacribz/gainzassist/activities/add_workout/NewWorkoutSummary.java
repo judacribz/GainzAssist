@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.*;
@@ -124,12 +125,10 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
         // ExerciseSet the layout manager
-        rvExerciseList.setLayoutManager(new GridLayoutManager(
-                this,
-                getNumColumns(this),
-                GridLayoutManager.HORIZONTAL,
-                false
-        ));
+        rvExerciseList.setLayoutManager(new LinearLayoutManager(this,
+                LinearLayoutManager.HORIZONTAL,
+                false));
+
         rvExerciseList.setHasFixedSize(true);
 
 

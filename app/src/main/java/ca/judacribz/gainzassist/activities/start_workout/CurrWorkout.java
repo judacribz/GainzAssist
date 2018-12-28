@@ -381,12 +381,16 @@ public class CurrWorkout {
         }
 
         this.currExercise = exercise;
+        this.currMinWeight = exercise.getMinWeight();
+        this.currWeightChange = exercise.getWeightChange();
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
     }
 
     private void setCurrExerciseSet(ExerciseSet exerciseSet) {
         this.currExerciseSet = exerciseSet;
-        setCurrReps(this.currExerciseSet.getReps());
+
+        setCurrReps(this.currExerciseSet.getReps(), true);
+
         this.currWeight = this.currExerciseSet.getWeight();
     }
 
@@ -431,25 +435,29 @@ public class CurrWorkout {
     }
 
     public void incReps() {
-        setCurrReps(++this.currReps);
+        setCurrReps(++this.currReps, false);
     }
 
     public void decReps() {
-        setCurrReps(--this.currReps);
+        setCurrReps(--this.currReps, false);
     }
 
-    public boolean setCurrReps(int reps) {
+    public void setCurrReps(int reps, boolean setTimer) {
         this.currReps = reps;
 
-        if (this.currExercise.getSetsType() == MAIN_SET) {
-            setCurrRestTime();
+        if (setTimer) {
+            if (this.currExercise.getSetsType() == MAIN_SET) {
+                setCurrRestTime();
+            }
         }
+    }
 
+    public boolean isMinReps() {
         return this.currReps == MIN_REPS;
     }
 
     private void setCurrRestTime() {
-        this.currRestTime =  (this.currExerciseSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
+        this.currRestTime = (this.currExerciseSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;
 
         setTimer();
     }
@@ -457,6 +465,7 @@ public class CurrWorkout {
     private void setTimer() {
         if (timerListener != null) {
             timerListener.startTimer(this.currRestTime);
+
             timerSet = true;
         } else {
             timerSet = false;
@@ -481,10 +490,12 @@ public class CurrWorkout {
         setWeight(Math.max(this.currMinWeight, this.currWeight - this.currWeightChange));
     }
 
-    public boolean setWeight(float weight) {
+    public void setWeight(float weight) {
         this.currWeight = weight;
+    }
 
-        return this.currWeight == this.currMinWeight;
+    public boolean isMinWeight() {
+        return this.currWeight <= this.currMinWeight;
     }
 
     public float getCurrMinWeight() {

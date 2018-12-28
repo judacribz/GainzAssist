@@ -64,7 +64,7 @@ public class Exercise {
     }
 
     @Ignore
-    SetsType setsType = null;
+    SetsType setsType = SetsType.MAIN_SET;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -165,6 +165,7 @@ public class Exercise {
         this.equipment = equipment;
 
         if (BARBELL.equals(this.equipment)) {
+            Logger.d("SET MIN WEIGHT");
             this.minWeight = BB_MIN_WEIGHT;
             this.weightChange = BB_WEIGHT_CHANGE;
         } else if (DUMBBELL.equals(this.equipment)) {
@@ -198,6 +199,7 @@ public class Exercise {
 
     public void setWeight(float weight) {
         this.weight = weight;
+
     }
 
     public float getMinWeight() {

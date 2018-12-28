@@ -34,6 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/et_workout_name"
+        android:layout_above="@id/tv_exercises"
+        android:padding="5dp"
         android:background="@color/colorAccent">
 
 
@@ -43,8 +45,6 @@
             android:id="@+id/et_exercise_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
             android:backgroundTint="@color/colorLightAccent"
             android:hint="@string/hint_exercise_name"
             android:inputType="text"
@@ -60,8 +60,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/et_exercise_name"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"
             android:orientation="horizontal">
 
             <!-- Exercise Type spinner -->
@@ -238,7 +236,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/btn_inc_sets"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
             android:background="@drawable/anim_button_ripple"
             android:text="@string/clear"
@@ -249,7 +247,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/btn_inc_reps"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
             android:background="@drawable/anim_button_ripple"
             android:text="@string/add_exercise"
@@ -260,7 +258,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/btn_inc_reps"
+            android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
             android:background="@drawable/anim_button_ripple"
             android:text="@string/update_exercise"
@@ -273,13 +271,20 @@
 
     <!-- List of Added Exercises -->
     <!--========================================================================================-->
+    <TextView
+        android:id="@+id/tv_exercises"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_above="@id/rv_exercise_btns"
+
+        android:layout_margin="5dp"
+              android:text="@string/exercises"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_exercise_btns"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="1dp"
-        android:layout_above="@id/btn_discard_workout"
-        android:layout_below="@id/rlay_add_exercise"/>
+        android:layout_height="125dp"
+        android:layout_margin="5dp"
+        android:layout_above="@id/btn_discard_workout"/>
     <!--List=of=Added=Exercises=================================================================-->
 
 
