@@ -1,0 +1,1091 @@
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/add_workout/NewWorkoutSummary.java b/app/src/main/java/ca/judacribz/gainzassist/activities/add_workout/NewWorkoutSummary.java[m
+[1mindex ed4823d..7f7fda8 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/add_workout/NewWorkoutSummary.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/add_workout/NewWorkoutSummary.java[m
+[36m@@ -5,6 +5,7 @@[m [mimport android.content.Intent;[m
+ import android.support.v7.app.AppCompatActivity;[m
+ import android.os.Bundle;[m
+ import android.support.v7.widget.GridLayoutManager;[m
+[32m+[m[32mimport android.support.v7.widget.LinearLayoutManager;[m
+ import android.support.v7.widget.RecyclerView;[m
+ import android.view.View;[m
+ import android.widget.*;[m
+[36m@@ -45,7 +46,6 @@[m [mpublic class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd[m
+     private static final int POS_CARDIO = 1;[m
+ [m
+     private static final int POS_NA = 2;[m
+[31m-[m
+     public enum CALLING_ACTIVITY {[m
+         WORKOUTS_LIST,[m
+         EXERCISES_ENTRY[m
+[36m@@ -60,6 +60,7 @@[m [mpublic class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd[m
+     ArrayList<ExerciseSet> exSets;[m
+     Workout workout;[m
+ [m
+[32m+[m[32m    long id = -1;[m
+     int num_reps, num_sets, minInt = 1; // for min num_reps/num_sets[m
+     float weight, minWeight, weightChange;[m
+ [m
+[36m@@ -102,6 +103,10 @@[m [mpublic class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd[m
+         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);[m
+         Intent intent = getIntent();[m
+         workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));[m
+[32m+[m[32m        long id = workout.getId();[m
+[32m+[m[32m        if (id != -1) {[m
+[32m+[m[32m            this.id = id;[m
+[32m+[m[32m        }[m
+         switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {[m
+             case WORKOUTS_LIST:[m
+                 btnAddWorkout.setText(getString(R.string.update_workout));[m
+[36m@@ -120,12 +125,10 @@[m [mpublic class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd[m
+         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);[m
+ [m
+         // ExerciseSet the layout manager[m
+[31m-        rvExerciseList.setLayoutManager(new GridLayoutManager([m
+[31m-                this,[m
+[31m-                getNumColumns(this),[m
+[31m-                GridLayoutManager.HORIZONTAL,[m
+[31m-                false[m
+[31m-        ));[m
+[32m+[m[32m        rvExerciseList.setLayoutManager(new LinearLayoutManager(this,[m
+[32m+[m[32m                LinearLayoutManager.HORIZONTAL,[m
+[32m+[m[32m                false));[m
+[32m+[m
+         rvExerciseList.setHasFixedSize(true);[m
+ [m
+ [m
+[36m@@ -399,6 +402,7 @@[m [mExercise ex;[m
+             } else {[m
+ [m
+                 workout = new Workout(getTextString(etWorkoutName), exercises);[m
+[32m+[m[32m                workout.setId(this.id);[m
+ [m
+                 addWorkoutFirebase(workout);[m
+ [m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/main/Main.java b/app/src/main/java/ca/judacribz/gainzassist/activities/main/Main.java[m
+[1mindex 254cfba..5831990 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/main/Main.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/main/Main.java[m
+[36m@@ -18,16 +18,16 @@[m [mimport butterknife.*;[m
+ import ca.judacribz.gainzassist.R;[m
+ import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry;[m
+ import ca.judacribz.gainzassist.activities.authentication.Login;[m
+[31m-import ca.judacribz.gainzassist.activities.main.fragments.Home;[m
+[32m+[m[32mimport ca.judacribz.gainzassist.activities.main.fragments.Workouts;[m
+ import ca.judacribz.gainzassist.activities.main.fragments.Resume;[m
+ import ca.judacribz.gainzassist.activities.main.fragments.Settings;[m
+[31m-import ca.judacribz.gainzassist.adapters.SingleItemAdapter;[m
+ import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;[m
+ import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;[m
+ import ca.judacribz.gainzassist.models.Workout;[m
+ import ca.judacribz.gainzassist.models.db.WorkoutViewModel;[m
+ import ca.judacribz.gainzassist.util.UI;[m
+ import com.miguelcatalan.materialsearchview.MaterialSearchView;[m
+[32m+[m[32mimport com.orhanobut.logger.Logger;[m
+ import org.parceler.Parcels;[m
+ [m
+ import java.util.ArrayList;[m
+[36m@@ -46,7 +46,7 @@[m [mpublic class Main extends AppCompatActivity implements[m
+             = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT";[m
+     public final Fragment[] fmts = new Fragment[] {[m
+             Resume.getInstance(),[m
+[31m-            Home.getInstance(),[m
+[32m+[m[32m            Workouts.getInstance(),[m
+             Settings.getInstance()[m
+     };[m
+     // --------------------------------------------------------------------------------------------[m
+[36m@@ -54,6 +54,7 @@[m [mpublic class Main extends AppCompatActivity implements[m
+     // Global Vars[m
+     // --------------------------------------------------------------------------------------------[m
+     LayoutInflater layInflater;[m
+[32m+[m[32m    int pos;[m
+ [m
+     @BindView(ca.judacribz.gainzassist.R.id.tlay_navbar) TabLayout tabLayout;[m
+     @BindView(ca.judacribz.gainzassist.R.id.vp_fmt_container) ViewPager viewPager;[m
+[36m@@ -68,6 +69,7 @@[m [mpublic class Main extends AppCompatActivity implements[m
+         super.onCreate(savedInstanceState);[m
+         UI.setInitView(this, ca.judacribz.gainzassist.R.layout.activity_main, ca.judacribz.gainzassist.R.string.app_name, false);[m
+ [m
+[32m+[m[32m//        Logger.d("dfdf");[m
+         setupPager();[m
+ [m
+         searchView.setOnQueryTextListener(this);[m
+[36m@@ -83,6 +85,20 @@[m [mpublic class Main extends AppCompatActivity implements[m
+             @Override[m
+             public void onTabSelected(TabLayout.Tab tab) {[m
+                 super.onTabSelected(tab);[m
+[32m+[m[32mpos = tab.getPosition();[m
+[32m+[m[32m                if (search != null && addWorkout != null) {[m
+[32m+[m[32m                    switch (tab.getPosition()) {[m
+[32m+[m[32m                        case 2:[m
+[32m+[m[32m                            search.setVisible(false);[m
+[32m+[m[32m                        case 0:[m
+[32m+[m[32m                            addWorkout.setVisible(false);[m
+[32m+[m[32m                            break;[m
+[32m+[m[32m                        case 1:[m
+[32m+[m[32m                            search.setVisible(true);[m
+[32m+[m[32m                            addWorkout.setVisible(true);[m
+[32m+[m[32m                            break;[m
+[32m+[m[32m                    }[m
+[32m+[m[32m                }[m
+             }[m
+ [m
+             @Override[m
+[36m@@ -97,17 +113,20 @@[m [mpublic class Main extends AppCompatActivity implements[m
+         ));[m
+         viewPager.setCurrentItem(1);[m
+     }[m
+[32m+[m
+     @Override[m
+     public void onBackPressed() {[m
+         handleBackButton(this);[m
+     }[m
+ [m
+[32m+[m[32m    MenuItem search, addWorkout;[m
+     @Override[m
+     public boolean onCreateOptionsMenu(Menu mainMenu) {[m
+[31m-        getMenuInflater().inflate(ca.judacribz.gainzassist.R.menu.menu_main, mainMenu);[m
+[32m+[m[32m        getMenuInflater().inflate(R.menu.menu_main, mainMenu);[m
+ [m
+[31m-        MenuItem item = mainMenu.findItem(R.id.act_search);[m
+[31m-        searchView.setMenuItem(item);[m
+[32m+[m[32m        search = mainMenu.findItem(R.id.act_search);[m
+[32m+[m[32m        searchView.setMenuItem(search);[m
+[32m+[m[32m        addWorkout = mainMenu.findItem(R.id.act_add_workout);[m
+ [m
+         return super.onCreateOptionsMenu(mainMenu);[m
+     }[m
+[36m@@ -134,7 +153,7 @@[m [mpublic class Main extends AppCompatActivity implements[m
+     ///////////////////////////////////////////////////////////////////////////////////////////////[m
+     @Override[m
+     public boolean onQueryTextChange(String newText) {[m
+[31m-        ((Home)fmts[1]).onQueryTextChange(newText);[m
+[32m+[m[32m        ((Workouts)fmts[1]).onQueryTextChange(newText);[m
+         return false;[m
+     }[m
+ [m
+[36m@@ -167,7 +186,23 @@[m [mpublic class Main extends AppCompatActivity implements[m
+ [m
+     @Override[m
+     public void onWorkoutsReceived(Workout workout) {[m
+[31m-        ((Home)fmts[1]).intent.putExtra(((Home)fmts[1]).extraKey, Parcels.wrap(workout));[m
+[31m-        startActivity(((Home)fmts[1]).intent);[m
+[32m+[m[32m        Intent intent = null;[m
+[32m+[m[32m        String extraKey = null;[m
+[32m+[m[32m        switch (pos) {[m
+[32m+[m[32m            case 0:[m
+[32m+[m[32m                intent = ((Resume)fmts[0]).intent;[m
+[32m+[m[32m                extraKey = ((Resume)fmts[0]).extraKey;[m
+[32m+[m[32m                break;[m
+[32m+[m
+[32m+[m[32m            case 1:[m
+[32m+[m[32m                intent = ((Workouts)fmts[1]).intent;[m
+[32m+[m[32m                extraKey = ((Workouts)fmts[1]).extraKey;[m
+[32m+[m[32m                break;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        if (intent != null) {[m
+[32m+[m[32m            intent.putExtra(extraKey, Parcels.wrap(workout));[m
+[32m+[m[32m            startActivity(intent);[m
+[32m+[m[32m        }[m
+     }[m
+ }[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Resume.java b/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Resume.java[m
+[1mindex 6ab557e..f1ee2d5 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Resume.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Resume.java[m
+[36m@@ -1,42 +1,66 @@[m
+ package ca.judacribz.gainzassist.activities.main.fragments;[m
+ [m
+[32m+[m[32mimport android.arch.lifecycle.ViewModelProviders;[m
+ import android.content.Context;[m
+[32m+[m[32mimport android.content.Intent;[m
+ import android.os.Bundle;[m
+ import android.support.annotation.NonNull;[m
+[32m+[m[32mimport android.support.annotation.Nullable;[m
+ import android.support.v4.app.Fragment;[m
+[32m+[m[32mimport android.support.v7.widget.LinearLayoutManager;[m
+[32m+[m[32mimport android.support.v7.widget.RecyclerView;[m
+ import android.view.LayoutInflater;[m
+ import android.view.View;[m
+ import android.view.ViewGroup;[m
+[31m-import android.widget.Button;[m
+ [m
+[32m+[m[32mimport butterknife.BindView;[m
+ import butterknife.ButterKnife;[m
+ import ca.judacribz.gainzassist.R;[m
+ import ca.judacribz.gainzassist.activities.main.Main;[m
+[32m+[m[32mimport ca.judacribz.gainzassist.activities.start_workout.StartWorkout;[m
+[32m+[m[32mimport ca.judacribz.gainzassist.adapters.SingleItemAdapter;[m
+[32m+[m[32mimport ca.judacribz.gainzassist.models.db.WorkoutViewModel;[m
+ [m
+[31m-public class Resume extends Fragment {[m
+[32m+[m[32mimport java.util.ArrayList;[m
+[32m+[m[32mimport java.util.Set;[m
+[32m+[m
+[32m+[m[32mimport static ca.judacribz.gainzassist.util.Preferences.getIncompleteWorkouts;[m
+[32m+[m
+[32m+[m[32mpublic class Resume extends Fragment implements SingleItemAdapter.ItemClickObserver {[m
+ [m
+     // Constants[m
+     // --------------------------------------------------------------------------------------------[m
+[32m+[m[32m    private static final Resume INST = new Resume();[m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+     // Global Vars[m
+     // --------------------------------------------------------------------------------------------[m
+     Main act;[m
+[32m+[m[32m    SingleItemAdapter workoutAdapter;[m
+[32m+[m[32m    LinearLayoutManager layoutManager;[m
+[32m+[m
+[32m+[m[32m    WorkoutViewModel workoutViewModel;[m
+[32m+[m
+[32m+[m[32m    ArrayList<String>[m
+[32m+[m[32m            workoutNames,[m
+[32m+[m[32m            filteredWorkouts;[m
+[32m+[m
+[32m+[m[32m    public Intent intent;[m
+[32m+[m[32m    public String extraKey;[m
+ [m
+     // UI Elements[m
+[32m+[m[32m    @BindView(R.id.rv_res_workout_btns) RecyclerView workoutsList;[m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+     // ######################################################################################### //[m
+     // WarmupsList Constructor/Instance                                                        //[m
+     // ######################################################################################### //[m
+     public Resume() {[m
+[31m-        // Required empty public constructor[m
+     }[m
+ [m
+     public static Resume getInstance() {[m
+[31m-        return new Resume();[m
+[32m+[m[32m        return INST;[m
+     }[m
+[31m-[m
+     // ######################################################################################### //[m
+ [m
+     // Fragment Override[m
+[36m@@ -60,11 +84,61 @@[m [mpublic class Resume extends Fragment {[m
+         View view =  inflater.inflate(R.layout.fragment_resume, container, false);[m
+         ButterKnife.bind(this, view);[m
+ [m
+[32m+[m[32m        // ExerciseSet the layout manager for the localWorkouts[m
+[32m+[m[32m        layoutManager = new LinearLayoutManager(act);[m
+[32m+[m[32m        workoutsList.setLayoutManager(layoutManager);[m
+[32m+[m[32m        workoutsList.setHasFixedSize(true);[m
+[32m+[m
+[32m+[m[32m        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel.class);[m
+[32m+[m
+         return view;[m
+     }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void onResume() {[m
+[32m+[m[32m        super.onResume();[m
+[32m+[m[32m        filteredWorkouts = new ArrayList<>();[m
+[32m+[m[32m        Set<String> names = getIncompleteWorkouts(act);[m
+[32m+[m[32m        if (names != null) {[m
+[32m+[m[32m            filteredWorkouts.addAll(names);[m
+[32m+[m[32m            displayWorkoutList(null);[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    /* Helper function to display button list of workouts */[m
+[32m+[m[32m    public void displayWorkoutList(@Nullable ArrayList<String> workouts) {[m
+[32m+[m[32m        if (workouts != null) {[m
+[32m+[m[32m            filteredWorkouts = workouts;[m
+[32m+[m[32m        }[m
+[32m+[m[32m        workoutAdapter = new SingleItemAdapter([m
+[32m+[m[32m                act,[m
+[32m+[m[32m                filteredWorkouts,[m
+[32m+[m[32m                R.layout.part_button,[m
+[32m+[m[32m                R.id.btnListItem[m
+[32m+[m[32m        );[m
+[32m+[m[32m        workoutAdapter.setItemClickObserver(this);[m
+[32m+[m[32m        workoutsList.setAdapter(workoutAdapter);[m
+[32m+[m[32m    }[m
+     //Fragment//Override///////////////////////////////////////////////////////////////////////////[m
+ [m
+ [m
+[32m+[m
+[32m+[m[32m    // SingleItemAdapter.ItemClickObserver Override[m
+[32m+[m[32m    ///////////////////////////////////////////////////////////////////////////////////////////////[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void onWorkoutClick(String name) {[m
+[32m+[m[32m        intent = new Intent(act, StartWorkout.class);[m
+[32m+[m[32m        extraKey = Main.EXTRA_WORKOUT;[m
+[32m+[m[32m        workoutViewModel.getWorkoutFromName(act, name);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void onWorkoutLongClick(View anchor, String name) {[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+[m[32m    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////[m
+[32m+[m
+[32m+[m
+     // Click Handling[m
+     // ============================================================================================[m
+ [m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Settings.java b/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Settings.java[m
+[1mindex 5659cca..fbe0f59 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Settings.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Settings.java[m
+[36m@@ -16,6 +16,8 @@[m [mpublic class Settings extends Fragment {[m
+ [m
+     // Constants[m
+     // --------------------------------------------------------------------------------------------[m
+[32m+[m
+[32m+[m[32m    private static final Settings INST = new Settings();[m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+     // Global Vars[m
+[36m@@ -30,13 +32,11 @@[m [mpublic class Settings extends Fragment {[m
+     // WarmupsList Constructor/Instance                                                        //[m
+     // ######################################################################################### //[m
+     public Settings() {[m
+[31m-        // Required empty public constructor[m
+     }[m
+ [m
+     public static Settings getInstance() {[m
+[31m-        return new Settings();[m
+[32m+[m[32m        return INST;[m
+     }[m
+[31m-[m
+     // ######################################################################################### //[m
+ [m
+     // Fragment Override[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Home.java b/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Workouts.java[m
+[1msimilarity index 85%[m
+[1mrename from app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Home.java[m
+[1mrename to app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Workouts.java[m
+[1mindex cbd3603..435b89d 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Home.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/main/fragments/Workouts.java[m
+[36m@@ -23,26 +23,21 @@[m [mimport ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;[m
+ import ca.judacribz.gainzassist.activities.main.Main;[m
+ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;[m
+ import ca.judacribz.gainzassist.adapters.SingleItemAdapter;[m
+[31m-import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;[m
+[31m-import ca.judacribz.gainzassist.models.ExerciseSet;[m
+[31m-import ca.judacribz.gainzassist.models.Session;[m
+ import ca.judacribz.gainzassist.models.Workout;[m
+ import ca.judacribz.gainzassist.models.db.WorkoutViewModel;[m
+[31m-import org.parceler.Parcels;[m
+ [m
+ import java.util.ArrayList;[m
+ import java.util.List;[m
+ [m
+ import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;[m
+ import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;[m
+[31m-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_WORKOUT;[m
+ import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;[m
+ [m
+[31m-public class Home extends Fragment implements[m
+[31m-        SingleItemAdapter.ItemClickObserver {[m
+[32m+[m[32mpublic class Workouts extends Fragment implements SingleItemAdapter.ItemClickObserver {[m
+ [m
+     // Constants[m
+     // --------------------------------------------------------------------------------------------[m
+[32m+[m[32m    private static final Workouts INST = new Workouts();[m
+ [m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+[36m@@ -52,30 +47,32 @@[m [mpublic class Home extends Fragment implements[m
+     SingleItemAdapter workoutAdapter;[m
+     LinearLayoutManager layoutManager;[m
+ [m
+[31m-    ArrayList<String> workoutNames;[m
+[31m-    ArrayList<String> filteredWorkouts;[m
+[31m-[m
+     WorkoutViewModel workoutViewModel;[m
+ [m
+[32m+[m[32m    ArrayList<String>[m
+[32m+[m[32m            workoutNames,[m
+[32m+[m[32m            filteredWorkouts;[m
+[32m+[m
+[32m+[m[32m    public Intent intent;[m
+[32m+[m[32m    public String extraKey;[m
+[32m+[m
+     // UI Elements[m
+[31m-    @BindView(R.id.rv_workout_btns)[m
+[31m-    RecyclerView workoutsList;[m
+[31m-//    @BindView(R.id.msvWorkouts) MaterialSearchView searchView;[m
+[32m+[m[32m    @BindView(R.id.rv_workout_btns) RecyclerView workoutsList;[m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+[32m+[m
+     // ######################################################################################### //[m
+[31m-    // WarmupsList Constructor/Instance                                                        //[m
+[32m+[m[32m    // WarmupsList Constructor/Instance                                                          //[m
+     // ######################################################################################### //[m
+[31m-    public Home() {[m
+[31m-        // Required empty public constructor[m
+[32m+[m[32m    public Workouts() {[m
+     }[m
+ [m
+[31m-    public static Home getInstance() {[m
+[31m-        return new Home();[m
+[32m+[m[32m    public static Workouts getInstance() {[m
+[32m+[m[32m        return INST;[m
+     }[m
+[31m-[m
+     // ######################################################################################### //[m
+ [m
+[32m+[m
+     // Fragment Override[m
+     ///////////////////////////////////////////////////////////////////////////////////////////////[m
+     @Override[m
+[36m@@ -94,7 +91,7 @@[m [mpublic class Home extends Fragment implements[m
+                              ViewGroup container,[m
+                              Bundle savedInstanceState) {[m
+         // Inflate the layout for this fragment[m
+[31m-        View view =  inflater.inflate(R.layout.fragment_home, container, false);[m
+[32m+[m[32m        View view =  inflater.inflate(R.layout.fragment_workouts, container, false);[m
+         ButterKnife.bind(this, view);[m
+ [m
+         workoutNames = new ArrayList<>();[m
+[36m@@ -113,21 +110,37 @@[m [mpublic class Home extends Fragment implements[m
+                     for (Workout workout : workouts) {[m
+                         workoutNames.add(workout.getName());[m
+                     }[m
+[31m-                    displayWorkoutList(workoutNames);[m
+[32m+[m[32m                    if (workoutAdapter == null) {[m
+[32m+[m[32m                        displayWorkoutList(workoutNames);[m
+[32m+[m[32m                    } else {[m
+[32m+[m[32m                        workoutAdapter.setItems(workoutNames);[m
+[32m+[m[32m                        workoutAdapter.notifyDataSetChanged();[m
+[32m+[m[32m                    }[m
+                 }[m
+             }[m
+         });[m
+ [m
+[31m-[m
+[31m-//        searchView.setOnQueryTextListener(this);[m
+[31m-//[m
+[31m-//        searchView.setVoiceSearch(true);[m
+[31m-[m
+[31m-[m
+         return view;[m
+     }[m
+[32m+[m
+[32m+[m[32m    /* Helper function to display button list of workouts */[m
+[32m+[m[32m    public void displayWorkoutList(@Nullable  ArrayList<String> workouts) {[m
+[32m+[m[32m        if (workouts != null) {[m
+[32m+[m[32m            filteredWorkouts = workouts;[m
+[32m+[m[32m        }[m
+[32m+[m[32m        workoutAdapter = new SingleItemAdapter([m
+[32m+[m[32m                act,[m
+[32m+[m[32m                filteredWorkouts,[m
+[32m+[m[32m                R.layout.part_button,[m
+[32m+[m[32m                R.id.btnListItem[m
+[32m+[m[32m        );[m
+[32m+[m[32m        workoutAdapter.setItemClickObserver(this);[m
+[32m+[m[32m        workoutsList.setAdapter(workoutAdapter);[m
+[32m+[m[32m    }[m
+[32m+[m
+     //Fragment//Override///////////////////////////////////////////////////////////////////////////[m
+ [m
+[32m+[m
+     // SingleItemAdapter.ItemClickObserver Override[m
+     ///////////////////////////////////////////////////////////////////////////////////////////////[m
+     @Override[m
+[36m@@ -138,8 +151,7 @@[m [mpublic class Home extends Fragment implements[m
+     }[m
+     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////[m
+ [m
+[31m-    public Intent intent;[m
+[31m-    public String extraKey;[m
+[32m+[m
+     // SingleItemAdapter.ItemLongClickObserver Override[m
+     ///////////////////////////////////////////////////////////////////////////////////////////////[m
+ //TODO change to dialogbar[m
+[36m@@ -178,8 +190,6 @@[m [mpublic class Home extends Fragment implements[m
+         // If the PopupWindow should be focusable[m
+         popupWindow.setFocusable(true);[m
+ [m
+[31m-[m
+[31m-[m
+         // If you need the PopupWindow to dismiss when when touched outside[m
+ //        popupWindow.setBackgroundDrawable(new ColorDrawable());[m
+         // Get the View's(the one that was clicked in the Fragment) location[m
+[36m@@ -195,41 +205,20 @@[m [mpublic class Home extends Fragment implements[m
+     //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////[m
+ [m
+ [m
+[31m-    /* Helper function to display button list of workouts */[m
+[31m-    public void displayWorkoutList(ArrayList<String> workouts) {[m
+[31m-        filteredWorkouts = workouts;[m
+[31m-        workoutAdapter = new SingleItemAdapter([m
+[31m-                act,[m
+[31m-                workouts,[m
+[31m-                R.layout.part_button,[m
+[31m-                R.id.btnListItem[m
+[31m-        );[m
+[31m-        workoutAdapter.setItemClickObserver(this);[m
+[31m-        workoutsList.setAdapter(workoutAdapter);[m
+[31m-    }[m
+[31m-[m
+[31m-[m
+     public void onQueryTextChange(String newText) {[m
+[31m-        filteredWorkouts = new ArrayList<>();[m
+         String filterWord = newText.toLowerCase();[m
+ [m
+[32m+[m[32m        filteredWorkouts = new ArrayList<>();[m
+         for (String workoutName : workoutNames) {[m
+             if (workoutName.toLowerCase().contains(filterWord)) {[m
+                 filteredWorkouts.add(workoutName);[m
+             }[m
+         }[m
+ [m
+[31m-        workoutAdapter = new SingleItemAdapter([m
+[31m-                act,[m
+[31m-                filteredWorkouts,[m
+[31m-                R.layout.part_button,[m
+[31m-                R.id.btnListItem[m
+[31m-        );[m
+[31m-        workoutAdapter.setItemClickObserver(this);[m
+[31m-        workoutsList.setAdapter(workoutAdapter);[m
+[32m+[m[32m        workoutAdapter.setItems(filteredWorkouts);[m
+[32m+[m[32m        workoutAdapter.notifyDataSetChanged();[m
+     }[m
+     // Click Handling[m
+     // ============================================================================================[m
+[31m-[m
+     //=Click=Handling==============================================================================[m
+ }[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/CurrWorkout.java b/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/CurrWorkout.java[m
+[1mindex d50878c..842d404 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/CurrWorkout.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/CurrWorkout.java[m
+[36m@@ -381,12 +381,16 @@[m [mpublic class CurrWorkout {[m
+         }[m
+ [m
+         this.currExercise = exercise;[m
+[32m+[m[32m        this.currMinWeight = exercise.getMinWeight();[m
+[32m+[m[32m        this.currWeightChange = exercise.getWeightChange();[m
+         setCurrExerciseSet(this.currExercise.getSet(this.set_i));[m
+     }[m
+ [m
+     private void setCurrExerciseSet(ExerciseSet exerciseSet) {[m
+         this.currExerciseSet = exerciseSet;[m
+[31m-        setCurrReps(this.currExerciseSet.getReps());[m
+[32m+[m
+[32m+[m[32m        setCurrReps(this.currExerciseSet.getReps(), true);[m
+[32m+[m
+         this.currWeight = this.currExerciseSet.getWeight();[m
+     }[m
+ [m
+[36m@@ -431,25 +435,29 @@[m [mpublic class CurrWorkout {[m
+     }[m
+ [m
+     public void incReps() {[m
+[31m-        setCurrReps(++this.currReps);[m
+[32m+[m[32m        setCurrReps(++this.currReps, false);[m
+     }[m
+ [m
+     public void decReps() {[m
+[31m-        setCurrReps(--this.currReps);[m
+[32m+[m[32m        setCurrReps(--this.currReps, false);[m
+     }[m
+ [m
+[31m-    public boolean setCurrReps(int reps) {[m
+[32m+[m[32m    public void setCurrReps(int reps, boolean setTimer) {[m
+         this.currReps = reps;[m
+ [m
+[31m-        if (this.currExercise.getSetsType() == MAIN_SET) {[m
+[31m-            setCurrRestTime();[m
+[32m+[m[32m        if (setTimer) {[m
+[32m+[m[32m            if (this.currExercise.getSetsType() == MAIN_SET) {[m
+[32m+[m[32m                setCurrRestTime();[m
+[32m+[m[32m            }[m
+         }[m
+[32m+[m[32m    }[m
+ [m
+[32m+[m[32m    public boolean isMinReps() {[m
+         return this.currReps == MIN_REPS;[m
+     }[m
+ [m
+     private void setCurrRestTime() {[m
+[31m-        this.currRestTime =  (this.currExerciseSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;[m
+[32m+[m[32m        this.currRestTime = (this.currExerciseSet.getReps() <= 6) ? HEAVY_REST_TIME : LIGHT_REST_TIME;[m
+ [m
+         setTimer();[m
+     }[m
+[36m@@ -457,6 +465,7 @@[m [mpublic class CurrWorkout {[m
+     private void setTimer() {[m
+         if (timerListener != null) {[m
+             timerListener.startTimer(this.currRestTime);[m
+[32m+[m
+             timerSet = true;[m
+         } else {[m
+             timerSet = false;[m
+[36m@@ -481,10 +490,12 @@[m [mpublic class CurrWorkout {[m
+         setWeight(Math.max(this.currMinWeight, this.currWeight - this.currWeightChange));[m
+     }[m
+ [m
+[31m-    public boolean setWeight(float weight) {[m
+[32m+[m[32m    public void setWeight(float weight) {[m
+         this.currWeight = weight;[m
+[32m+[m[32m    }[m
+ [m
+[31m-        return this.currWeight == this.currMinWeight;[m
+[32m+[m[32m    public boolean isMinWeight() {[m
+[32m+[m[32m        return this.currWeight <= this.currMinWeight;[m
+     }[m
+ [m
+     public float getCurrMinWeight() {[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/fragments/WorkoutScreen.java b/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/fragments/WorkoutScreen.java[m
+[1mindex 93834d7..c06dfcc 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/fragments/WorkoutScreen.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/activities/start_workout/fragments/WorkoutScreen.java[m
+[36m@@ -9,6 +9,7 @@[m [mimport android.support.annotation.NonNull;[m
+ import android.support.v4.app.Fragment;[m
+ import android.support.v4.app.FragmentActivity;[m
+ import android.view.LayoutInflater;[m
+[32m+[m[32mimport android.view.MotionEvent;[m
+ import android.view.View;[m
+ import android.view.ViewGroup;[m
+ import android.view.ViewGroup.LayoutParams;[m
+[36m@@ -173,7 +174,9 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+     public void startTimer(long timeInMillis) {[m
+         if (countDownTimer != null) {[m
+             countDownTimer.cancel();[m
+[32m+[m[32m            Logger.d("CANCEL TIME");[m
+         }[m
+[32m+[m
+         countDownTimer = getCountDownTimer(timeInMillis);[m
+         countDownTimer.start();[m
+     }[m
+[36m@@ -194,7 +197,8 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+                 minutes = seconds / 60;[m
+                 seconds = seconds % 60;[m
+ [m
+[31m-                tvTimer.setText((minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds)));[m
+[32m+[m[32m                String time = minutes + ":" + String.format(Locale.getDefault(), "%02d", seconds);[m
+[32m+[m[32m                tvTimer.setText(time);[m
+             }[m
+ [m
+             // Changes the timer text, when it gets to 0:00, to "Start the next set"[m
+[36m@@ -210,8 +214,10 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+     // =============================================================================================[m
+     @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)[m
+     public void beforeRepsChanged() {[m
+[31m-        if (!btnDecReps.isEnabled())[m
+[32m+[m[32m        if (!btnDecReps.isEnabled()) {[m
+             btnDecReps.setEnabled(true);[m
+[32m+[m[32m            btnDecReps.setVisibility(View.VISIBLE);[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)[m
+[36m@@ -223,8 +229,10 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+         else[m
+             reps = MIN_REPS;[m
+ [m
+[31m-        if (currWorkout.setCurrReps(reps))[m
+[32m+[m[32m        if (currWorkout.isMinReps()) {[m
+             btnDecReps.setEnabled(false);[m
+[32m+[m[32m            btnDecReps.setVisibility(View.GONE);[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     // TextWatcher for weight ET[m
+[36m@@ -232,8 +240,10 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+             value = R.id.et_curr_weight,[m
+             callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)[m
+     public void beforeWeightChanged() {[m
+[31m-        if (!btnDecWeight.isEnabled())[m
+[32m+[m[32m        if (!btnDecWeight.isEnabled()) {[m
+             btnDecWeight.setEnabled(true);[m
+[32m+[m[32m            btnDecWeight.setVisibility(View.VISIBLE);[m
+[32m+[m[32m        }[m
+     }[m
+ [m
+     @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)[m
+[36m@@ -246,8 +256,10 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+         } else[m
+             weight = currWorkout.getCurrMinWeight();[m
+ [m
+[31m-        if (currWorkout.setWeight(weight))[m
+[32m+[m[32m        if (currWorkout.isMinWeight() || weight <= currWorkout.getCurrMinWeight()) {[m
+             btnDecWeight.setEnabled(false);[m
+[32m+[m[32m            btnDecWeight.setVisibility(View.GONE);[m
+[32m+[m[32m        }[m
+     }[m
+     // =TextWatcher=Handling========================================================================[m
+ [m
+[36m@@ -345,13 +357,9 @@[m [mpublic class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener[m
+ [m
+     public void updateUI() {[m
+         String setType;[m
+[31m-        if (countDownTimer != null) {[m
+[31m-            countDownTimer.cancel();[m
+[31m-        }[m
+ [m
+         if (currWorkout.getIsWarmup()) {[m
+             setType = "Warmup";[m
+[31m-            tvTimer.setText(R.string.start_next_set);[m
+         } else {[m
+             setType = "Main";[m
+         }[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/adapters/SingleItemAdapter.java b/app/src/main/java/ca/judacribz/gainzassist/adapters/SingleItemAdapter.java[m
+[1mindex 5a33b1b..a23e7b3 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/adapters/SingleItemAdapter.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/adapters/SingleItemAdapter.java[m
+[36m@@ -26,14 +26,13 @@[m [mpublic class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu[m
+ [m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+[31m-    private int numItems, listItemLayout, listItemId;[m
+[32m+[m[32m    private int listItemLayout, listItemId;[m
+     private ArrayList<String> itemNames;[m
+     private LayoutInflater inflater;[m
+ [m
+     // Adapter Constructor[m
+     public SingleItemAdapter(Context context, ArrayList<String> itemNames, int listItemLayout, int listItemId) {[m
+         this.inflater = LayoutInflater.from(context);[m
+[31m-        this.numItems = itemNames.size();[m
+         this.itemNames = itemNames;[m
+         this.listItemLayout = listItemLayout;[m
+         this.listItemId = listItemId;[m
+[36m@@ -56,10 +55,13 @@[m [mpublic class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu[m
+ [m
+     @Override[m
+     public int getItemCount() {[m
+[31m-        return numItems;[m
+[32m+[m[32m        return itemNames.size();[m
+     }[m
+     //RecyclerView.Adapter<SingleItemAdapter.ButtonViewHolder>//Override///////////////////////////////[m
+ [m
+[32m+[m[32m    public void setItems(ArrayList<String> itemNames) {[m
+[32m+[m[32m        this.itemNames = itemNames;[m
+[32m+[m[32m    }[m
+ [m
+     // Custom ViewHolder class for the recyclerView[m
+     // ============================================================================================[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/models/Exercise.java b/app/src/main/java/ca/judacribz/gainzassist/models/Exercise.java[m
+[1mindex a468d1b..53aa69a 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/models/Exercise.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/models/Exercise.java[m
+[36m@@ -64,7 +64,7 @@[m [mpublic class Exercise {[m
+     }[m
+ [m
+     @Ignore[m
+[31m-    SetsType setsType = null;[m
+[32m+[m[32m    SetsType setsType = SetsType.MAIN_SET;[m
+     // --------------------------------------------------------------------------------------------[m
+ [m
+     // ######################################################################################### //[m
+[36m@@ -165,6 +165,7 @@[m [mpublic class Exercise {[m
+         this.equipment = equipment;[m
+ [m
+         if (BARBELL.equals(this.equipment)) {[m
+[32m+[m[32m            Logger.d("SET MIN WEIGHT");[m
+             this.minWeight = BB_MIN_WEIGHT;[m
+             this.weightChange = BB_WEIGHT_CHANGE;[m
+         } else if (DUMBBELL.equals(this.equipment)) {[m
+[36m@@ -198,6 +199,7 @@[m [mpublic class Exercise {[m
+ [m
+     public void setWeight(float weight) {[m
+         this.weight = weight;[m
+[32m+[m
+     }[m
+ [m
+     public float getMinWeight() {[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/models/Workout.java b/app/src/main/java/ca/judacribz/gainzassist/models/Workout.java[m
+[1mindex cb702e9..90a8884 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/models/Workout.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/models/Workout.java[m
+[36m@@ -18,7 +18,7 @@[m [mpublic class Workout {[m
+     // Global Vars[m
+     // --------------------------------------------------------------------------------------------[m
+     @PrimaryKey[m
+[31m-    long id;[m
+[32m+[m[32m    long id = -1;[m
+     String name;[m
+ [m
+     @Ignore[m
+[36m@@ -34,7 +34,8 @@[m [mpublic class Workout {[m
+ [m
+ [m
+     public Workout(String name, @Nullable ArrayList<Exercise> exercises) {[m
+[31m-        setId(-1);[m
+[32m+[m[32m        if (id == -1)[m
+[32m+[m[32m            setId(-1);[m
+         setName(name);[m
+         if (exercises != null){[m
+             this.exercises = exercises;[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutDao.java b/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutDao.java[m
+[1mindex 0a1914a..42c3f9b 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutDao.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutDao.java[m
+[36m@@ -13,7 +13,7 @@[m [mpublic interface WorkoutDao {[m
+     Long insert(Workout workout);[m
+ [m
+ [m
+[31m-    @Query("SELECT * from  workouts")[m
+[32m+[m[32m    @Query("SELECT * from workouts ORDER BY id")[m
+     LiveData<List<Workout>> getAll();[m
+ [m
+     @Query("SELECT * from  workouts WHERE id = :id")[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutRepo.java b/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutRepo.java[m
+[1mindex be74f0f..519c3c7 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutRepo.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/models/db/WorkoutRepo.java[m
+[36m@@ -19,6 +19,7 @@[m [mimport java.util.Date;[m
+ import java.util.List;[m
+ import java.util.Map;[m
+ [m
+[32m+[m[32mimport static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;[m
+ import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;[m
+ import static ca.judacribz.gainzassist.models.db.WorkoutRepo.TableTxn.*;[m
+ import static ca.judacribz.gainzassist.util.Misc.extractWorkout;[m
+[36m@@ -328,9 +329,7 @@[m [mpublic class WorkoutRepo {[m
+                         workoutDao.insert(workout);[m
+                         id = workout.getId();[m
+                         Logger.d("ExerciseConst:" + workout.getName() + " id : " + workoutDao.getId(workoutName));[m
+[31m-                        long exid = new Date().getTime();[m
+                         for (Exercise exercise : workout.getExercises()) {[m
+[31m-                            exercise.setId(exid++);[m
+                             exercise.setWorkoutId(id);[m
+                             setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);[m
+                         }[m
+[1mdiff --git a/app/src/main/java/ca/judacribz/gainzassist/util/Preferences.java b/app/src/main/java/ca/judacribz/gainzassist/util/Preferences.java[m
+[1mindex 9339f72..ae7217d 100644[m
+[1m--- a/app/src/main/java/ca/judacribz/gainzassist/util/Preferences.java[m
+[1m+++ b/app/src/main/java/ca/judacribz/gainzassist/util/Preferences.java[m
+[36m@@ -43,7 +43,7 @@[m [mpublic class Preferences {[m
+         editor.apply();[m
+     }[m
+ [m
+[31m-    private static Set<String> getIncompleteWorkouts(Context context) {[m
+[32m+[m[32m    public static Set<String> getIncompleteWorkouts(Context context) {[m
+         return getSharedPref([m
+                 context,[m
+                 R.string.file_workout_info[m
+[1mdiff --git a/app/src/main/res/layout/activity_new_workout_summary.xml b/app/src/main/res/layout/activity_new_workout_summary.xml[m
+[1mindex 79f7fb0..07e5a4d 100644[m
+[1m--- a/app/src/main/res/layout/activity_new_workout_summary.xml[m
+[1m+++ b/app/src/main/res/layout/activity_new_workout_summary.xml[m
+[36m@@ -34,6 +34,8 @@[m
+         android:layout_width="match_parent"[m
+         android:layout_height="wrap_content"[m
+         android:layout_below="@id/et_workout_name"[m
+[32m+[m[32m        android:layout_above="@id/tv_exercises"[m
+[32m+[m[32m        android:padding="5dp"[m
+         android:background="@color/colorAccent">[m
+ [m
+ [m
+[36m@@ -43,8 +45,6 @@[m
+             android:id="@+id/et_exercise_name"[m
+             android:layout_width="match_parent"[m
+             android:layout_height="wrap_content"[m
+[31m-            android:layout_marginEnd="10dp"[m
+[31m-            android:layout_marginStart="10dp"[m
+             android:backgroundTint="@color/colorLightAccent"[m
+             android:hint="@string/hint_exercise_name"[m
+             android:inputType="text"[m
+[36m@@ -60,8 +60,6 @@[m
+             android:layout_width="match_parent"[m
+             android:layout_height="wrap_content"[m
+             android:layout_below="@id/et_exercise_name"[m
+[31m-            android:layout_marginEnd="10dp"[m
+[31m-            android:layout_marginStart="10dp"[m
+             android:orientation="horizontal">[m
+ [m
+             <!-- Exercise Type spinner -->[m
+[36m@@ -238,7 +236,7 @@[m
+             android:layout_width="150dp"[m
+             android:layout_height="wrap_content"[m
+             android:layout_alignParentStart="true"[m
+[31m-            android:layout_below="@id/btn_inc_sets"[m
+[32m+[m[32m            android:layout_alignParentBottom="true"[m
+             android:layout_marginTop="5dp"[m
+             android:background="@drawable/anim_button_ripple"[m
+             android:text="@string/clear"[m
+[36m@@ -249,7 +247,7 @@[m
+             android:layout_width="150dp"[m
+             android:layout_height="wrap_content"[m
+             android:layout_alignParentEnd="true"[m
+[31m-            android:layout_below="@id/btn_inc_reps"[m
+[32m+[m[32m            android:layout_alignParentBottom="true"[m
+             android:layout_marginTop="5dp"[m
+             android:background="@drawable/anim_button_ripple"[m
+             android:text="@string/add_exercise"[m
+[36m@@ -260,7 +258,7 @@[m
+             android:layout_width="150dp"[m
+             android:layout_height="wrap_content"[m
+             android:layout_alignParentEnd="true"[m
+[31m-            android:layout_below="@id/btn_inc_reps"[m
+[32m+[m[32m            android:layout_alignParentBottom="true"[m
+             android:layout_marginTop="5dp"[m
+             android:background="@drawable/anim_button_ripple"[m
+             android:text="@string/update_exercise"[m
+[36m@@ -273,13 +271,20 @@[m
+ [m
+     <!-- List of Added Exercises -->[m
+     <!--========================================================================================-->[m
+[32m+[m[32m    <TextView[m
+[32m+[m[32m        android:id="@+id/tv_exercises"[m
+[32m+[m[32m        android:layout_width="wrap_content" android:layout_height="wrap_content"[m
+[32m+[m[32m                android:layout_above="@id/rv_exercise_btns"[m
+[32m+[m
+[32m+[m[32m        android:layout_margin="5dp"[m
+[32m+[m[32m              android:text="@string/exercises"/>[m
+[32m+[m
+     <android.support.v7.widget.RecyclerView[m
+         android:id="@+id/rv_exercise_btns"[m
+         android:layout_width="match_parent"[m
+[31m-        android:layout_height="match_parent"[m
+[31m-        android:padding="1dp"[m
+[31m-        android:layout_above="@id/btn_discard_workout"[m
+[31m-        android:layout_below="@id/rlay_add_exercise"/>[m
+[32m+[m[32m        android:layout_height="125dp"[m
+[32m+[m[32m        android:layout_margin="5dp"[m
+[32m+[m[32m        android:layout_above="@id/btn_discard_workout"/>[m
+     <!--List=of=Added=Exercises=================================================================-->[m
+ [m
+ [m
+[1mdiff --git a/app/src/main/res/layout/fragment_home.xml b/app/src/main/res/layout/fragment_home.xml[m
+[1mdeleted file mode 100644[m
+[1mindex 16570cf..0000000[m
+[1m--- a/app/src/main/res/layout/fragment_home.xml[m
+[1m+++ /dev/null[m
+[36m@@ -1,39 +0,0 @@[m
+[31m-<?xml version="1.0" encoding="utf-8"?>[m
+[31m-<RelativeLayout[m
+[31m-	xmlns:android="http://schemas.android.com/apk/res/android"[m
+[31m-	xmlns:tools="http://schemas.android.com/tools"[m
+[31m-	android:layout_width="match_parent"[m
+[31m-	android:layout_height="match_parent"[m
+[31m-	tools:context=".activities.main.fragments.Home">[m
+[31m-[m
+[31m-	<!--<FrameLayout-->[m
+[31m-		<!--android:id="@+id/toolbar_container"-->[m
+[31m-		<!--android:layout_width="match_parent"-->[m
+[31m-		<!--android:layout_height="wrap_content">-->[m
+[31m-[m
+[31m-		<!--<include-->[m
+[31m-			<!--android:id="@+id/toolbar"-->[m
+[31m-			<!--layout="@layout/partial_title_bar"/>-->[m
+[31m-[m
+[31m-		<!--<com.miguelcatalan.materialsearchview.MaterialSearchView-->[m
+[31m-			<!--android:id="@+id/msvWorkouts"-->[m
+[31m-			<!--android:theme="@style/MaterialSearchViewStyle"-->[m
+[31m-			<!--android:hint="@string/hint_search_workouts"-->[m
+[31m-			<!--android:layout_width="match_parent"-->[m
+[31m-			<!--android:layout_height="wrap_content" />-->[m
+[31m-	<!--</FrameLayout>-->[m
+[31m-[m
+[31m-	<LinearLayout[m
+[31m-		android:layout_width="match_parent"[m
+[31m-		android:layout_height="match_parent"[m
+[31m-		android:layout_below="@id/toolbar_container"[m
+[31m-		android:layout_margin="15dp"[m
+[31m-		android:orientation="vertical">[m
+[31m-[m
+[31m-		<android.support.v7.widget.RecyclerView[m
+[31m-			android:id="@+id/rv_workout_btns"[m
+[31m-			android:layout_width="match_parent"[m
+[31m-			android:layout_height="match_parent"[m
+[31m-			android:scrollbars="vertical"/>[m
+[31m-	</LinearLayout>[m
+[31m-</RelativeLayout>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/res/layout/fragment_resume.xml b/app/src/main/res/layout/fragment_resume.xml[m
+[1mindex 6078502..71826e6 100644[m
+[1m--- a/app/src/main/res/layout/fragment_resume.xml[m
+[1m+++ b/app/src/main/res/layout/fragment_resume.xml[m
+[36m@@ -8,8 +8,16 @@[m
+ 	android:orientation="vertical"[m
+ 	tools:context=".activities.main.fragments.Resume">[m
+ [m
+[31m-	<include[m
+[31m-		android:id="@+id/btn_workouts"[m
+[31m-		layout="@layout/part_button" />[m
+[32m+[m	[32m<TextView[m
+[32m+[m		[32mandroid:layout_width="match_parent"[m
+[32m+[m		[32mandroid:layout_height="wrap_content"[m
+[32m+[m		[32mandroid:layout_marginBottom="10dp"[m
+[32m+[m		[32mandroid:text="@string/incomplete_workouts"/>[m
+[32m+[m
+[32m+[m	[32m<android.support.v7.widget.RecyclerView[m
+[32m+[m		[32mandroid:id="@+id/rv_res_workout_btns"[m
+[32m+[m		[32mandroid:layout_width="match_parent"[m
+[32m+[m		[32mandroid:layout_height="match_parent"[m
+[32m+[m		[32mandroid:scrollbars="vertical"/>[m
+ [m
+ </LinearLayout>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/res/layout/fragment_workouts.xml b/app/src/main/res/layout/fragment_workouts.xml[m
+[1mnew file mode 100644[m
+[1mindex 0000000..78a0d4e[m
+[1m--- /dev/null[m
+[1m+++ b/app/src/main/res/layout/fragment_workouts.xml[m
+[36m@@ -0,0 +1,22 @@[m
+[32m+[m[32m<?xml version="1.0" encoding="utf-8"?>[m
+[32m+[m[32m<LinearLayout[m
+[32m+[m	[32mxmlns:android="http://schemas.android.com/apk/res/android"[m
+[32m+[m	[32mxmlns:tools="http://schemas.android.com/tools"[m
+[32m+[m	[32mandroid:layout_width="match_parent"[m
+[32m+[m	[32mandroid:layout_height="match_parent"[m
+[32m+[m	[32mandroid:padding="15dp"[m
+[32m+[m	[32mandroid:orientation="vertical"[m
+[32m+[m	[32mtools:context=".activities.main.fragments.Workouts">[m
+[32m+[m
+[32m+[m	[32m<TextView[m
+[32m+[m		[32mandroid:layout_width="match_parent"[m
+[32m+[m		[32mandroid:layout_height="wrap_content"[m
+[32m+[m		[32mandroid:layout_marginBottom="10dp"[m
+[32m+[m		[32mandroid:text="@string/workout_list"/>[m
+[32m+[m
+[32m+[m	[32m<android.support.v7.widget.RecyclerView[m
+[32m+[m		[32mandroid:id="@+id/rv_workout_btns"[m
+[32m+[m		[32mandroid:layout_width="match_parent"[m
+[32m+[m		[32mandroid:layout_height="match_parent"[m
+[32m+[m		[32mandroid:scrollbars="vertical"/>[m
+[32m+[m[32m</LinearLayout>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/res/menu/menu_workouts_list.xml b/app/src/main/res/menu/menu_workouts_list.xml[m
+[1mdeleted file mode 100644[m
+[1mindex 26f0124..0000000[m
+[1m--- a/app/src/main/res/menu/menu_workouts_list.xml[m
+[1m+++ /dev/null[m
+[36m@@ -1,23 +0,0 @@[m
+[31m-<?xml version="1.0" encoding="utf-8"?>[m
+[31m-<menu[m
+[31m-    xmlns:android="http://schemas.android.com/apk/res/android"[m
+[31m-    xmlns:app="http://schemas.android.com/apk/res-auto"[m
+[31m-    xmlns:tools="http://schemas.android.com/tools"[m
+[31m-    android:background="@drawable/anim_button_ripple"[m
+[31m-    tools:context=".activities.workouts_list.WorkoutsList">[m
+[31m-[m
+[31m-    <!-- Resources:[m
+[31m-         https://www.freepik.com/free-icon/add-button-with-plus-symbol-in-a-black-circle_735567.htm -->[m
+[31m-[m
+[31m-    <item[m
+[31m-		android:id="@+id/act_search"[m
+[31m-		android:icon="@drawable/ic_search_dark"[m
+[31m-		android:title="@string/hint_search_workouts"[m
+[31m-		app:showAsAction="always" />[m
+[31m-[m
+[31m-	<item[m
+[31m-		android:id="@+id/act_add_workout"[m
+[31m-		android:icon="@drawable/ic_add_dark"[m
+[31m-		android:title="@string/add_workout"[m
+[31m-		app:showAsAction="ifRoom"/>[m
+[31m-</menu>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml[m
+[1mindex 452b187..eeb17e7 100644[m
+[1m--- a/app/src/main/res/values/strings.xml[m
+[1m+++ b/app/src/main/res/values/strings.xml[m
+[36m@@ -119,4 +119,6 @@[m
+ 	<string name="update">update</string>[m
+ 	<string name="home">Home</string>[m
+ 	<string name="resume">Resume</string>[m
+[32m+[m	[32m<string name="workout_list">Workout List</string>[m
+[32m+[m	[32m<string name="incomplete_workouts">Incomplete Workouts</string>[m
+ </resources>[m

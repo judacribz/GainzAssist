@@ -329,9 +329,7 @@ public class WorkoutRepo {
                         workoutDao.insert(workout);
                         id = workout.getId();
                         Logger.d("ExerciseConst:" + workout.getName() + " id : " + workoutDao.getId(workoutName));
-                        long exid = new Date().getTime();
                         for (Exercise exercise : workout.getExercises()) {
-                            exercise.setId(exid++);
                             exercise.setWorkoutId(id);
                             setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
                         }
