@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
@@ -60,6 +59,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         exercises = workout.getExercises();
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
         setTheme(R.style.WorkoutTheme);
+
     }
 
 
@@ -68,14 +68,11 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         super.onResume();
         if (viewPager.getAdapter() == null) {
             setCurrSession();
-            Toast.makeText(this, "viewpager null", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void setCurrSession() {
         currWorkout.setDataListener(this);
-        Toast.makeText(this, "setsession", Toast.LENGTH_SHORT).show();
-
         if (removeIncompleteWorkoutPref(this, workout.getName())) {
             currWorkout.setRetrievedWorkout(
                     readValue(getIncompleteSessionPref(this, workout.getName())),
@@ -84,6 +81,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
 
             removeIncompleteSessionPref(this, workout.getName());
         } else {
+
             currWorkout.setCurrWorkout(workout);
         }
     }
@@ -193,7 +191,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
                             Exercise exercise,
                             LinearLayout llSubtitle,
                             LinearLayout llSets) {
-
+        layInflater = getLayoutInflater();
         // Add subtitle layout which includes "ExerciseSet #", "Reps" and "Weight"
         setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
         llSubtitle.addView(setsView, 0);

@@ -73,12 +73,12 @@ public class CurrWorkout {
         }
     }
 
-    private DataListener dataListener;
+    private static DataListener dataListener;
     public interface DataListener {
         void warmupsGenerated(ArrayList<Exercise> warmups);
     }
     void setDataListener(DataListener dataListener) {
-        this.dataListener = dataListener;
+        CurrWorkout.dataListener = dataListener;
     }
     // --------------------------------------------------------------------------------------------
 
@@ -167,7 +167,7 @@ public class CurrWorkout {
             }
 
             //Todo: use onerepmax
-            oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
+//            oneRepMax = getOneRepMax(ex.getAvgReps(), ex.getAvgWeight());
 
             if (BARBELL.equals(equip)) {
                 exerciseSets = genBBWarmups(ex);

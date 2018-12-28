@@ -359,6 +359,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         String setType;
 
         if (currWorkout.getIsWarmup()) {
+            if (countDownTimer != null) {
+                countDownTimer.onFinish();
+                countDownTimer = null;
+            }
             setType = "Warmup";
         } else {
             setType = "Main";

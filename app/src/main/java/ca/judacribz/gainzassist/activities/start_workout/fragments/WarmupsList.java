@@ -61,13 +61,16 @@ public class WarmupsList extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
+View view;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+        if (view != null) {
+            return  view;
+        }
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_warmups_list, container, false);
+        view =  inflater.inflate(R.layout.fragment_warmups_list, container, false);
         ButterKnife.bind(this, view);
 
         if (bundle != null) {

@@ -97,7 +97,7 @@ public class Main extends AppCompatActivity implements
             }
         };
 
-//        Logger.d("dfdf");
+        Logger.d("dfdf");
 
     }
 
