@@ -27,6 +27,13 @@
         <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="imageButtonStyle">@style/ImageButtonStyle</item>
+        <item name="android:background">@color/colorDarkGreen</item>
+    </style>
+
+    <style name="WorkoutTheme2" parent="AppTheme">
+        <item name="editTextStyle">@style/EditTextRipple</item>
+        <item name="android:buttonStyle">@style/ButtonStyle</item>
+        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
     </style>
 
     <style name="AddWorkoutTheme" parent="AppTheme">

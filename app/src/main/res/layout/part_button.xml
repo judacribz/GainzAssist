@@ -6,10 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="5dp"
     android:layout_marginTop="5dp"
-    android:background="@drawable/anim_button_ripple"
 	android:elevation="1dp"
-	android:shadowDy="10"
-	android:translationZ="10dp"
+	android:translationZ="4dp"
     android:padding="50dp"
     android:textColor="@drawable/selector_btn_text_default"
 	android:textSize="18sp"/>

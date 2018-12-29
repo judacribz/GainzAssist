@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.util;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -21,7 +22,7 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.facebook.rebound.SpringUtil;
-import com.google.firebase.database.FirebaseDatabase;
+import io.alterac.blurkit.BlurLayout;
 
 public class UI {
 
@@ -94,6 +95,8 @@ public class UI {
 
         // ExerciseSet the title for the partial_title_bar
         ((TextView) act.findViewById(R.id.title)).setText(title);
+
+        act.setTheme(R.style.WorkoutTheme2);
 
         return title;
     }
@@ -208,4 +211,64 @@ public class UI {
             et.setText(String.valueOf(min));
         }
     }
+
+
+
+    public static class ProgressHandler extends Handler {
+
+        private static String DOT = "...";
+
+        ProgressDialog progress;
+        BlurLayout blurLayout;
+        String msg, newMsg;
+        int count = 0;
+
+        public void setProgress(Context context, String msg, BlurLayout blurLayout) {
+            this.progress = new ProgressDialog(context);
+            this.blurLayout = blurLayout;
+            this.msg = msg + DOT;
+
+            this.progress.setMessage(this.msg);
+            this.progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        }
+
+        public  void setTitle(String title) {
+            this.progress.setTitle(title);
+        }
+
+        public void show() {
+            if (this.progress != null) {
+                this.progress.show();
+                if (this.blurLayout != null) {
+                    blurLayout.setVisibility(View.VISIBLE);
+                    blurLayout.setTop(1);
+                    blurLayout.startBlur();
+                }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while (progress.isShowing()) {
+                                Thread.sleep(500);
+                                progress.setMessage(msg.substring(0, msg.length() - 1 - (++count % 3)));
+                                blurLayout.pauseBlur();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        }
+
+        public void dismiss() {
+            if (this.progress != null) {
+                this.progress.dismiss();
+                this.blurLayout.pauseBlur();
+                this.blurLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
 }

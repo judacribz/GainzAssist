@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.main;
 
+import android.app.ProgressDialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.speech.RecognizerIntent;
@@ -53,11 +54,17 @@ public class Main extends AppCompatActivity implements
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    private static ProgressHandler progressHandler = new ProgressHandler();
+
+    TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
+    TabLayout.ViewPagerOnTabSelectedListener viewPagerOnTabSelectedListener;
+    MenuItem search, addWorkout;
     LayoutInflater layInflater;
+
     int pos;
 
-    @BindView(ca.judacribz.gainzassist.R.id.tlay_navbar) TabLayout tabLayout;
-    @BindView(ca.judacribz.gainzassist.R.id.vp_fmt_container) ViewPager viewPager;
+    @BindView(R.id.tlay_navbar) TabLayout tabLayout;
+    @BindView(R.id.vp_fmt_container) ViewPager viewPager;
     @BindView(R.id.msvWorkouts) MaterialSearchView searchView;
     // --------------------------------------------------------------------------------------------
 
@@ -67,15 +74,17 @@ public class Main extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UI.setInitView(this, ca.judacribz.gainzassist.R.layout.activity_main, ca.judacribz.gainzassist.R.string.app_name, false);
+        setInitView(this, R.layout.activity_main, ca.judacribz.gainzassist.R.string.app_name, false);
 
         tabLayoutOnPageChangeListener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
-        f = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+        viewPagerOnTabSelectedListener = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
                 pos = tab.getPosition();
+                searchView.closeSearch();
+
                 if (search != null && addWorkout != null) {
                     switch (tab.getPosition()) {
                         case 2:
@@ -96,9 +105,6 @@ public class Main extends AppCompatActivity implements
                 super.onTabUnselected(tab);
             }
         };
-
-        Logger.d("dfdf");
-
     }
 
     @Override
@@ -108,22 +114,14 @@ public class Main extends AppCompatActivity implements
 
         searchView.setOnQueryTextListener(this);
         searchView.setVoiceSearch(true);
-    }
-TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
-    TabLayout.ViewPagerOnTabSelectedListener f;
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        viewPager.removeOnPageChangeListener(tabLayoutOnPageChangeListener);
-        tabLayout.removeOnTabSelectedListener(f);
+        searchView.showVoice(true);
     }
 
     private void setupPager() {
         layInflater = getLayoutInflater();
 
         viewPager.addOnPageChangeListener(tabLayoutOnPageChangeListener);
-        tabLayout.addOnTabSelectedListener(f);
+        tabLayout.addOnTabSelectedListener(viewPagerOnTabSelectedListener);
 
         viewPager.setAdapter(new WorkoutPagerAdapter(
                 getSupportFragmentManager(),
@@ -131,12 +129,24 @@ TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
         ));
         viewPager.setCurrentItem(1);
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        searchView.setOnQueryTextListener(this);
+        searchView.setVoiceSearch(true);
+
+        viewPager.removeOnPageChangeListener(tabLayoutOnPageChangeListener);
+        tabLayout.removeOnTabSelectedListener(viewPagerOnTabSelectedListener);
+    }
+
     @Override
     public void onBackPressed() {
         handleBackButton(this);
     }
 
-    MenuItem search, addWorkout;
+
     @Override
     public boolean onCreateOptionsMenu(Menu mainMenu) {
         getMenuInflater().inflate(R.menu.menu_main, mainMenu);
@@ -171,6 +181,7 @@ TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
     @Override
     public boolean onQueryTextChange(String newText) {
         ((Workouts)fmts[1]).onQueryTextChange(newText);
+
         return false;
     }
 
@@ -179,7 +190,6 @@ TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
         return false;
     }
     //TextWatcher//Override////////////////////////////////////////////////////////////////////////
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

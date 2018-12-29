@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.main.fragments;
 
+import android.app.ProgressDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -26,6 +27,7 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import ca.judacribz.gainzassist.util.UI.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +46,15 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    View view;
     Main act;
+
     SingleItemAdapter workoutAdapter;
     LinearLayoutManager layoutManager;
 
     WorkoutViewModel workoutViewModel;
+    Observer<List<Workout>> workObs;
+    LiveData<List<Workout>> workLiv;
 
     ArrayList<String>
             workoutNames,
@@ -86,27 +92,26 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-View view;
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-if (view != null) {
-    return  view;
-}
-         view =  inflater.inflate(R.layout.fragment_workouts, container, false);
-        ButterKnife.bind(this, view);
+        if (view != null) {
+            return  view;
+        }
 
+        ButterKnife.bind(
+                this,
+                view = inflater.inflate(R.layout.fragment_workouts, container, false)
+        );
+        setRetainInstance(true);
 
-
+        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel.class);
         workoutNames = new ArrayList<>();
 
-        // ExerciseSet the layout manager for the localWorkouts
         layoutManager = new LinearLayoutManager(act);
         workoutsList.setLayoutManager(layoutManager);
         workoutsList.setHasFixedSize(true);
-        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel.class);
 
         workObs = new Observer<List<Workout>>() {
             @Override
@@ -126,17 +131,13 @@ if (view != null) {
             }
         };
         workLiv = workoutViewModel.getAllWorkouts();
-         setRetainInstance(true);
         return view;
     }
-Observer<List<Workout>> workObs;
-    LiveData<List<Workout>> workLiv;
+
     @Override
     public void onResume() {
         super.onResume();
-
-
-            workLiv.observe(act, workObs);
+        workLiv.observe(act, workObs);
     }
 
     @Override
@@ -146,16 +147,18 @@ Observer<List<Workout>> workObs;
     }
 
     /* Helper function to display button list of workouts */
-    public void displayWorkoutList(@Nullable  ArrayList<String> workouts) {
+    public void displayWorkoutList(@Nullable ArrayList<String> workouts) {
         if (workouts != null) {
             filteredWorkouts = workouts;
         }
+
         workoutAdapter = new SingleItemAdapter(
                 act,
                 filteredWorkouts,
                 R.layout.part_button,
                 R.id.btnListItem
         );
+
         workoutAdapter.setItemClickObserver(this);
         workoutsList.setAdapter(workoutAdapter);
     }

@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
-
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
-import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -16,9 +14,6 @@ import com.google.firebase.auth.*;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.authentication.Login;
-
-import java.util.Arrays;
-
 
 public class Authentication {
 
@@ -74,13 +69,16 @@ public class Authentication {
         } else {
             userCreated = false;
             msg = getExceptionMsg(act, task.getException());
+
+            ((Login) act).loginFail();
+
+            if (msg.equals(act.getString(R.string.txt_email_registered))) {
+                ((Login) act).linkGoogle = true;
+                ((Login) act).googleLogin();
+            }
         }
 
         Toast.makeText(act, msg, Toast.LENGTH_SHORT).show();
-        if (msg.equals(act.getString(R.string.txt_email_registered))) {
-            ((Login) act).linkGoogle = true;
-            googleSignIn(act, signInClient);
-        }
     }
 
     public static void linkUser(final Activity act, AuthCredential cred, FirebaseUser currUser) {
@@ -97,11 +95,6 @@ public class Authentication {
                 });
     }
 
-
-    public static void googleSignIn(Activity act, GoogleSignInClient signInClient) {
-        Intent signInIntent = signInClient.getSignInIntent();
-        act.startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
 
 //    public static void facebookSignIn(Activity act) {
 //        LoginManager.getInstance().logInWithReadPermissions(

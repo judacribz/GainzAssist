@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.authentication;
 
 import android.animation.Animator;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
@@ -17,7 +18,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;;
 import ca.judacribz.gainzassist.activities.main.Main;
@@ -40,27 +40,33 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.R;
+import io.alterac.blurkit.BlurLayout;
 
 import static ca.judacribz.gainzassist.activities.main.Main.EXTRA_LOGOUT_USER;
-import static ca.judacribz.gainzassist.util.UI.setSpring;
 import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
 import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
 import static ca.judacribz.gainzassist.util.Preferences.*;
-import static ca.judacribz.gainzassist.util.UI.setInitView;
+import static ca.judacribz.gainzassist.util.UI.*;
 
 public class Login extends AppCompatActivity implements FacebookCallback<LoginResult>,
                                                         FirebaseAuth.AuthStateListener {
     // Constants
     // --------------------------------------------------------------------------------------------
-    private static final int RC_SIGN_IN = 9001;
-    private static final int MIN_PASSWORD_LEN = 6;
-    private static final int SLIDE_DURATION = 1000;
+    private static final int
+            RC_SIGN_IN = 9001,
+            MIN_PASSWORD_LEN = 6,
+            SLIDE_DURATION = 1000;
+
     private static final String LOGIN_IMG = "squat.png";
     private static final String SIGN_UP_IMG = "fatman.png";
+
+    private static final int PROGRESS_MAX = 100;
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    private static ProgressHandler progressHandler = new ProgressHandler();
+
     FirebaseAuth auth;
     AuthCredential credential, googleCred;
     GoogleSignInOptions signInOptions;
@@ -72,6 +78,8 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     boolean isLoggedIn;
     public boolean linkGoogle;
     Spring loginSpring, signUpSpring;
+
+    @BindView(R.id.blurLayout) BlurLayout blurLayout;
 
     @BindView(R.id.tv_sign_up_here) TextView tvSignUpHere;
     @BindView(R.id.tv_login_here) TextView tvLoginHere;
@@ -88,11 +96,7 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     @BindView(R.id.btn_facebook_sign_in) LoginButton btnFacebook;
     @BindView(R.id.btn_login) Button btnLogin;
     @BindView(R.id.btn_sign_up) Button btnSignUp;
-
-    @BindView(R.id.progress_bar) ProgressBar progressBar;
     // --------------------------------------------------------------------------------------------
-
-
     // AppCompatActivity Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -100,18 +104,12 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_login, R.string.app_name,  false);
 
-        progressBar.setMax(10);
+        progressHandler.setProgress(this, "Authenticating", blurLayout);
 
-        // Get firebase instance and setup google and facebook sign in
-        setupSignInMethods();
 
         // Setup main images
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                setupMainImages();
-            }
-        }).start();
+        setupSignInMethods();
+        setupMainImages();
 
         ivLoginImg.post(new Runnable() {
             @Override
@@ -186,23 +184,27 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case RC_SIGN_IN:
+
+                    progressHandler.setTitle("Google Sign In");
                     Task<GoogleSignInAccount> task
                             = GoogleSignIn.getSignedInAccountFromIntent(data);
                     try {
                         GoogleSignInAccount account = task.getResult(ApiException.class);
                         googleCred = GoogleAuthProvider.getCredential(Objects.requireNonNull(account).getIdToken(), null);
 
-
                         signIn(this, googleCred, signInClient);
-
                     } catch (ApiException ex) {
                         ex.printStackTrace();
                     }
                     break;
+
                 default:
+                    progressHandler.setTitle("Facebook Login");
                     callbackManager.onActivityResult(requestCode, resultCode, data);
                     break;
             }
+
+            progressHandler.show();
         }
     }
 
@@ -210,9 +212,47 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     protected void onStop() {
         super.onStop();
         auth.removeAuthStateListener(this);
-        progressBar.setVisibility(View.GONE);
+
+        progressHandler.dismiss();
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
+
+
+    // FirebaseAuth.AuthStateListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /* Listener to handle all login types through firebase if successful */
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+
+        // Current User is signed in
+        if (firebaseUser != null) {
+            progressHandler.show();
+
+
+            Toast.makeText(
+                    this,
+                    String.format(getString(R.string.txt_logged_in), firebaseUser.getEmail()),
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            if (linkGoogle) {
+                linkUser(this, credential, firebaseUser);
+            }
+
+            setUserInfoPref(this, firebaseUser.getEmail(), firebaseUser.getUid());
+
+            setUserInfo(this);
+
+
+            startActivity(new Intent(this, Main.class));
+            finish();
+//            for (UserInfo profile : fbUser.getProviderData()) {
+//                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
+//            }
+        }
+    }
+    //FirebaseAuth.AuthStateListener//Override/////////////////////////////////////////////////////
 
 
     // FacebookCallback Override
@@ -232,42 +272,6 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         ex.printStackTrace();
     }
     //FacebookCallback//Override///////////////////////////////////////////////////////////////////
-
-
-    // FirebaseAuth.AuthStateListener Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /* Listener to handle all login types through firebase if successful */
-    @Override
-    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-
-        // Current User is signed in
-        if (firebaseUser != null) {
-            Toast.makeText(
-                    this,
-                    String.format(getString(R.string.txt_logged_in), firebaseUser.getEmail()),
-                    Toast.LENGTH_SHORT
-            ).show();
-
-            if (linkGoogle) {
-                linkUser(this, credential, firebaseUser);
-            }
-
-            setUserInfoPref(this, firebaseUser.getEmail(), firebaseUser.getUid());
-
-            progressBar.setProgress(0);
-            progressBar.setVisibility(View.VISIBLE);
-            setUserInfo(this);
-
-            startActivity(new Intent(this, Main.class));
-            finish();
-
-//            for (UserInfo profile : fbUser.getProviderData()) {
-//                Toast.makeText(this, "Provider: " + profile.getProviderId(), Toast.LENGTH_SHORT).show();
-//            }
-        }
-    }
-    //FirebaseAuth.AuthStateListener//Override/////////////////////////////////////////////////////
 
     /* Validates login and sign up forms using email and password combination */
     public boolean validateForm(String email, String password) {
@@ -300,12 +304,8 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
     @OnClick(R.id.btn_google_sign_in)
     public void googleLogin() {
-       googleSignIn(this, signInClient);
-    }
-
-    @OnClick(R.id.btn_facebook_sign_in)
-    public void facebookLogin() {
-//        facebookSignIn(this);
+        Intent signInIntent = signInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @OnClick(R.id.btn_login)
@@ -313,6 +313,9 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         email = etEmail.getText().toString().trim();
         password = etPassword.getText().toString().trim();
         if (validateForm(email, password)) {
+            progressHandler.setTitle("Login");
+            progressHandler.show();
+
             // Email/Password login to firebase
             credential = EmailAuthProvider.getCredential(email, password);
             signIn(this, credential, signInClient);
@@ -324,6 +327,9 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
         email = etEmail.getText().toString().trim();
         password = etPassword.getText().toString().trim();
         if (validateForm(email, password)) {
+            progressHandler.setTitle("Sign Up");
+            progressHandler.show();
+
             credential = EmailAuthProvider.getCredential(email, password);
             // Email/Password sign up in firebase
             createUser(this, email, password, signInClient);
@@ -389,5 +395,9 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
             navTextView.startAnimation(slide_end);
         }
+    }
+
+    public void loginFail() {
+        progressHandler.dismiss();
     }
 }

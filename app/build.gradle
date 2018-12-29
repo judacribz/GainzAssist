@@ -79,10 +79,14 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+
+    // Pretty Logging
     implementation 'com.orhanobut:logger:2.2.0'
+
+    // AutoFitTextView
     implementation 'me.grantland:autofittextview:0.2.1'
-    implementation 'com.anton46:stepsview:0.0.2'
-//    implementation 'com.github.canner:android-stepsview:1.1.0'
+
+    implementation 'io.alterac.blurkit:blurkit:1.1.0'
 
     // Parceler
     implementation 'org.parceler:parceler-api:1.1.11'

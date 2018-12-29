@@ -205,9 +205,7 @@
         android:gravity="center"
 		android:background="@color/colorLightBg"
 		android:layout_margin="2dp"
-        android:paddingTop="2dp"
-        android:paddingStart="2dp"
-        android:paddingEnd="2dp">
+        android:padding="2dp">
 
         <Button
             android:id="@+id/btn_finish_set"
