@@ -58,10 +58,10 @@
 	</string>
 
 	<!-- Phrases -->
-	<string name="txt_no_account">Don\'t have an account?\</string>
-	<string name="txt_sign_up_here">Sign up here!</string>
-	<string name="txt_yes_account">Already have an account?\</string>
-	<string name="txt_login_here">Login here!</string>
+	<string name="txt_no_account"><b>Don\'t have an account?\</b></string>
+	<string name="txt_sign_up_here"><b>Sign up here!</b></string>
+	<string name="txt_yes_account"><b>Already have an account?\</b></string>
+	<string name="txt_login_here"><b>Login here!</b></string>
 	<string name="txt_email_registered">Email is already registered</string>
 	<string name="txt_network_needed">Internet connection required</string>
 	<string name="txt_logged_in">Logged in with %s</string>

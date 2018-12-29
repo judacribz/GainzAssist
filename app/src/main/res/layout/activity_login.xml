@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:padding="5dp"
-	android:background="@color/colorBg"
-	android:theme="@style/WorkoutTheme2"
-	tools:context=".activities.authentication.Login">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+				xmlns:tools="http://schemas.android.com/tools"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				xmlns:app="http://schemas.android.com/apk/res-auto"
+				android:background="@drawable/login_bg"
+				android:theme="@style/WorkoutTheme2"
+				tools:context=".activities.authentication.Login">
 
-    <!-- Resources:
-         https://thenounproject.com/term/muscle/15255/ -->
+	<!-- Resources:
+		 https://thenounproject.com/term/muscle/15255/ -->
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/partial_title_bar" />
+	<!--<include-->
+		<!--android:id="@+id/toolbar"-->
+		<!--layout="@layout/partial_title_bar" />-->
 
 	<io.alterac.blurkit.BlurLayout
 		android:id="@+id/blurLayout"
@@ -23,227 +22,217 @@
 		android:layout_height="match_parent"
 		android:visibility="gone"/>
 
-	<LinearLayout
-		android:id="@+id/ll_sign_in_methods"
-		android:layout_width="match_parent"
+	<!--<LinearLayout-->
+		<!--android:id="@+id/ll_signin_methods"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="150dp"-->
+		<!--android:layout_below="@id/toolbar"-->
+		<!--android:orientation="horizontal">-->
+
+		<!--<FrameLayout-->
+			<!--android:layout_width="0dp"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:layout_weight="@integer/ll_lg_weight">-->
+
+			<!--<ImageButton-->
+				<!--android:id="@+id/ibtn_google"-->
+				<!--android:layout_width="match_parent"-->
+				<!--android:layout_height="match_parent"-->
+				<!--android:layout_marginStart="20dp"-->
+				<!--android:layout_marginEnd="10dp"-->
+				<!--android:scaleType="fitCenter"-->
+				<!--android:padding="10dp"-->
+				<!--android:src="@drawable/common_google_signin_btn_icon_light_normal"-->
+				<!--android:background="@drawable/common_google_signin_btn_icon_light"/>-->
+		<!--</FrameLayout>-->
+
+		<!--<ImageButton-->
+			<!--android:id="@+id/ibtn_facebook"-->
+			<!--android:layout_width="0dp"-->
+			<!--android:layout_height="match_parent"-->
+			<!--android:layout_weight="@integer/ll_lg_weight"-->
+			<!--android:layout_marginStart="10dp"-->
+			<!--android:layout_marginEnd="20dp"-->
+			<!--android:scaleType="fitCenter"-->
+			<!--android:padding="20dp"-->
+			<!--android:src="@drawable/com_facebook_button_login_logo"-->
+			<!--android:background="@drawable/com_facebook_button_login_background"/>-->
+	<!--</LinearLayout>-->
+
+	<!-- Google Sign-In Button-->
+	<com.google.android.gms.common.SignInButton
+		android:id="@+id/btn_google_sign_in"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_below="@id/toolbar"
-		android:layout_margin="2dp"
-		android:background="@color/colorLightBg"
-		android:orientation="vertical">
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:layout_marginTop="20dp"
+		android:background="@color/colorBg"/>
 
-		<!-- Google Sign-In Button-->
-		<com.google.android.gms.common.SignInButton
-			android:id="@+id/btn_google_sign_in"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_weight="@integer/ll_sm_weight"
-			android:layout_marginStart="20dp"
-			android:layout_marginEnd="20dp"
-			android:layout_marginTop="5dp"
-			android:layout_marginBottom="2.5dp"
-			android:background="@color/colorBg"/>
-
-		 <!--Facebook Login Button-->
-		<FrameLayout
-			android:id="@+id/flay_facebook_login"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:layout_weight="@integer/ll_sm_weight"
-			android:layout_marginStart="20dp"
-			android:layout_marginEnd="20dp"
-			android:layout_marginTop="2.5dp"
-			android:layout_marginBottom="5dp"
-			android:background="@color/colorBg">
-
-			<com.facebook.login.widget.LoginButton
-				android:id="@+id/btn_facebook_sign_in"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:layout_gravity="center"
-				android:layout_margin="4dp"
-				android:textColor="@color/colorBg"/>
-		</FrameLayout>
-	</LinearLayout>
-
+	<!--Facebook Login Button-->
 	<FrameLayout
-		android:id="@+id/fl_auth_images"
-		android:layout_width="match_parent"
+		android:id="@+id/flay_facebook_login"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_below="@id/ll_sign_in_methods"
-		android:layout_above="@id/ll_login_signup"
-		android:layout_margin="2dp"
-		android:background="@color/colorLightBg">
+		android:layout_below="@id/btn_google_sign_in"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:layout_marginTop="20dp"
+		android:layout_marginBottom="20dp"
+		android:background="@color/colorBg">
 
-		<!-- Image for login -->
-		<ImageView
-			android:id="@+id/iv_login_image"
+		<com.facebook.login.widget.LoginButton
+			android:id="@+id/btn_facebook_sign_in"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-
-			android:contentDescription="@string/cd_login_img"
-			android:background="@color/colorLightBg"
-			android:tint="@color/colorBg"/>
-
-		<!-- Image for sign up -->
-		<ImageView
-			android:id="@+id/iv_sign_up_image"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:paddingTop="5dp"
-			android:background="@color/colorLightBg"
-			android:contentDescription="@string/cd_sign_up_img"
-			android:tint="@color/colorBg"
-			android:visibility="invisible"/>
+			android:layout_gravity="center"
+			android:layout_margin="4dp"
+			android:textColor="@color/colorBg"/>
 	</FrameLayout>
 
-	<LinearLayout
-		android:id="@+id/ll_login_signup"
+	<!-- Image for login -->
+	<ImageView
+		android:id="@+id/iv_login_image"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@id/flay_facebook_login"
+		android:layout_above="@id/tiLay_email"
+		android:layout_centerHorizontal="true"
+		android:contentDescription="@string/cd_login_img"
+		android:tint="@color/colorText"/>
+
+	<!-- Image for sign up -->
+	<ImageView
+		android:id="@+id/iv_sign_up_image"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@id/flay_facebook_login"
+		android:layout_above="@id/tiLay_email"
+		android:layout_centerHorizontal="true"
+		android:paddingTop="5dp"
+		android:contentDescription="@string/cd_sign_up_img"
+		android:tint="@color/colorBg"
+		android:visibility="invisible"/>
+
+	<!-- Email text field -->
+	<android.support.design.widget.TextInputLayout
+		android:id="@+id/tiLay_email"
+		android:layout_width="275dp"
+		android:layout_height="70dp"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:layout_above="@id/tiLay_password"
+		android:layout_centerHorizontal="true">
+
+		<EditText
+			android:id="@+id/et_email"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="20dp"
+			android:drawableEnd="@drawable/ic_mail_dark"
+			android:hint="@string/hint_email"
+			android:inputType="textEmailAddress"/>
+	</android.support.design.widget.TextInputLayout>
+
+	<!-- Password text field -->
+	<android.support.design.widget.TextInputLayout
+		android:id="@+id/tiLay_password"
+		android:layout_width="275dp"
+		android:layout_height="70dp"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:layout_above="@id/btn_login"
+		android:textColorHint="@color/com_facebook_blue"
+		android:layout_marginBottom="10dp"
+		android:textAppearance="@style/Base.TextAppearance.AppCompat">
+
+		<EditText
+			android:id="@+id/et_password"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:padding="20dp"
+			android:drawableEnd="@drawable/ic_pass_dark"
+			android:hint="@string/hint_password"
+			android:inputType="textPassword" />
+	</android.support.design.widget.TextInputLayout>
+
+	<!-- Login button -->
+	<Button
+		android:id="@+id/btn_login"
+		android:layout_width="275dp"
+		android:layout_height="70dp"
+		android:layout_above="@id/rlay_login_content"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:gravity="center"
+		android:text="@string/login"/>
+
+	<!-- Sign up button -->
+	<Button
+		android:id="@+id/btn_sign_up"
+		android:layout_width="275dp"
+		android:layout_height="70dp"
+		android:layout_above="@id/rlay_login_content"
+		android:layout_alignEnd="@id/tiLay_email"
+		android:layout_alignStart="@id/tiLay_email"
+		android:gravity="center"
+		android:text="@string/sign_up"
+		android:visibility="invisible"/>
+
+	<!-- Sign up here text -->
+	<RelativeLayout
+		android:id="@+id/rlay_sign_up_content"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
-		android:layout_margin="2dp"
-		android:background="@color/colorLightBg"
-		android:orientation="vertical">
+		android:layout_marginBottom="20dp"
+		android:gravity="center"
+		android:paddingTop="5dp">
 
-		<!-- Email text field -->
-		<android.support.design.widget.TextInputLayout
-			android:id="@+id/tiLay_email"
-			android:layout_width="match_parent"
-			android:layout_height="0dp"
-			android:layout_weight="@integer/ll_lg_weight"
-			android:layout_marginStart="20dp"
-			android:layout_marginEnd="20dp"
-			android:layout_marginBottom="10dp">
+		<TextView
+			android:id="@+id/tv_sign_up_quest"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/txt_no_account"
+			android:textSize="15sp"/>
 
-			<EditText
-				android:id="@+id/et_email"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:hint="@string/hint_email"
-				android:inputType="textEmailAddress"/>
-		</android.support.design.widget.TextInputLayout>
+		<TextView
+			android:id="@+id/tv_sign_up_here"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toEndOf="@id/tv_sign_up_quest"
+			android:textColor="@drawable/selector_link_text"
+			android:text="@string/txt_sign_up_here"
+			android:textSize="15sp"/>
+	</RelativeLayout>
 
-		<!-- Password text field -->
-		<android.support.design.widget.TextInputLayout
-			android:id="@+id/tiLay_password"
-			android:layout_width="match_parent"
-			android:layout_height="0dp"
-			android:layout_marginBottom="10dp"
-			android:layout_weight="@integer/ll_lg_weight"
-			android:layout_marginStart="20dp"
-			android:layout_marginEnd="20dp">
+	<!-- Login here text -->
+	<RelativeLayout
+		android:id="@+id/rlay_login_content"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:layout_marginBottom="20dp"
+		android:gravity="center"
+		android:paddingTop="5dp">
 
-			<EditText
-				android:id="@+id/et_password"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:hint="@string/hint_password"
-				android:inputType="textPassword" />
-		</android.support.design.widget.TextInputLayout>
+		<TextView
+			android:id="@+id/tv_login_quest"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/txt_yes_account"
+			android:textSize="15sp"
+			android:visibility="invisible"/>
 
-
-		<FrameLayout
-			android:id="@+id/fl_login_signup"
-			android:layout_width="match_parent"
-			android:layout_height="0dp"
-			android:layout_weight="@integer/ll_lg_weight"
-			android:layout_margin="2dp"
-			android:background="@color/colorLightBg">
-
-			<!-- Login button -->
-			<Button
-				android:id="@+id/btn_login"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:layout_marginStart="20dp"
-				android:layout_marginEnd="20dp"
-				android:background="@drawable/anim_button_ripple"
-				android:text="@string/login"
-				android:textColor="@drawable/selector_btn_text_default"/>
-
-			<!-- Sign up button -->
-			<Button
-				android:id="@+id/btn_sign_up"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:layout_marginStart="20dp"
-				android:layout_marginEnd="20dp"
-				android:background="@drawable/anim_button_ripple"
-				android:text="@string/sign_up"
-				android:textColor="@drawable/selector_btn_text_default"
-				android:visibility="invisible"/>
-		</FrameLayout>
-
-		<FrameLayout
-			android:id="@+id/fl_tv_login_signup"
-			android:layout_width="match_parent"
-			android:layout_height="0dp"
-			android:layout_weight="@integer/ll_sm_weight"
-			android:layout_margin="2dp"
-			android:background="@color/colorLightBg">
-
-			<!-- Sign up here text -->
-			<RelativeLayout
-				android:id="@+id/rlay_sign_up_content"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:gravity="center"
-				android:layout_margin="1dp">
-
-				<TextView
-					android:id="@+id/tv_sign_up_quest"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/txt_no_account"
-					android:textColor="@color/colorBg"
-					android:textSize="15sp"/>
-
-				<TextView
-					android:id="@+id/tv_sign_up_here"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_toEndOf="@id/tv_sign_up_quest"
-					android:textColor="@drawable/selector_link_text"
-					android:text="@string/txt_sign_up_here"
-					android:textSize="15sp"/>
-			</RelativeLayout>
-
-			<!-- Login here text -->
-			<RelativeLayout
-				android:id="@+id/rlay_login_content"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:gravity="center"
-				android:layout_margin="1dp">
-
-				<TextView
-					android:id="@+id/tv_login_quest"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="@string/txt_yes_account"
-					android:textColor="@color/colorBg"
-					android:textSize="15sp"
-					android:visibility="invisible"/>
-
-				<TextView
-					android:id="@+id/tv_login_here"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_toEndOf="@id/tv_login_quest"
-					android:textColor="@drawable/selector_link_text"
-					android:text="@string/txt_login_here"
-					android:textSize="15sp"
-					android:visibility="invisible"/>
-			</RelativeLayout>
-		</FrameLayout>
-	</LinearLayout>
-
-	<!--<ProgressBar-->
-			<!--android:id="@+id/progress_bar"-->
-			<!--android:layout_height="match_parent"-->
-			<!--android:layout_width="match_parent"-->
-			<!--android:padding="100dp"-->
-			<!--android:visibility="invisible"-->
-			<!--style="@android:style/Widget.Holo.Light.ProgressBar.Large"/>-->
+		<TextView
+			android:id="@+id/tv_login_here"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_toEndOf="@id/tv_login_quest"
+			android:textColor="@drawable/selector_link_text"
+			android:text="@string/txt_login_here"
+			android:textSize="15sp"
+			android:visibility="invisible"/>
+	</RelativeLayout>
 </RelativeLayout>

@@ -15,11 +15,8 @@ import android.view.ViewAnimationUtils;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;;
+import android.widget.*;
+;
 import ca.judacribz.gainzassist.activities.main.Main;
 import com.facebook.*;
 import com.facebook.login.LoginManager;
@@ -48,8 +45,9 @@ import static ca.judacribz.gainzassist.util.firebase.Database.setUserInfo;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 
-public class Login extends AppCompatActivity implements FacebookCallback<LoginResult>,
-                                                        FirebaseAuth.AuthStateListener {
+public class Login extends AppCompatActivity implements
+        FacebookCallback<LoginResult>,
+        FirebaseAuth.AuthStateListener {
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final int
@@ -94,6 +92,10 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
 
     @BindView(R.id.btn_google_sign_in) SignInButton btnGoogle;
     @BindView(R.id.btn_facebook_sign_in) LoginButton btnFacebook;
+//    @BindView(R.id.ibtn_facebook) ImageButton ibtnFacebook;
+//    @BindView(R.id.ibtn_google) ImageButton ibtnGoogle;
+
+
     @BindView(R.id.btn_login) Button btnLogin;
     @BindView(R.id.btn_sign_up) Button btnSignUp;
     // --------------------------------------------------------------------------------------------
@@ -102,10 +104,8 @@ public class Login extends AppCompatActivity implements FacebookCallback<LoginRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setInitView(this, R.layout.activity_login, R.string.app_name,  false);
-
+        setInitView(this, R.layout.activity_login, null,  false);
         progressHandler.setProgress(this, "Authenticating", blurLayout);
-
 
         // Setup main images
         setupSignInMethods();

@@ -49,7 +49,9 @@ public class UI {
     public static void setInitView(Activity act, int layoutId, String title, boolean setBackArrow) {
         act.setContentView(layoutId);
         ButterKnife.bind(act);
-        setToolbar((AppCompatActivity) act, title, setBackArrow);
+        if (title != null) {
+            setToolbar((AppCompatActivity) act, title, setBackArrow);
+        }
     }
 
     /* Exits app and goes to home screen if back pressed twice from this screen */
