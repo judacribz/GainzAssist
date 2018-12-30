@@ -99,8 +99,7 @@
 		android:layout_below="@id/flay_facebook_login"
 		android:layout_above="@id/tiLay_email"
 		android:layout_centerHorizontal="true"
-		android:contentDescription="@string/cd_login_img"
-		android:tint="@color/colorText"/>
+		android:contentDescription="@string/cd_login_img"/>
 
 	<!-- Image for sign up -->
 	<ImageView
@@ -112,14 +111,13 @@
 		android:layout_centerHorizontal="true"
 		android:paddingTop="5dp"
 		android:contentDescription="@string/cd_sign_up_img"
-		android:tint="@color/colorBg"
 		android:visibility="invisible"/>
 
 	<!-- Email text field -->
 	<android.support.design.widget.TextInputLayout
 		android:id="@+id/tiLay_email"
 		android:layout_width="275dp"
-		android:layout_height="70dp"
+		android:layout_height="65dp"
 		android:layout_alignEnd="@id/tiLay_email"
 		android:layout_alignStart="@id/tiLay_email"
 		android:layout_above="@id/tiLay_password"
@@ -139,7 +137,7 @@
 	<android.support.design.widget.TextInputLayout
 		android:id="@+id/tiLay_password"
 		android:layout_width="275dp"
-		android:layout_height="70dp"
+		android:layout_height="65dp"
 		android:layout_alignEnd="@id/tiLay_email"
 		android:layout_alignStart="@id/tiLay_email"
 		android:layout_above="@id/btn_login"
@@ -161,7 +159,7 @@
 	<Button
 		android:id="@+id/btn_login"
 		android:layout_width="275dp"
-		android:layout_height="70dp"
+		android:layout_height="50dp"
 		android:layout_above="@id/rlay_login_content"
 		android:layout_alignEnd="@id/tiLay_email"
 		android:layout_alignStart="@id/tiLay_email"
@@ -172,7 +170,7 @@
 	<Button
 		android:id="@+id/btn_sign_up"
 		android:layout_width="275dp"
-		android:layout_height="70dp"
+		android:layout_height="50dp"
 		android:layout_above="@id/rlay_login_content"
 		android:layout_alignEnd="@id/tiLay_email"
 		android:layout_alignStart="@id/tiLay_email"
@@ -186,7 +184,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
-		android:layout_marginBottom="20dp"
 		android:gravity="center"
 		android:paddingTop="5dp">
 
@@ -195,7 +192,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/txt_no_account"
-			android:textSize="15sp"/>
+			android:textColor="#e3d4d4d4"
+			android:textSize="18sp"/>
 
 		<TextView
 			android:id="@+id/tv_sign_up_here"
@@ -204,7 +202,7 @@
 			android:layout_toEndOf="@id/tv_sign_up_quest"
 			android:textColor="@drawable/selector_link_text"
 			android:text="@string/txt_sign_up_here"
-			android:textSize="15sp"/>
+			android:textSize="18sp"/>
 	</RelativeLayout>
 
 	<!-- Login here text -->
@@ -213,7 +211,6 @@
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
-		android:layout_marginBottom="20dp"
 		android:gravity="center"
 		android:paddingTop="5dp">
 
@@ -222,7 +219,8 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="@string/txt_yes_account"
-			android:textSize="15sp"
+			android:textSize="18sp"
+			android:textColor="#e3d4d4d4"
 			android:visibility="invisible"/>
 
 		<TextView
@@ -232,7 +230,7 @@
 			android:layout_toEndOf="@id/tv_login_quest"
 			android:textColor="@drawable/selector_link_text"
 			android:text="@string/txt_login_here"
-			android:textSize="15sp"
+			android:textSize="18sp"
 			android:visibility="invisible"/>
 	</RelativeLayout>
 </RelativeLayout>

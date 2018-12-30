@@ -4,7 +4,7 @@
 
     <item
         android:state_pressed="true"
-        android:color="@color/colorTitle"/>
-    <item
         android:color="@color/colorLink"/>
+    <item
+        android:color="#e3d4d4d4"/>
 </selector>
