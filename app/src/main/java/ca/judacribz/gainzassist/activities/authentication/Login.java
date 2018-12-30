@@ -92,8 +92,8 @@ public class Login extends AppCompatActivity implements
 
     @BindView(R.id.btn_google_sign_in) SignInButton btnGoogle;
     @BindView(R.id.btn_facebook_sign_in) LoginButton btnFacebook;
-//    @BindView(R.id.ibtn_facebook) ImageButton ibtnFacebook;
-//    @BindView(R.id.ibtn_google) ImageButton ibtnGoogle;
+    @BindView(R.id.ibtn_facebook) ImageButton ibtnFacebook;
+    @BindView(R.id.ibtn_google) ImageButton ibtnGoogle;
 
 
     @BindView(R.id.btn_login) Button btnLogin;
@@ -302,10 +302,15 @@ public class Login extends AppCompatActivity implements
     }
 
 
-    @OnClick(R.id.btn_google_sign_in)
+    @OnClick({R.id.btn_google_sign_in, R.id.ibtn_google})
     public void googleLogin() {
         Intent signInIntent = signInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @OnClick(R.id.ibtn_facebook)
+    public void facebookLogin() {
+        btnFacebook.performClick();
     }
 
     @OnClick(R.id.btn_login)

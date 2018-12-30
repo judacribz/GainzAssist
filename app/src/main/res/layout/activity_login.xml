@@ -11,53 +11,45 @@
 	<!-- Resources:
 		 https://thenounproject.com/term/muscle/15255/ -->
 
-	<!--<include-->
-		<!--android:id="@+id/toolbar"-->
-		<!--layout="@layout/partial_title_bar" />-->
-
 	<io.alterac.blurkit.BlurLayout
 		android:id="@+id/blurLayout"
-		android:layout_below="@id/toolbar"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:visibility="gone"/>
+		android:visibility="invisible"/>
 
-	<!--<LinearLayout-->
-		<!--android:id="@+id/ll_signin_methods"-->
-		<!--android:layout_width="match_parent"-->
-		<!--android:layout_height="150dp"-->
-		<!--android:layout_below="@id/toolbar"-->
-		<!--android:orientation="horizontal">-->
+	<LinearLayout
+		android:id="@+id/ll_signin_methods"
+		android:layout_width="match_parent"
+		android:layout_height="150dp"
+		android:layout_below="@id/toolbar"
+		android:orientation="horizontal">
 
-		<!--<FrameLayout-->
-			<!--android:layout_width="0dp"-->
-			<!--android:layout_height="match_parent"-->
-			<!--android:layout_weight="@integer/ll_lg_weight">-->
+		<ImageButton
+			android:id="@+id/ibtn_google"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="@integer/ll_lg_weight"
+			android:layout_marginStart="20dp"
+			android:layout_marginEnd="10dp"
+			android:scaleType="fitCenter"
+			android:padding="10dp"
+			android:src="@drawable/common_google_signin_btn_icon_light_normal"
+			android:background="@drawable/common_google_signin_btn_icon_light"/>
 
-			<!--<ImageButton-->
-				<!--android:id="@+id/ibtn_google"-->
-				<!--android:layout_width="match_parent"-->
-				<!--android:layout_height="match_parent"-->
-				<!--android:layout_marginStart="20dp"-->
-				<!--android:layout_marginEnd="10dp"-->
-				<!--android:scaleType="fitCenter"-->
-				<!--android:padding="10dp"-->
-				<!--android:src="@drawable/common_google_signin_btn_icon_light_normal"-->
-				<!--android:background="@drawable/common_google_signin_btn_icon_light"/>-->
-		<!--</FrameLayout>-->
-
-		<!--<ImageButton-->
-			<!--android:id="@+id/ibtn_facebook"-->
-			<!--android:layout_width="0dp"-->
-			<!--android:layout_height="match_parent"-->
-			<!--android:layout_weight="@integer/ll_lg_weight"-->
-			<!--android:layout_marginStart="10dp"-->
-			<!--android:layout_marginEnd="20dp"-->
-			<!--android:scaleType="fitCenter"-->
-			<!--android:padding="20dp"-->
-			<!--android:src="@drawable/com_facebook_button_login_logo"-->
-			<!--android:background="@drawable/com_facebook_button_login_background"/>-->
-	<!--</LinearLayout>-->
+		<ImageButton
+			android:id="@+id/ibtn_facebook"
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="@integer/ll_lg_weight"
+			android:layout_marginTop="3dp"
+			android:layout_marginBottom="3dp"
+			android:layout_marginStart="13dp"
+			android:layout_marginEnd="23dp"
+			android:scaleType="fitCenter"
+			android:padding="20dp"
+			android:src="@drawable/com_facebook_button_login_logo"
+			android:background="@drawable/com_facebook_button_login_background"/>
+	</LinearLayout>
 
 	<!-- Google Sign-In Button-->
 	<com.google.android.gms.common.SignInButton
@@ -68,7 +60,8 @@
 		android:layout_alignEnd="@id/tiLay_email"
 		android:layout_alignStart="@id/tiLay_email"
 		android:layout_marginTop="20dp"
-		android:background="@color/colorBg"/>
+		android:background="@color/colorBg"
+		android:visibility="invisible"/>
 
 	<!--Facebook Login Button-->
 	<FrameLayout
@@ -80,7 +73,8 @@
 		android:layout_alignStart="@id/tiLay_email"
 		android:layout_marginTop="20dp"
 		android:layout_marginBottom="20dp"
-		android:background="@color/colorBg">
+		android:background="@color/colorBg"
+		android:visibility="invisible">
 
 		<com.facebook.login.widget.LoginButton
 			android:id="@+id/btn_facebook_sign_in"
@@ -96,7 +90,7 @@
 		android:id="@+id/iv_login_image"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/flay_facebook_login"
+		android:layout_below="@id/ll_signin_methods"
 		android:layout_above="@id/tiLay_email"
 		android:layout_centerHorizontal="true"
 		android:contentDescription="@string/cd_login_img"/>
@@ -106,7 +100,7 @@
 		android:id="@+id/iv_sign_up_image"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_below="@id/flay_facebook_login"
+		android:layout_below="@id/ll_signin_methods"
 		android:layout_above="@id/tiLay_email"
 		android:layout_centerHorizontal="true"
 		android:paddingTop="5dp"
