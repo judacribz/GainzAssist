@@ -6,22 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".activities.how_to_videos.HowToVideos">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/partial_title_bar"/>
+    <FrameLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/part_title_bar"/>
+
+        <com.miguelcatalan.materialsearchview.MaterialSearchView
+            android:id="@+id/msvHowToVids"
+            android:theme="@style/MaterialSearchViewStyle"
+            android:hint="@string/hint_search_exercise_vids"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_video_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/toolbar_container"
         android:background="@android:color/black"/>
 
     <fragment
         android:id="@+id/fmt_youtube"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
+        android:layout_below="@id/toolbar_container"
         android:layout_centerInParent="true"
         android:name="com.google.android.youtube.player.YouTubePlayerSupportFragment"/>
 </RelativeLayout>

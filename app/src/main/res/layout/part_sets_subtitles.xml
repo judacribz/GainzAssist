@@ -3,14 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:background="@color/colorBg">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/tv_blank"
-        android:layout_width="wrap_content"
+        android:layout_width="10dp"
         android:layout_height="70dp"
-        android:background="@color/colorBg"/>
+        android:background="@color/colorLightBg"/>
 
     <TextView
         android:id="@+id/tv_sets"
@@ -22,8 +21,8 @@
         android:layout_marginBottom="2dp"
         android:layout_marginTop="4dp"
         android:padding="10dp"
-        android:text="@string/set_num"
-        android:theme="@style/TextViewStyle"/>
+        android:background="@color/colorLightBg"
+        android:text="@string/set_num"/>
 
     <TextView
         android:id="@+id/tv_reps"
@@ -35,8 +34,7 @@
         android:layout_marginBottom="2dp"
         android:layout_marginTop="2dp"
         android:padding="10dp"
-        android:text="@string/reps"
-        android:theme="@style/TextViewStyle"/>
+        android:text="@string/reps"/>
 
     <TextView
         android:id="@+id/tv_weight"
@@ -48,6 +46,5 @@
         android:layout_marginStart="2dp"
         android:layout_marginTop="2dp"
         android:padding="10dp"
-        android:text="@string/weight_lbs"
-        android:theme="@style/TextViewStyle"/>
+        android:text="@string/weight_lbs"/>
 </RelativeLayout>

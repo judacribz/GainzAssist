@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.how_to_videos;
 
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -8,8 +9,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import butterknife.BindView;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 
@@ -17,15 +21,18 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import com.google.android.youtube.player.YouTubePlayerSupportFragment;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
-import static ca.judacribz.gainzassist.activities.start_workout.fragments.WorkoutScreen.EXTRA_HOW_TO_VID;
+import static ca.judacribz.gainzassist.activities.start_workout.StartWorkout.EXTRA_HOW_TO_VID;
+import static ca.judacribz.gainzassist.util.UI.setInitView;
 import static ca.judacribz.gainzassist.util.UI.setToolbar;
 
-public class HowToVideos extends AppCompatActivity
-        implements SearchVideosTask.YouTubeSearchObserver,
-                   ThumbnailAdapter.VideoClickObserver,
-                   YouTubePlayer.OnInitializedListener,
-                   YouTubePlayer.PlayerStateChangeListener {
+public class HowToVideos extends AppCompatActivity implements
+        MaterialSearchView.OnQueryTextListener,
+        SearchVideosTask.YouTubeSearchObserver,
+       ThumbnailAdapter.VideoClickObserver,
+       YouTubePlayer.OnInitializedListener,
+       YouTubePlayer.PlayerStateChangeListener {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -37,7 +44,7 @@ public class HowToVideos extends AppCompatActivity
                  "part=snippet&" +                                  // search resource
                  "fields=items(id/videoId,snippet/title)&" +        // needed fields
                  "maxResults=10&" +                                 // number of results to show
-                 "q=how%20to%20";                                   // search text
+                 "q=";                                              // search text
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -52,6 +59,9 @@ public class HowToVideos extends AppCompatActivity
     FragmentManager fmtMgr;
     FragmentTransaction fmtTxn;
     String videoId, exerciseName;
+
+
+    @BindView(R.id.msvHowToVids) MaterialSearchView searchView;
     //---------------------------------------------------------------------------------------------
 
     // AppCompatActivity Override
@@ -59,9 +69,8 @@ public class HowToVideos extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_how_to_videos);
         exerciseName = getIntent().getStringExtra(EXTRA_HOW_TO_VID);
-        setToolbar(this, "How To " + exerciseName, true);
+        setInitView(this, R.layout.activity_how_to_videos, "How To " + exerciseName, true);
 
         fmtMgr = getSupportFragmentManager();
 
@@ -70,10 +79,9 @@ public class HowToVideos extends AppCompatActivity
 
         handleFmt(false);
 
-
         task = new SearchVideosTask();
         task.setYouTubeSearchObserver(this);
-        task.execute(URL.concat(exerciseName.replaceAll("\\s+", SEARCH_SPACE_STR))
+        task.execute(URL.concat("how%20to%20" + exerciseName.replaceAll("\\s+", SEARCH_SPACE_STR))
                 .concat("&key=")
                 .concat(getString(R.string.google_api_key)));
 
@@ -86,7 +94,8 @@ public class HowToVideos extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-
+        searchView.setOnQueryTextListener(this);
+        searchView.setVoiceSearch(true);
     }
 
     @Override
@@ -134,6 +143,25 @@ public class HowToVideos extends AppCompatActivity
         }
 
         fmtTxn.commitNow();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu mainMenu) {
+        getMenuInflater().inflate(R.menu.menu_how_to, mainMenu);
+
+        searchView.setMenuItem(mainMenu.findItem(R.id.act_search));
+
+        return super.onCreateOptionsMenu(mainMenu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.act_search:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
@@ -229,4 +257,22 @@ boolean isFullScreen = false;
     public void onError(YouTubePlayer.ErrorReason errorReason) {
     }
     //YouTubePlayer.PlayerStateChangeListener//Override////////////////////////////////////////////
+
+    // MaterialSearchView.OnQueryTextListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onQueryTextChange(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        task = new SearchVideosTask();
+        task.setYouTubeSearchObserver(this);
+        task.execute(URL.concat(query.replaceAll("\\s+", SEARCH_SPACE_STR))
+                .concat("&key=")
+                .concat(getString(R.string.google_api_key)));
+        return false;
+    }
+    //MaterialSearchView.OnQueryTextListener//Override/////////////////////////////////////////////
 }

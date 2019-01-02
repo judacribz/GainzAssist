@@ -3,13 +3,12 @@ package ca.judacribz.gainzassist.activities.start_workout.fragments;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -37,8 +36,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     // Constants
     // --------------------------------------------------------------------------------------------
-    public static final String EXTRA_HOW_TO_VID = "ca.judacribz.gainzassist.EXTRA_HOW_TO_VID";
-
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -47,12 +44,13 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     Bundle bundle;
     EquipmentView equipmentView;
     CountDownTimer countDownTimer;
+
     long currTime;
     CurrWorkout currWorkout = CurrWorkout.getInstance();
-
     ArrayList<Exercise> finExercises;
-
+    float weight;
     // --------------------------------------------------------------------------------------------
+
     // UI Elements
     @BindView(R.id.rl_equip_disp) ViewGroup vgEquipDisp;
     @BindView(R.id.tv_timer) TextView tvTimer;
@@ -61,14 +59,13 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @BindView(R.id.tv_set_info) TextView tvSetInfo;
     @BindView(R.id.tv_ex_info) TextView tvExInfo;
 
-    @BindView(R.id.btn_how_to) Button btnHowTo;
     @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
     @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
+    @BindView(R.id.btn_lock_reps) ImageButton btnLockReps;
+    @BindView(R.id.btn_lock_weight) ImageButton btnLockWeight;
 
     @BindView(R.id.et_curr_reps) EditText etCurrReps;
     @BindView(R.id.et_curr_weight) EditText etCurrWeight;
-//    @BindView(R.id.svExs) StepsView svExs;
-//    @BindView(R.id.svSets) StepsView svSets;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -120,8 +117,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         }
 
         updateUI();
-//        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
-//        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
     }
 
     @Override
@@ -130,28 +125,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         vgEquipDisp.removeView(equipmentView);
         equipmentView = null;
     }
-
-    //    String[] setStrs, exStrs;
-//    void setProgress(StepsView sv, String[] labels, int progLen, int pos) {
-//        if (labels == null) {
-//            labels = new String[progLen];
-//            for (int i = 0; i < progLen; i++) {
-//                labels[i] = String.valueOf(i + 1);
-//            }
-//        } else if(labels.length != progLen) {
-//
-//            labels = new String[progLen];
-//            for (int i = 0; i < progLen; i++) {
-//                labels[i] = String.valueOf(i + 1);
-//            }
-//        }
-//        sv.setLabels(labels)
-//                .setBarColorIndicator(getContext().getResources().getColor(R.color.material_blue_grey_800))
-//                .setProgressColorIndicator(getContext().getResources().getColor(R.color.colorGreen))
-//                .setLabelColorIndicator(getContext().getResources().getColor(R.color.colorGreen))
-//                .setCompletedPosition(pos-1)
-//                .drawView();
-//    }
 
     // ExerciseSet up the custom view (EquipmentView) to display the equipment. View added dynamically
     // to trigger onDraw method
@@ -179,6 +152,22 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
         countDownTimer = getCountDownTimer(timeInMillis);
         countDownTimer.start();
+    }
+
+    @Override
+    public void endOfExercise(boolean isWarmup) {
+        lockReps = false;
+        lockWeight = false;
+        currWorkout.resetLocks();
+
+        if (!isWarmup) {
+            btnLockReps.setVisibility(View.INVISIBLE);
+            btnLockWeight.setVisibility(View.INVISIBLE);
+        } else {
+            changeBtnState(btnLockReps, false);
+            changeBtnState(btnLockWeight, false);
+        }
+
     }
 
     /* Creates and returns a new CountDownTimer with the rest time to count down from. Has the
@@ -229,9 +218,11 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         else
             reps = MIN_REPS;
 
+        currWorkout.setCurrReps(reps, false);
+
         if (currWorkout.isMinReps()) {
             btnDecReps.setEnabled(false);
-            btnDecReps.setVisibility(View.GONE);
+            btnDecReps.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -256,9 +247,11 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         } else
             weight = currWorkout.getCurrMinWeight();
 
+        currWorkout.setWeight(weight);
+
         if (currWorkout.isMinWeight() || weight <= currWorkout.getCurrMinWeight()) {
             btnDecWeight.setEnabled(false);
-            btnDecWeight.setVisibility(View.GONE);
+            btnDecWeight.setVisibility(View.INVISIBLE);
         }
     }
     // =TextWatcher=Handling========================================================================
@@ -288,13 +281,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     // Click Handling
     // =============================================================================================
-    @OnClick(R.id.btn_how_to)
-    public void startWorkoutsList() {
-        Intent intent = new Intent(act, HowToVideos.class);
-        intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.getCurrExName());
-        startActivity(intent);
-    }
-
     @OnClick(R.id.tv_timer)
     public void changeTimerState() {
         if (currTime / 1000 != 0) {
@@ -368,8 +354,11 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
             setType = "Main";
         }
 
-        setReps();
-        setWeight();
+        if (!lockReps)
+            setReps();
+
+        if (!lockWeight)
+            setWeight();
 
         tvExInfo.setText(String.format(
                 "%s %s/%s",
@@ -384,18 +373,13 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 currWorkout.getCurrNumSets())
         );
 
-        Logger.d(currWorkout.getCurrNumSets());
-//        setProgress(svExs, exStrs, currWorkout.getCurrNumExs(), currWorkout.getCurrExNum());
-//        setProgress(svSets, setStrs, currWorkout.getCurrNumSets(), currWorkout.getCurrSetNum());
-
-
         tvExerciseTitle.setText(currWorkout.getCurrExName());
     }
 
     private void setReps() {
         etCurrReps.setText(String.valueOf(currWorkout.getCurrReps()));
     }
-    float weight;
+
     public void setWeight() {
         weight = currWorkout.getCurrWeight();
         etCurrWeight.setText(String.valueOf(weight));
@@ -408,5 +392,28 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         });
     }
 
+
+    boolean lockReps = false, lockWeight = false;
+
+    @OnClick({R.id.btn_lock_reps, R.id.btn_lock_weight})
+    public void lockWeight(ImageButton iBtn){
+        switch (iBtn.getId()) {
+            case R.id.btn_lock_reps: ;
+                changeBtnState(iBtn, lockReps = !lockReps);
+                currWorkout.toggleReps();
+                break;
+            case R.id.btn_lock_weight:
+                changeBtnState(iBtn, lockWeight = !lockWeight);
+                currWorkout.toggleWeight();
+                break;
+        }
+    }
+
+    public void changeBtnState(ImageButton iBtn, boolean lock) {
+        if (iBtn.getVisibility() == View.INVISIBLE) {
+            iBtn.setVisibility(View.VISIBLE);
+        }
+        iBtn.setImageResource((lock) ? R.drawable.ic_lock : R.drawable.ic_unlock);
+    }
     //=Click=Handling===============================================================================
 }

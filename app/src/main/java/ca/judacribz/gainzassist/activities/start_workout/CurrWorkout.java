@@ -2,6 +2,7 @@ package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.models.Exercise;
@@ -64,6 +65,7 @@ public class CurrWorkout {
 
     public interface TimerListener {
         void startTimer(long timeInMillis);
+        void endOfExercise(boolean isWarmup);
     }
     public void setTimerListener(TimerListener timerListener) {
         this.timerListener = timerListener;
@@ -239,7 +241,7 @@ public class CurrWorkout {
 
         reps = reps/2 + 1;
         do {
-            if (weightInc < weightChange) {
+            if (weightInc <= (weightChange * 2)) {
                 return exerciseSets;
             }
 
@@ -247,10 +249,10 @@ public class CurrWorkout {
                 exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
                 newWeight += weightInc;
 
-                reps /=2;
+                reps = Math.max(reps/2, 1);
             } else if (newWeight > 0.91f * weight) {
                 newWeight -= weightInc;
-                weightInc -= weightChange;
+                weightInc /= 2;
                 newWeight += weightInc;
             }
         } while (true);
@@ -327,6 +329,8 @@ public class CurrWorkout {
 
         // End of sets for an exercise
         if (atEndOfSets()) {
+            timerListener.endOfExercise(getIsWarmup());
+
             this.set_i = 0;
             this.ex_i++;
 
@@ -386,12 +390,27 @@ public class CurrWorkout {
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
     }
 
+    private boolean lockReps = false, lockWeight = false;
+    public void toggleReps() {
+        lockReps = !lockReps;
+    }
+
+    public void toggleWeight() {
+        lockWeight = !lockWeight;
+    }
+
+    public void resetLocks() {
+        lockReps = false;
+        lockWeight = false;
+    }
+
     private void setCurrExerciseSet(ExerciseSet exerciseSet) {
         this.currExerciseSet = exerciseSet;
 
         setCurrReps(this.currExerciseSet.getReps(), true);
 
-        this.currWeight = this.currExerciseSet.getWeight();
+        if (!lockWeight)
+            this.currWeight = this.currExerciseSet.getWeight();
     }
 
     public ArrayList<Exercise> getWarmups() {
@@ -443,7 +462,8 @@ public class CurrWorkout {
     }
 
     public void setCurrReps(int reps, boolean setTimer) {
-        this.currReps = reps;
+        if (!lockReps)
+            this.currReps = reps;
 
         if (setTimer) {
             if (this.currExercise.getSetsType() == MAIN_SET) {

@@ -25,12 +25,12 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     final public static String EXTRA_EX_INDEX =
             "ca.judacribz.gainzassist.activities.start_workout.EXTRA_EX_INDEX";
 
-    final private static Fragment[] FMTS = new Fragment[] {
+    final private Fragment[] FMTS = new Fragment[] {
             WarmupsList.getInstance(),
             WorkoutScreen.getInstance(),
             ExercisesList.getInstance()
     };
-    final private static Fragment[] FMTS_NO_WARMUPS = new Fragment[] {
+    final private Fragment[] FMTS_NO_WARMUPS = new Fragment[] {
             WorkoutScreen.getInstance(),
             ExercisesList.getInstance()
     };

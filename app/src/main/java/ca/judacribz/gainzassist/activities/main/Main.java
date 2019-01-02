@@ -114,7 +114,6 @@ public class Main extends AppCompatActivity implements
 
         searchView.setOnQueryTextListener(this);
         searchView.setVoiceSearch(true);
-        searchView.showVoice(true);
     }
 
     private void setupPager() {
@@ -134,8 +133,8 @@ public class Main extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
 
-        searchView.setOnQueryTextListener(this);
-        searchView.setVoiceSearch(true);
+        searchView.setOnQueryTextListener(null);
+        searchView.setVoiceSearch(false);
 
         viewPager.removeOnPageChangeListener(tabLayoutOnPageChangeListener);
         tabLayout.removeOnTabSelectedListener(viewPagerOnTabSelectedListener);
@@ -176,7 +175,7 @@ public class Main extends AppCompatActivity implements
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // TextWatcher Override
+    // MaterialSearchView.OnQueryTextListener Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean onQueryTextChange(String newText) {
@@ -189,7 +188,7 @@ public class Main extends AppCompatActivity implements
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
-    //TextWatcher//Override////////////////////////////////////////////////////////////////////////
+    //MaterialSearchView.OnQueryTextListener//Override/////////////////////////////////////////////
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

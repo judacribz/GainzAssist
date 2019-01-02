@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorBg">
+    android:background="@color/colorLightBg">
 
     <TextView
         android:id="@+id/tv_sets"
@@ -14,8 +14,7 @@
         android:layout_alignEnd="@id/et_weight"
         android:layout_marginBottom="2dp"
         android:layout_marginTop="4dp"
-        android:textAlignment="center"
-        android:theme="@style/TextViewStyle"/>
+        android:textAlignment="center"/>
 
     <EditText
         android:id="@+id/et_num_reps"

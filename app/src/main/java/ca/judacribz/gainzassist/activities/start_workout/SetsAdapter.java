@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.ExerciseSet;
+
+import static ca.judacribz.gainzassist.util.Calculations.dpToPix;
 
 
 public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> {
@@ -32,7 +35,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
         View view = inflater.inflate(R.layout.part_sets_input, parent, false);
-        return new SetsViewHolder(view);
+        return new SetsViewHolder(parent.getContext(), view);
     }
 
     @Override
@@ -61,11 +64,12 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
         private TextView tvSetNum;
         private EditText etReps, etWeight;
+        private Context context;
 
         // ViewHolder Constructor
-        SetsViewHolder(View itemView) {
+        SetsViewHolder(Context context, View itemView) {
             super(itemView);
-
+            this.context = context;
 
             tvSetNum = itemView.findViewById(R.id.tv_sets);
             etReps = itemView.findViewById(R.id.et_num_reps);
@@ -76,7 +80,9 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
         void bind(int setNumber, int reps, float weight) {
             tvSetNum.setText(String.valueOf(setNumber));
             etReps.setText(String.valueOf(reps));
+            etReps.setHeight((int) dpToPix(context, 50f)) ;
             etWeight.setText(String.valueOf(weight));
+            etWeight.setHeight((int) dpToPix(context, 50f)) ;
         }
     }
 }

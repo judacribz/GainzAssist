@@ -11,11 +11,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
+import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
 import ca.judacribz.gainzassist.models.*;
 import java.util.ArrayList;
@@ -30,6 +33,8 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
 
     // Constants
     // --------------------------------------------------------------------------------------------
+    public static final String EXTRA_HOW_TO_VID =
+            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_HOW_TO_VID";
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -58,8 +63,6 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         workout = Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
         exercises = workout.getExercises();
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
-        setTheme(R.style.WorkoutTheme);
-
     }
 
 
@@ -81,7 +84,6 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
 
             removeIncompleteSessionPref(this, workout.getName());
         } else {
-
             currWorkout.setCurrWorkout(workout);
         }
     }
@@ -109,7 +111,6 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     public void onBackPressed() {
         super.onBackPressed();
         handleLeavingScreen();
-//        addIncompleteSessionPref(this, workout.getName(), currWorkout.getExInd());
     }
 
     public void handleLeavingScreen() {
@@ -123,6 +124,27 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         }
         addIncompleteWorkoutPref(this, workout.getName());
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu mainMenu) {
+        getMenuInflater().inflate(R.menu.menu_start_workout, mainMenu);
+
+        return super.onCreateOptionsMenu(mainMenu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.act_how_to:
+                Intent intent = new Intent(this, HowToVideos.class);
+                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.getCurrExName());
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
@@ -144,26 +166,11 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
             @Override
             public void onTabSelected(Tab tab) {
                 super.onTabSelected(tab);
-//                icon = tab.getIcon();
-//                if (icon != null) {
-//                    icon.setColorFilter(
-//                            ContextCompat.getColor(getApplicationContext(), R.color.colorBg),
-//                            PorterDuff.Mode.SRC_IN
-//                    );
-//                }
             }
 
             @Override
             public void onTabUnselected(Tab tab) {
                 super.onTabUnselected(tab);
-
-//                icon = tab.getIcon();
-//                if (icon != null) {
-//                    icon.setColorFilter(
-//                            ContextCompat.getColor(getApplicationContext(), R.color.colorGreen),
-//                            PorterDuff.Mode.SRC_IN
-//                    );
-//                }
             }
         });
 
@@ -177,7 +184,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
                 warmups
         ));
         viewPager.setCurrentItem(tabLayout.getTabCount() - 2);
-        viewPager.setOffscreenPageLimit(3);
+//        viewPager.setOffscreenPageLimit(3);
     }
     //CurrWorkout.DataListener//Override//////////////////////////////////////////////////////////
 
@@ -191,7 +198,9 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
                             Exercise exercise,
                             LinearLayout llSubtitle,
                             LinearLayout llSets) {
+
         layInflater = getLayoutInflater();
+
         // Add subtitle layout which includes "ExerciseSet #", "Reps" and "Weight"
         setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
         llSubtitle.addView(setsView, 0);
@@ -209,9 +218,11 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         // adapter
         setList = (RecyclerView) setsView.findViewById(R.id.rv_exercise_sets);
         setList.setHasFixedSize(true);
-        setList.setLayoutManager(new LinearLayoutManager(this,
+        setList.setLayoutManager(new LinearLayoutManager(
+                this,
                 LinearLayoutManager.HORIZONTAL,
-                false));
+                false
+        ));
 
         setList.setAdapter(new SetsAdapter(exercise.getSetsList()));
     }

@@ -14,7 +14,7 @@
 
         <include
             android:id="@+id/toolbar"
-            layout="@layout/partial_title_bar"/>
+            layout="@layout/part_title_bar"/>
 
         <com.miguelcatalan.materialsearchview.MaterialSearchView
             android:id="@+id/msvWorkouts"

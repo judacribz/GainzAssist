@@ -14,6 +14,7 @@ import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.models.Exercise;
+import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -76,7 +77,6 @@ View view;
         if (bundle != null) {
             ArrayList<Exercise> exercises = Parcels.unwrap(bundle.getParcelable(EXTRA_MAIN_EXERCISES));
             if (exercises != null) {
-
                 for (int i = exercises.size()-1; i >= 0; --i) {
 
                     act.displaySets(

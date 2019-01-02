@@ -38,6 +38,9 @@
 	<string name="hint_search_workouts">
 		<i>Search Workouts</i>
 	</string>
+	<string name="hint_search_exercise_vids">
+		<i>Search Youtube</i>
+	</string>
 	<string name="hint_workout_name">
 		<i>Workout Name</i>
 	</string>
@@ -121,4 +124,7 @@
 	<string name="resume">Resume</string>
 	<string name="workout_list">Workout List</string>
 	<string name="incomplete_workouts">Incomplete Workouts</string>
+	<string name="locked">Locked</string>
+	<string name="unlocked">Unlocked</string>
+	<string name="lbs">lbs</string>
 </resources>

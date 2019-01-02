@@ -19,28 +19,11 @@
 		android:layout_margin="2dp"
         android:layout_weight="5">
 
-        <!-- How to do exercise button-->
-        <Button
-            android:id="@+id/btn_how_to"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-			android:layout_margin="2.2dp"
-            android:gravity="center"
-            android:padding="1dp"
-            android:text="@string/how_to"
-            android:textSize="20sp"/>
-
         <!-- Exercise name -->
         <me.grantland.widget.AutofitTextView
             android:id="@+id/tv_exercise_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/btn_how_to"
-            android:layout_alignTop="@id/btn_how_to"
-            android:layout_alignParentEnd="true"
-            android:layout_toEndOf="@id/btn_how_to"
+            android:layout_width="match_parent"
+			android:layout_height="50dp"
 			android:background="@color/colorLightBg"
 			android:layout_margin="1dp"
             android:gravity="center"
@@ -49,24 +32,6 @@
 			autofit:minTextSize="16sp"
             android:fontFamily="@font/fnl"/>
 
-		<!--<com.anton46.stepsview.StepsView-->
-			<!--android:id="@+id/svExs"-->
-			<!--android:layout_width="250dp"-->
-			<!--android:layout_height="50dp"-->
-			<!--android:background="@color/colorLightBg"-->
-			<!--android:layout_below="@id/tv_exercise_title"-->
-			<!--android:layout_alignParentEnd="true"/>-->
-
-		<!--<com.anton46.stepsview.StepsView-->
-			<!--android:id="@+id/svSets"-->
-			<!--android:layout_width="250dp"-->
-			<!--android:layout_height="50dp"-->
-			<!--android:background="@color/colorLightBg"-->
-			<!--android:layout_below="@id/tv_exercise_title"-->
-			<!--android:layout_alignParentEnd="true"-->
-			<!--android:layout_alignParentBottom="true"/>-->
-
-
         <!-- Exercise/ExerciseSet number -->
         <LinearLayout
             android:id="@+id/ll_info"
@@ -74,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/btn_how_to"
+            android:layout_below="@id/tv_exercise_title"
 			android:background="@color/colorLightBg"
             android:orientation="vertical"
             android:paddingBottom="5dp">
@@ -134,67 +99,137 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-		android:background="@color/colorLightBg"
 		android:layout_margin="2dp"
         android:layout_weight="5"
-        android:gravity="center">
+		android:paddingBottom="5dp"
+		android:background="@color/colorLightBg">
 
-        <EditText
-            android:id="@+id/et_curr_reps"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="10dp"
-            android:inputType="number"
-            android:minWidth="100dp"
-            android:selectAllOnFocus="true"/>
+		<TextView
+			android:id="@+id/tv_center"
+			android:layout_width="wrap_content"
+			android:layout_height="50dp"
+			android:layout_centerHorizontal="true"
+			android:layout_alignParentTop="true"/>
+
+		<me.grantland.widget.AutofitLayout
+			android:id="@+id/afl_curr_reps"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+		  	android:layout_margin="10dp"
+		  	android:layout_above="@id/tv_reps_et"
+		  	android:layout_alignParentStart="true"
+		  	android:layout_alignParentTop="true"
+		  	android:layout_toStartOf="@id/tv_center">
+
+			<EditText
+				android:id="@+id/et_curr_reps"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:inputType="number"
+				android:maxLength="4"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:textSize="45sp"/>
+		</me.grantland.widget.AutofitLayout>
 
         <ImageButton
             android:id="@+id/btn_dec_reps"
             android:layout_width="50dp"
-            android:layout_height="100dp"
-            android:layout_alignTop="@id/et_curr_reps"
-            android:layout_alignBottom="@id/et_curr_reps"
-            android:layout_toStartOf="@id/et_curr_reps"
+            android:layout_height="50dp"
+			android:layout_alignStart="@id/afl_curr_reps"
+			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
             android:id="@+id/btn_inc_reps"
             android:layout_width="50dp"
-            android:layout_height="100dp"
-            android:layout_alignTop="@id/et_curr_reps"
-            android:layout_alignBottom="@id/et_curr_reps"
-            android:layout_toEndOf="@id/et_curr_reps"
+            android:layout_height="50dp"
+			android:layout_alignEnd="@id/afl_curr_reps"
+			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_plus"/>
 
-        <EditText
-            android:id="@+id/et_curr_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_below="@id/et_curr_reps"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="10dp"
-            android:inputType="number"
-            android:minWidth="100dp"
-            android:selectAllOnFocus="true"/>
+		<ImageButton
+			android:id="@+id/btn_lock_reps"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_marginStart="20dp"
+			android:layout_marginEnd="20dp"
+			android:layout_toEndOf="@id/btn_dec_reps"
+			android:layout_toStartOf="@id/btn_inc_reps"
+			android:padding="3dp"
+			android:background="@color/colorLightAccent"
+			android:src="@drawable/ic_unlock"/>
+
+		<TextView
+			android:id="@+id/tv_reps_et"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_above="@id/btn_lock_reps"
+			android:layout_alignStart="@id/afl_curr_reps"
+			android:layout_alignEnd="@id/afl_curr_reps"
+			android:gravity="center"
+			android:text="@string/reps"/>
+
+		<me.grantland.widget.AutofitLayout
+			android:id="@+id/afl_curr_weight"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dp"
+			android:layout_above="@id/tv_weight_et"
+			android:layout_alignParentEnd="true"
+			android:layout_alignParentTop="true"
+			android:layout_toEndOf="@id/tv_center">
+
+			<EditText
+				android:id="@+id/et_curr_weight"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:inputType="numberDecimal"
+				android:maxLength="7"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:textSize="45sp"/>
+		</me.grantland.widget.AutofitLayout>
 
         <ImageButton
             android:id="@+id/btn_dec_weight"
             android:layout_width="50dp"
-            android:layout_height="100dp"
-            android:layout_alignTop="@id/et_curr_weight"
-            android:layout_alignBottom="@id/et_curr_weight"
-            android:layout_toStartOf="@id/et_curr_weight"
+			android:layout_height="50dp"
+			android:layout_alignStart="@id/afl_curr_weight"
+			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_minus"/>
 
         <ImageButton
             android:id="@+id/btn_inc_weight"
             android:layout_width="50dp"
-            android:layout_height="100dp"
-            android:layout_alignTop="@id/et_curr_weight"
-            android:layout_alignBottom="@id/et_curr_weight"
-            android:layout_toEndOf="@id/et_curr_weight"
+			android:layout_height="50dp"
+			android:layout_alignEnd="@id/afl_curr_weight"
+			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_plus"/>
+
+		<ImageButton
+			android:id="@+id/btn_lock_weight"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_marginStart="20dp"
+			android:layout_marginEnd="20dp"
+			android:layout_toEndOf="@id/btn_dec_weight"
+			android:layout_toStartOf="@id/btn_inc_weight"
+			android:padding="2dp"
+			android:background="@color/colorLightAccent"
+			android:src="@drawable/ic_unlock"/>
+
+		<TextView
+			android:id="@+id/tv_weight_et"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_above="@id/btn_lock_weight"
+			android:layout_alignStart="@id/afl_curr_weight"
+			android:layout_alignEnd="@id/afl_curr_weight"
+			android:gravity="center"
+			android:text="@string/weight_lbs"/>
     </RelativeLayout>
 
     <!-- Exercise currSet control -->
