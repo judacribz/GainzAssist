@@ -216,7 +216,7 @@ public class CurrWorkout {
             while (newWeight <= 0.85f * weight) {
                 if (newWeight >= 0.75f * weight) {
                     reps = ex.getReps()/4 + 1;
-                }else if (newWeight > 0.65f * weight) {
+                } else if (newWeight > 0.65f * weight) {
                     reps = ex.getReps()/2 + 1;
                 }
 
@@ -329,8 +329,6 @@ public class CurrWorkout {
 
         // End of sets for an exercise
         if (atEndOfSets()) {
-            timerListener.endOfExercise(getIsWarmup());
-
             this.set_i = 0;
             this.ex_i++;
 
@@ -388,6 +386,9 @@ public class CurrWorkout {
         this.currMinWeight = exercise.getMinWeight();
         this.currWeightChange = exercise.getWeightChange();
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
+
+        if (timerListener != null)
+            timerListener.endOfExercise(getIsWarmup());
     }
 
     private boolean lockReps = false, lockWeight = false;

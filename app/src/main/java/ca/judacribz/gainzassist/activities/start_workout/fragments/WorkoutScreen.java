@@ -103,20 +103,28 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
-
-        currWorkout.setTimerListener(this);
-
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        currWorkout.setTimerListener(this);
+
         if (equipmentView == null) {
             setupEquipView();
         }
 
         updateUI();
+
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        currWorkout.setTimerListener(null);
     }
 
     @Override
@@ -160,7 +168,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         lockWeight = false;
         currWorkout.resetLocks();
 
-        if (!isWarmup) {
+        if (isWarmup) {
             btnLockReps.setVisibility(View.INVISIBLE);
             btnLockWeight.setVisibility(View.INVISIBLE);
         } else {
@@ -350,6 +358,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 countDownTimer = null;
             }
             setType = "Warmup";
+
+            if (btnLockWeight.getVisibility() == View.VISIBLE)
+                endOfExercise(true);
         } else {
             setType = "Main";
         }
@@ -396,7 +407,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     boolean lockReps = false, lockWeight = false;
 
     @OnClick({R.id.btn_lock_reps, R.id.btn_lock_weight})
-    public void lockWeight(ImageButton iBtn){
+    public void lockInfo(ImageButton iBtn){
         switch (iBtn.getId()) {
             case R.id.btn_lock_reps: ;
                 changeBtnState(iBtn, lockReps = !lockReps);
