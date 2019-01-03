@@ -90,7 +90,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
 
     @Override
     public boolean onSupportNavigateUp() {
-        finish();
+        onBackPressed();
         return super.onSupportNavigateUp();
     }
 

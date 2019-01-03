@@ -6,17 +6,17 @@
 	android:layout_height="match_parent"
 	android:padding="15dp"
 	android:background="@drawable/login_bg"
-	android:theme="@style/WorkoutTheme2"
+	android:theme="@style/LoginTheme"
 	tools:context=".activities.authentication.Login">
 
 	<!-- Resources:
 		 https://thenounproject.com/term/muscle/15255/ -->
 
+
 	<io.alterac.blurkit.BlurLayout
 		android:id="@+id/blurLayout"
 		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:visibility="invisible"/>
+		android:layout_height="match_parent"/>
 
 	<RelativeLayout
 		android:id="@+id/ll_signin_methods"
@@ -231,4 +231,5 @@
 			android:textSize="18sp"
 			android:visibility="invisible"/>
 	</RelativeLayout>
+
 </RelativeLayout>

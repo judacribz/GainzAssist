@@ -98,7 +98,7 @@ public class UI {
         // ExerciseSet the title for the part_title_bar
         ((TextView) act.findViewById(R.id.title)).setText(title);
 
-        act.setTheme(R.style.WorkoutTheme2);
+        act.setTheme(R.style.LoginTheme);
 
         return title;
     }
@@ -243,7 +243,7 @@ public class UI {
                 this.progress.show();
                 if (this.blurLayout != null) {
                     blurLayout.setVisibility(View.VISIBLE);
-                    blurLayout.setTop(1);
+                    blurLayout.setTop(0);
                     blurLayout.startBlur();
                 }
 
@@ -252,7 +252,7 @@ public class UI {
                     public void run() {
                         try {
                             while (progress.isShowing()) {
-                                Thread.sleep(500);
+                                Thread.sleep(10);
                                 progress.setMessage(msg.substring(0, msg.length() - 1 - (++count % 3)));
                                 blurLayout.pauseBlur();
                             }

@@ -11,6 +11,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        BlurKit.init(this);
         // debugging
         Logger.addLogAdapter(new AndroidLogAdapter());
 
@@ -18,7 +19,6 @@ public class App extends Application {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
 
-        BlurKit.init(this);
     }
 
 }

@@ -245,7 +245,7 @@ public class CurrWorkout {
                 return exerciseSets;
             }
 
-            if (newWeight < 0.91f * weight && newWeight > 0.85f * weight) {
+            if (newWeight < 0.91f * weight) {
                 exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
                 newWeight += weightInc;
 

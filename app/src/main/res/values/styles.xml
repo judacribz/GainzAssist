@@ -1,8 +1,5 @@
 <resources>
-
-    <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -30,10 +27,10 @@
         <item name="android:background">@color/colorDarkGreen</item>
     </style>
 
-    <style name="WorkoutTheme2" parent="AppTheme">
+    <style name="LoginTheme" parent="AppTheme">
         <item name="editTextStyle">@style/EditTextRipple</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
-        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
+        <item name="android:imageButtonStyle">@style/ImageButtonStyle</item>
     </style>
 
     <style name="AddWorkoutTheme" parent="AppTheme">
@@ -43,17 +40,19 @@
     </style>
 
     <style name="ImageButtonStyle" parent="Base.Widget.AppCompat.ImageButton">
-        <item name="android:background">@drawable/anim_circ_button_ripple</item>
+        <item name="android:background">@drawable/selector_btn_default</item>
     </style>
 
     <style name="ButtonStyle" parent="Base.TextAppearance.AppCompat.Widget.Button">
         <item name="android:textColor">@drawable/selector_btn_text_default</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:background">@drawable/anim_button_ripple</item>
+        <item name="android:background">@drawable/selector_btn_default</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingStart">20dp</item>
         <item name="android:paddingTop">10dp</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:translationZ">2dp</item>
     </style>
 
     <style name="TextViewStyle" parent="Widget.AppCompat.EditText">

@@ -15,11 +15,7 @@
 		</shape>
 	</item>
 
-	<item
-		android:left="3dp"
-		android:right="3dp"
-		android:top="3dp"
-		android:bottom="3dp">
+	<item>
 		<shape
 			xmlns:android="http://schemas.android.com/apk/res/android"
 			android:shape="rectangle">
