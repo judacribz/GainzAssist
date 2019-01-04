@@ -42,19 +42,21 @@ public class CurrWorkout {
             currMinWeight = MIN_WEIGHT,
             currWeightChange = WEIGHT_CHANGE;
 
-    private ArrayList<Exercise>
-            currWarmups,
-            currMains;
-
     private int
             set_i = -1,
             ex_i = -1,
             currReps,
             numWarmups,
             numMains;
-    private long currRestTime;
-    private boolean timerSet;
+    private ArrayList<Exercise>
+            currWarmups,
+            currMains;
 
+    private long currRestTime;
+    private boolean
+            timerSet,
+            lockReps = false,
+            lockWeight = false;
     private Session currSession = null;
     // --------------------------------------------------------------------------------------------
 
@@ -65,7 +67,6 @@ public class CurrWorkout {
 
     public interface TimerListener {
         void startTimer(long timeInMillis);
-        void endOfExercise(boolean isWarmup);
     }
     public void setTimerListener(TimerListener timerListener) {
         this.timerListener = timerListener;
@@ -104,8 +105,6 @@ public class CurrWorkout {
         this.currSession = new Session(workout);
 
         this.ex_i = Integer.valueOf(String.valueOf(map.get(EXERCISE_INDEX)));
-        //TODO remove
-//        Logger.d("yooooo" + this.ex_i);
         this.set_i = Integer.valueOf(String.valueOf(map.get(SET_INDEX)));
 
         exsMap =  readValue(readValue(map.get(SESSION)).get(EXERCISES));
@@ -246,6 +245,7 @@ public class CurrWorkout {
             }
 
             if (newWeight < 0.91f * weight) {
+                newWeight -= newWeight % weightChange;
                 exerciseSets.add(new ExerciseSet(ex, setNum++, reps, newWeight));
                 newWeight += weightInc;
 
@@ -329,6 +329,8 @@ public class CurrWorkout {
 
         // End of sets for an exercise
         if (atEndOfSets()) {
+            resetLocks();
+
             this.set_i = 0;
             this.ex_i++;
 
@@ -349,10 +351,25 @@ public class CurrWorkout {
 
         // End of set, set next set from current exercise
         } else {
+            if (!getIsWarmup()) {
+                if (this.currReps != this.currExercise.getReps()) {
+                    lockReps = true;
+                }
+
+                if (this.currWeight != this.currExercise.getWeight()) {
+                    lockWeight = true;
+                }
+            }
+
             setCurrExerciseSet(currExercise.getSet(this.set_i));
         }
 
         return true;
+    }
+
+    public void resetLocks() {
+        lockReps = false;
+        lockWeight = false;
     }
 
     public void addCurrSet() {
@@ -361,7 +378,7 @@ public class CurrWorkout {
         this.currExercise.addSet(this.currExerciseSet, true);
     }
 
-    private boolean atEndOfSets() {
+    public boolean atEndOfSets() {
         return this.set_i >= this.currExercise.getNumSets();
     }
 
@@ -386,23 +403,6 @@ public class CurrWorkout {
         this.currMinWeight = exercise.getMinWeight();
         this.currWeightChange = exercise.getWeightChange();
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
-
-        if (timerListener != null)
-            timerListener.endOfExercise(getIsWarmup());
-    }
-
-    private boolean lockReps = false, lockWeight = false;
-    public void toggleReps() {
-        lockReps = !lockReps;
-    }
-
-    public void toggleWeight() {
-        lockWeight = !lockWeight;
-    }
-
-    public void resetLocks() {
-        lockReps = false;
-        lockWeight = false;
     }
 
     private void setCurrExerciseSet(ExerciseSet exerciseSet) {
@@ -539,7 +539,6 @@ public class CurrWorkout {
     }
 
     String saveSessionState() {
-
         if (!getIsWarmup()) {
             Exercise ex = this.currExercise;
             this.currSession.addExercise(ex);
@@ -555,4 +554,15 @@ public class CurrWorkout {
         return jsonStr;
     }
 
+    public void unsetTimer() {
+        timerSet = false;
+    }
+
+    public boolean getLockReps() {
+        return this.lockReps;
+    }
+
+    public boolean getLockWeight() {
+        return this.lockWeight;
+    }
 }

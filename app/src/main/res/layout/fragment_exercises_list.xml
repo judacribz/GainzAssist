@@ -4,24 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorLightBg"
     tools:context=".activities.start_workout.fragments.ExercisesList">
 
     <LinearLayout
+        android:id="@+id/ll_exercise_sets_insert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/ll_exercise_subtitle_insert"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"/>
-
-        <LinearLayout
-            android:id="@+id/ll_exercise_sets_insert"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"/>
-    </LinearLayout>
+        android:layout_margin="5dp"
+        android:orientation="vertical"/>
 </ScrollView>

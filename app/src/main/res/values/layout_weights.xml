@@ -2,5 +2,5 @@
 <resources>
     <integer name="ll_lg_weight">4</integer>
     <integer name="ll_md_weight">3</integer>
-    <integer name="ll_sm_weight">2</integer>
+    <integer name="ll_sm_weight">1</integer>
 </resources>

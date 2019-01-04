@@ -32,7 +32,7 @@ public class ExercisesList extends Fragment {
     StartWorkout act;
     Bundle bundle;
 
-    @BindView(R.id.ll_exercise_subtitle_insert) LinearLayout llExSubInsert;
+//    @BindView(R.id.ll_exercise_subtitle_insert) LinearLayout llExSubInsert;
     @BindView(R.id.ll_exercise_sets_insert) LinearLayout llExSetsInsert;
     // --------------------------------------------------------------------------------------------
 
@@ -82,7 +82,7 @@ View view;
                     act.displaySets(
                             200 + i,
                             exercises.get(i),
-                            llExSubInsert,
+//                            llExSubInsert,
                             llExSetsInsert
                     );
                 }

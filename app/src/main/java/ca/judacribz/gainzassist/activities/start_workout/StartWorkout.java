@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
@@ -28,6 +29,7 @@ import static ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
+import static com.facebook.rebound.ui.Util.dpToPx;
 
 public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataListener {
 
@@ -50,6 +52,9 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     TextView tvExerciseName;
     RecyclerView setList;
 
+    RelativeLayout.LayoutParams lp;
+
+
     @BindView(R.id.tlay_navbar) TabLayout tabLayout;
     @BindView(R.id.vp_fmt_container) ViewPager viewPager;
     // --------------------------------------------------------------------------------------------
@@ -63,6 +68,13 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         workout = Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
         exercises = workout.getExercises();
         setInitView(this, R.layout.activity_start_workout, workout.getName(), true);
+
+        lp = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        int dpval = dpToPx(5, getResources());
+        lp.setMargins(dpval, dpval, dpval, dpval);
     }
 
 
@@ -110,6 +122,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        currWorkout.unsetTimer();
         handleLeavingScreen();
     }
 
@@ -123,6 +136,8 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
             );
         }
         addIncompleteWorkoutPref(this, workout.getName());
+
+        currWorkout.resetLocks();
     }
 
     @Override
@@ -196,17 +211,13 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     @SuppressLint("InflateParams")
     public void displaySets(int id,
                             Exercise exercise,
-                            LinearLayout llSubtitle,
                             LinearLayout llSets) {
 
         layInflater = getLayoutInflater();
 
-        // Add subtitle layout which includes "ExerciseSet #", "Reps" and "Weight"
-        setsView = layInflater.inflate(R.layout.part_sets_subtitles, null);
-        llSubtitle.addView(setsView, 0);
-
         // Add the listView layout which containsExercise a textView and a recyclerVIew
         setsView = layInflater.inflate(R.layout.part_horizontal_rv, null);
+        setsView.setLayoutParams(lp);
         setsView.setId(id);
         llSets.addView(setsView, 0);
 

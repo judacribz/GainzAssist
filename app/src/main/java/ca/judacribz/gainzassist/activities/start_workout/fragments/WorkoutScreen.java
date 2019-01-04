@@ -42,7 +42,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     // --------------------------------------------------------------------------------------------
     StartWorkout act;
     Bundle bundle;
-    EquipmentView equipmentView;
     CountDownTimer countDownTimer;
 
     long currTime;
@@ -52,7 +51,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     // --------------------------------------------------------------------------------------------
 
     // UI Elements
-    @BindView(R.id.rl_equip_disp) ViewGroup vgEquipDisp;
+    @BindView(R.id.equip_view) EquipmentView equipmentView;
     @BindView(R.id.tv_timer) TextView tvTimer;
 
     @BindView(R.id.tv_exercise_title) TextView tvExerciseTitle;
@@ -61,8 +60,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
     @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
-    @BindView(R.id.btn_lock_reps) ImageButton btnLockReps;
-    @BindView(R.id.btn_lock_weight) ImageButton btnLockWeight;
 
     @BindView(R.id.et_curr_reps) EditText etCurrReps;
     @BindView(R.id.et_curr_weight) EditText etCurrWeight;
@@ -111,9 +108,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         super.onResume();
         currWorkout.setTimerListener(this);
 
-        if (equipmentView == null) {
-            setupEquipView();
-        }
+//        if (equipmentView == null) {
+//            setupEquipView();
+//        }
 
         updateUI();
 
@@ -130,8 +127,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @Override
     public void onDestroy() {
         super.onDestroy();
-        vgEquipDisp.removeView(equipmentView);
-        equipmentView = null;
     }
 
     // ExerciseSet up the custom view (EquipmentView) to display the equipment. View added dynamically
@@ -147,7 +142,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         ));
 
 
-        vgEquipDisp.addView(equipmentView, 0);
+//        vgEquipDisp.addView(equipmentView, 0);
         tvTimer.setWidth(p/2);
     }
 
@@ -160,22 +155,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
         countDownTimer = getCountDownTimer(timeInMillis);
         countDownTimer.start();
-    }
-
-    @Override
-    public void endOfExercise(boolean isWarmup) {
-        lockReps = false;
-        lockWeight = false;
-        currWorkout.resetLocks();
-
-        if (isWarmup) {
-            btnLockReps.setVisibility(View.INVISIBLE);
-            btnLockWeight.setVisibility(View.INVISIBLE);
-        } else {
-            changeBtnState(btnLockReps, false);
-            changeBtnState(btnLockWeight, false);
-        }
-
     }
 
     /* Creates and returns a new CountDownTimer with the rest time to count down from. Has the
@@ -332,7 +311,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
         if (currWorkout.finishCurrSet()) {
+
             updateUI();
+
+        // End of workout
         } else {
             if (removeIncompleteWorkoutPref(act, currWorkout.getWorkoutName())) {
                 removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
@@ -358,17 +340,14 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 countDownTimer = null;
             }
             setType = "Warmup";
-
-            if (btnLockWeight.getVisibility() == View.VISIBLE)
-                endOfExercise(true);
         } else {
             setType = "Main";
         }
 
-        if (!lockReps)
+        if (!currWorkout.getLockReps())
             setReps();
 
-        if (!lockWeight)
+        if (!currWorkout.getLockWeight())
             setWeight();
 
         tvExInfo.setText(String.format(
@@ -401,30 +380,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 equipmentView.setup(weight, currWorkout.getCurrEquip());
             }
         });
-    }
-
-
-    boolean lockReps = false, lockWeight = false;
-
-    @OnClick({R.id.btn_lock_reps, R.id.btn_lock_weight})
-    public void lockInfo(ImageButton iBtn){
-        switch (iBtn.getId()) {
-            case R.id.btn_lock_reps: ;
-                changeBtnState(iBtn, lockReps = !lockReps);
-                currWorkout.toggleReps();
-                break;
-            case R.id.btn_lock_weight:
-                changeBtnState(iBtn, lockWeight = !lockWeight);
-                currWorkout.toggleWeight();
-                break;
-        }
-    }
-
-    public void changeBtnState(ImageButton iBtn, boolean lock) {
-        if (iBtn.getVisibility() == View.INVISIBLE) {
-            iBtn.setVisibility(View.VISIBLE);
-        }
-        iBtn.setImageResource((lock) ? R.drawable.ic_lock : R.drawable.ic_unlock);
     }
     //=Click=Handling===============================================================================
 }
