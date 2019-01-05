@@ -26,7 +26,7 @@ public interface WorkoutDao {
     Workout getFromName(String name);
 
     @Query("SELECT id from  workouts WHERE name = :name")
-    long getId(String name);
+    Long getId(String name);
 
     @Query("SELECT id from  workouts WHERE id = :id")
     LiveData<Long> exists(long id);

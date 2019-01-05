@@ -92,6 +92,9 @@ dependencies {
     implementation 'org.parceler:parceler-api:1.1.11'
     annotationProcessor 'org.parceler:parceler:1.1.11'
 
+    // DialogPlus
+    implementation 'com.orhanobut:dialogplus:1.11@aar'
+
     testImplementation 'junit:junit:4.12'
 }
 

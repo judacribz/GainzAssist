@@ -1,6 +1,8 @@
 package ca.judacribz.gainzassist.activities.how_to_videos;
 
 import android.os.AsyncTask;
+import com.google.gson.JsonObject;
+import com.orhanobut.logger.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +37,7 @@ public class SearchVideosTask extends AsyncTask<String, Void, JSONObject> {
         HttpsURLConnection conn = null;
 
 
-        JSONObject jsonData = null;
+        JSONObject jsonData = new JSONObject();
         StringBuilder sb = new StringBuilder();
 
         // Get the JSON format data from url
@@ -52,7 +54,6 @@ public class SearchVideosTask extends AsyncTask<String, Void, JSONObject> {
 
             jsonData = new JSONObject(sb.toString());
 
-
         } catch (IOException | JSONException ex) {
             ex.printStackTrace();
 
@@ -62,35 +63,37 @@ public class SearchVideosTask extends AsyncTask<String, Void, JSONObject> {
             }
         }
 
+        Logger.d("YOUTUBE SEARCH  " +jsonData.toString());
+
         return jsonData;
     }
 
     @Override
     protected void onPostExecute(JSONObject jsonData) {
+        ArrayList<String> videoIds = new ArrayList<>();
+        ArrayList<String> videoTitles = new ArrayList<>();
+        try {
 
-        // Get the video ids from the JSON data retrieved above
-        if (jsonData != null) {
-            try {
-                ArrayList<String> videoIds = new ArrayList<>();
-                ArrayList<String> videoTitles = new ArrayList<>();
+            JSONArray items = jsonData.getJSONArray("items");
 
-                JSONArray items = jsonData.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                videoIds.add(
+                        ((JSONObject) items.get(i))
+                                .getJSONObject("id")
+                                .getString("videoId")
+                );
 
-                for (int i = 0; i < items.length(); i++) {
-                    videoIds.add(((JSONObject) items.get(i))
-                            .getJSONObject("id")
-                            .getString("videoId"));
-
-                    videoTitles.add(((JSONObject) items.get(i))
-                            .getJSONObject("snippet")
-                            .getString("title"));
-                }
-
-                youTubeSearchObserver.videoSearchDataReceived(videoIds, videoTitles);
-            } catch (JSONException ex) {
-                ex.printStackTrace();
+                videoTitles.add(
+                        ((JSONObject) items.get(i))
+                                .getJSONObject("snippet")
+                                .getString("title")
+                );
             }
+        } catch (JSONException ex) {
+            ex.printStackTrace();
         }
+
+        youTubeSearchObserver.videoSearchDataReceived(videoIds, videoTitles);
     }
     //AsyncTask<String//Void//JSONObject>//Override////////////////////////////////////////////////
 }

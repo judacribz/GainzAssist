@@ -88,14 +88,14 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
         }
 
         @Override
-        public void onClick(View v) {
+        public void onClick(View view) {
             itemClickObserver.onWorkoutClick(listItemButtonView.getText().toString());
         }
 
         @Override
-        public boolean onLongClick(View v) {
-            itemClickObserver.onWorkoutLongClick(v, listItemButtonView.getText().toString());
-            return false;
+        public boolean onLongClick(View view) {
+            itemClickObserver.onWorkoutLongClick(view, listItemButtonView.getText().toString());
+            return true;
         }
     }
     // ============================================================================================

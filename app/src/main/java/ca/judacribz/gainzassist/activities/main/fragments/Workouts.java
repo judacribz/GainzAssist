@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import butterknife.BindView;
@@ -28,6 +29,11 @@ import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import ca.judacribz.gainzassist.util.UI.*;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
+import me.grantland.widget.AutofitTextView;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +51,12 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    View view;
     Main act;
+    View view;
 
     SingleItemAdapter workoutAdapter;
     LinearLayoutManager layoutManager;
+    DialogPlus dialog;
 
     WorkoutViewModel workoutViewModel;
     Observer<List<Workout>> workObs;
@@ -85,6 +92,19 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     public void onAttach(Context context) {
         super.onAttach(context);
         act = (Main) context;
+
+        dialog = DialogPlus.newDialog(act)
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                    }
+                })
+                .setContentHolder(new ViewHolder(R.layout.dialog_workout))
+                .setContentBackgroundResource(R.drawable.edit_text_box)
+                .setExpanded(true)
+                .setGravity(Gravity.CENTER)
+                .setCancelable(true)
+                .create();
     }
 
     @Override
@@ -96,7 +116,7 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
                              ViewGroup container,
                              Bundle savedInstanceState) {
         if (view != null) {
-            return  view;
+            return view;
         }
 
         ButterKnife.bind(
@@ -180,53 +200,44 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
 
     // SingleItemAdapter.ItemLongClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
-//TODO change to dialogbar
     @Override
-    public void onWorkoutLongClick(View anch, final String workoutName) {
-        View popupView = getLayoutInflater().inflate(R.layout.part_confirm_popup, null);
+    public void onWorkoutLongClick(View view, final String workoutName) {
 
-        final PopupWindow popupWindow = new PopupWindow(popupView,
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ((TextView) dialog.findViewById(R.id.tv_workout_name)).setText(workoutName);
 
-        TextView textView = popupView.findViewById(R.id.tv_workout_name);
-        textView.setText(workoutName);
-        popupView.findViewById(R.id.btn_edit_workout).setOnClickListener(new View.OnClickListener() {
+        dialog.findViewById(R.id.btn_edit_workout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent newWorkoutSummaryIntent = new Intent(
-                        act,
-                        NewWorkoutSummary.class
-                );
-                newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
-
-                extraKey = NewWorkoutSummary.EXTRA_WORKOUT;
-                intent = newWorkoutSummaryIntent;
-
-                workoutViewModel.getWorkoutFromName(act, workoutName);
+                editWorkout(workoutName);
             }
         });
 
-        popupView.findViewById(R.id.btn_delete_workout).setOnClickListener(new View.OnClickListener() {
+        dialog.findViewById(R.id.btn_delete_workout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteWorkoutFirebase(workoutName);
-                popupWindow.dismiss();
+                deleteWorkout(workoutName);
             }
         });
-        // If the PopupWindow should be focusable
-        popupWindow.setFocusable(true);
 
-        // If you need the PopupWindow to dismiss when when touched outside
-//        popupWindow.setBackgroundDrawable(new ColorDrawable());
-        // Get the View's(the one that was clicked in the Fragment) location
-        int location[] = new int[2];
-        anch.getLocationOnScreen(location);
+        dialog.show();
+    }
 
-        popupWindow.setHeight((anch.getHeight() - anch.getPaddingTop())*2 );
-        popupWindow.setWidth(anch.getWidth() - anch.getPaddingStart());
-        // Using location, the PopupWindow will be displayed right under anchorView
-        popupWindow.showAtLocation(anch, Gravity.NO_GRAVITY,
-                location[0] + anch.getPaddingStart()/2, location[1]);
+    private void editWorkout(String workoutName) {
+        Intent newWorkoutSummaryIntent = new Intent(
+                act,
+                NewWorkoutSummary.class
+        );
+        newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
+
+        extraKey = NewWorkoutSummary.EXTRA_WORKOUT;
+        intent = newWorkoutSummaryIntent;
+
+        workoutViewModel.getWorkoutFromName(act, workoutName);
+    }
+
+    private void deleteWorkout(String workoutName) {
+        workoutViewModel.deleteWorkout(workoutName);
+        deleteWorkoutFirebase(workoutName);
     }
     //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////
 
@@ -244,6 +255,8 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
         workoutAdapter.setItems(filteredWorkouts);
         workoutAdapter.notifyDataSetChanged();
     }
+
+
     // Click Handling
     // ============================================================================================
     //=Click=Handling==============================================================================

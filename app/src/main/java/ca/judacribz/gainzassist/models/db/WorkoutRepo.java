@@ -42,7 +42,6 @@ public class WorkoutRepo {
     }
 
     public enum RepoTask {
-        GET_WORKOUT_ID,
         GET_WORKOUT,
         GET_EXERCISES,
 
@@ -118,13 +117,6 @@ public class WorkoutRepo {
         setRepoAsyncConfig(GET_WORKOUT, WORKOUTS_TXN, context, name);
     }
 
-    public LiveData<Long> workoutExists(long id) {
-        return workoutDao.exists(id);
-    }
-    public void getWorkoutId(Context context, DataSnapshot workoutShot) {
-        setRepoAsyncConfig(GET_WORKOUT_ID, WORKOUTS_TXN, context, workoutShot.getKey(), workoutShot);
-    }
-
     LiveData<List<Exercise>> getExercisesFromWorkout(long workoutId) {
         return exerciseDao.getLiveFromWorkout(workoutId);
     }
@@ -169,8 +161,17 @@ public class WorkoutRepo {
         setRepoAsyncConfig(DELETE_ALL_WORKOUTS, WORKOUTS_TXN, null, (Object) null);
     }
 
-    public void deleteWorkout(Workout workout) {
-        setRepoAsyncConfig(DELETE_WORKOUT, WORKOUTS_TXN, null, workout);
+    public void deleteWorkout(final Workout workout) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                workoutDao.delete(workout);
+            }
+        });
+    }
+
+    public void deleteWorkout(String workoutName) {
+        setRepoAsyncConfig(DELETE_WORKOUT, WORKOUTS_TXN, null, workoutName);
     }
 
     void deleteExercise(Exercise exercise) {
@@ -198,18 +199,14 @@ public class WorkoutRepo {
                         repoAsyncTask.setWorkout((Workout) obj[0]);
                         break;
 
-                    case GET_WORKOUT_ID:
-                        repoAsyncTask.setWorkoutShot((DataSnapshot) obj[1]);
                     case GET_WORKOUT:
                         if (context != null) {
                             repoAsyncTask.setOnWorkoutReceivedListener(
                                     (OnWorkoutReceivedListener) context
                             );
                         }
-                        repoAsyncTask.setWorkoutName((String) obj[0]);
-                        break;
                     case DELETE_WORKOUT:
-                        repoAsyncTask.setWorkout((Workout) obj[0]);
+                        repoAsyncTask.setWorkoutName((String) obj[0]);
                         break;
                 }
             break;
@@ -309,15 +306,6 @@ public class WorkoutRepo {
 
             for (RepoTask task : tasks) {
                 switch (task) {
-                    case GET_WORKOUT_ID:
-                        if (workoutDao.getId(workoutName) == 0) {
-                            onWorkoutReceivedListener.onWorkoutsReceived(extractWorkout(workoutShot));
-                        }
-
-                        setOnWorkoutReceivedListener(null);
-                        break;
-
-
                     case GET_WORKOUT:
                         workout = workoutDao.getFromName(workoutName);
 
@@ -332,14 +320,11 @@ public class WorkoutRepo {
 
 
                     case INSERT_WORKOUT:
-                        workoutDao.insert(workout);
-                        id = workout.getId();
-//                        Logger.d("ExerciseConst:" + workout.getName() + " id : " + id);
-                        for (Exercise exercise : workout.getExercises()) {
-
-//                            Logger.d("ExerciseConst:" + exercise.getName() + " id : " +exercise.getWorkoutId());
-                            exercise.setWorkoutId(id);
-                            setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
+                        if (workoutDao.getId(workout.getName()) == null) {
+                            workoutDao.insert(workout);
+                            for (Exercise exercise : workout.getExercises()) {
+                                setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
+                            }
                         }
                         break;
 
@@ -397,7 +382,7 @@ public class WorkoutRepo {
                         break;
 
                     case DELETE_WORKOUT:
-                        workoutDao.delete(workout);
+                        workoutDao.delete(workoutDao.getFromName(workoutName));
                         break;
 
                     case DELETE_EXERCISE:

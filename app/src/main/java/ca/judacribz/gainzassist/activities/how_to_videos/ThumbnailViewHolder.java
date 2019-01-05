@@ -5,6 +5,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
@@ -12,15 +15,13 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 
-public class ThumbnailViewHolder extends RecyclerView.ViewHolder
-        implements View.OnClickListener,
-                   YouTubeThumbnailView.OnInitializedListener,
-                   YouTubeThumbnailLoader.OnThumbnailLoadedListener {
+public class ThumbnailViewHolder extends RecyclerView.ViewHolder implements
+        YouTubeThumbnailView.OnInitializedListener,
+        YouTubeThumbnailLoader.OnThumbnailLoadedListener {
 
     // Interfaces
     // --------------------------------------------------------------------------------------------
     private VideoClickObserver videoClickObserver;
-
 
     public interface VideoClickObserver {
         void onVideoClick(String videoId);
@@ -38,13 +39,15 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    private YouTubeThumbnailView thumbnailView;
+
     private YouTubeThumbnailLoader thumbnailLoader;
-    private TextView tvVideoTitle;
     private  String videoId;
     private ArrayList<String> videoIds;
 
-    private ProgressBar progressBar;
+
+    @BindView(R.id.yt_tv_video) YouTubeThumbnailView thumbnailView;
+    @BindView(R.id.tv_video_title) TextView tvVideoTitle;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -53,13 +56,8 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
     ThumbnailViewHolder(View itemView, ArrayList<String> videoIds) {
         super(itemView);
 
+        ButterKnife.bind(this, itemView);
         this.videoIds = videoIds;
-
-        thumbnailView = (YouTubeThumbnailView) itemView.findViewById(R.id.yt_tv_video);
-        tvVideoTitle = (TextView) itemView.findViewById(R.id.tv_video_title);
-        progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
-
-        ((ImageButton) itemView.findViewById(R.id.btn_play_video)).setOnClickListener(this);
     }
     // ######################################################################################### //
 
@@ -111,8 +109,8 @@ public class ThumbnailViewHolder extends RecyclerView.ViewHolder
 
     // Click Handling
     // ============================================================================================
-    @Override
-    public void onClick(View v) {
+    @OnClick(R.id.btn_play_video)
+    public void videoClick() {
         videoClickObserver.onVideoClick(videoIds.get(getLayoutPosition()));
     }
     // ============================================================================================

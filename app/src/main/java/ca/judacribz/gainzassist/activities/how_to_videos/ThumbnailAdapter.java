@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 import ca.judacribz.gainzassist.R;
 
-public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
-        implements ThumbnailViewHolder.VideoClickObserver {
+public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder> implements
+        ThumbnailViewHolder.VideoClickObserver {
 
     // Interfaces
     // --------------------------------------------------------------------------------------------
@@ -23,11 +23,9 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
     void setVideoClickObserver(VideoClickObserver videoClickObserver) {
         this.videoClickObserver = videoClickObserver;
     }
-    // --------------------------------------------------------------------------------------------
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    private int numItems;
     private ArrayList<String> videoIds;
     private ArrayList<String> videoTitles;
     // --------------------------------------------------------------------------------------------
@@ -36,7 +34,6 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
     // ThumbnailAdapter Constructor                                                              //
     // ######################################################################################### //
     ThumbnailAdapter(ArrayList<String> videoIds, ArrayList<String> videoTitles) {
-        this.numItems = videoIds.size();
         this.videoIds = videoIds;
         this.videoTitles = videoTitles;
     }
@@ -64,7 +61,7 @@ public class ThumbnailAdapter extends RecyclerView.Adapter<ThumbnailViewHolder>
 
     @Override
     public int getItemCount() {
-        return numItems;
+        return videoIds.size();
     }
     //RecyclerView.Adapter<ThumbnailViewHolder>//Override//////////////////////////////////////////
 

@@ -23,8 +23,7 @@ import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessions
 import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
 
 
-public class FirebaseService extends IntentService implements
-        OnWorkoutReceivedListener {
+public class FirebaseService extends IntentService {
 
     WorkoutRepo workoutRepo;
 
@@ -48,37 +47,27 @@ public class FirebaseService extends IntentService implements
             userWorkoutsRef.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull final DataSnapshot workoutShot, String s) {
-                    String idStr = String.valueOf(workoutShot.child("id").getValue());
-
-                    workoutRepo.workoutExists(Long.valueOf(idStr)).observeForever(new Observer<Long>() {
-                        @Override
-                        public void onChanged(@Nullable Long id) {
-                            if (id == null) {
-                                workoutRepo.insertWorkout(extractWorkout(workoutShot));
-                            }
-                        }
-                    });
-
-                    //TODO change to read from textfile for list of current workout names instead of using interface
+                    workoutRepo.insertWorkout(extractWorkout(workoutShot));
                 }
 
                 @Override
-                public void onChildChanged(DataSnapshot workoutShot, String s) {
+                public void onChildChanged(@NonNull DataSnapshot workoutShot, String s) {
                     workoutRepo.updateWorkout(extractWorkout(workoutShot));
                 }
 
                 @Override
-                public void onChildRemoved(DataSnapshot workoutShot) {
+                public void onChildRemoved(@NonNull DataSnapshot workoutShot) {
                     Toast.makeText(FirebaseService.this, "Deleted " + workoutShot.getKey(), Toast.LENGTH_SHORT).show();
                     workoutRepo.deleteWorkout(extractWorkout(workoutShot));
                 }
 
                 @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Logger.d("FIREBASE DB WORKOUT ERROR: " + databaseError.getMessage());
                 }
             });
         }
@@ -86,25 +75,26 @@ public class FirebaseService extends IntentService implements
         if (userSessionRef != null) {
             userSessionRef.addChildEventListener(new ChildEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot sessionShot, String s) {
+                public void onChildAdded(@NonNull DataSnapshot sessionShot, String s) {
                     workoutRepo.insertSession(extractSession(sessionShot), false);
                 }
 
                 @Override
-                public void onChildChanged(DataSnapshot sessionShot, String s) {
+                public void onChildChanged(@NonNull DataSnapshot sessionShot, String s) {
 
                 }
 
                 @Override
-                public void onChildRemoved(DataSnapshot sessionShot) {
+                public void onChildRemoved(@NonNull DataSnapshot sessionShot) {
                 }
 
                 @Override
-                public void onChildMoved(DataSnapshot sessionShot, String s) {
+                public void onChildMoved(@NonNull DataSnapshot sessionShot, String s) {
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Logger.d("FIREBASE DB SESSION ERROR: " + databaseError.getMessage());
                 }
             });
         }
@@ -114,11 +104,5 @@ public class FirebaseService extends IntentService implements
 
     @Override
     protected void onHandleIntent(Intent intent) {
-    }
-
-
-    @Override
-    public void onWorkoutsReceived(Workout workout) {
-        workoutRepo.insertWorkout(workout);
     }
 }

@@ -35,6 +35,7 @@ public class Resume extends Fragment implements SingleItemAdapter.ItemClickObser
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    View view;
     Main act;
     SingleItemAdapter workoutAdapter;
     LinearLayoutManager layoutManager;
@@ -80,9 +81,14 @@ public class Resume extends Fragment implements SingleItemAdapter.ItemClickObser
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_resume, container, false);
-        ButterKnife.bind(this, view);
+        if (view != null) {
+            return view;
+        }
+
+        ButterKnife.bind(
+                this,
+                view =  inflater.inflate(R.layout.fragment_resume, container, false)
+        );
 
         // ExerciseSet the layout manager for the localWorkouts
         layoutManager = new LinearLayoutManager(act);

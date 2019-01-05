@@ -4,6 +4,7 @@ package ca.judacribz.gainzassist.activities.how_to_videos;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -60,6 +61,8 @@ public class HowToVideos extends AppCompatActivity implements
     FragmentTransaction fmtTxn;
     String videoId, exerciseName;
 
+    boolean isFullScreen = false;
+    boolean backPressed = false;
 
     @BindView(R.id.msvHowToVids) MaterialSearchView searchView;
     //---------------------------------------------------------------------------------------------
@@ -79,11 +82,7 @@ public class HowToVideos extends AppCompatActivity implements
 
         handleFmt(false);
 
-        task = new SearchVideosTask();
-        task.setYouTubeSearchObserver(this);
-        task.execute(URL.concat("how%20to%20" + exerciseName.replaceAll("\\s+", SEARCH_SPACE_STR))
-                .concat("&key=")
-                .concat(getString(R.string.google_api_key)));
+        executeSearch("how to " + exerciseName);
 
         rvLayoutManager = new LinearLayoutManager(this);
         rvVideoList.setLayoutManager(rvLayoutManager);
@@ -114,13 +113,10 @@ public class HowToVideos extends AppCompatActivity implements
     public void onBackPressed() {
         if (!ytpFmt.isHidden()) {
             handleFmt(false);
-
-//            super.onBackPressed();
         } else {
             super.onBackPressed();
         }
     }
-    boolean backPressed = false;
 
     /* Handles showing or hiding the youtube player fragment */
     void handleFmt(boolean showFmt) {
@@ -166,6 +162,34 @@ public class HowToVideos extends AppCompatActivity implements
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
+    // MaterialSearchView.OnQueryTextListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onQueryTextChange(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        executeSearch(query);
+
+        return false;
+    }
+    //MaterialSearchView.OnQueryTextListener//Override/////////////////////////////////////////////
+
+
+    private void executeSearch(String query) {
+        if (task != null) {
+            task.setYouTubeSearchObserver(null);
+        }
+        task = new SearchVideosTask();
+        task.setYouTubeSearchObserver(this);
+        task.execute(URL.concat(query.replaceAll("\\s+", SEARCH_SPACE_STR))
+                .concat("&key=")
+                .concat(getString(R.string.google_api_key)));
+    }
+
+
     // Interface Callback: SearchVideosTask.YouTubeSearchObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -173,13 +197,13 @@ public class HowToVideos extends AppCompatActivity implements
         if (videoIds.size() > 0) {
             thumbnailAdapter = new ThumbnailAdapter(videoIds, videoTitles);
             rvVideoList.setAdapter(thumbnailAdapter);
-
             thumbnailAdapter.setVideoClickObserver(this);
+
         } else {
-            Toast.makeText(this, "No video results", Toast.LENGTH_SHORT).show();
-            finish();
+            Snackbar.make(rvVideoList, "No video results", Snackbar.LENGTH_SHORT).show();
         }
     }
+
     //SearchVideosTask.YouTubeSearchObserver//Override/////////////////////////////////////////////
 
 
@@ -191,7 +215,6 @@ public class HowToVideos extends AppCompatActivity implements
         handleFmt(true);
     }
     //ThumbnailAdapter.VideoClickObserver//Override////////////////////////////////////////////////
-boolean isFullScreen = false;
 
     // Interface Callback: YouTubePlayer.OnInitializedListener Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -257,22 +280,4 @@ boolean isFullScreen = false;
     public void onError(YouTubePlayer.ErrorReason errorReason) {
     }
     //YouTubePlayer.PlayerStateChangeListener//Override////////////////////////////////////////////
-
-    // MaterialSearchView.OnQueryTextListener Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public boolean onQueryTextChange(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        task = new SearchVideosTask();
-        task.setYouTubeSearchObserver(this);
-        task.execute(URL.concat(query.replaceAll("\\s+", SEARCH_SPACE_STR))
-                .concat("&key=")
-                .concat(getString(R.string.google_api_key)));
-        return false;
-    }
-    //MaterialSearchView.OnQueryTextListener//Override/////////////////////////////////////////////
 }

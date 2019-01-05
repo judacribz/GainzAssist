@@ -268,7 +268,7 @@ public class UI {
             if (this.progress != null) {
                 this.progress.dismiss();
                 this.blurLayout.pauseBlur();
-//                this.blurLayout.setVisibility(View.GONE);
+                this.blurLayout.setVisibility(View.GONE);
             }
         }
     }
