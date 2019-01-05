@@ -8,5 +8,10 @@
 	android:orientation="vertical"
 	tools:context=".activities.main.fragments.Settings">
 
+	<Button android:id="@+id/btnBlue" android:layout_width="wrap_content" android:layout_height="wrap_content"
+	android:text="BLUE"/>
 
+
+	<Button android:id="@+id/btnGreen" android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:text="GREEN"/>
 </LinearLayout>

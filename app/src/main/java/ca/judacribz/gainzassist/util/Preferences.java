@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import ca.judacribz.gainzassist.R;
@@ -35,6 +36,17 @@ public class Preferences {
         }
         incompleteWorkouts.add(workoutName);
         addIncompleteWorkoutPref(context, incompleteWorkouts);
+    }
+    public static void setTheme(Context context, String themeName) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_settings_info).edit();
+        editor.putString("THEME", themeName);
+        editor.apply();
+    }
+    public static String getThemePref(Activity context) {
+        return getSharedPref(
+                context,
+                R.string.file_settings_info
+        ).getString("THEME", null);
     }
 
     private static void addIncompleteWorkoutPref(Context context, Set<String> incompleteWorkouts) {

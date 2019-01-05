@@ -19,34 +19,43 @@
         <item name="android:textSize">35sp</item>
     </style>
 
-    <style name="WorkoutTheme" parent="AppTheme">
-        <item name="editTextStyle">@style/EditTextStyle</item>
-        <item name="android:textViewStyle">@style/TextViewStyle</item>
-        <item name="android:buttonStyle">@style/ButtonStyle</item>
-        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
-        <item name="android:background">@color/colorDarkGreen</item>
+    <style name="BlueTheme" parent="AppTheme">
+        <item name="editTextStyle">@style/EditTextRipple</item>
+        <item name="android:buttonStyle">@style/BlueButtonStyle</item>
+        <item name="imageButtonStyle">@style/BlueImageButtonStyle</item>
+        <item name="tabBackground">@drawable/anim_tab_ripple_blue</item>
     </style>
 
-    <style name="LoginTheme" parent="AppTheme">
-        <item name="editTextStyle">@style/EditTextRipple</item>
-        <item name="android:buttonStyle">@style/ButtonStyle</item>
-        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
-    </style>
+	<style name="GreenTheme" parent="AppTheme">
+		<item name="editTextStyle">@style/EditTextRipple</item>
+		<item name="android:buttonStyle">@style/GreenButtonStyle</item>
+		<item name="imageButtonStyle">@style/GreenImageButtonStyle</item>
+        <item name="tabBackground">@drawable/anim_tab_ripple_green</item>
+	</style>
 
-    <style name="AddWorkoutTheme" parent="AppTheme">
-        <item name="editTextStyle">@style/EditTextRipple</item>
-        <item name="imageButtonStyle">@style/ImageButtonStyle</item>
-        <item name="android:buttonStyle">@style/ButtonStyle</item>
+	<style name="GreenImageButtonStyle" parent="ImageButtonStyle">
+		<item name="android:background">@drawable/selector_btn_default_green</item>
+	</style>
+
+    <style name="BlueImageButtonStyle" parent="ImageButtonStyle">
+        <item name="android:background">@drawable/selector_btn_default_blue</item>
     </style>
 
     <style name="ImageButtonStyle" parent="Base.Widget.AppCompat.ImageButton">
-        <item name="android:background">@drawable/selector_btn_default</item>
     </style>
+
+
+	<style name="GreenButtonStyle" parent="ButtonStyle">
+		<item name="android:background">@drawable/selector_btn_default_green</item>
+	</style>
+
+    <style name="BlueButtonStyle" parent="ButtonStyle">
+		<item name="android:background">@drawable/selector_btn_default_blue</item>
+	</style>
 
     <style name="ButtonStyle" parent="Base.TextAppearance.AppCompat.Widget.Button">
         <item name="android:textColor">@drawable/selector_btn_text_default</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:background">@drawable/selector_btn_default</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingStart">20dp</item>
@@ -54,6 +63,7 @@
         <item name="android:elevation">2dp</item>
         <item name="android:translationZ">2dp</item>
     </style>
+
 
     <style name="TextViewStyle" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/text_view_box</item>

@@ -115,7 +115,7 @@
             android:layout_height="40dp"
             android:layout_alignEnd="@id/et_num_sets"
             android:layout_below="@id/et_num_sets"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_plus"/>
 
         <ImageButton
@@ -124,7 +124,7 @@
             android:layout_height="40dp"
             android:layout_alignStart="@id/et_num_sets"
             android:layout_below="@id/et_num_sets"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_minus"/>
         <!--Number=of=Sets======================================================================-->
 
@@ -165,7 +165,7 @@
             android:layout_height="40dp"
             android:layout_alignEnd="@id/et_weight"
             android:layout_below="@id/et_weight"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_plus"/>
 
         <ImageButton
@@ -174,7 +174,7 @@
             android:layout_height="40dp"
             android:layout_alignStart="@id/et_weight"
             android:layout_below="@id/et_weight"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_minus"/>
         <!--Weight==============================================================================-->
 
@@ -215,7 +215,7 @@
             android:layout_height="40dp"
             android:layout_alignEnd="@id/et_num_reps"
             android:layout_below="@id/et_num_reps"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_plus"/>
 
         <ImageButton
@@ -224,7 +224,7 @@
             android:layout_height="40dp"
             android:layout_alignStart="@id/et_num_reps"
             android:layout_below="@id/et_num_reps"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_minus"/>
         <!--Number=of=Reps======================================================================-->
 
@@ -238,7 +238,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:text="@string/clear"
             android:textColor="@color/colorText"/>
 
@@ -249,7 +249,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:text="@string/add_exercise"
             android:textColor="@color/colorText"/>
 
@@ -260,7 +260,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="5dp"
-            android:background="@drawable/anim_button_ripple"
+            android:background="@drawable/anim_button_ripple_blue"
             android:text="@string/update_exercise"
             android:textColor="@color/colorText"
             android:visibility="gone"/>
@@ -295,7 +295,7 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/anim_button_ripple"
+        android:background="@drawable/anim_button_ripple_blue"
         android:text="@string/discard"
         android:textColor="@color/colorText"/>
 
@@ -305,7 +305,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/anim_button_ripple"
+        android:background="@drawable/anim_button_ripple_blue"
         android:text="@string/add_workout"
         android:textColor="@color/colorText"/>
     <!--ExerciseConst=Discard/Add=Buttons=============================================================-->

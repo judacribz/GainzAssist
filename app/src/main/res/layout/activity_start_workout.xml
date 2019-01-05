@@ -31,10 +31,9 @@
             android:layout_width="match_parent"
             app:tabPadding="2dp"
             android:layout_height="wrap_content"
-            app:tabBackground="@drawable/anim_tab_ripple"
-            app:tabIndicatorColor="@color/colorGreen"
+            app:tabIndicatorColor="@color/green"
             app:tabIndicatorHeight="2dp"
-            app:tabSelectedTextColor="@color/colorGreen"
+            app:tabSelectedTextColor="@color/green"
             app:tabTextColor="@color/colorLightBg">
 
             <android.support.design.widget.TabItem

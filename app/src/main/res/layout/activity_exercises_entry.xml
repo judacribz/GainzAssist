@@ -23,12 +23,11 @@
             android:id="@+id/tlay_navbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:tabBackground="@drawable/anim_tab_ripple_reverse"
-            app:tabIndicatorColor="@color/colorGreen"
+            app:tabIndicatorColor="@color/green"
             app:tabIndicatorHeight="2dp"
             app:tabIndicatorGravity="top"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="@color/colorGreen"
+            app:tabSelectedTextColor="@color/green"
             app:tabTextColor="@color/colorLightBg"
             app:tabPaddingBottom="-10dp"/>
     </android.support.design.widget.AppBarLayout>

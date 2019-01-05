@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:theme="@style/AddWorkoutTheme"
     tools:context=".activities.add_workout.WorkoutEntry">
 
     <include
@@ -97,7 +96,6 @@
             android:layout_margin="10dp"
             android:padding="10dp"
             android:text="@string/skip"
-            android:textColor="@drawable/selector_btn_text_default"
             android:textSize="20sp"/>
 
         <Button
@@ -107,7 +105,6 @@
             android:layout_margin="10dp"
             android:padding="10dp"
             android:text="@string/cancel"
-            android:textColor="@drawable/selector_btn_text_default"
             android:textSize="20sp"/>
     </RelativeLayout>
 </LinearLayout>

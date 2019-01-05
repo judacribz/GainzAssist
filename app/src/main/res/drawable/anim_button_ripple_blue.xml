@@ -1,5 +1,5 @@
 <ripple
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="@color/colorAccent">
-    <item android:drawable="@drawable/tab_box_reverse"/>
+    <item android:drawable="@drawable/button_box_blue"/>
 </ripple>

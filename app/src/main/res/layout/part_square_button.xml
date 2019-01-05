@@ -6,5 +6,5 @@
     android:layout_height="match_parent"
     android:layout_margin="1dp"
     android:gravity="center"
-    android:background="@drawable/anim_button_ripple"
+    android:background="@drawable/anim_button_ripple_blue"
     android:textColor="@drawable/selector_btn_text_default"/>

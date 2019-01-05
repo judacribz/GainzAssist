@@ -24,6 +24,8 @@ import com.facebook.rebound.SpringSystem;
 import com.facebook.rebound.SpringUtil;
 import io.alterac.blurkit.BlurLayout;
 
+import static ca.judacribz.gainzassist.util.Preferences.getThemePref;
+
 public class UI {
 
     // Constants
@@ -51,6 +53,18 @@ public class UI {
         ButterKnife.bind(act);
         if (title != null) {
             setToolbar((AppCompatActivity) act, title, setBackArrow);
+        }
+
+        String col = getThemePref(act);
+
+        if (col != null) {
+            if (col.equals("blue")) {
+                act.setTheme(R.style.BlueTheme);
+            }    else if (col.equals("green")) {
+
+                act.setTheme(R.style.GreenTheme);
+            }
+
         }
     }
 
@@ -98,7 +112,7 @@ public class UI {
         // ExerciseSet the title for the part_title_bar
         ((TextView) act.findViewById(R.id.title)).setText(title);
 
-        act.setTheme(R.style.LoginTheme);
+        act.setTheme(R.style.BlueTheme);
 
         return title;
     }

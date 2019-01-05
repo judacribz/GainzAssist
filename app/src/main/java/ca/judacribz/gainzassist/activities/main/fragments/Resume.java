@@ -89,6 +89,7 @@ public class Resume extends Fragment implements SingleItemAdapter.ItemClickObser
                 this,
                 view =  inflater.inflate(R.layout.fragment_resume, container, false)
         );
+        setRetainInstance(true);
 
         // ExerciseSet the layout manager for the localWorkouts
         layoutManager = new LinearLayoutManager(act);

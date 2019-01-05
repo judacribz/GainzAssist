@@ -19,7 +19,7 @@
 		android:state_pressed="true"
 		android:state_focused="true"
 		android:state_active="true"
-		android:drawable="@drawable/anim_button_ripple"/>
+		android:drawable="@drawable/anim_button_ripple_blue"/>
 
-	<item android:drawable="@drawable/anim_button_ripple"/>
+	<item android:drawable="@drawable/anim_button_ripple_blue"/>
 </selector>

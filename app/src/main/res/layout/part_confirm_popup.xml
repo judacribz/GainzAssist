@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/llay_choice_popup"
     android:orientation="vertical"
-    android:background="@drawable/button_box"
+    android:background="@drawable/button_box_blue"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 

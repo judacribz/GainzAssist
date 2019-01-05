@@ -9,8 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.main.Main;
+
+import static ca.judacribz.gainzassist.util.Preferences.setTheme;
 
 public class Settings extends Fragment {
 
@@ -69,5 +72,18 @@ public class Settings extends Fragment {
     // Click Handling
     // ============================================================================================
 
+    @OnClick(R.id.btnBlue)
+    public void setBlue() {
+        setTheme(this.getContext(), "blue");
+        act.setTheme(R.style.BlueTheme);
+        act.recreate();
+    }
+    @OnClick(R.id.btnGreen)
+    public void setGreen() {
+
+        setTheme(this.getContext(), "green");
+        act.setTheme(R.style.GreenTheme);
+        act.recreate();
+    }
     //=Click=Handling==============================================================================
 }

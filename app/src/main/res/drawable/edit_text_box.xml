@@ -13,13 +13,13 @@
             android:type="radial"
             android:centerX="50%"
             android:centerY="50%"
-            android:startColor="#e3d4d4d4"
-            android:endColor="#e3d4d4d4"
+            android:startColor="@color/grey"
+            android:endColor="@color/grey"
             android:gradientRadius="900"/>
 
         <stroke
             android:width="2.5dp"
-            android:color="#29677d" />
+            android:color="@color/blue" />
         <corners
             android:radius="20dp"/>
     </shape>

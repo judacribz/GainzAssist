@@ -12,13 +12,21 @@
     <color name="colorLink">#0000EE</color>
     <color name="colorLightAccent">#cccccc</color>
     <color name="colorBlue">#039bd5</color>
-    <color name="colorGreen">#16A85A</color>
-    <color name="colorDarkGreen">#0F6B3A</color>
+    <color name="green">#16A85A</color>
+    <color name="greenDark">#0F6B3A</color>
     <color name="colorYellow">#FFE500</color>
+
+
+
+    <color name="blueDark">#e8054a6a</color>
+    <color name="blue">#e8125c81</color>
+
+
 
     <!-- YouTube icon colors -->
     <color name="ic_youtube_bg">@color/colorText</color>
     <color name="ic_youtube_btn_bg">@color/colorPrimaryDark</color>
     <color name="ic_youtube_btn_clicked_bg">@color/colorPrimaryDark</color>
     <color name="ic_youtube_pressed_bg">@color/colorPrimaryDark</color>
+	<color name="grey">#e3d4d4d4</color>
 </resources>

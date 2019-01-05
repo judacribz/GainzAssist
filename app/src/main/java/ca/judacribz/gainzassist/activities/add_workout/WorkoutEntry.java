@@ -12,6 +12,7 @@ import android.widget.Toast;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 
+import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class WorkoutEntry extends AppCompatActivity{
@@ -39,11 +40,14 @@ public class WorkoutEntry extends AppCompatActivity{
     @BindView(R.id.ibtn_inc_exercises) ImageButton ibtnIncExercises;
     @BindView(R.id.ibtn_dec_exercises) ImageButton ibtnDecExercises;
     // --------------------------------------------------------------------------------------------
-
+static boolean rec = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setInitView(this, R.layout.activity_workout_entry, R.string.add_workout, true);
+
+
+
 
     }
 
