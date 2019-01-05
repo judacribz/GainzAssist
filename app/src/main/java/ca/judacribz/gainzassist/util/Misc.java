@@ -41,9 +41,7 @@ public class Misc {
     public static Workout extractWorkout(DataSnapshot workoutShot) {
         ArrayList<Exercise> exercises = new ArrayList<>();
         Exercise exercise;
-        ArrayList<ExerciseSet> exerciseSets;
-        ExerciseSet exerciseSet;
-        String setNum;
+        long workoutId = Long.valueOf(String.valueOf(workoutShot.child("id").getValue()));
 
 
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
@@ -56,12 +54,13 @@ public class Misc {
                     exercise.setExerciseNumber(
                             Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()))
                     );
+                    exercise.setWorkoutId(workoutId);
                     exercises.add(exercise);
                 }
             }
         }
         Workout workout = new Workout(workoutShot.getKey(), exercises);
-        workout.setId(Long.valueOf(String.valueOf(workoutShot.child("id").getValue())));
+        workout.setId(workoutId);
 
         return workout;
     }

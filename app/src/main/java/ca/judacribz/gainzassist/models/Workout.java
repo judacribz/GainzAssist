@@ -59,7 +59,10 @@ public class Workout {
     }
 
     public void addExercise(Exercise exercise) {
-        exercises.add(exercise);
+        if (this.id != -1) {
+            exercise.setWorkoutId(id);
+        }
+        this.exercises.add(exercise);
     }
 
     public void removeExercise(Exercise exercise) {
@@ -87,6 +90,10 @@ public class Workout {
 
     public Exercise getExerciseFromIndex(int exIndex) {
         return this.exercises.get(exIndex);
+    }
+
+    public void setExercises(ArrayList<Exercise> exercises) {
+        this.exercises = exercises;
     }
 
     public ArrayList<Exercise> getExercises() {
@@ -133,9 +140,7 @@ public class Workout {
         return  exerciseNames;
     }
 
-    public void setExercises(ArrayList<Exercise> exercises) {
-        this.exercises = exercises;
-    }
+
 
     public int getNumExercises() {
         return this.exercises.size();

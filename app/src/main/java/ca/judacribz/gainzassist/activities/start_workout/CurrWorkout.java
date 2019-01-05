@@ -157,6 +157,8 @@ public class CurrWorkout {
 
         setCurrMainExercises(exercises);
 
+
+        Logger.d("EXERCISE SIZE HERE = " + exercises.size());
         for (Exercise ex: exercises) {
             equip = ex.getEquipment();
             minWeight = ex.getMinWeight();

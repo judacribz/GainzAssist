@@ -118,6 +118,9 @@ public class WorkoutRepo {
         setRepoAsyncConfig(GET_WORKOUT, WORKOUTS_TXN, context, name);
     }
 
+    public LiveData<Long> workoutExists(long id) {
+        return workoutDao.exists(id);
+    }
     public void getWorkoutId(Context context, DataSnapshot workoutShot) {
         setRepoAsyncConfig(GET_WORKOUT_ID, WORKOUTS_TXN, context, workoutShot.getKey(), workoutShot);
     }
@@ -166,8 +169,8 @@ public class WorkoutRepo {
         setRepoAsyncConfig(DELETE_ALL_WORKOUTS, WORKOUTS_TXN, null, (Object) null);
     }
 
-    public void deleteWorkout(String workoutName) {
-        setRepoAsyncConfig(DELETE_WORKOUT, WORKOUTS_TXN, null, workoutName);
+    public void deleteWorkout(Workout workout) {
+        setRepoAsyncConfig(DELETE_WORKOUT, WORKOUTS_TXN, null, workout);
     }
 
     void deleteExercise(Exercise exercise) {
@@ -198,13 +201,15 @@ public class WorkoutRepo {
                     case GET_WORKOUT_ID:
                         repoAsyncTask.setWorkoutShot((DataSnapshot) obj[1]);
                     case GET_WORKOUT:
-                    case DELETE_WORKOUT:
                         if (context != null) {
                             repoAsyncTask.setOnWorkoutReceivedListener(
                                     (OnWorkoutReceivedListener) context
                             );
                         }
                         repoAsyncTask.setWorkoutName((String) obj[0]);
+                        break;
+                    case DELETE_WORKOUT:
+                        repoAsyncTask.setWorkout((Workout) obj[0]);
                         break;
                 }
             break;
@@ -215,6 +220,7 @@ public class WorkoutRepo {
                     case UPDATE_EXERCISE_WEIGHT:
 //                        repoAsyncTask.setExerciseWeights((SparseArray<Float>) obj[0]);
                         break;
+                    case UPDATE_EXERCISE:
                     default:
                         repoAsyncTask.setExercise((Exercise) obj[0]);
                         break;
@@ -328,8 +334,10 @@ public class WorkoutRepo {
                     case INSERT_WORKOUT:
                         workoutDao.insert(workout);
                         id = workout.getId();
-                        Logger.d("ExerciseConst:" + workout.getName() + " id : " + workoutDao.getId(workoutName));
+//                        Logger.d("ExerciseConst:" + workout.getName() + " id : " + id);
                         for (Exercise exercise : workout.getExercises()) {
+
+//                            Logger.d("ExerciseConst:" + exercise.getName() + " id : " +exercise.getWorkoutId());
                             exercise.setWorkoutId(id);
                             setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
                         }
@@ -367,17 +375,15 @@ public class WorkoutRepo {
 
 
                     case UPDATE_WORKOUT:
-                        id = workoutDao.getId(workoutName);
-                        workout.setId(id);
                         workoutDao.update(workout);
+                        id = workout.getId();
                         for (Exercise exercise : workout.getExercises()) {
-                            exercise.setWorkoutId(id);
                             setRepoAsyncConfig(UPDATE_EXERCISE, EXERCISES_TXN, null, exercise);
                         }
                         break;
 
                     case UPDATE_EXERCISE:
-                        exercise.setId(exerciseDao.getId(exercise.getName(), exercise.getWorkoutId()));
+//                        exercise.setId(exerciseDao.getId(exercise.getName(), exercise.getWorkoutId()));
                         exerciseDao.update(exercise);
                         break;
 
@@ -391,7 +397,7 @@ public class WorkoutRepo {
                         break;
 
                     case DELETE_WORKOUT:
-                        workoutDao.delete(workoutName);
+                        workoutDao.delete(workout);
                         break;
 
                     case DELETE_EXERCISE:

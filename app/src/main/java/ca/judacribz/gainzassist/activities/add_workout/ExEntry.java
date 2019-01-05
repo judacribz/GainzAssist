@@ -68,11 +68,6 @@ public class ExEntry extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement ExEntryDataListener");
         }
-
-//        bundle = getArguments();
-//        if (bundle != null) {
-//            this.ex_i = bundle.getInt(EXTRA_EX_INDEX);
-//        }
     }
 
     @Override
@@ -233,7 +228,6 @@ public class ExEntry extends Fragment {
     @OnClick(R.id.ibtn_inc_weight)
     public void incNumWeight() {
         etWeight.setText(String.valueOf(weight + weightChange));
-
     }
 
     /* Decrease weight */
@@ -316,5 +310,4 @@ public class ExEntry extends Fragment {
         exEntryDataListener.cancelWorkout();
     }
     //=Click=Handling===============================================================================
-
 }

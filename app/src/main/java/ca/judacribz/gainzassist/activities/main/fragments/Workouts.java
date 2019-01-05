@@ -41,7 +41,6 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     // Constants
     // --------------------------------------------------------------------------------------------
     private static final Workouts INST = new Workouts();
-
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -124,8 +123,10 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
                     if (workoutAdapter == null) {
                         displayWorkoutList(workoutNames);
                     } else {
-                        workoutAdapter.setItems(workoutNames);
-                        workoutAdapter.notifyDataSetChanged();
+//                        workoutAdapter.setItems(workoutNames);
+//                        workoutAdapter.notifyDataSetChanged();
+
+                        displayWorkoutList(workoutNames);
                     }
                 }
             }
@@ -141,8 +142,8 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         workLiv.removeObserver(workObs);
     }
 

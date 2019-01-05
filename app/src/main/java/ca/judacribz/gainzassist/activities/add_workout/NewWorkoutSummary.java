@@ -20,6 +20,7 @@ import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
@@ -59,8 +60,8 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     ArrayList<Exercise> exercises;
     ArrayList<ExerciseSet> exSets;
     Workout workout;
+    long workoutId;
 
-    long id = -1;
     int num_reps, num_sets, minInt = 1; // for min num_reps/num_sets
     float weight, minWeight, weightChange;
 
@@ -102,11 +103,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
         Intent intent = getIntent();
-        workout = (Workout) Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
-        long id = workout.getId();
-        if (id != -1) {
-            this.id = id;
-        }
+        workout = Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
+        workoutId = workout.getId();
+
         switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {
             case WORKOUTS_LIST:
                 btnAddWorkout.setText(getString(R.string.update_workout));
@@ -133,11 +132,10 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
 
         exercises = workout.getExercises();
+
         updateAdapter();
 
         etWorkoutName.setText(workout.getName());
-
-        workoutHelper = new WorkoutHelper(this);
     }
 
 
@@ -360,13 +358,13 @@ Exercise ex;
     }
 
     private Exercise updateExerciseData(int exNumber, String exName) {
+        Exercise exercise;
         etExerciseName.setText("");
         if (exNumber == -1) {
             exNumber = workout.getNumExercises();
         }
 
-        // add exercise to list
-        return new Exercise(
+        exercise = new Exercise(
                 exNumber,
                 exName,
                 sprType.getSelectedItem().toString().toLowerCase(),
@@ -376,6 +374,9 @@ Exercise ex;
                 getTextFloat(etWeight),
                 MAIN_SET
         );
+        exercise.setWorkoutId(workoutId);
+
+        return exercise;
     }
 
 
@@ -401,8 +402,14 @@ Exercise ex;
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show();
             } else {
 
-                workout = new Workout(getTextString(etWorkoutName), exercises);
-                workout.setId(this.id);
+                workout.setName(getTextString(etWorkoutName));
+                workout.setExercises(exercises);
+
+                Logger.d("ExerciseConst:" + workout.getName() + " id : " + workout.getId());
+                for (Exercise ex : workout.getExercises()) {
+                    Logger.d("ExerciseConst:" + ex.getName() + " id : " + ex.getWorkoutId());
+                }
+
 
                 addWorkoutFirebase(workout);
 
@@ -428,7 +435,6 @@ Exercise ex;
     /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
     @OnClick(R.id.btn_discard_workout)
     public void discardWorkout() {
-        workoutHelper.close();
         finish();
     }
 

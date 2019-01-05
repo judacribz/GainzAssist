@@ -34,7 +34,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
             WorkoutScreen.getInstance(),
             ExercisesList.getInstance()
     };
-    FragmentManager fragmentManager;
+    private FragmentManager fragmentManager;
     private int numExs;
     // --------------------------------------------------------------------------------------------
 
@@ -51,7 +51,6 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         super(fragmentManager);
         this.fragmentManager = fragmentManager;
 
-//        Log.d("WARMUPS", "reps" + warmups.getLive(0).getSetsList().size());
         bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]));
         ArrayList<Exercise> warmups = exercises[1];
 

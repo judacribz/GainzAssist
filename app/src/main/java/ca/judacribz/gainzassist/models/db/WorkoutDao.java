@@ -28,6 +28,9 @@ public interface WorkoutDao {
     @Query("SELECT id from  workouts WHERE name = :name")
     long getId(String name);
 
+    @Query("SELECT id from  workouts WHERE id = :id")
+    LiveData<Long> exists(long id);
+
 
     @Update
     void update(Workout... workout);
@@ -36,6 +39,9 @@ public interface WorkoutDao {
     @Query("DELETE FROM workouts")
     void deleteAll();
 
-    @Query("DELETE from workouts WHERE name = :name")
-    void delete(String name);
+//    @Query("DELETE from workouts WHERE name = :name")
+//    void delete(String name);
+
+    @Delete
+    void delete(Workout workout);
 }

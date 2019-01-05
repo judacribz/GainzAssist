@@ -15,6 +15,7 @@ import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
                 entity = Workout.class,
                 parentColumns = "id",
                 childColumns = "workout_id",
+                onUpdate = CASCADE,
                 onDelete = CASCADE),
                 indices = {@Index(value = {"workout_id", "exercise_number"})})
 public class Exercise {
@@ -38,7 +39,7 @@ public class Exercise {
     long id = -1;
 
     @ColumnInfo(name = "workout_id")
-    long workoutId;
+    long workoutId = -1;
 
     @ColumnInfo(name = "exercise_number")
     int exerciseNumber;
@@ -278,27 +279,20 @@ Logger.d("setlist size " + setsList.size());
     /* Misc function used to store Exercise information in the firebase db */
     public Map<String, Object> toMap() {
         return new HashMap<String, Object>() {{
-            put("name", name);
-            put("type", type);
+            put("id",        id);
+            put("name",      name);
+            put("type",      type);
             put("equipment", equipment);
-            put("sets", sets);
-            put("reps", reps);
-            put("weight", weight);
+            put("sets",      sets);
+            put("reps",      reps);
+            put("weight",    weight);
         }};
     }
 
     public Map<String, Object> setsToMap() {
         Map<String, Object>
                 setMap = new HashMap<>(),
-                exMap = new HashMap<String, Object>() {{
-                    put("id",      id);
-                    put("name",      name);
-                    put("type",      type);
-                    put("equipment", equipment);
-                    put("sets", sets);
-                    put("reps", reps);
-                    put("weight", weight);
-                }};
+                exMap = toMap();
 
         for (ExerciseSet set : this.finSets) {
             setMap.put(String.valueOf(set.getSetNumber()), set.toMap());

@@ -38,6 +38,7 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     // --------------------------------------------------------------------------------------------
     Workout workout;
     int numExs;
+    long workoutId;
 
     LayoutInflater layInflater;
 
@@ -54,11 +55,14 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
                 "Exercises Entry",
                 true
         );
-        this.workout = new Workout();
+        workout = new Workout();
+        workout.setId(-1);
+        workoutId = workout.getId();
+
 
         Intent workoutEntryIntent = getIntent();
-        this.workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
-        this.numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_NUM);
+        workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
+        numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_NUM);
 
         setupPager();
     }
@@ -136,17 +140,16 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
 
     @Override
     public void exerciseDataReceived(Exercise exercise) {
+        exercise.setWorkoutId(workoutId);
         workout.addExercise(exercise);
 
-        Toast.makeText(this, "" + exercise.getExerciseNumber(), Toast.LENGTH_SHORT).show();
-
-        if (workout.getNumExercises() == this.numExs) {
+        if (workout.getNumExercises() >= numExs) {
             Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
             newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
             startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
         } else {
-            for (int i = 0; i < this.numExs; i++) {
+            for (int i = 0; i < numExs; i++) {
                 if (!workout.exerciseAtNumExists(i)) {
                     viewPager.setCurrentItem(i, true);
                     break;

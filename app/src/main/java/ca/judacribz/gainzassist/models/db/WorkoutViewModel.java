@@ -105,7 +105,7 @@ public class WorkoutViewModel extends AndroidViewModel {
     }
 
     public void deleteWorkout(Workout workout) {
-        workoutRepo.deleteWorkout(workout.getName());
+        workoutRepo.deleteWorkout(workout);
     }
 
     public void deleteExercise(Exercise exercise) {
