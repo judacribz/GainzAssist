@@ -24,7 +24,7 @@
     </style>
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:background">@drawable/edit_text_box</item>
+        <item name="android:background">@drawable/edit_text_box_blue</item>
         <item name="android:inputType">textNoSuggestions</item>
         <item name="android:padding">10dp</item>
         <item name="android:textAlignment">center</item>

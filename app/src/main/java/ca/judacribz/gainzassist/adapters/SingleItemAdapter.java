@@ -9,8 +9,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import java.util.ArrayList;
 
+import static com.facebook.rebound.ui.Util.dpToPx;
+
 public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.ButtonViewHolder> {
 
+    private final Context context;
     // Interfaces
     // --------------------------------------------------------------------------------------------
     private ItemClickObserver itemClickObserver;
@@ -35,6 +38,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
                              ArrayList<String> itemNames,
                              int listItemLayout,
                              int listItemId) {
+        this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.itemNames = itemNames;
         this.listItemLayout = listItemLayout;
@@ -54,7 +58,6 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
     @Override
     public void onBindViewHolder(@NonNull ButtonViewHolder holder, int position) {
         holder.bind(itemNames.get(position));
-        //
     }
 
     @Override
@@ -80,6 +83,8 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.Bu
             listItemButtonView = (Button) itemView.findViewById(listItemId);
             listItemButtonView.setOnClickListener(this);
             listItemButtonView.setOnLongClickListener(this);
+            listItemButtonView.setElevation(dpToPx(2, context.getResources()));
+            listItemButtonView.setTranslationZ(dpToPx(2, context.getResources()));
         }
 
         // Sets the text for each button item

@@ -3,8 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sqrBtnListItem"
     android:layout_width="80dp"
-    android:layout_height="match_parent"
+    android:layout_height="80dp"
     android:layout_margin="1dp"
-    android:gravity="center"
-    android:background="@drawable/anim_button_ripple_blue"
-    android:textColor="@drawable/selector_btn_text_default"/>
+    android:gravity="center"/>

@@ -1,6 +1,5 @@
 package ca.judacribz.gainzassist.activities.main.fragments;
 
-import android.app.ProgressDialog;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -16,8 +15,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,12 +25,9 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import ca.judacribz.gainzassist.util.UI.*;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.OnItemClickListener;
 import com.orhanobut.dialogplus.ViewHolder;
-import me.grantland.widget.AutofitTextView;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +94,7 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
                     }
                 })
                 .setContentHolder(new ViewHolder(R.layout.dialog_workout))
-                .setContentBackgroundResource(R.drawable.edit_text_box)
+                .setContentBackgroundResource(R.drawable.edit_text_box_blue)
                 .setExpanded(true)
                 .setGravity(Gravity.CENTER)
                 .setCancelable(true)

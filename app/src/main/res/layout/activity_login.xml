@@ -165,6 +165,8 @@
 		android:layout_alignEnd="@id/tiLay_email"
 		android:layout_alignStart="@id/tiLay_email"
 		android:gravity="center"
+		android:elevation="4dp"
+		android:translationZ="4dp"
 		android:text="@string/login"/>
 
 	<!-- Sign up button -->

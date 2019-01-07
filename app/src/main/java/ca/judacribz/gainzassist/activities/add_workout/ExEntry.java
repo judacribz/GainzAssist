@@ -1,8 +1,6 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -10,9 +8,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.*;
 import butterknife.*;
+
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
 
@@ -21,19 +19,37 @@ import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class ExEntry extends Fragment {
-    ExEntryDataListener exEntryDataListener;
+
+    // Interfaces
+    // --------------------------------------------------------------------------------------------
+    private ExEntryDataListener exEntryDataListener;
+
     public interface ExEntryDataListener {
         boolean checkExerciseExists(ExEntry fmt, String exerciseName);
         void exerciseDataReceived(Exercise exercise);
         void deleteExercise(@Nullable Exercise exercise, int index);
         void cancelWorkout();
     }
+    // --------------------------------------------------------------------------------------------
 
+    // Constants
+    // --------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------
+
+    // Global Vars
+    // --------------------------------------------------------------------------------------------
+    View view;
     Exercise exercise = null;
     String exerciseName;
-
-    int num_reps, num_sets, ex_i = 0, minInt = 1; // for min num_reps/num_sets
-    float weight, minWeight, weightChange;
+    int
+            num_reps,
+            num_sets,
+            ex_i = 0,
+            minInt = MIN_INT;
+    float
+            weight,
+            minWeight,
+            weightChange;
 
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
     @BindView(R.id.et_weight) EditText etWeight;
@@ -48,17 +64,41 @@ public class ExEntry extends Fragment {
 
     @BindView(R.id.btn_update) Button btnUpdate;
 
-    @BindViews({R.id.et_exercise_name, R.id.et_weight, R.id.et_num_reps, R.id.et_num_sets})
-    EditText[] formEntries;
+    @BindViews({
+            R.id.et_exercise_name,
+            R.id.et_weight,
+            R.id.et_num_reps,
+            R.id.et_num_sets
+    }) EditText[] formEntries;
+    // --------------------------------------------------------------------------------------------
 
+    // ######################################################################################### //
+    // ExEntry Constructor/Instance                                                        //
+    // ######################################################################################### //
     public ExEntry() {
-        // Required empty public constructor
     }
+    // ######################################################################################### //
 
     public void setInd(int index) {
         this.ex_i = index;
     }
 
+    public void updateExFields(@Nullable Exercise exercise) {
+        if (exercise == null) {
+            etExerciseName.setText("");
+            etWeight.setText("");
+            etNumSets.setText("");
+            etNumReps.setText("");
+        } else {
+            etExerciseName.setText(exercise.getName());
+            setText(etWeight, exercise.getWeight());
+            setText(etNumSets, exercise.getSets());
+            setText(etNumReps, exercise.getReps());
+        }
+    }
+
+    // Fragment Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -75,7 +115,13 @@ public class ExEntry extends Fragment {
             @NonNull LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
+
+        if (view != null) {
+            return view;
+        }
+        setRetainInstance(true);
+
+        view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
         ButterKnife.bind(this, view);
 
         num_reps = Integer.valueOf(getString(R.string.starting_reps));
@@ -86,14 +132,16 @@ public class ExEntry extends Fragment {
         return view;
     }
 
-
     @Override
     public void onDetach() {
         super.onDetach();
         exEntryDataListener = null;
     }
+    //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
 
+    // OnItemSelected Handling
+    // ============================================================================================
     @OnItemSelected(R.id.spr_equipment)
     public void equipmentSelected(int position) {
         switch (position) {
@@ -104,67 +152,43 @@ public class ExEntry extends Fragment {
             case 1:
                 minWeight = DB_MIN_WEIGHT;
                 weightChange = DB_WEIGHT_CHANGE;
+                break;
             default:
                 minWeight = MIN_WEIGHT;
                 weightChange = WEIGHT_CHANGE;
                 break;
         }
 
-
         if (weight > minWeight) {
-
-            if (!ibtnDecWeight.isEnabled()) {
-                ibtnDecWeight.setEnabled(true);
-                ibtnDecWeight.setVisibility(View.VISIBLE);
-            }
+            setVisibleIfDisabled(ibtnDecWeight);
         } else {
             etWeight.setText(String.valueOf(minWeight));
-
-            if (ibtnDecWeight.isEnabled()) {
-                ibtnDecWeight.setEnabled(false);
-                ibtnDecWeight.setVisibility(View.GONE);
-            }
+            setGoneIfEnabled(ibtnDecWeight);
         }
-
     }
+    // =OnItemSelected=Handling=====================================================================
+
 
     // OnTextChanged Handling
     // =============================================================================================
     @OnTextChanged(value = R.id.et_weight, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeNumExercisesChanged() {
-        if (!ibtnDecWeight.isEnabled()) {
-            ibtnDecWeight.setEnabled(true);
-            ibtnDecWeight.setVisibility(View.VISIBLE);
-        }
+        setVisibleIfDisabled(ibtnDecWeight);
     }
 
     @OnTextChanged(value = R.id.et_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onNumExercisesChanged(CharSequence s, int start, int before, int count) {
-        String weightStr = s.toString();
-        weight = (weightStr.isEmpty()) ? minWeight : Float.valueOf(weightStr);
-
-        if (weight <= minWeight) {
-            ibtnDecWeight.setEnabled(false);
-            ibtnDecWeight.setVisibility(View.GONE);
-        }
-
+        weight = handleNumChanged(ibtnDecWeight, s.toString(), minWeight).floatValue();
     }
 
     @OnTextChanged(value = R.id.et_num_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
-        beforeNumChanged(ibtnDecReps);
+        setVisibleIfDisabled(ibtnDecReps);
     }
 
     @OnTextChanged(value = R.id.et_num_sets, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeSetsChanged() {
-        beforeNumChanged(ibtnDecSets);
-    }
-
-    public void beforeNumChanged(ImageButton ibtnDec) {
-        if (!ibtnDec.isEnabled()) {
-            ibtnDec.setEnabled(true);
-            ibtnDec.setVisibility(View.VISIBLE);
-        }
+        setVisibleIfDisabled(ibtnDecSets);
     }
 
     @OnTextChanged(R.id.et_num_reps)
@@ -172,7 +196,7 @@ public class ExEntry extends Fragment {
                               int start,
                               int before,
                               int count) {
-        num_reps = onNumChanged(ibtnDecReps, s.toString());
+        num_reps = handleNumChanged(ibtnDecReps, s.toString(), minInt).intValue();
     }
 
     @OnTextChanged(R.id.et_num_sets)
@@ -180,20 +204,10 @@ public class ExEntry extends Fragment {
                               int start,
                               int before,
                               int count) {
-        num_sets = onNumChanged(ibtnDecSets, s.toString());
-    }
-
-    public int onNumChanged(ImageButton ibtnDec, String str) {
-        int value = (str.isEmpty()) ? minInt : Integer.valueOf(str);
-
-        if (value <= minInt) {
-            ibtnDec.setEnabled(false);
-            ibtnDec.setVisibility(View.GONE);
-        }
-
-        return value;
+        num_sets = handleNumChanged(ibtnDecSets, s.toString(), minInt).intValue();
     }
     // =OnTextChanged=Handling======================================================================
+
 
     // OnFocusChanged Handling
     // =============================================================================================
@@ -218,46 +232,46 @@ public class ExEntry extends Fragment {
 
             handleFocusLeft(et, min, res);
         }
-
     }
     // =OnFocusChanged=Handling=====================================================================
+
 
     // Click Handling
     // =============================================================================================
     /* Increase weight */
     @OnClick(R.id.ibtn_inc_weight)
     public void incNumWeight() {
-        etWeight.setText(String.valueOf(weight + weightChange));
+        setText(etWeight, weight + weightChange);
     }
 
     /* Decrease weight */
     @OnClick(R.id.ibtn_dec_weight)
     public void decNumWeight() {
-        etWeight.setText(String.valueOf(Math.max(weight - weightChange, minWeight)));
+        setText(etWeight, Math.max(weight - weightChange, minWeight));
     }
 
     /* Increase num_reps */
     @OnClick(R.id.ibtn_inc_reps)
     public void incNumReps() {
-        etNumReps.setText(String.valueOf(num_reps + 1));
+        setText(etNumReps, num_reps + 1);
     }
 
     /* Decrease num_reps */
     @OnClick(R.id.ibtn_dec_reps)
     public void decNumReps() {
-        etNumReps.setText(String.valueOf(num_reps - 1));
+        setText(etNumReps, num_reps - 1);
     }
 
     /* Increase num_sets */
     @OnClick(R.id.ibtn_inc_sets)
     public void incNumSets() {
-        etNumSets.setText(String.valueOf(num_sets + 1));
+        setText(etNumSets, num_sets + 1);
     }
 
     /* Decrease num_sets */
     @OnClick(R.id.ibtn_dec_sets)
     public void decNumSets() {
-        etNumSets.setText(String.valueOf(num_sets - 1));
+        setText(etNumSets, num_sets - 1);
     }
 
     @OnClick(R.id.btn_enter)

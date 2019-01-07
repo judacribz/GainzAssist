@@ -93,16 +93,22 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         return fmts.get(position);
     }
+    //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
 
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
 
-        for (int i = 0; i < this.numExs; i++) {
-            ((ExEntry) fmts.get(i)).setInd(i);
+    public void notifyDataSetChanged(ArrayList<Exercise> exercises) {
+        notifyDataSetChanged();
+
+        ExEntry exEntryFmt;
+        int i;
+        for (Fragment fmt : fmts) {
+            exEntryFmt = (ExEntry) fmt;
+            i = fmts.indexOf(fmt);
+
+            exEntryFmt.setInd(i);
+            exEntryFmt.updateExFields(exercises.get(i));
         }
     }
-    //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
 
     public void addTab() {
         this.numExs++;
@@ -119,5 +125,4 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         this.numExs--;
         fmts.remove(getCount() - index - 1);
     }
-
 }

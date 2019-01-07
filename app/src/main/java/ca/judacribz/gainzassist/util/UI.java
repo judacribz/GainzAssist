@@ -10,11 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import butterknife.ButterKnife;
 
 import ca.judacribz.gainzassist.R;
@@ -49,24 +45,14 @@ public class UI {
         setInitView(act, layoutId, act.getResources().getString(titleId), setBackArrow);
     }
     public static void setInitView(Activity act, int layoutId, String title, boolean setBackArrow) {
+        setInitTheme(act);
         act.setContentView(layoutId);
         ButterKnife.bind(act);
         if (title != null) {
             setToolbar((AppCompatActivity) act, title, setBackArrow);
         }
-
-        String col = getThemePref(act);
-
-        if (col != null) {
-            if (col.equals("blue")) {
-                act.setTheme(R.style.BlueTheme);
-            }    else if (col.equals("green")) {
-
-                act.setTheme(R.style.GreenTheme);
-            }
-
-        }
     }
+
 
     /* Exits app and goes to home screen if back pressed twice from this screen */
     public static void handleBackButton(Context context) {
@@ -112,9 +98,20 @@ public class UI {
         // ExerciseSet the title for the part_title_bar
         ((TextView) act.findViewById(R.id.title)).setText(title);
 
-        act.setTheme(R.style.BlueTheme);
-
         return title;
+    }
+
+    public static void setInitTheme(Activity act) {
+        String col = getThemePref(act);
+
+        if (col != null) {
+            if (col.equals("blue")) {
+                act.setTheme(R.style.BlueTheme);
+            }    else if (col.equals("green")) {
+
+                act.setTheme(R.style.GreenTheme);
+            }
+        }
     }
 
     /* Sets the spinner with the given array resource in the Activity */
@@ -229,7 +226,37 @@ public class UI {
     }
 
 
+    /* Text changed handling */
+    public static void setVisibleIfDisabled(View view) {
+        if (!view.isEnabled()) {
+            view.setEnabled(true);
+            view.setVisibility(View.VISIBLE);
+        }
+    }
 
+    public static Number handleNumChanged(View  view, String str, Number min) {
+        Number num = (str.isEmpty()) ? min : Float.valueOf(str);
+
+        if (num.floatValue() <= min.floatValue()) {
+            setGoneIfEnabled(view);
+        }
+
+        return num;
+    };
+
+    public static void setGoneIfEnabled(View view) {
+        if (view.isEnabled()) {
+            view.setEnabled(false);
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    public static void setText(EditText view, Number num) {
+        view.setText(String.valueOf(num));
+    }
+
+
+    /* Progress display */
     public static class ProgressHandler extends Handler {
 
         private static String DOT = "...";

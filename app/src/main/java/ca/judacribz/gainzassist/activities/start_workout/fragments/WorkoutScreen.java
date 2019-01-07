@@ -66,10 +66,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
-    // WorkoutScreen Constructor/Instance                                                          //
+    // WorkoutScreen Constructor/Instance                                                        //
     // ######################################################################################### //
     public WorkoutScreen() {
-        // Required empty public constructor
     }
 
     public static WorkoutScreen getInstance() {
@@ -108,13 +107,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         super.onResume();
         currWorkout.setTimerListener(this);
 
-//        if (equipmentView == null) {
-//            setupEquipView();
-//        }
-
         updateUI();
-
-
     }
 
     @Override
@@ -128,23 +121,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     public void onDestroy() {
         super.onDestroy();
     }
-
-    // ExerciseSet up the custom view (EquipmentView) to display the equipment. View added dynamically
-    // to trigger onDraw method
-    public void setupEquipView() {
-        equipmentView = new EquipmentView(act);
-        int p = getResources().getDisplayMetrics().widthPixels;
-
-
-        equipmentView.setLayoutParams(new LayoutParams(
-                        p/2,
-                        LayoutParams.MATCH_PARENT
-        ));
-
-
-//        vgEquipDisp.addView(equipmentView, 0);
-        tvTimer.setWidth(p/2);
-    }
+    //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
     @Override
     public void startTimer(long timeInMillis) {
@@ -184,7 +161,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
             }
         };
     }
-    //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
     // TextWatcher Handling
     // =============================================================================================

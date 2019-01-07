@@ -58,17 +58,21 @@ public class Workout {
         this.name = name;
     }
 
-    public void addExercise(Exercise exercise) {
-        if (this.id != -1) {
+    public void addExercise(@Nullable Exercise exercise) {
+        if (exercise != null && this.id != -1) {
             exercise.setWorkoutId(id);
         }
         this.exercises.add(exercise);
     }
 
+
     public void removeExercise(Exercise exercise) {
-        exercises.remove(exercise);
+        this.exercises.remove(exercise);
+        this.exercises.trimToSize();
+        int i;
         for (Exercise ex : exercises) {
-            ex.setExerciseNumber(exercises.indexOf(ex));
+            i = exercises.indexOf(ex);
+            ex.setExerciseNumber(i);
         }
     }
 
@@ -144,16 +148,6 @@ public class Workout {
 
     public int getNumExercises() {
         return this.exercises.size();
-    }
-
-    public boolean exerciseAtNumExists(int i) {
-        for (Exercise ex : exercises) {
-            if (ex.getExerciseNumber() == i) {
-                return true;
-            }
-        }
-
-        return  false;
     }
     // --------------------------------------------------------------------------------------------
 }

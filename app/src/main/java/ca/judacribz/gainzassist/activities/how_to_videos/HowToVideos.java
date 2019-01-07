@@ -31,9 +31,9 @@ import static ca.judacribz.gainzassist.util.UI.setToolbar;
 public class HowToVideos extends AppCompatActivity implements
         MaterialSearchView.OnQueryTextListener,
         SearchVideosTask.YouTubeSearchObserver,
-       ThumbnailAdapter.VideoClickObserver,
-       YouTubePlayer.OnInitializedListener,
-       YouTubePlayer.PlayerStateChangeListener {
+        ThumbnailAdapter.VideoClickObserver,
+        YouTubePlayer.OnInitializedListener,
+        YouTubePlayer.PlayerStateChangeListener {
 
     // Constants
     // --------------------------------------------------------------------------------------------

@@ -7,9 +7,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.widget.*;
-
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
@@ -17,9 +16,9 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Workout;
 import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
-
 import java.util.ArrayList;
 
+import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.*;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.*;
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
@@ -36,9 +35,13 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    WorkoutPagerAdapter  workoutPagerAdapter;
+    ArrayList<TabLayout.Tab> tabs = new ArrayList<>();
     Workout workout;
-    int numExs;
+    int numExs, addedExs = 0;
     long workoutId;
+
+    SparseArray<Exercise> exercises;
 
     LayoutInflater layInflater;
 
@@ -46,6 +49,8 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     @BindView(R.id.vp_fmt_container) ViewPager viewPager;
     // --------------------------------------------------------------------------------------------
 
+    // AppCompatActivity Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,17 +64,31 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         workout.setId(-1);
         workoutId = workout.getId();
 
-
         Intent workoutEntryIntent = getIntent();
         workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
-        numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_NUM);
+        numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_INT);
+
+        exercises = new SparseArray<>(numExs);
 
         setupPager();
     }
 
-    WorkoutPagerAdapter  workoutPagerAdapter;
 
-    ArrayList<TabLayout.Tab> tabs = new ArrayList<>();
+    @Override
+    protected void onActivityResult(int req, int res, Intent data) {
+        if (req == REQ_NEW_WORKOUT_SUMMARY) {
+            finish();
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
+    }
+    //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
+
+
     private void setupPager() {
         layInflater = getLayoutInflater();
 
@@ -102,7 +121,7 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
             }
         });
 
-        for (int i = 0; i < this.numExs; i ++) {
+        for (int i = 0; i < this.numExs; i++) {
             TabLayout.Tab tab = tabLayout.newTab().setText(String.format(TAB_LABEL, i + 1));
             tabs.add(tab);
             tabLayout.addTab(tab);
@@ -119,20 +138,26 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         });
         viewPager.setAdapter(workoutPagerAdapter);
         viewPager.setCurrentItem(0);
-}
-
-    @Override
-    protected void onActivityResult(int req, int res, Intent data) {
-        if (req == REQ_NEW_WORKOUT_SUMMARY) {
-            finish();
-        }
     }
 
+    // ExEntry.ExEntryDataListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean checkExerciseExists(ExEntry fmt, String exerciseName) {
-        if (workout.containsExercise(exerciseName)) {
-            fmt.setExerciseExists();
-            return true;
+        Exercise ex;
+        String name;
+
+        for (int i = 0; i < exercises.size(); i++) {
+            ex = exercises.get(i);
+            if (ex == null) {
+                continue;
+            }
+            name = ex.getName();
+
+            if (name.equals(exerciseName)) {
+                fmt.setExerciseExists();
+                return true;
+            }
         }
 
         return false;
@@ -141,16 +166,14 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     @Override
     public void exerciseDataReceived(Exercise exercise) {
         exercise.setWorkoutId(workoutId);
-        workout.addExercise(exercise);
+        exercises.put(exercise.getExerciseNumber(), exercise);
 
-        if (workout.getNumExercises() >= numExs) {
-            Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
-            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
-            newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
-            startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
+        addedExs++;
+        if (addedExs >= numExs) {
+            goToSummary();
         } else {
             for (int i = 0; i < numExs; i++) {
-                if (!workout.exerciseAtNumExists(i)) {
+                if (exercises.get(i) == null) {
                     viewPager.setCurrentItem(i, true);
                     break;
                 }
@@ -161,9 +184,15 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     @Override
     public void deleteExercise(@Nullable Exercise exercise, int index) {
         if (exercise != null) {
-            workout.removeExercise(exercise);
+            addedExs--;
         }
+
+        exercises.remove(index);
         this.numExs--;
+
+        if (addedExs >= this.numExs) {
+            goToSummary();
+        }
 
         tabLayout.removeTabAt(index);
         tabs.remove(index);
@@ -180,12 +209,23 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         }
 
         workoutPagerAdapter.removeTabFragment(index);
+
         workoutPagerAdapter.notifyDataSetChanged();
+        viewPager.setAdapter(workoutPagerAdapter);
+//        viewPager.setCurrentItem(0);
+
     }
 
     @Override
     public void cancelWorkout() {
         finish();
     }
+    //ExEntry.ExEntryDataListener//Override////////////////////////////////////////////////////////
 
+    private void goToSummary() {
+        Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
+        newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
+        newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
+        startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
+    }
 }

@@ -102,8 +102,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         setInitView(this, R.layout.activity_new_workout_summary, R.string.title_new_workout_summary, true);
 
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel.class);
+
         Intent intent = getIntent();
-        workout = Parcels.unwrap(intent.getParcelableExtra(EXTRA_WORKOUT));
+        workout = Parcels.unwrap(getIntent().getParcelableExtra(EXTRA_WORKOUT));
         workoutId = workout.getId();
 
         switch((CALLING_ACTIVITY) intent.getSerializableExtra(EXTRA_CALLING_ACTIVITY)) {

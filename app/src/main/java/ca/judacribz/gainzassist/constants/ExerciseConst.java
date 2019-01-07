@@ -17,6 +17,7 @@ public class ExerciseConst {
     public static final float DB_WEIGHT_CHANGE = 2.5f;
     public static final float WEIGHT_CHANGE = 5.0f;
 
+    public static final int MIN_INT = 1;
     public static final int MIN_REPS = 0;
     public static final long HEAVY_REST_TIME = 180000;
     public static final long LIGHT_REST_TIME = 90000;
