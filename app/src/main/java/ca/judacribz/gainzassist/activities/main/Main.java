@@ -45,10 +45,12 @@ public class Main extends AppCompatActivity implements
     public static final String EXTRA_LOGOUT_USER = "ca.judacribz.gainzassist.EXTRA_LOGOUT_USER";
     public static final String EXTRA_WORKOUT
             = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT";
-    public final Fragment[] fmts = new Fragment[] {
-            Resume.getInstance(),
-            Workouts.getInstance(),
-            Settings.getInstance()
+    final private ArrayList<Fragment> FMTS = new ArrayList<Fragment>()  {
+        {
+            add(Resume.getInstance());
+            add(Workouts.getInstance());
+            add(Settings.getInstance());
+        }
     };
     // --------------------------------------------------------------------------------------------
 
@@ -124,7 +126,7 @@ public class Main extends AppCompatActivity implements
 
         viewPager.setAdapter(new WorkoutPagerAdapter(
                 getSupportFragmentManager(),
-                Arrays.asList(fmts)
+                FMTS
         ));
         viewPager.setCurrentItem(1);
     }
@@ -179,7 +181,7 @@ public class Main extends AppCompatActivity implements
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public boolean onQueryTextChange(String newText) {
-        ((Workouts)fmts[1]).onQueryTextChange(newText);
+        ((Workouts)FMTS.get(1)).onQueryTextChange(newText);
 
         return false;
     }
@@ -216,13 +218,13 @@ public class Main extends AppCompatActivity implements
         String extraKey = null;
         switch (pos) {
             case 0:
-                intent = ((Resume)fmts[0]).intent;
-                extraKey = ((Resume)fmts[0]).extraKey;
+                intent = ((Resume)FMTS.get(0)).intent;
+                extraKey = ((Resume)FMTS.get(0)).extraKey;
                 break;
 
             case 1:
-                intent = ((Workouts)fmts[1]).intent;
-                extraKey = ((Workouts)fmts[1]).extraKey;
+                intent = ((Workouts)FMTS.get(1)).intent;
+                extraKey = ((Workouts)FMTS.get(1)).extraKey;
                 break;
         }
 

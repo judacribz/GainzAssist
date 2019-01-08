@@ -3,12 +3,16 @@ package ca.judacribz.gainzassist.adapters;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentActivity.*;
+import android.support.v4.app.*;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import android.support.v4.app.FragmentTransaction;
+import android.util.SparseArray;
 import ca.judacribz.gainzassist.activities.add_workout.ExEntry;
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
 import ca.judacribz.gainzassist.models.Exercise;
@@ -25,15 +29,22 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     final public static String EXTRA_EX_INDEX =
             "ca.judacribz.gainzassist.activities.start_workout.EXTRA_EX_INDEX";
 
-    final private Fragment[] FMTS = new Fragment[] {
-            WarmupsList.getInstance(),
-            WorkoutScreen.getInstance(),
-            ExercisesList.getInstance()
+
+    final private ArrayList<Fragment> FMTS = new ArrayList<Fragment>()  {
+        {
+            add(WarmupsList.getInstance());
+            add(WorkoutScreen.getInstance());
+            add(ExercisesList.getInstance());
+        }
     };
-    final private Fragment[] FMTS_NO_WARMUPS = new Fragment[] {
-            WorkoutScreen.getInstance(),
-            ExercisesList.getInstance()
+
+    final private ArrayList<Fragment> FMTS_NO_WARMUPS = new ArrayList<Fragment>()  {
+        {
+            add(WorkoutScreen.getInstance());
+            add(ExercisesList.getInstance());
+        }
     };
+
     private FragmentManager fragmentManager;
     private int numExs;
     // --------------------------------------------------------------------------------------------
@@ -42,7 +53,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     // --------------------------------------------------------------------------------------------
     private Bundle bundle = new Bundle();
     // --------------------------------------------------------------------------------------------
-    List<Fragment> fmts = Arrays.asList(FMTS);
+    ArrayList<Fragment> fmts = FMTS;
     // ######################################################################################### //
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
@@ -57,7 +68,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         if (warmups.size() > 0) {
             bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]));
         } else {
-            fmts =  Arrays.asList(FMTS_NO_WARMUPS);
+            fmts =  FMTS_NO_WARMUPS;
         }
         for (Fragment fmt : fmts) {
             fmt.setArguments(bundle);
@@ -76,7 +87,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
     public WorkoutPagerAdapter(FragmentManager fragmentManager, List<Fragment> fmts) {
         super(fragmentManager);
-        this.fmts = fmts;
+        this.fmts = (ArrayList<Fragment>) fmts;
     }
     // ######################################################################################### //
 
@@ -96,7 +107,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
 
 
-    public void notifyDataSetChanged(ArrayList<Exercise> exercises) {
+    public void notifyDataSetChanged(SparseArray<Exercise> exercises) {
         notifyDataSetChanged();
 
         ExEntry exEntryFmt;
@@ -121,8 +132,10 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         fmts.add(fmt);
     }
 
-    public void removeTabFragment(int index) {
+    public void removeTabFragment(int index, FragmentManager fragmentManager) {
         this.numExs--;
-        fmts.remove(getCount() - index - 1);
+
+        fmts.remove(index);
+        fmts.trimToSize();
     }
 }

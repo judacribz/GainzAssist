@@ -406,14 +406,7 @@ Exercise ex;
                 workout.setName(getTextString(etWorkoutName));
                 workout.setExercises(exercises);
 
-                Logger.d("ExerciseConst:" + workout.getName() + " id : " + workout.getId());
-                for (Exercise ex : workout.getExercises()) {
-                    Logger.d("ExerciseConst:" + ex.getName() + " id : " + ex.getWorkoutId());
-                }
-
-
                 addWorkoutFirebase(workout);
-
                 workoutViewModel.insertWorkout(workout);
 
                 discardWorkout();

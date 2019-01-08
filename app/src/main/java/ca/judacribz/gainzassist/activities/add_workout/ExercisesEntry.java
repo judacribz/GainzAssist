@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
@@ -42,6 +43,7 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     long workoutId;
 
     SparseArray<Exercise> exercises;
+    SparseBooleanArray exsSet;
 
     LayoutInflater layInflater;
 
@@ -68,7 +70,12 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
         numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_INT);
 
-        exercises = new SparseArray<>(numExs);
+        exsSet = new SparseBooleanArray(numExs);
+        for (int i = 0; i < numExs; i++) {
+            exsSet.put(i, false);
+        }
+
+        exercises = new SparseArray<>();
 
         setupPager();
     }
@@ -167,6 +174,9 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     public void exerciseDataReceived(Exercise exercise) {
         exercise.setWorkoutId(workoutId);
         exercises.put(exercise.getExerciseNumber(), exercise);
+        exsSet.put(exercise.getExerciseNumber(), true);
+
+        lognow();
 
         addedExs++;
         if (addedExs >= numExs) {
@@ -181,18 +191,43 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         }
     }
 
+    private void lognow() {
+        Exercise e;
+        for (int i = 0; i < numExs; i++) {
+            e = exercises.get(i);
+            String g;
+            if (e == null) {
+                g = "null";
+            } else {
+                g = e.getName();
+            }
+            Logger.d("INDEX = " + (i + 1) + " value=  " + g);
+        }
+        Logger.d("INDEX = -----------------------------------");
+    }
+
     @Override
     public void deleteExercise(@Nullable Exercise exercise, int index) {
         if (exercise != null) {
             addedExs--;
         }
+        Exercise ex;
+        for (int i = index + 1; i < exsSet.size(); i++) {
+            if (exsSet.get(i)) {
+                ex = exercises.get(i);
+                ex.setExerciseNumber(i - 1);
+                exercises.put(i - 1, ex);
+                exsSet.put(i - 1, true);
+            } else {
+                exercises.remove(i - 1);
+                exsSet.put(i - 1, false);
+            }
+        }
 
-        exercises.remove(index);
+        exsSet.delete(numExs);
+        exercises.remove(numExs);
         this.numExs--;
 
-        if (addedExs >= this.numExs) {
-            goToSummary();
-        }
 
         tabLayout.removeTabAt(index);
         tabs.remove(index);
@@ -208,11 +243,10 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
             tab.setText(String.format(TAB_LABEL, i + 1));
         }
 
-        workoutPagerAdapter.removeTabFragment(index);
-
-        workoutPagerAdapter.notifyDataSetChanged();
+        workoutPagerAdapter.removeTabFragment(index, getSupportFragmentManager());
+        workoutPagerAdapter.notifyDataSetChanged(exercises);
         viewPager.setAdapter(workoutPagerAdapter);
-//        viewPager.setCurrentItem(0);
+        viewPager.setCurrentItem(0);
 
     }
 
@@ -223,6 +257,10 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     //ExEntry.ExEntryDataListener//Override////////////////////////////////////////////////////////
 
     private void goToSummary() {
+        for (int i = 0; i < exercises.size(); i++) {
+            workout.addExercise(exercises.get(i));
+        }
+
         Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
         newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
         newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);

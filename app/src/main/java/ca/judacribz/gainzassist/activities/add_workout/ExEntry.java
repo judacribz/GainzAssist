@@ -85,10 +85,10 @@ public class ExEntry extends Fragment {
 
     public void updateExFields(@Nullable Exercise exercise) {
         if (exercise == null) {
-            etExerciseName.setText("");
-            etWeight.setText("");
-            etNumSets.setText("");
-            etNumReps.setText("");
+//            etExerciseName.setText("");
+//            etWeight.setText("");
+//            etNumSets.setText("");
+//            etNumReps.setText("");
         } else {
             etExerciseName.setText(exercise.getName());
             setText(etWeight, exercise.getWeight());
@@ -119,7 +119,7 @@ public class ExEntry extends Fragment {
         if (view != null) {
             return view;
         }
-        setRetainInstance(true);
+//        setRetainInstance(true);
 
         view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
         ButterKnife.bind(this, view);
