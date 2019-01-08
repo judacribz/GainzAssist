@@ -18,11 +18,14 @@ import ca.judacribz.gainzassist.models.Workout;
 import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.*;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.*;
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
+import static ca.judacribz.gainzassist.util.Misc.shrinkTo;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntryDataListener {
@@ -37,13 +40,14 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     // Global Vars
     // --------------------------------------------------------------------------------------------
     WorkoutPagerAdapter  workoutPagerAdapter;
+    TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
+    TabLayout.ViewPagerOnTabSelectedListener viewPagerOnTabSelectedListener;
     ArrayList<TabLayout.Tab> tabs = new ArrayList<>();
     Workout workout;
     int numExs, addedExs = 0;
     long workoutId;
 
-    SparseArray<Exercise> exercises;
-    SparseBooleanArray exsSet;
+    ArrayList<Exercise> exercises;
 
     LayoutInflater layInflater;
 
@@ -62,6 +66,37 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
                 "Exercises Entry",
                 true
         );
+
+        tabLayoutOnPageChangeListener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
+        viewPagerOnTabSelectedListener = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+
+                if (tab.getText() == null) {
+                    numExs++;
+                    workoutPagerAdapter.addTab();
+
+                    tab.getPosition();
+                    tab.setText(String.format(TAB_LABEL, tab.getPosition() + 1));
+                    tab.setIcon(null);
+
+                    tabs.add(tab);
+                    tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_plus));
+
+                    viewPager.setAdapter(workoutPagerAdapter);
+                    viewPager.setCurrentItem(tab.getPosition());
+                } else {
+                    super.onTabSelected(tab);
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                super.onTabUnselected(tab);
+            }
+        };
+
         workout = new Workout();
         workout.setId(-1);
         workoutId = workout.getId();
@@ -70,14 +105,12 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
         numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_INT);
 
-        exsSet = new SparseBooleanArray(numExs);
-        for (int i = 0; i < numExs; i++) {
-            exsSet.put(i, false);
+        exercises = new ArrayList<>();
+        for (int i = 0; i < numExs; i ++) {
+            exercises.add(new Exercise());
         }
 
-        exercises = new SparseArray<>();
-
-        setupPager();
+        setupPager(null);
     }
 
 
@@ -96,37 +129,11 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
-    private void setupPager() {
+    private void setupPager(@Nullable List<Exercise> exercises) {
         layInflater = getLayoutInflater();
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
-
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-
-                if (tab.getText() == null) {
-                    numExs++;
-                    workoutPagerAdapter.addTab();
-
-                    tab.getPosition();
-                    tab.setText(String.format(TAB_LABEL, tab.getPosition() + 1));
-                    tab.setIcon(null);
-                    tabs.add(tab);
-                    tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_plus));
-
-                    viewPager.setAdapter(workoutPagerAdapter);
-                    viewPager.setCurrentItem(tab.getPosition());
-                } else {
-                    super.onTabSelected(tab);
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                super.onTabUnselected(tab);
-            }
-        });
+        viewPager.addOnPageChangeListener(tabLayoutOnPageChangeListener);
+        tabLayout.addOnTabSelectedListener(viewPagerOnTabSelectedListener);
 
         for (int i = 0; i < this.numExs; i++) {
             TabLayout.Tab tab = tabLayout.newTab().setText(String.format(TAB_LABEL, i + 1));
@@ -135,14 +142,8 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         }
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_plus));
 
-        workoutPagerAdapter = new WorkoutPagerAdapter(getSupportFragmentManager(), this.numExs);
-        workoutPagerAdapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                viewPager.setAdapter(workoutPagerAdapter);
-            }
-        });
+        workoutPagerAdapter = new WorkoutPagerAdapter(getSupportFragmentManager(), this.numExs, exercises);
+
         viewPager.setAdapter(workoutPagerAdapter);
         viewPager.setCurrentItem(0);
     }
@@ -161,9 +162,11 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
             }
             name = ex.getName();
 
-            if (name.equals(exerciseName)) {
-                fmt.setExerciseExists();
-                return true;
+            if (name != null) {
+                if (name.equals(exerciseName)) {
+                    fmt.setExerciseExists();
+                    return true;
+                }
             }
         }
 
@@ -173,8 +176,8 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     @Override
     public void exerciseDataReceived(Exercise exercise) {
         exercise.setWorkoutId(workoutId);
-        exercises.put(exercise.getExerciseNumber(), exercise);
-        exsSet.put(exercise.getExerciseNumber(), true);
+        exercises.set(exercise.getExerciseNumber(), exercise);
+//        exsSet.put(exercise.getExerciseNumber(), true);
 
         lognow();
 
@@ -193,7 +196,7 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
 
     private void lognow() {
         Exercise e;
-        for (int i = 0; i < numExs; i++) {
+        for (int i = 0; i < exercises.size(); i++) {
             e = exercises.get(i);
             String g;
             if (e == null) {
@@ -206,29 +209,18 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         Logger.d("INDEX = -----------------------------------");
     }
 
+
     @Override
     public void deleteExercise(@Nullable Exercise exercise, int index) {
         if (exercise != null) {
             addedExs--;
         }
-        Exercise ex;
-        for (int i = index + 1; i < exsSet.size(); i++) {
-            if (exsSet.get(i)) {
-                ex = exercises.get(i);
-                ex.setExerciseNumber(i - 1);
-                exercises.put(i - 1, ex);
-                exsSet.put(i - 1, true);
-            } else {
-                exercises.remove(i - 1);
-                exsSet.put(i - 1, false);
-            }
-        }
 
-        exsSet.delete(numExs);
-        exercises.remove(numExs);
         this.numExs--;
 
-
+        exercises.remove(index);
+        shrinkTo(exercises, numExs);
+        lognow();
         tabLayout.removeTabAt(index);
         tabs.remove(index);
 
@@ -243,11 +235,19 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
             tab.setText(String.format(TAB_LABEL, i + 1));
         }
 
-        workoutPagerAdapter.removeTabFragment(index, getSupportFragmentManager());
-        workoutPagerAdapter.notifyDataSetChanged(exercises);
+//        tabLayout.removeAllTabs();
+
+        workoutPagerAdapter.removeFragment(index, exercises);
+        workoutPagerAdapter.notifyDataSetChanged();
         viewPager.setAdapter(workoutPagerAdapter);
         viewPager.setCurrentItem(0);
 
+        if (addedExs >= numExs) {
+            goToSummary();
+        }
+
+//        viewPager.removeAllViews();
+//        setupPager(exercises);
     }
 
     @Override

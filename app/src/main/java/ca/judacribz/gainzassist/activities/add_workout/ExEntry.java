@@ -13,6 +13,7 @@ import butterknife.*;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
+import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
@@ -42,12 +43,12 @@ public class ExEntry extends Fragment {
     Exercise exercise = null;
     String exerciseName;
     int
-            num_reps,
-            num_sets,
+            num_reps = -1,
+            num_sets = -1,
             ex_i = 0,
             minInt = MIN_INT;
     float
-            weight,
+            weight = -1f,
             minWeight,
             weightChange;
 
@@ -83,18 +84,13 @@ public class ExEntry extends Fragment {
         this.ex_i = index;
     }
 
+
     public void updateExFields(@Nullable Exercise exercise) {
-        if (exercise == null) {
-//            etExerciseName.setText("");
-//            etWeight.setText("");
-//            etNumSets.setText("");
-//            etNumReps.setText("");
-        } else {
-            etExerciseName.setText(exercise.getName());
-            setText(etWeight, exercise.getWeight());
-            setText(etNumSets, exercise.getSets());
-            setText(etNumReps, exercise.getReps());
-        }
+        this.exercise = exercise;
+    }
+
+    public int getInd() {
+        return this.ex_i;
     }
 
     // Fragment Override
@@ -116,18 +112,27 @@ public class ExEntry extends Fragment {
             ViewGroup container,
             Bundle savedInstanceState) {
 
-        if (view != null) {
-            return view;
-        }
+//        if (view != null) {
+//            return view;
+//        }
 //        setRetainInstance(true);
 
-        view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
+        View view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
         ButterKnife.bind(this, view);
 
         num_reps = Integer.valueOf(getString(R.string.starting_reps));
         num_sets = Integer.valueOf(getString(R.string.starting_sets));
 
         setSpinnerWithArray(getActivity(), R.array.exerciseEquipment, sprEquipment);
+
+
+        if (exercise != null) {
+            etExerciseName.setText(exercise.getName());
+            setText(etWeight, exercise.getWeight());
+            setText(etNumSets, exercise.getSets());
+            setText(etNumReps, exercise.getReps());
+
+        }
 
         return view;
     }
@@ -137,6 +142,7 @@ public class ExEntry extends Fragment {
         super.onDetach();
         exEntryDataListener = null;
     }
+
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
 

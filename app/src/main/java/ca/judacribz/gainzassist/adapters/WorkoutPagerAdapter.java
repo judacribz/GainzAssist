@@ -1,6 +1,8 @@
 package ca.judacribz.gainzassist.adapters;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity.*;
@@ -9,14 +11,21 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
+import android.view.View;
+import android.view.ViewGroup;
 import ca.judacribz.gainzassist.activities.add_workout.ExEntry;
 import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
 import ca.judacribz.gainzassist.models.Exercise;
+import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
+
+import static ca.judacribz.gainzassist.util.Misc.shrinkTo;
 
 public class WorkoutPagerAdapter extends FragmentPagerAdapter {
 
@@ -75,14 +84,12 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public WorkoutPagerAdapter(FragmentManager fragmentManager, int numExs) {
+    public WorkoutPagerAdapter(FragmentManager fragmentManager, int numExs, @Nullable List<Exercise> exercises) {
         super(fragmentManager);
         this.numExs = numExs;
         fmts = new ArrayList<>();
 
-        for (int i = 0; i < this.numExs; i++) {
-            newEntry(i);
-        }
+        newEntries(exercises);
     }
 
     public WorkoutPagerAdapter(FragmentManager fragmentManager, List<Fragment> fmts) {
@@ -107,35 +114,73 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
 
 
-    public void notifyDataSetChanged(SparseArray<Exercise> exercises) {
-        notifyDataSetChanged();
+    public void addTab() {
+        this.numExs++;
+        newEntry(getCount(), null);
+    }
 
-        ExEntry exEntryFmt;
-        int i;
-        for (Fragment fmt : fmts) {
-            exEntryFmt = (ExEntry) fmt;
-            i = fmts.indexOf(fmt);
-
-            exEntryFmt.setInd(i);
-            exEntryFmt.updateExFields(exercises.get(i));
+    public void newEntries(@Nullable List<Exercise> exercises) {
+        Exercise ex;
+        for (int i = 0; i < this.numExs; i++) {
+            ex = (exercises != null) ? exercises.get(i) : null;
+            newEntry(i, ex);
         }
     }
 
-    public void addTab() {
-        this.numExs++;
-        newEntry(getCount());
-    }
-
-    public void newEntry(int index) {
+    public void newEntry(int index, @Nullable Exercise exercise) {
         Fragment fmt = new ExEntry();
         ((ExEntry) fmt).setInd(index);
+        if (exercise != null) {
+            ((ExEntry) fmt).updateExFields(exercise);
+        }
         fmts.add(fmt);
     }
 
-    public void removeTabFragment(int index, FragmentManager fragmentManager) {
-        this.numExs--;
+    public void removeFragment(int index, ArrayList<Exercise> exercises) {
+        this.fmts.remove(index);
 
-        fmts.remove(index);
-        fmts.trimToSize();
+        notifyChangeInPosition(1);
+        int i;
+        Exercise exercise;
+        for (Fragment fmt : fmts) {
+            i = fmts.indexOf(fmt);
+
+            Logger.d("INDEX FM INIT " +((ExEntry) fmt).getInd() );
+            fmt = new ExEntry();
+            ((ExEntry) fmt).setInd(i);
+
+            Logger.d("INDEX FM END " +((ExEntry) fmt).getInd() );
+            exercise = exercises.get(i);
+            if (exercise != null) {
+                ((ExEntry) fmt).updateExFields(exercise);
+            }
+
+            fmts.set(i, fmt);
+        }
+    }
+
+
+    //this is called when notifyDataSetChanged() is called
+    @Override
+    public int getItemPosition(Object object) {
+        // refresh all fragments when data set changed
+        return WorkoutPagerAdapter.POSITION_NONE;
+    }
+
+int baseId = 0;
+    @Override
+    public long getItemId(int position) {
+        // give an ID different from position when position has been changed
+        return baseId + position;
+    }
+
+    /**
+     * Notify that the position of a fragment has been changed.
+     * Create a new ID for each position to force recreation of the fragment
+     * @param n number of items which have been changed
+     */
+    public void notifyChangeInPosition(int n) {
+        // shift the ID returned by getItemId outside the range of all previous fragments
+        baseId += getCount() + n;
     }
 }

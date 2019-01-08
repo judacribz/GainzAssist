@@ -59,12 +59,13 @@ public class Workout {
     }
 
     public void addExercise(@Nullable Exercise exercise) {
-        if (exercise != null && this.id != -1) {
-            exercise.setWorkoutId(id);
+        if (exercise != null) {
+            if (this.id != -1) {
+                exercise.setWorkoutId(id);
+            }
+            this.exercises.add(exercise);
         }
-        this.exercises.add(exercise);
     }
-
 
     public void removeExercise(Exercise exercise) {
         this.exercises.remove(exercise);
