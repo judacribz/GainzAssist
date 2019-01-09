@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +14,6 @@ import butterknife.*;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.Exercise;
-import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
@@ -26,10 +26,9 @@ public class ExEntry extends Fragment {
     private ExEntryDataListener exEntryDataListener;
 
     public interface ExEntryDataListener {
-        boolean checkExerciseExists(ExEntry fmt, String exerciseName);
-        void exerciseDataReceived(Exercise exercise);
+        boolean exerciseDoesNotExist(ExEntry fmt, String exerciseName, int skipIndex);
+        void exerciseDataReceived(Exercise exercise, boolean update);
         void deleteExercise(@Nullable Exercise exercise, int index);
-        void cancelWorkout();
     }
     // --------------------------------------------------------------------------------------------
 
@@ -52,7 +51,10 @@ public class ExEntry extends Fragment {
             minWeight,
             weightChange;
 
-    @BindView(R.id.et_exercise_name) EditText etExerciseName;
+    boolean deleteHidden = false;
+
+    @BindView(R.id.et_exercise_name)
+    TextInputEditText etExerciseName;
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_num_reps) EditText etNumReps;
     @BindView(R.id.et_num_sets) EditText etNumSets;
@@ -63,7 +65,9 @@ public class ExEntry extends Fragment {
 
     @BindView(R.id.spr_equipment) Spinner sprEquipment;
 
+    @BindView(R.id.btn_enter) Button btnEnter;
     @BindView(R.id.btn_update) Button btnUpdate;
+    @BindView(R.id.btn_delete) Button btnDelete;
 
     @BindViews({
             R.id.et_exercise_name,
@@ -84,13 +88,12 @@ public class ExEntry extends Fragment {
         this.ex_i = index;
     }
 
-
-    public void updateExFields(@Nullable Exercise exercise) {
+    public void updateExFields(Exercise exercise) {
         this.exercise = exercise;
     }
 
-    public int getInd() {
-        return this.ex_i;
+    public void hideDelete() {
+        btnDelete.setVisibility(View.INVISIBLE);
     }
 
     // Fragment Override
@@ -125,13 +128,19 @@ public class ExEntry extends Fragment {
 
         setSpinnerWithArray(getActivity(), R.array.exerciseEquipment, sprEquipment);
 
-
         if (exercise != null) {
             etExerciseName.setText(exercise.getName());
             setText(etWeight, exercise.getWeight());
             setText(etNumSets, exercise.getSets());
             setText(etNumReps, exercise.getReps());
+            btnEnter.setVisibility(View.GONE);
+            btnUpdate.setVisibility(View.VISIBLE);
 
+            if (deleteHidden) {
+                btnDelete.setVisibility(View.GONE);
+            } else {
+                btnDelete.setVisibility(View.VISIBLE);
+            }
         }
 
         return view;
@@ -281,13 +290,13 @@ public class ExEntry extends Fragment {
     }
 
     @OnClick(R.id.btn_enter)
-    public void enterExercise(Button btnEnter) {
+    public void enterExercise() {
 
         if (validateForm(getActivity(), formEntries)) {
             exerciseName = getTextString(etExerciseName);
 
             // Check if exercise already added
-            if (!exEntryDataListener.checkExerciseExists(this, exerciseName)) {
+            if (exEntryDataListener.exerciseDoesNotExist(this, exerciseName, ex_i)) {
                 btnEnter.setVisibility(View.GONE);
                 btnUpdate.setVisibility(View.VISIBLE);
 
@@ -303,7 +312,7 @@ public class ExEntry extends Fragment {
                         getTextInt(etNumReps),
                         getTextFloat(etWeight),
                         MAIN_SET
-                ));
+                ), false);
             }
         }
     }
@@ -317,17 +326,34 @@ public class ExEntry extends Fragment {
 
     @OnClick(R.id.btn_update)
     public void updateExercise() {
+
+        if (validateForm(getActivity(), formEntries)) {
+            exerciseName = getTextString(etExerciseName);
+
+            // Check if exercise already added
+            if (exEntryDataListener.exerciseDoesNotExist(this, exerciseName, ex_i)) {
+
+                num_reps = getTextInt(etNumReps);
+                num_sets = getTextInt(etNumSets);
+
+                exEntryDataListener.exerciseDataReceived(exercise = new Exercise(
+                        this.ex_i,
+                        exerciseName,
+                        "Strength",
+                        getTextString(sprEquipment),
+                        getTextInt(etNumSets),
+                        getTextInt(etNumReps),
+                        getTextFloat(etWeight),
+                        MAIN_SET
+                ), true);
+            }
+        }
     }
 
     @OnClick(R.id.btn_delete)
     public void deleteExercise() {
         etExerciseName.setText("");
         exEntryDataListener.deleteExercise(exercise, this.ex_i);
-    }
-
-    @OnClick(R.id.btn_cancel)
-    public void cancelWorkout() {
-        exEntryDataListener.cancelWorkout();
     }
     //=Click=Handling===============================================================================
 }
