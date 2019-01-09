@@ -53,8 +53,7 @@ public class ExEntry extends Fragment {
 
     boolean deleteHidden = false;
 
-    @BindView(R.id.et_exercise_name)
-    TextInputEditText etExerciseName;
+    @BindView(R.id.et_exercise_name) EditText etExerciseName;
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_num_reps) EditText etNumReps;
     @BindView(R.id.et_num_sets) EditText etNumSets;
@@ -115,12 +114,12 @@ public class ExEntry extends Fragment {
             ViewGroup container,
             Bundle savedInstanceState) {
 
-//        if (view != null) {
-//            return view;
-//        }
-//        setRetainInstance(true);
+        if (view != null) {
+            return view;
+        }
+        setRetainInstance(true);
 
-        View view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
+        view =  inflater.inflate(R.layout.fragment_ex_entry, container, false);
         ButterKnife.bind(this, view);
 
         num_reps = Integer.valueOf(getString(R.string.starting_reps));
