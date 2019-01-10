@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,8 +54,8 @@ public class ExEntry extends Fragment {
 
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
     @BindView(R.id.et_weight) EditText etWeight;
-    @BindView(R.id.et_num_reps) EditText etNumReps;
-    @BindView(R.id.et_num_sets) EditText etNumSets;
+    @BindView(R.id.et_reps) EditText etNumReps;
+    @BindView(R.id.et_sets) EditText etNumSets;
 
     @BindView(R.id.ibtn_dec_weight) ImageButton ibtnDecWeight;
     @BindView(R.id.ibtn_dec_reps) ImageButton ibtnDecReps;
@@ -71,8 +70,8 @@ public class ExEntry extends Fragment {
     @BindViews({
             R.id.et_exercise_name,
             R.id.et_weight,
-            R.id.et_num_reps,
-            R.id.et_num_sets
+            R.id.et_reps,
+            R.id.et_sets
     }) EditText[] formEntries;
     // --------------------------------------------------------------------------------------------
 
@@ -195,17 +194,17 @@ public class ExEntry extends Fragment {
         weight = handleNumChanged(ibtnDecWeight, s.toString(), minWeight).floatValue();
     }
 
-    @OnTextChanged(value = R.id.et_num_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
         setVisibleIfDisabled(ibtnDecReps);
     }
 
-    @OnTextChanged(value = R.id.et_num_sets, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_sets, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeSetsChanged() {
         setVisibleIfDisabled(ibtnDecSets);
     }
 
-    @OnTextChanged(R.id.et_num_reps)
+    @OnTextChanged(R.id.et_reps)
     public void onRepsChanged(CharSequence s,
                               int start,
                               int before,
@@ -213,7 +212,7 @@ public class ExEntry extends Fragment {
         num_reps = handleNumChanged(ibtnDecReps, s.toString(), minInt).intValue();
     }
 
-    @OnTextChanged(R.id.et_num_sets)
+    @OnTextChanged(R.id.et_sets)
     public void onSetsChanged(CharSequence s,
                               int start,
                               int before,
@@ -225,7 +224,7 @@ public class ExEntry extends Fragment {
 
     // OnFocusChanged Handling
     // =============================================================================================
-    @OnFocusChange({R.id.et_num_reps, R.id.et_num_sets, R.id.et_weight})
+    @OnFocusChange({R.id.et_reps, R.id.et_sets, R.id.et_weight})
     void onFocusLeft(EditText et, boolean hasFocus) {
         if (!hasFocus) {
             Number min = 0, res = 0;
@@ -234,11 +233,11 @@ public class ExEntry extends Fragment {
                     res = weight;
                     min = minWeight;
                     break;
-                case R.id.et_num_reps:
+                case R.id.et_reps:
                     res = num_reps;
                     min = minInt;
                     break;
-                case R.id.et_num_sets:
+                case R.id.et_sets:
                     res = num_sets;
                     min = minInt;
                     break;

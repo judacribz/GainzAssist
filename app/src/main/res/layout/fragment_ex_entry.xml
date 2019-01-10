@@ -55,26 +55,30 @@
 			android:id="@+id/tv_equipment"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
-			android:layout_margin="2dp"
+			android:layout_margin="5dp"
 			android:gravity="center"
-			android:text="@string/equipment"/>
+			android:text="@string/equipment"
+			android:textSize="18sp"/>
 
 		<RelativeLayout
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:layout_toEndOf="@id/tv_equipment"
 			android:layout_margin="2dp"
-			android:background="@drawable/spinner_box">
+			android:background="@drawable/spinner_box"
+			android:orientation="horizontal">
 
 			<Spinner
 				android:id="@+id/spr_equipment"
 				android:layout_width="match_parent"
 				android:layout_height="match_parent"
+				android:layout_centerVertical="true"
+				android:layout_marginStart="5dp"
+				android:background="@android:color/transparent"
 				android:gravity="center"
+				android:spinnerMode="dropdown"
 				android:textAlignment="center"
-				android:background="@color/colorLightBg"
-				android:textColor="@color/colorText"
-			style="@style/Widget.AppCompat.Spinner"/>
+				android:textColor="@color/colorText"/>
 
 			<ImageView
 				android:layout_width="wrap_content"
@@ -84,7 +88,6 @@
 				android:layout_gravity="center"
 				android:src="@drawable/ic_drop_dark" />
 		</RelativeLayout>
-
 	</RelativeLayout>
 
 	<LinearLayout
@@ -107,26 +110,22 @@
 			android:padding="2dp"
 			tools:ignore="NestedWeights">
 
-			<EditText
-				android:id="@+id/et_weight"
+			<include
+				android:id="@+id/part_et_weight"
 				android:layout_width="150dp"
 				android:layout_height="match_parent"
 				android:layout_centerInParent="true"
 				android:layout_margin="2dp"
-				android:inputType="numberDecimal"
-				android:minEms="4"
-				android:text="@string/starting_weight"
-				android:textAlignment="center"
-				android:selectAllOnFocus="true"/>
+				layout="@layout/part_edit_text_weight" />
 
 			<ImageButton
 				android:id="@+id/ibtn_dec_weight"
 				android:layout_width="wrap_content"
 				android:layout_height="match_parent"
 				android:layout_alignParentStart="true"
-				android:layout_toStartOf="@id/et_weight"
+				android:layout_toStartOf="@id/part_et_weight"
 				android:layout_margin="2dp"
-				android:src="@drawable/ic_minus"
+				android:src="@drawable/selector_minus_btn"
 				android:visibility="gone" />
 
 			<ImageButton
@@ -135,8 +134,8 @@
 				android:layout_height="match_parent"
 				android:layout_alignParentEnd="true"
 				android:layout_margin="2dp"
-				android:layout_toEndOf="@id/et_weight"
-				android:src="@drawable/ic_plus"/>
+				android:layout_toEndOf="@id/part_et_weight"
+				android:src="@drawable/selector_plus_btn"/>
 		</RelativeLayout>
 	<!--Weight==================================================================================-->
 
@@ -148,26 +147,22 @@
 			android:layout_weight="@integer/ll_md_weight"
 			android:padding="2dp">
 
-			<EditText
-				android:id="@+id/et_num_reps"
+			<include
+				android:id="@+id/part_et_reps"
 				android:layout_width="150dp"
 				android:layout_height="match_parent"
 				android:layout_centerInParent="true"
 				android:layout_margin="2dp"
-				android:textAlignment="center"
-				android:ems="4"
-				android:inputType="number"
-				android:text="@string/starting_reps"
-				android:selectAllOnFocus="true"/>
+				layout="@layout/part_edit_text_reps" />
 
 			<ImageButton
 				android:id="@+id/ibtn_dec_reps"
 				android:layout_width="wrap_content"
 				android:layout_height="match_parent"
 				android:layout_alignParentStart="true"
-				android:layout_toStartOf="@id/et_num_reps"
+				android:layout_toStartOf="@id/part_et_reps"
 				android:layout_margin="2dp"
-				android:src="@drawable/ic_minus"/>
+				android:src="@drawable/selector_minus_btn"/>
 
 			<ImageButton
 				android:id="@+id/ibtn_inc_reps"
@@ -175,8 +170,8 @@
 				android:layout_height="match_parent"
 				android:layout_alignParentEnd="true"
 				android:layout_margin="2dp"
-				android:layout_toEndOf="@id/et_num_reps"
-				android:src="@drawable/ic_plus"/>
+				android:layout_toEndOf="@id/part_et_reps"
+				android:src="@drawable/selector_plus_btn"/>
 		</RelativeLayout>
 	<!--Number=of=Sets==========================================================================-->
 
@@ -188,26 +183,22 @@
 			android:layout_weight="@integer/ll_md_weight"
 			android:padding="2dp">
 
-			<EditText
-				android:id="@+id/et_num_sets"
+			<include
+				android:id="@+id/part_et_sets"
 				android:layout_width="150dp"
 				android:layout_height="match_parent"
 				android:layout_centerInParent="true"
 				android:layout_margin="2dp"
-				android:ems="4"
-				android:inputType="number"
-				android:text="@string/starting_sets"
-				android:textAlignment="center"
-				android:selectAllOnFocus="true" />
+				layout="@layout/part_edit_text_sets" />
 
 			<ImageButton
 				android:id="@+id/ibtn_dec_sets"
 				android:layout_width="wrap_content"
 				android:layout_height="match_parent"
 				android:layout_alignParentStart="true"
-				android:layout_toStartOf="@id/et_num_sets"
+				android:layout_toStartOf="@id/part_et_sets"
 				android:layout_margin="2dp"
-				android:src="@drawable/ic_minus"/>
+				android:src="@drawable/selector_minus_btn"/>
 
 			<ImageButton
 				android:id="@+id/ibtn_inc_sets"
@@ -215,8 +206,8 @@
 				android:layout_height="match_parent"
 				android:layout_alignParentEnd="true"
 				android:layout_margin="2dp"
-				android:layout_toEndOf="@id/et_num_sets"
-				android:src="@drawable/ic_plus"/>
+				android:layout_toEndOf="@id/part_et_sets"
+				android:src="@drawable/selector_plus_btn"/>
 		</RelativeLayout>
 	<!--Number=of=Sets==========================================================================-->
 	</LinearLayout>

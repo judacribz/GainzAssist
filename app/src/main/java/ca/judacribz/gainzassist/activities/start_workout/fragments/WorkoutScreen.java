@@ -2,8 +2,6 @@ package ca.judacribz.gainzassist.activities.start_workout.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
@@ -11,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.*;
 
 import java.util.ArrayList;
@@ -19,7 +16,6 @@ import java.util.Locale;
 
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
@@ -61,8 +57,8 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
     @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
 
-    @BindView(R.id.et_curr_reps) EditText etCurrReps;
-    @BindView(R.id.et_curr_weight) EditText etCurrWeight;
+    @BindView(R.id.et_reps) EditText etCurrReps;
+    @BindView(R.id.et_weight) EditText etCurrWeight;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -164,7 +160,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     // TextWatcher Handling
     // =============================================================================================
-    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
         if (!btnDecReps.isEnabled()) {
             btnDecReps.setEnabled(true);
@@ -172,7 +168,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         }
     }
 
-    @OnTextChanged(value = R.id.et_curr_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_reps, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onRepsChanged(CharSequence s, int start, int before, int count) {
         String repStr = s.toString();
         int reps;
@@ -191,7 +187,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     // TextWatcher for weight ET
     @OnTextChanged(
-            value = R.id.et_curr_weight,
+            value = R.id.et_weight,
             callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeWeightChanged() {
         if (!btnDecWeight.isEnabled()) {
@@ -200,7 +196,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         }
     }
 
-    @OnTextChanged(value = R.id.et_curr_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_weight, callback = OnTextChanged.Callback.TEXT_CHANGED)
     public void onWeightChanged(CharSequence s, int start, int before, int count) {
         float weight;
         if (!s.toString().isEmpty()) {
@@ -221,12 +217,12 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     // OnFocusChanged Handling
     // =============================================================================================
-    @OnFocusChange({R.id.et_curr_reps, R.id.et_curr_weight})
+    @OnFocusChange({R.id.et_reps, R.id.et_weight})
     void onFocusLeft(EditText et, boolean hasFocus) {
         if (!hasFocus) {
             Number min, res;
             switch (et.getId()) {
-                case R.id.et_curr_weight:
+                case R.id.et_weight:
                     min = currWorkout.getCurrMinWeight();
                     res = currWorkout.getCurrWeight();
                     break;

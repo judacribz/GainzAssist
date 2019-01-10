@@ -18,7 +18,7 @@
         android:layout_above="@id/appbar"
         android:layout_below="@id/toolbar"/>
 
-    <!-- Naviagtion Tabs -->
+    <!-- Navigation Tabs -->
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
@@ -32,7 +32,6 @@
             android:layout_height="match_parent"
             app:tabIndicatorHeight="2dp"
             app:tabMode="scrollable"
-            app:tabTextColor="@color/colorLightBg"
-            app:tabPaddingBottom="-10dp"/>
+            app:tabTextColor="@color/colorLightBg"/>
     </android.support.design.widget.AppBarLayout>
 </RelativeLayout>

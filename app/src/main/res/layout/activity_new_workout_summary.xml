@@ -86,17 +86,17 @@
             android:id="@+id/tv_sets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/et_num_sets"
-            android:layout_alignStart="@id/et_num_sets"
+            android:layout_alignEnd="@id/et_sets"
+            android:layout_alignStart="@id/et_sets"
             android:layout_below="@id/llay_type_equipment"
             android:layout_margin="10dp"
             android:gravity="center"
-            android:labelFor="@id/et_num_sets"
+            android:labelFor="@id/et_sets"
             android:text="@string/num_sets"
             android:textColor="@color/colorText" />
 
         <EditText
-            android:id="@+id/et_num_sets"
+            android:id="@+id/et_sets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_sets"
@@ -113,8 +113,8 @@
             android:id="@+id/btn_inc_sets"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignEnd="@id/et_num_sets"
-            android:layout_below="@id/et_num_sets"
+            android:layout_alignEnd="@id/et_sets"
+            android:layout_below="@id/et_sets"
             android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_plus"/>
 
@@ -122,8 +122,8 @@
             android:id="@+id/btn_dec_sets"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignStart="@id/et_num_sets"
-            android:layout_below="@id/et_num_sets"
+            android:layout_alignStart="@id/et_sets"
+            android:layout_below="@id/et_sets"
             android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_minus"/>
         <!--Number=of=Sets======================================================================-->
@@ -185,17 +185,17 @@
             android:id="@+id/tv_reps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/et_num_reps"
-            android:layout_alignStart="@id/et_num_reps"
+            android:layout_alignEnd="@id/et_reps"
+            android:layout_alignStart="@id/et_reps"
             android:layout_below="@id/llay_type_equipment"
             android:layout_margin="10dp"
             android:gravity="center"
-            android:labelFor="@id/et_num_reps"
+            android:labelFor="@id/et_reps"
             android:text="@string/num_reps"
             android:textColor="@color/colorText" />
 
         <EditText
-            android:id="@+id/et_num_reps"
+            android:id="@+id/et_reps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -213,8 +213,8 @@
             android:id="@+id/btn_inc_reps"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignEnd="@id/et_num_reps"
-            android:layout_below="@id/et_num_reps"
+            android:layout_alignEnd="@id/et_reps"
+            android:layout_below="@id/et_reps"
             android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_plus"/>
 
@@ -222,8 +222,8 @@
             android:id="@+id/btn_dec_reps"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignStart="@id/et_num_reps"
-            android:layout_below="@id/et_num_reps"
+            android:layout_alignStart="@id/et_reps"
+            android:layout_below="@id/et_reps"
             android:background="@drawable/anim_button_ripple_blue"
             android:src="@drawable/ic_minus"/>
         <!--Number=of=Reps======================================================================-->

@@ -5,6 +5,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+
+    <style name="SpinnerStyle" parent="@android:style/Widget.TextView.SpinnerItem">
+        <item name="android:textSize">22sp</item>
+    </style>
+
     <style name="ToolBarStyle" parent="Theme.AppCompat.NoActionBar">
         <item name="android:textColor">@color/colorText</item>
         <item name="android:textColorSecondary">@color/colorBg</item>
@@ -38,14 +43,16 @@
 	</style>
 
 	<style name="GreenImageButtonStyle" parent="ImageButtonStyle">
-		<item name="android:background">@drawable/selector_btn_default_green</item>
+		<item name="android:background">@drawable/anim_button_ripple_green</item>
 	</style>
 
     <style name="BlueImageButtonStyle" parent="ImageButtonStyle">
-        <item name="android:background">@drawable/selector_btn_default_blue</item>
+        <item name="android:background">@drawable/anim_button_ripple_blue</item>
     </style>
 
-    <style name="ImageButtonStyle" parent="Base.Widget.AppCompat.ImageButton">
+    <style name="ImageButtonStyle" parent="@style/Widget.AppCompat.ImageButton">
+        <item name="android:elevation">2dp</item>
+        <item name="android:translationZ">2dp</item>
     </style>
 
 
@@ -77,15 +84,14 @@
     </style>
 
     <style name="BlueEditTextStyle" parent="EditTextStyle">
-        <item name="android:background">@drawable/edit_text_box_blue</item>
+        <item name="android:background">@drawable/anim_edit_text_ripple_blue</item>
     </style>
 
     <style name="GreenEditTextStyle" parent="EditTextStyle">
-        <item name="android:background">@drawable/edit_text_box_green</item>
+        <item name="android:background">@drawable/anim_edit_text_ripple_green</item>
     </style>
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:background">@drawable/anim_edit_text_ripple_blue</item>
         <item name="android:textColorHighlight">@color/colorText</item>
         <item name="colorAccent">@color/colorText</item>
         <item name="android:inputType">textNoSuggestions</item>
@@ -98,6 +104,12 @@
     <style name="HintTextAppearance" parent="@android:style/TextAppearance">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="HintTextAppearance2" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/colorBg</item>
         <item name="android:textStyle">italic</item>
     </style>
 

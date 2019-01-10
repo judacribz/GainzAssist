@@ -72,7 +72,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
             this.context = context;
 
             tvSetNum = itemView.findViewById(R.id.tv_sets);
-            etReps = itemView.findViewById(R.id.et_num_reps);
+            etReps = itemView.findViewById(R.id.et_reps);
             etWeight = itemView.findViewById(R.id.et_weight);
         }
 

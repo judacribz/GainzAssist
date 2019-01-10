@@ -126,33 +126,22 @@
 			android:layout_centerHorizontal="true"
 			android:layout_alignParentTop="true"/>
 
-		<me.grantland.widget.AutofitLayout
-			android:id="@+id/afl_curr_reps"
+		<include
+			android:id="@+id/part_et_reps"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		  	android:layout_margin="10dp"
 		  	android:layout_above="@id/btn_dec_reps"
 		  	android:layout_alignParentStart="true"
 		  	android:layout_alignParentTop="true"
-		  	android:layout_toStartOf="@id/tv_center">
-
-			<EditText
-				android:id="@+id/et_curr_reps"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:inputType="number"
-				android:maxLength="4"
-				android:selectAllOnFocus="true"
-				android:singleLine="true"
-				android:textAlignment="center"
-				android:textSize="45sp"/>
-		</me.grantland.widget.AutofitLayout>
+		  	android:layout_toStartOf="@id/tv_center"
+			layout="@layout/part_edit_text_reps"/>
 
         <ImageButton
             android:id="@+id/btn_dec_reps"
             android:layout_width="50dp"
             android:layout_height="50dp"
-			android:layout_alignStart="@id/afl_curr_reps"
+			android:layout_alignStart="@id/part_et_reps"
 			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_minus"/>
 
@@ -160,7 +149,7 @@
             android:id="@+id/btn_inc_reps"
             android:layout_width="50dp"
             android:layout_height="50dp"
-			android:layout_alignEnd="@id/afl_curr_reps"
+			android:layout_alignEnd="@id/part_et_reps"
 			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_plus"/>
 
@@ -168,39 +157,29 @@
 			android:id="@+id/tv_reps_et"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_alignStart="@id/afl_curr_reps"
-			android:layout_alignEnd="@id/afl_curr_reps"
-			android:layout_below="@id/afl_curr_reps"
+			android:layout_alignStart="@id/part_et_reps"
+			android:layout_alignEnd="@id/part_et_reps"
+			android:layout_below="@id/part_et_reps"
 			android:gravity="center"
 			android:text="@string/reps"/>
 
-		<me.grantland.widget.AutofitLayout
-			android:id="@+id/afl_curr_weight"
+		<include
+			android:id="@+id/part_et_weight"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_margin="10dp"
 			android:layout_above="@id/btn_dec_weight"
 			android:layout_alignParentEnd="true"
 			android:layout_alignParentTop="true"
-			android:layout_toEndOf="@id/tv_center">
+			android:layout_toEndOf="@id/tv_center"
+			layout="@layout/part_edit_text_weight" />
 
-			<EditText
-				android:id="@+id/et_curr_weight"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:inputType="numberDecimal"
-				android:maxLength="7"
-				android:selectAllOnFocus="true"
-				android:singleLine="true"
-				android:textAlignment="center"
-				android:textSize="45sp"/>
-		</me.grantland.widget.AutofitLayout>
 
         <ImageButton
             android:id="@+id/btn_dec_weight"
             android:layout_width="50dp"
 			android:layout_height="50dp"
-			android:layout_alignStart="@id/afl_curr_weight"
+			android:layout_alignStart="@id/part_et_weight"
 			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_minus"/>
 
@@ -208,7 +187,7 @@
             android:id="@+id/btn_inc_weight"
             android:layout_width="50dp"
 			android:layout_height="50dp"
-			android:layout_alignEnd="@id/afl_curr_weight"
+			android:layout_alignEnd="@id/part_et_weight"
 			android:layout_alignParentBottom="true"
             android:src="@drawable/ic_plus"/>
 
@@ -216,9 +195,9 @@
 			android:id="@+id/tv_weight_et"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_alignStart="@id/afl_curr_weight"
-			android:layout_alignEnd="@id/afl_curr_weight"
-			android:layout_below="@id/afl_curr_weight"
+			android:layout_alignStart="@id/part_et_weight"
+			android:layout_alignEnd="@id/part_et_weight"
+			android:layout_below="@id/part_et_weight"
 			android:gravity="center"
 			android:text="@string/weight_lbs"/>
     </RelativeLayout>

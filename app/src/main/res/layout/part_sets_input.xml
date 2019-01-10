@@ -16,7 +16,7 @@
         android:textColor="@color/colorBg"/>
 
     <EditText
-        android:id="@+id/et_num_reps"
+        android:id="@+id/et_reps"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_below="@id/tv_sets"
@@ -24,10 +24,10 @@
         android:inputType="number"/>
 
     <me.grantland.widget.AutofitLayout
-        android:id="@+id/afl_curr_weight"
+        android:id="@+id/part_et_weight"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_below="@id/et_num_reps"
+        android:layout_below="@id/et_reps"
         android:gravity="center">
 
         <EditText

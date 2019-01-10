@@ -78,7 +78,7 @@
             android:layout_alignTop="@id/et_num_exercises"
             android:layout_alignBottom="@id/et_num_exercises"
             android:layout_margin="10dp"
-            android:src="@drawable/ic_minus"/>
+            android:src="@drawable/selector_minus_btn"/>
 
         <ImageButton
             android:id="@+id/ibtn_inc_exercises"
@@ -89,7 +89,7 @@
             android:layout_toEndOf="@id/et_num_exercises"
             android:layout_alignTop="@id/et_num_exercises"
             android:layout_alignBottom="@id/et_num_exercises"
-            android:src="@drawable/ic_plus"/>
+            android:src="@drawable/selector_plus_btn"/>
     </RelativeLayout>
 
     <RelativeLayout

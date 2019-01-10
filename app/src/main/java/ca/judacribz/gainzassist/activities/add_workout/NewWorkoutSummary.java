@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -20,14 +19,12 @@ import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.models.Exercise.*;
-import static ca.judacribz.gainzassist.util.Calculations.getNumColumns;
 import static ca.judacribz.gainzassist.util.UI.*;
 
 public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver {
@@ -75,9 +72,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
     @BindView(R.id.spr_type) Spinner sprType;
     @BindView(R.id.spr_equipment) Spinner sprEquipment;
-    @BindView(R.id.et_num_reps) EditText etNumReps;
+    @BindView(R.id.et_reps) EditText etNumReps;
     @BindView(R.id.et_weight) EditText etWeight;
-    @BindView(R.id.et_num_sets) EditText etNumSets;
+    @BindView(R.id.et_sets) EditText etNumSets;
 
     @BindView(R.id.btn_dec_reps) ImageButton ibtnDecReps;
     @BindView(R.id.btn_dec_weight) ImageButton ibtnDecWeight;
@@ -221,12 +218,12 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     }
 
 
-    @OnTextChanged(value = R.id.et_num_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_reps, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeRepsChanged() {
         beforeNumChanged(ibtnDecReps);
     }
 
-    @OnTextChanged(value = R.id.et_num_sets, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
+    @OnTextChanged(value = R.id.et_sets, callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
     public void beforeSetsChanged() {
         beforeNumChanged(ibtnDecSets);
     }
@@ -238,7 +235,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         }
     }
 
-    @OnTextChanged(R.id.et_num_reps)
+    @OnTextChanged(R.id.et_reps)
     public void onRepsChanged(CharSequence s,
                               int start,
                               int before,
@@ -246,7 +243,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
         num_reps = onNumChanged(etNumReps, ibtnDecReps, s.toString());
     }
 
-    @OnTextChanged(R.id.et_num_sets)
+    @OnTextChanged(R.id.et_sets)
     public void onSetsChanged(CharSequence s,
                               int start,
                               int before,
