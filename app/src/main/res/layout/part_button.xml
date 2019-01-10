@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <Button
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/btnListItem"
@@ -11,6 +9,4 @@
 	android:elevation="2dp"
 	android:translationZ="4dp"
     android:padding="50dp"
-	style="@style/ButtonStyle"
-    android:textColor="@drawable/selector_btn_text_default"
 	android:textSize="18sp"/>

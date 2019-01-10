@@ -50,21 +50,21 @@
 
 
 	<style name="GreenButtonStyle" parent="ButtonStyle">
-		<item name="android:background">@drawable/selector_btn_default_green</item>
+		<item name="android:background">@drawable/anim_button_ripple_green</item>
 	</style>
 
     <style name="BlueButtonStyle" parent="ButtonStyle">
-		<item name="android:background">@drawable/selector_btn_default_blue</item>
+		<item name="android:background">@drawable/anim_button_ripple_blue</item>
 	</style>
 
-    <style name="ButtonStyle" parent="Base.TextAppearance.AppCompat.Widget.Button.Colored">
+    <style name="ButtonStyle" parent="@style/Widget.AppCompat.Button.Colored">
         <item name="android:textColor">@drawable/selector_btn_text_default</item>
         <item name="android:textAlignment">center</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingStart">20dp</item>
         <item name="android:paddingTop">10dp</item>
-        <item name="elevation">5dp</item>
+        <item name="android:elevation">2dp</item>
         <item name="android:translationZ">2dp</item>
     </style>
 
