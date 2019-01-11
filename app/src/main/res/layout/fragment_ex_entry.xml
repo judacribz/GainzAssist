@@ -21,22 +21,12 @@
 		android:elevation="3dp"
 		android:translationZ="1dp">
 
-		<android.support.design.widget.TextInputLayout
+		<include
 			android:layout_height="match_parent"
 			android:layout_width="match_parent"
 			android:layout_margin="4dp"
 			android:layout_centerInParent="true"
-			app:hintTextAppearance="@style/HintTextAppearance">
-
-			<EditText
-				android:id="@+id/et_exercise_name"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:hint="@string/hint_exercise_name"
-				android:inputType="text"
-				android:textColorHint="@color/colorLightAccent"
-				android:translationY="2dp"/>
-		</android.support.design.widget.TextInputLayout>
+			layout="@layout/part_edit_text_exercise" />
 	</RelativeLayout>
 	<!--Exercise=Name===========================================================================-->
 

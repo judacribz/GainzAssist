@@ -6,7 +6,7 @@
 	android:layout_height="match_parent">
 
 	<EditText
-		android:id="@+id/et_sets"
+		android:id="@+id/et_num_exercises"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:layout_centerInParent="true"

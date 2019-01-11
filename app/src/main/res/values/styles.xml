@@ -103,7 +103,7 @@
 
     <style name="HintTextAppearance" parent="@android:style/TextAppearance">
         <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorBg</item>
         <item name="android:textStyle">italic</item>
     </style>
 

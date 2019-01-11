@@ -13,7 +13,6 @@
         android:id="@+id/toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_margin="-14dp"
         layout="@layout/part_title_bar" />
 
     <!-- ExerciseConst Name EditText -->
@@ -28,22 +27,12 @@
         android:elevation="3dp"
         android:translationZ="1dp">
 
-        <android.support.design.widget.TextInputLayout
+        <include
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             android:layout_margin="4dp"
             android:layout_centerInParent="true"
-            app:hintTextAppearance="@style/HintTextAppearance">
-
-            <EditText
-                android:id="@+id/et_workout_name"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="@string/hint_workout_name"
-                android:inputType="text"
-                android:textColorHint="@color/colorLightAccent"
-                android:translationY="2dp"/>
-        </android.support.design.widget.TextInputLayout>
+            layout="@layout/part_edit_text_workout" />
     </RelativeLayout>
     <!--ExerciseConst=Name============================================================================-->
 
@@ -57,26 +46,37 @@
         android:elevation="3dp"
         android:translationZ="1dp">
 
-        <EditText
-            android:id="@+id/et_num_exercises"
+        <me.grantland.widget.AutofitLayout
+            android:id="@+id/afl_num_exercises"
             android:layout_width="150dp"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:layout_margin="10dp"
-            android:ems="4"
-            android:inputType="number"
-            android:text="@string/starting_sets"
-            android:textAlignment="center"
-            android:selectAllOnFocus="true" />
+            android:layout_margin="2dp">
+
+            <EditText
+                android:id="@+id/et_num_exercises"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ems="4"
+                android:hint="@string/num_sets"
+                android:inputType="number"
+                android:maxLength="3"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="@string/starting_sets"
+                android:textAlignment="center"
+                android:textSize="40sp"
+                tools:ignore="Autofill"/>
+        </me.grantland.widget.AutofitLayout>
 
         <ImageButton
             android:id="@+id/ibtn_dec_exercises"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/et_num_exercises"
-            android:layout_alignTop="@id/et_num_exercises"
-            android:layout_alignBottom="@id/et_num_exercises"
+            android:layout_toStartOf="@id/afl_num_exercises"
+            android:layout_alignTop="@id/afl_num_exercises"
+            android:layout_alignBottom="@id/afl_num_exercises"
             android:layout_margin="10dp"
             android:src="@drawable/selector_minus_btn"/>
 
@@ -86,9 +86,9 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_margin="10dp"
-            android:layout_toEndOf="@id/et_num_exercises"
-            android:layout_alignTop="@id/et_num_exercises"
-            android:layout_alignBottom="@id/et_num_exercises"
+            android:layout_toEndOf="@id/afl_num_exercises"
+            android:layout_alignTop="@id/afl_num_exercises"
+            android:layout_alignBottom="@id/afl_num_exercises"
             android:src="@drawable/selector_plus_btn"/>
     </RelativeLayout>
 

@@ -70,7 +70,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     @BindView(R.id.et_workout_name) EditText etWorkoutName;
 
     @BindView(R.id.et_exercise_name) EditText etExerciseName;
-    @BindView(R.id.spr_type) Spinner sprType;
+//    @BindView(R.id.spr_type) Spinner sprType;
     @BindView(R.id.spr_equipment) Spinner sprEquipment;
     @BindView(R.id.et_reps) EditText etNumReps;
     @BindView(R.id.et_weight) EditText etWeight;
@@ -118,7 +118,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
             etWorkoutName.setText(workoutName);
         }
 
-        setSpinnerWithArray(this, R.array.exerciseType, sprType);
+//        setSpinnerWithArray(this, R.array.exerciseType, sprType);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
         // ExerciseSet the layout manager
@@ -281,7 +281,7 @@ Exercise ex;
         etNumReps.setText(String.valueOf(ex.getReps()));
         etWeight.setText(String.valueOf(ex.getWeight()));
         sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex.getEquipment()));
-        sprType.setSelection(EXERCISE_TYPES.indexOf(ex.getType()));
+//        sprType.setSelection(EXERCISE_TYPES.indexOf(ex.getType()));
     }
 
 
@@ -365,7 +365,7 @@ Exercise ex;
         exercise = new Exercise(
                 exNumber,
                 exName,
-                sprType.getSelectedItem().toString().toLowerCase(),
+                "Strength",
                 sprEquipment.getSelectedItem().toString().toLowerCase(),
                 getTextInt(etNumSets),
                 getTextInt(etNumReps),
@@ -420,7 +420,7 @@ Exercise ex;
         etNumSets.setText(String.valueOf(minInt));
         etWeight.setText(String.valueOf(minWeight));
         sprEquipment.setSelection(0);
-        sprType.setSelection(0);
+//        sprType.setSelection(0);
     }
 
     /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
@@ -429,22 +429,22 @@ Exercise ex;
         finish();
     }
 
-    @OnItemSelected(R.id.spr_type)
-    public void changeSprEquipment(Spinner spr) {
-        if (spr.getSelectedItemPosition() == POS_CARDIO) {
-            sprEquipment.setSelection(POS_NA);
-        }
-    }
+//    @OnItemSelected(R.id.spr_type)
+//    public void changeSprEquipment(Spinner spr) {
+//        if (spr.getSelectedItemPosition() == POS_CARDIO) {
+//            sprEquipment.setSelection(POS_NA);
+//        }
+//    }
 
     @OnItemSelected(R.id.spr_equipment)
     public void changeSprType(Spinner spr) {
         Toast.makeText(this, spr.getItemAtPosition(POS_NA).toString(), Toast.LENGTH_SHORT).show();
 
-        if (spr.getSelectedItemPosition() != POS_NA) {
-            if (sprType.getSelectedItemPosition() == POS_CARDIO) {
-                sprType.setSelection(POS_STREN);
-            }
-        }
+//        if (spr.getSelectedItemPosition() != POS_NA) {
+//            if (sprType.getSelectedItemPosition() == POS_CARDIO) {
+//                sprType.setSelection(POS_STREN);
+//            }
+//        }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 }
