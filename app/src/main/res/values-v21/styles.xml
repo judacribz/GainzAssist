@@ -16,7 +16,7 @@
         <item name="android:background">@color/colorBg</item>
     </style>
 
-    <style name="TextViewStyle" parent="Widget.AppCompat.EditText">
+    <style name="WorkoutTextView" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/text_view_box</item>
         <item name="android:focusable">false</item>
         <item name="android:inputType">textNoSuggestions</item>

@@ -189,7 +189,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     private void switchExerciseBtns(Button btnDisable, Button btnEnable) {
         if (btnDisable.getVisibility() == View.VISIBLE) {
             btnEnable.setVisibility(View.VISIBLE);
-            btnDisable.setVisibility(View.GONE);
+            btnDisable.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -210,7 +210,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
         if (weight <= minWeight) {
             ibtnDecWeight.setEnabled(false);
-            ibtnDecWeight.setVisibility(View.GONE);
+            ibtnDecWeight.setVisibility(View.INVISIBLE);
 
             if (weight < minWeight)
                 etWeight.setText(String.valueOf(minWeight));
@@ -256,7 +256,7 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
 
         if (value <= minInt) {
             ibtnDec.setEnabled(false);
-            ibtnDec.setVisibility(View.GONE);
+            ibtnDec.setVisibility(View.INVISIBLE);
 
             if (value < minInt)
                 etNum.setText(String.valueOf(minInt));
@@ -284,10 +284,8 @@ Exercise ex;
 //        sprType.setSelection(EXERCISE_TYPES.indexOf(ex.getType()));
     }
 
-
     @Override
     public void onWorkoutLongClick(View anchor, String name) {
-
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 

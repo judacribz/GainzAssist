@@ -2,7 +2,7 @@
 <Button
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sqrBtnListItem"
-    android:layout_width="80dp"
-    android:layout_height="80dp"
-    android:layout_margin="1dp"
+    android:layout_width="70dp"
+    android:layout_height="70dp"
+    android:layout_margin="2dp"
     android:gravity="center"/>

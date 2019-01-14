@@ -12,9 +12,9 @@
 		android:id="@+id/et_workout_name"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:fontFamily="@font/staatliches"
 		android:hint="@string/hint_workout_name"
 		android:inputType="text"
-		android:minHeight="75dp"
 		android:translationZ="-10dp"
 		android:textSize="30sp"/>
 </android.support.design.widget.TextInputLayout>

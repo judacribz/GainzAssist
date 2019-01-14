@@ -5,7 +5,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-
     <style name="SpinnerStyle" parent="@android:style/Widget.TextView.SpinnerItem">
         <item name="android:textSize">22sp</item>
     </style>
@@ -24,7 +23,7 @@
         <item name="android:textSize">35sp</item>
     </style>
 
-    <style name="BlueTheme" parent="AppTheme">
+    <style name="BlueTheme" parent="@style/AppTheme">
         <item name="editTextStyle">@style/BlueEditTextStyle</item>
         <item name="android:buttonStyle">@style/BlueButtonStyle</item>
         <item name="imageButtonStyle">@style/BlueImageButtonStyle</item>
@@ -33,7 +32,7 @@
         <item name="tabSelectedTextColor">@color/blue</item>
     </style>
 
-	<style name="GreenTheme" parent="AppTheme">
+	<style name="GreenTheme" parent="@style/AppTheme">
 		<item name="editTextStyle">@style/GreenEditTextStyle</item>
 		<item name="android:buttonStyle">@style/GreenButtonStyle</item>
 		<item name="imageButtonStyle">@style/GreenImageButtonStyle</item>
@@ -55,7 +54,6 @@
         <item name="android:translationZ">2dp</item>
     </style>
 
-
 	<style name="GreenButtonStyle" parent="ButtonStyle">
 		<item name="android:background">@drawable/anim_button_ripple_green</item>
 	</style>
@@ -75,8 +73,7 @@
         <item name="android:translationZ">2dp</item>
     </style>
 
-
-    <style name="TextViewStyle" parent="Widget.AppCompat.EditText">
+    <style name="WorkoutTextView" parent="Widget.AppCompat.EditText">
         <item name="android:background">@drawable/text_view_box</item>
         <item name="android:focusable">false</item>
         <item name="android:inputType">textNoSuggestions</item>

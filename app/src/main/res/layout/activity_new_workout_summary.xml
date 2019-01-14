@@ -41,7 +41,9 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/btn_discard_workout"
         android:layout_margin="4dp"
-        android:padding="4dp"
+        android:paddingTop="4dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:background="@drawable/border"
         android:elevation="3dp"
         android:translationZ="1dp">
@@ -50,9 +52,9 @@
             android:id="@+id/tv_exercises"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/rv_exercise_btns"
-            android:layout_margin="5dp"
-            android:textSize="20sp"
+            android:layout_margin="2.5dp"
+            android:fontFamily="@font/staatliches"
+            android:textSize="18sp"
             android:textColor="@color/colorBg"
             android:text="@string/exercises"/>
 
@@ -60,7 +62,11 @@
             android:id="@+id/rv_exercise_btns"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"/>
+			android:layout_below="@id/tv_exercises"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginStart="2.5dp"
+            android:layout_marginEnd="2.5dp"
+            android:layout_marginBottom="5dp"/>
     </RelativeLayout>
     <!--List=of=Added=Exercises=================================================================-->
 
@@ -107,7 +113,9 @@
         android:layout_below="@id/rlay_workout"
         android:layout_above="@id/rlay_exercises"
         android:layout_margin="4dp"
-        android:padding="4dp"
+        android:paddingTop="4dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
         android:background="@drawable/border"
         android:elevation="3dp"
         android:translationZ="1dp">
@@ -128,6 +136,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_above="@id/part_et_weight"
+            android:layout_marginBottom="5dp"
             layout="@layout/part_edit_text_exercise" />
         <!--Exercise=Name=======================================================================-->
 
@@ -154,7 +163,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/tv_center_exercise"
-            android:layout_above="@id/tv_center_exercise"
+            android:layout_above="@id/part_et_sets"
+            android:layout_margin="2.5dp"
             layout="@layout/part_edit_text_weight"/>
 
         <ImageButton
@@ -186,9 +196,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/part_et_exercise"
-            android:layout_above="@id/tv_center_exercise"
+            android:layout_above="@id/part_et_reps"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/tv_center_exercise"
+            android:layout_margin="2.5dp"
             android:orientation="horizontal">
 
             <Spinner
@@ -231,9 +242,11 @@
             android:id="@+id/part_et_sets"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_center_exercise"
+            android:layout_above="@id/btn_clear_exercise"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/tv_center_exercise"
+            android:layout_margin="2.5dp"
+            android:textSize="100sp"
             layout="@layout/part_edit_text_sets"/>
 
         <ImageButton
@@ -274,9 +287,10 @@
             android:id="@+id/part_et_reps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_center_exercise"
+            android:layout_above="@id/btn_add_exercise"
             android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/tv_center_exercise"
+            android:layout_margin="2.5dp"
             layout="@layout/part_edit_text_reps" />
 
         <ImageButton
@@ -306,36 +320,42 @@
         <Button
             android:id="@+id/btn_clear_exercise"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/part_et_sets"
             android:layout_toStartOf="@id/tv_center_exercise"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="2.5dp"
+            android:layout_marginStart="2.5dp"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginBottom="5dp"
             android:maxHeight="60dp"
             android:text="@string/clear"/>
 
         <Button
             android:id="@+id/btn_add_exercise"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/part_et_reps"
+            android:layout_height="55dp"
             android:layout_toEndOf="@id/tv_center_exercise"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="2.5dp"
+            android:layout_marginEnd="2.5dp"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginBottom="5dp"
             android:maxHeight="60dp"
             android:text="@string/add_exercise"/>
 
         <Button
             android:id="@+id/btn_update_exercise"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/part_et_reps"
+            android:layout_height="55dp"
             android:layout_toEndOf="@id/tv_center_exercise"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="2.5dp"
+            android:layout_marginEnd="2.5dp"
+            android:layout_marginTop="2.5dp"
+            android:layout_marginBottom="5dp"
             android:maxHeight="60dp"
             android:text="@string/update_exercise"
             android:visibility="gone"/>
