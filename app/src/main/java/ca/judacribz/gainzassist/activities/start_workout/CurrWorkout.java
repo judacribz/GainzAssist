@@ -1,15 +1,9 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.widget.Toast;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -17,11 +11,9 @@ import java.util.Map;
 
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
-import static ca.judacribz.gainzassist.util.Calculations.getOneRepMax;
 import static ca.judacribz.gainzassist.util.Misc.enablePrettyMapper;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
-import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
 public class CurrWorkout {
@@ -63,25 +55,27 @@ public class CurrWorkout {
 
     // Interfaces
     // --------------------------------------------------------------------------------------------
-    private TimerListener timerListener;
+    private DataListener dataListener;
 
-    public interface TimerListener {
+    public interface DataListener {
         void startTimer(long timeInMillis);
+        void updateProgressExs(int numExs);
+        void updateProgressSets(int numSets);
     }
-    public void setTimerListener(TimerListener timerListener) {
-        this.timerListener = timerListener;
+    public void setDataListener(DataListener dataListener) {
+        this.dataListener = dataListener;
         //TODO make deterministic
         if (!timerSet) {
             setTimer();
         }
     }
 
-    private static DataListener dataListener;
-    public interface DataListener {
+    private static WarmupsListener warmupsListener;
+    public interface WarmupsListener {
         void warmupsGenerated(ArrayList<Exercise> warmups);
     }
-    void setDataListener(DataListener dataListener) {
-        CurrWorkout.dataListener = dataListener;
+    void setDataListener(WarmupsListener warmupsListener) {
+        CurrWorkout.warmupsListener = warmupsListener;
     }
     // --------------------------------------------------------------------------------------------
 
@@ -310,7 +304,7 @@ public class CurrWorkout {
         this.currWarmups = warmups;
         this.numWarmups = warmups.size();
 
-        dataListener.warmupsGenerated(warmups);
+        warmupsListener.warmupsGenerated(warmups);
     }
 
     private void setAllCurrExercises(ArrayList<Exercise> allExercises ) {
@@ -389,7 +383,7 @@ public class CurrWorkout {
     }
 
     public int getExInd() {
-        return  this.ex_i;
+        return this.ex_i;
     }
 
     public void setExInd(int ex_i) {
@@ -402,6 +396,11 @@ public class CurrWorkout {
         }
 
         this.currExercise = exercise;
+
+        if (dataListener != null) {
+            dataListener.updateProgressSets(exercise.getNumSets());
+        }
+
         this.currMinWeight = exercise.getMinWeight();
         this.currWeightChange = exercise.getWeightChange();
         setCurrExerciseSet(this.currExercise.getSet(this.set_i));
@@ -425,14 +424,15 @@ public class CurrWorkout {
     }
 
     public int getCurrNumExs() {
-        return (getIsWarmup()) ? this.numWarmups : this.numMains;
+//        (getIsWarmup()) ? this.numWarmups :
+        return this.numMains;
     }
-
+    private int currMainInd = 1;
     public int getCurrExNum() {
-        return ((this.currExercise.getSetsType() == WARMUP_SET)
-                ? currWarmups.indexOf(currExercise)
-                : currMains.indexOf(currExercise))
-                + 1;
+        if (getIsWarmup()) {
+            return currMainInd;
+        }
+        return  currMainInd = currMains.indexOf(currExercise) + 1;
     }
 
     public String getCurrExName() {
@@ -486,8 +486,8 @@ public class CurrWorkout {
     }
 
     private void setTimer() {
-        if (timerListener != null) {
-            timerListener.startTimer(this.currRestTime);
+        if (dataListener != null) {
+            dataListener.startTimer(this.currRestTime);
 
             timerSet = true;
         } else {

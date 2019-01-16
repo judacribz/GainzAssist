@@ -41,7 +41,7 @@ public class EquipmentView extends View{
 
     // Constants
     // ============================================================================================
-    private final int TEXT_SIZE   = 30;
+    private final int TEXT_SIZE   = 50;
     private final int PLATE_WIDTH = 40;
     private final int[] WEIGHTS   = new int[] {450, 250, 100, 50, 25};
     // ============================================================================================
@@ -83,11 +83,7 @@ public class EquipmentView extends View{
 
     private void init(Context context) {
         this.context = context;
-
         paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setTextSize(TEXT_SIZE);
     }
 
 
@@ -97,7 +93,17 @@ public class EquipmentView extends View{
     protected void onDraw(Canvas canvas) {
         this.height = getHeight();
         int width = getWidth();
-        canvas.drawColor(Color.WHITE);
+
+        paint.setColor( Color.BLACK );
+        paint.setStrokeWidth( 0.5f );
+        paint.setStyle( Paint.Style.STROKE );
+        canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
+
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(TEXT_SIZE);
+
+//        canvas.drawColor(Color.WHITE);
 
         // Draw the plate weights for the barbell
         if (plates != null) {

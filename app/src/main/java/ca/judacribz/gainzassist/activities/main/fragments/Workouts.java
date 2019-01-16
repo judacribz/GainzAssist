@@ -34,6 +34,7 @@ import java.util.List;
 
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
 import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
+import static ca.judacribz.gainzassist.util.UI.getTextString;
 import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 
 public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObserver {
@@ -184,18 +185,16 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     // SingleItemAdapter.ItemClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
-    public void onWorkoutClick(String name) {
+    public void onItemClick(View view) {
         intent = new Intent(act, StartWorkout.class);
         extraKey = Main.EXTRA_WORKOUT;
-        workoutViewModel.getWorkoutFromName(act, name);
+        workoutViewModel.getWorkoutFromName(act, getTextString((TextView) view));
     }
-    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 
-
-    // SingleItemAdapter.ItemLongClickObserver Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
+    String workoutName;
     @Override
-    public void onWorkoutLongClick(View view, final String workoutName) {
+    public void onItemLongClick(View view) {
+        workoutName = getTextString((TextView) view);
 
         ((TextView) dialog.findViewById(R.id.tv_workout_name)).setText(workoutName);
 
@@ -233,7 +232,7 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
         workoutViewModel.deleteWorkout(workoutName);
         deleteWorkoutFirebase(workoutName);
     }
-    //SingleItemAdapter.ItemLongClickObserver//Override////////////////////////////////////////////////
+    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 
 
     public void onQueryTextChange(String newText) {

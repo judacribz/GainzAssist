@@ -37,16 +37,16 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     TabLayout.TabLayoutOnPageChangeListener tabLayoutOnPageChangeListener;
     TabLayout.ViewPagerOnTabSelectedListener viewPagerOnTabSelectedListener;
     ArrayList<TabLayout.Tab> tabs = new ArrayList<>();
+
     LayoutInflater layInflater;
 
     Workout workout;
     long workoutId;
+    ArrayList<Exercise> exercises;
     int
             pos,
             numExs,
             addedExs = 0;
-
-    ArrayList<Exercise> exercises;
 
     @BindView(R.id.tlay_navbar) TabLayout tabLayout;
     @BindView(R.id.vp_fmt_container) ViewPager viewPager;
@@ -63,13 +63,12 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
                 "Exercises Entry",
                 true
         );
-
+        Intent workoutEntryIntent = getIntent();
 
         workout = new Workout();
         workout.setId(-1);
         workoutId = workout.getId();
 
-        Intent workoutEntryIntent = getIntent();
         workout.setName(workoutEntryIntent.getStringExtra(EXTRA_WORKOUT_NAME));
         numExs = workoutEntryIntent.getIntExtra(EXTRA_NUM_EXERCISES, MIN_INT);
 
@@ -77,7 +76,6 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         for (int i = 0; i < numExs; i ++) {
             exercises.add(new Exercise());
         }
-
 
         tabLayoutOnPageChangeListener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
         viewPagerOnTabSelectedListener = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
@@ -112,13 +110,14 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     }
 
     private void setupPager() {
+        TabLayout.Tab tab;
         layInflater = getLayoutInflater();
 
         viewPager.addOnPageChangeListener(tabLayoutOnPageChangeListener);
         tabLayout.addOnTabSelectedListener(viewPagerOnTabSelectedListener);
 
         for (int i = 0; i < this.numExs; i++) {
-            TabLayout.Tab tab = tabLayout.newTab().setText(String.format(TAB_LABEL, i + 1));
+             tab = tabLayout.newTab().setText(String.format(TAB_LABEL, i + 1));
             tabs.add(tab);
             tabLayout.addTab(tab);
         }
@@ -177,22 +176,10 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         }
 
         lognow();
-        if (!checkAndGoToSummary()) {
-            setFirstEmptyTab();
-        }
+        checkAndGoToSummary();
     }
 
-    public void setFirstEmptyTab() {
-        for (int i = 0; i < numExs; i++) {
-
-            if (exercises.get(i).getName() == null) {
-                viewPager.setCurrentItem(i, true);
-
-                break;
-            }
-        }
-    }
-
+    //TODO remove debug
     private void lognow() {
         Exercise e;
         for (int i = 0; i < exercises.size(); i++) {
@@ -228,8 +215,9 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         }
         tabs.get(index).select();
 
+        TabLayout.Tab tab;
         for (int i = index; i < tabs.size(); i++) {
-            TabLayout.Tab tab = tabs.get(i);
+            tab = tabs.get(i);
             tab.setText(String.format(TAB_LABEL, i + 1));
         }
 
@@ -243,9 +231,7 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         }
     }
 
-    //ExEntry.ExEntryDataListener//Override////////////////////////////////////////////////////////
-
-    private boolean checkAndGoToSummary() {
+    private void checkAndGoToSummary() {
         if (addedExs >= numExs) {
             workout.setExercises(exercises);
 
@@ -253,10 +239,19 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
             newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
             startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);
-
-            return  true;
+        } else {
+            setFirstEmptyTab();
         }
-
-        return false;
     }
+
+    public void setFirstEmptyTab() {
+        for (int i = 0; i < numExs; i++) {
+            if (exercises.get(i).getName() == null) {
+                viewPager.setCurrentItem(i, true);
+
+                break;
+            }
+        }
+    }
+    //ExEntry.ExEntryDataListener//Override////////////////////////////////////////////////////////
 }

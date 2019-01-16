@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
+import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
@@ -28,7 +31,9 @@ import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.handleFocusLeft;
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
-public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener {
+public class WorkoutScreen extends Fragment implements
+        CurrWorkout.DataListener,
+        SingleItemAdapter.ItemClickObserver {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -39,6 +44,10 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     StartWorkout act;
     Bundle bundle;
     CountDownTimer countDownTimer;
+
+    SingleItemAdapter
+            exerciseNumAdapter,
+            exerciseSetAdapter;
 
     long currTime;
     CurrWorkout currWorkout = CurrWorkout.getInstance();
@@ -59,6 +68,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
 
     @BindView(R.id.et_reps) EditText etCurrReps;
     @BindView(R.id.et_weight) EditText etCurrWeight;
+
+    @BindView(R.id.rv_exercise_num) RecyclerView rvExerciseNum;
+    @BindView(R.id.rv_exercise_set) RecyclerView rvExerciseSet;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -95,13 +107,26 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
+
+        rvExerciseSet.setLayoutManager(new LinearLayoutManager(act,
+                LinearLayoutManager.HORIZONTAL,
+                false));
+        rvExerciseSet.setHasFixedSize(true);
+
+        rvExerciseNum.setLayoutManager(new LinearLayoutManager(act,
+                LinearLayoutManager.HORIZONTAL,
+                false));
+        rvExerciseNum.setHasFixedSize(true);
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        currWorkout.setTimerListener(this);
+        currWorkout.setDataListener(this);
+
+        updateProgressExs(currWorkout.getCurrNumExs());
+        updateProgressSets(currWorkout.getCurrNumSets());
 
         updateUI();
     }
@@ -110,7 +135,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     public void onPause() {
         super.onPause();
 
-        currWorkout.setTimerListener(null);
+        currWorkout.setDataListener(null);
     }
 
     @Override
@@ -119,6 +144,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     }
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
+
+    // CurrWorkout.DataListener Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void startTimer(long timeInMillis) {
         if (countDownTimer != null) {
@@ -156,6 +184,46 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 cancel();
             }
         };
+    }
+
+    @Override
+    public void updateProgressExs(int numExs) {
+        exerciseNumAdapter = new SingleItemAdapter(
+                act,
+                numExs,
+                R.layout.part_text_view_progress,
+                R.id.tv_progress
+        );
+        exerciseNumAdapter.setItemClickObserver(this);
+        rvExerciseNum.setAdapter(exerciseNumAdapter);
+
+        exerciseNumAdapter.setCurrItem(currWorkout.getCurrExNum());
+    }
+
+    @Override
+    public void updateProgressSets(int numSets) {
+        exerciseSetAdapter = new SingleItemAdapter(
+                act,
+                numSets,
+                R.layout.part_text_view_progress,
+                R.id.tv_progress
+        );
+        exerciseSetAdapter.setItemClickObserver(this);
+        rvExerciseSet.setAdapter(exerciseSetAdapter);
+
+        exerciseSetAdapter.setCurrItem(currWorkout.getCurrSetNum());
+    }
+    //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
+
+
+    @Override
+    public void onItemClick(View view) {
+
+    }
+
+    @Override
+    public void onItemLongClick(View view) {
+
     }
 
     // TextWatcher Handling
@@ -283,7 +351,6 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
         if (currWorkout.finishCurrSet()) {
-
             updateUI();
 
         // End of workout
@@ -329,6 +396,7 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
                 currWorkout.getCurrNumExs())
         );
 
+
         tvSetInfo.setText(String.format(
                 "Set %s/%s",
                 currWorkout.getCurrSetNum(),
@@ -336,6 +404,9 @@ public class WorkoutScreen extends Fragment implements CurrWorkout.TimerListener
         );
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
+
+        exerciseNumAdapter.setCurrItem(currWorkout.getCurrExNum()-1);
+        exerciseSetAdapter.setCurrItem(currWorkout.getCurrSetNum()-1);
     }
 
     private void setReps() {

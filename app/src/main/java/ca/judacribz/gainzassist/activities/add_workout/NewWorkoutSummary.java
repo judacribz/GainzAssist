@@ -270,8 +270,8 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     // SingleItemAdapter.ItemClickObserver override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
-    public void onWorkoutClick(String exName) {
-        updateExerciseArea(exName);
+    public void onItemClick(View view) {
+        updateExerciseArea(getTextString((TextView) view));
     }
 Exercise ex;
     private void updateExerciseArea(String exName) {
@@ -285,7 +285,7 @@ Exercise ex;
     }
 
     @Override
-    public void onWorkoutLongClick(View anchor, String name) {
+    public void onItemLongClick(View view) {
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 

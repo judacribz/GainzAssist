@@ -31,7 +31,7 @@ import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 import static com.facebook.rebound.ui.Util.dpToPx;
 
-public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataListener {
+public class StartWorkout extends AppCompatActivity implements CurrWorkout.WarmupsListener {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
-    // CurrWorkout.DataListener Override
+    // CurrWorkout.WarmupsListener Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void warmupsGenerated(ArrayList<Exercise> warmups) {
@@ -201,7 +201,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.DataL
         viewPager.setCurrentItem(tabLayout.getTabCount() - 2);
 //        viewPager.setOffscreenPageLimit(3);
     }
-    //CurrWorkout.DataListener//Override//////////////////////////////////////////////////////////
+    //CurrWorkout.WarmupsListener//Override//////////////////////////////////////////////////////////
 
 
     /* Creates horizontal recycler view lists of  set#, reps, weights for each exercise and adds

@@ -95,7 +95,6 @@
 	<string name="initial_num_reps">10</string>
 	<string name="initial_weight">45.0</string>
 	<string name="reps">Reps</string>
-	<string name="set_num">Set #</string>
 	<string name="barbell">barbell</string>
 	<string name="cancel_set">Cancel Set</string>
 	<string name="finish_set">Finish Set</string>
@@ -129,4 +128,6 @@
 	<string name="unlocked">Unlocked</string>
 	<string name="lbs">lbs</string>
 	<string name="exercise">Exercise</string>
+	<string name="exercise_num">Exercise # </string>
+	<string name="set_num">Set # </string>
 </resources>

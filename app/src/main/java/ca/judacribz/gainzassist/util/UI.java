@@ -130,8 +130,8 @@ public class UI {
         return spr.getSelectedItem().toString().toLowerCase();
     }
 
-    public static String getTextString(EditText et) {
-        return et.getText().toString().trim();
+    public static String getTextString(TextView tv) {
+        return tv.getText().toString().trim();
     }
 
     /* Gets integer value of text from EditText element */

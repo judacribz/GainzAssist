@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<me.grantland.widget.AutofitTextView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/tv_progress"
+	android:layout_width="35dp"
+	android:layout_height="35dp"
+	android:layout_margin="5dp"
+	android:background="@drawable/textview_circle"
+	android:fontFamily="@font/staatliches"
+	android:gravity="center"
+	android:textColor="@color/colorBg"
+	android:textSize="25sp"/>

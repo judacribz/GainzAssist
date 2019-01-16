@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	   android:shape="oval">
+
+	<gradient
+		android:startColor="@color/colorLightAccent"
+		android:endColor="@color/colorBg"
+		android:type="radial"
+		android:gradientRadius="@dimen/progress_circle_dim"/>
+
+	<size
+		android:height="@dimen/progress_circle_dim"
+		android:width="@dimen/progress_circle_dim" />
+</shape>

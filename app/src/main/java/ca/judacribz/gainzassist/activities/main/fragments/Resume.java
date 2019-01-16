@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import static ca.judacribz.gainzassist.util.Preferences.getIncompleteWorkouts;
+import static ca.judacribz.gainzassist.util.UI.getTextString;
 
 public class Resume extends Fragment implements SingleItemAdapter.ItemClickObserver {
 
@@ -133,14 +135,14 @@ public class Resume extends Fragment implements SingleItemAdapter.ItemClickObser
     // SingleItemAdapter.ItemClickObserver Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
-    public void onWorkoutClick(String name) {
+    public void onItemClick(View view) {
         intent = new Intent(act, StartWorkout.class);
         extraKey = Main.EXTRA_WORKOUT;
-        workoutViewModel.getWorkoutFromName(act, name);
+        workoutViewModel.getWorkoutFromName(act, getTextString((TextView) view));
     }
 
     @Override
-    public void onWorkoutLongClick(View anchor, String name) {
+    public void onItemLongClick(View view) {
 
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
