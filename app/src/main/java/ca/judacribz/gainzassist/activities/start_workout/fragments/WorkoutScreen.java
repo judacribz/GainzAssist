@@ -46,8 +46,11 @@ public class WorkoutScreen extends Fragment implements
     CountDownTimer countDownTimer;
 
     SingleItemAdapter
-            exerciseNumAdapter,
-            exerciseSetAdapter;
+            exerciseAdapter,
+            setAdapter;
+    LinearLayoutManager
+            setManager,
+            exerciseManager;
 
     long currTime;
     CurrWorkout currWorkout = CurrWorkout.getInstance();
@@ -69,8 +72,8 @@ public class WorkoutScreen extends Fragment implements
     @BindView(R.id.et_reps) EditText etCurrReps;
     @BindView(R.id.et_weight) EditText etCurrWeight;
 
-    @BindView(R.id.rv_exercise_num) RecyclerView rvExerciseNum;
-    @BindView(R.id.rv_exercise_set) RecyclerView rvExerciseSet;
+    @BindView(R.id.rv_exercise_num) RecyclerView rvExercise;
+    @BindView(R.id.rv_exercise_set) RecyclerView rvSet;
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -108,16 +111,23 @@ public class WorkoutScreen extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
 
-        rvExerciseSet.setLayoutManager(new LinearLayoutManager(act,
-                LinearLayoutManager.HORIZONTAL,
-                false));
-        rvExerciseSet.setHasFixedSize(true);
+        setManager = setProgressLayoutManagers(rvSet);
+        exerciseManager = setProgressLayoutManagers(rvExercise);
 
-        rvExerciseNum.setLayoutManager(new LinearLayoutManager(act,
-                LinearLayoutManager.HORIZONTAL,
-                false));
-        rvExerciseNum.setHasFixedSize(true);
         return view;
+    }
+
+    private LinearLayoutManager setProgressLayoutManagers(RecyclerView rv) {
+        LinearLayoutManager manager = new LinearLayoutManager(
+                act,
+                LinearLayoutManager.HORIZONTAL,
+                false
+        );
+        manager.setSmoothScrollbarEnabled(true);
+        rv.setLayoutManager(manager);
+        rv.setHasFixedSize(true);
+
+        return manager;
     }
 
     @Override
@@ -186,33 +196,31 @@ public class WorkoutScreen extends Fragment implements
         };
     }
 
+    int setPos, exPos;
     @Override
     public void updateProgressExs(int numExs) {
-        exerciseNumAdapter = new SingleItemAdapter(
+        rvExercise.setAdapter(exerciseAdapter = new SingleItemAdapter(
                 act,
                 numExs,
                 R.layout.part_text_view_progress,
                 R.id.tv_progress
-        );
-        exerciseNumAdapter.setItemClickObserver(this);
-        rvExerciseNum.setAdapter(exerciseNumAdapter);
-
-        exerciseNumAdapter.setCurrItem(currWorkout.getCurrExNum());
+        ));
+        exerciseAdapter.setItemClickObserver(this);
+        selectProgressAdapterPos(exerciseAdapter, exerciseManager, currWorkout.getCurrExNum());
     }
 
     @Override
     public void updateProgressSets(int numSets) {
-        exerciseSetAdapter = new SingleItemAdapter(
+        rvSet.setAdapter(setAdapter = new SingleItemAdapter(
                 act,
                 numSets,
                 R.layout.part_text_view_progress,
                 R.id.tv_progress
-        );
-        exerciseSetAdapter.setItemClickObserver(this);
-        rvExerciseSet.setAdapter(exerciseSetAdapter);
-
-        exerciseSetAdapter.setCurrItem(currWorkout.getCurrSetNum());
+        ));
+        setAdapter.setItemClickObserver(this);
+        selectProgressAdapterPos(setAdapter, setManager, currWorkout.getCurrSetNum());
     }
+
     //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
 
 
@@ -405,9 +413,11 @@ public class WorkoutScreen extends Fragment implements
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
 
-        exerciseNumAdapter.setCurrItem(currWorkout.getCurrExNum()-1);
-        exerciseSetAdapter.setCurrItem(currWorkout.getCurrSetNum()-1);
+        selectProgressAdapterPos(exerciseAdapter, exerciseManager, currWorkout.getCurrExNum());
+        selectProgressAdapterPos(setAdapter, setManager, currWorkout.getCurrSetNum());
     }
+
+
 
     private void setReps() {
         etCurrReps.setText(String.valueOf(currWorkout.getCurrReps()));
@@ -425,4 +435,12 @@ public class WorkoutScreen extends Fragment implements
         });
     }
     //=Click=Handling===============================================================================
+
+    private void selectProgressAdapterPos(
+            SingleItemAdapter adapter,
+            LinearLayoutManager manager,
+            int pos) {
+        adapter.setCurrItem(pos);
+        manager.scrollToPosition(pos - 1);
+    }
 }

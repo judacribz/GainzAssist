@@ -19,6 +19,7 @@ import ca.judacribz.gainzassist.models.Exercise;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_WARMUPS;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
 
 public class WarmupsList extends Fragment {
 
@@ -79,9 +80,8 @@ View view;
 
                 for (int i = warmups.size()-1; i >= 0; --i) {
                     act.displaySets(
-                            100 + i,
+                            WARMUP_SET,
                             warmups.get(i),
-//                            llExSubInsert,
                             llExSetsInsert
                     );
                 }

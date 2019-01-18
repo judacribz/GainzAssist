@@ -19,6 +19,6 @@
 		android:singleLine="true"
 		android:text="@string/starting_sets"
 		android:textAlignment="center"
-		android:textSize="40sp"
+		android:textSize="35sp"
 		tools:ignore="Autofill"/>
 </me.grantland.widget.AutofitLayout>

@@ -22,6 +22,7 @@ import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos;
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter;
 import ca.judacribz.gainzassist.models.*;
+import ca.judacribz.gainzassist.models.Exercise.*;
 import java.util.ArrayList;
 import org.parceler.Parcels;
 
@@ -208,26 +209,29 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.Warmu
      * dynamically to the view.
      * Called in ExercisesList and WarmupsList
      */
-    @SuppressLint("InflateParams")
-    public void displaySets(int id,
+    SetsAdapter adapter;
+    ArrayList<SetsAdapter>
+            warmupAdapter = new ArrayList<>(),
+            mainAdapters = new ArrayList<>();
+    public void displaySets(SetsType setsType,
                             Exercise exercise,
                             LinearLayout llSets) {
 
         layInflater = getLayoutInflater();
 
         // Add the listView layout which containsExercise a textView and a recyclerVIew
-        setsView = layInflater.inflate(R.layout.part_horizontal_rv, null);
+        setsView = layInflater.inflate(R.layout.part_horizontal_rv, llSets, false);
         setsView.setLayoutParams(lp);
-        setsView.setId(id);
+//        setsView.setId(id);
         llSets.addView(setsView, 0);
 
         // ExerciseSet the title in the textView within the listView layout above
-        tvExerciseName = (TextView) setsView.findViewById(R.id.tv_exercise_name);
+        tvExerciseName = setsView.findViewById(R.id.tv_exercise_name);
         tvExerciseName.setText(exercise.getName());
 
         // ExerciseSet the recyclerView list to be horizontal and pass in the exercise sets through the
         // adapter
-        setList = (RecyclerView) setsView.findViewById(R.id.rv_exercise_sets);
+        setList = setsView.findViewById(R.id.rv_exercise_sets);
         setList.setHasFixedSize(true);
         setList.setLayoutManager(new LinearLayoutManager(
                 this,
@@ -235,6 +239,17 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.Warmu
                 false
         ));
 
-        setList.setAdapter(new SetsAdapter(exercise.getSetsList()));
+        adapter = new SetsAdapter(exercise.getSetsList());
+        setList.setAdapter(adapter);
+
+        switch (setsType) {
+            case MAIN_SET:
+                mainAdapters.add(adapter);
+                break;
+
+            case WARMUP_SET:
+                warmupAdapter.add(adapter);
+                break;
+        }
     }
 }

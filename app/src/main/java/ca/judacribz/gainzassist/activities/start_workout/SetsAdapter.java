@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.ExerciseSet;
@@ -18,13 +19,11 @@ import static ca.judacribz.gainzassist.util.Calculations.dpToPix;
 
 public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> {
 
-    private int numberOfSets;
     private ArrayList<ExerciseSet> exerciseSets;
 
     // Adapter Constructor
     SetsAdapter(ArrayList<ExerciseSet> exerciseSets) {
         this.exerciseSets = exerciseSets;
-        this.numberOfSets = exerciseSets.size();
     }
 
     // SetsAdapter @Override
@@ -47,7 +46,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
     @Override
     public int getItemCount() {
-        return numberOfSets;
+        return exerciseSets.size();
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -78,11 +77,11 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
 
         // Sets the text for each list item
         void bind(int setNumber, int reps, float weight) {
-            tvSetNum.setText(String.valueOf(setNumber));
+            tvSetNum.setText(String.valueOf(setNumber + 1));
             etReps.setText(String.valueOf(reps));
-            etReps.setHeight((int) dpToPix(context, 50f)) ;
-            etWeight.setText(String.valueOf(weight));
-            etWeight.setHeight((int) dpToPix(context, 50f)) ;
+//            etReps.setHeight((int) dpToPix(context, 50f)) ;
+            etWeight.setText(String.format(Locale.CANADA, "%.0f", weight));
+//            etWeight.setHeight((int) dpToPix(context, 50f)) ;
         }
     }
 }

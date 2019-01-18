@@ -9,14 +9,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import ca.judacribz.gainzassist.R;
+import me.grantland.widget.AutofitHelper;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
 public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> {
 
-    private final Context context;
-    private ArrayList<TextView> listViews = new ArrayList<>();
+
     // Interfaces
     // --------------------------------------------------------------------------------------------
     private ItemClickObserver itemClickObserver;
@@ -29,12 +29,15 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     public void setItemClickObserver(ItemClickObserver itemClickObserver) {
         this.itemClickObserver = itemClickObserver;
     }
-
     // --------------------------------------------------------------------------------------------
 
+    private final Context context;
+    private ArrayList<TextView> listViews = new ArrayList<>();
     private int listItemLayout, listItemId;
     private ArrayList<String> itemNames;
     private LayoutInflater inflater;
+    private int currSelected = -1;
+    private boolean dontRecycle = false;
 
     // Adapter Constructor
     public SingleItemAdapter(Context context,
@@ -62,6 +65,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
 
         this.listItemLayout = listItemLayout;
         this.listItemId = listItemId;
+        dontRecycle = true;
     }
 
     // RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> Override
@@ -71,7 +75,12 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(listItemLayout, parent, false);
 
-        return new ItemViewHolder(view);
+        ItemViewHolder holder = new ItemViewHolder(view);
+        if (dontRecycle) {
+            holder.setIsRecyclable(false);
+        }
+
+        return holder;
     }
 
     @Override
@@ -89,19 +98,19 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         this.itemNames = itemNames;
     }
 
-    int currSelected = -1;
     public void setCurrItem(int currSetNum) {
-        deselectAll();
-        if (currSetNum < listViews.size()) {
-            listViews.get(currSetNum).setBackground(context.getDrawable(R.drawable.textview_circle_selected));
-            currSetNum = -1;
+        deselectAll(currSetNum);
+        if (currSetNum <= listViews.size()) {
+            listViews.get(currSetNum - 1).setBackground(context.getDrawable(R.drawable.textview_circle_selected));
+
+            currSelected = -1;
         } else {
-            currSelected = currSetNum;
+            currSelected = currSetNum - 1;
         }
     }
 
-    private void deselectAll() {
-        for (TextView listView : listViews) {
+    private void deselectAll(int currSetInd) {
+        for (TextView listView : listViews.subList(0, currSetInd - 1)) {
             listView.setBackground(context.getDrawable(R.drawable.textview_circle));
         }
     }

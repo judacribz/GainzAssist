@@ -246,7 +246,7 @@ public class CurrWorkout {
                 newWeight += weightInc;
 
                 reps = Math.max(reps/2, 1);
-            } else if (newWeight > 0.91f * weight) {
+            } else {
                 newWeight -= weightInc;
                 weightInc /= 2;
                 newWeight += weightInc;
@@ -330,7 +330,9 @@ public class CurrWorkout {
             this.set_i = 0;
             this.ex_i++;
 
-            this.currSession.addExercise(this.currExercise);
+            if (!getIsWarmup()) {
+                this.currSession.addExercise(this.currExercise);
+            }
 
             // End of all exercises for this workout session
             if (atEndOfExercises()) {
@@ -427,10 +429,10 @@ public class CurrWorkout {
 //        (getIsWarmup()) ? this.numWarmups :
         return this.numMains;
     }
-    private int currMainInd = 1;
+    private int currMainInd = 0;
     public int getCurrExNum() {
         if (getIsWarmup()) {
-            return currMainInd;
+            return currMainInd + 1;
         }
         return  currMainInd = currMains.indexOf(currExercise) + 1;
     }
@@ -538,6 +540,7 @@ public class CurrWorkout {
     void resetIndices() {
         this.ex_i = -1;
         this.set_i = -1;
+        this.currMainInd = 0;
     }
 
     String saveSessionState() {

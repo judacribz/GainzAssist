@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.util.firebase;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.SparseArray;
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
@@ -140,15 +141,13 @@ public class Database {
         updateWorkoutWeights(session.getWorkoutName(), session.getAvgWeights());
     }
 
-    public static void updateWorkoutWeights(String workoutName, Map<String, Float> newWeights) {
+    public static void updateWorkoutWeights(String workoutName, SparseArray<Float> newWeights) {
         userWorkoutsRef = getWorkoutsRef();
         if (userWorkoutsRef != null) {
             DatabaseReference workoutRef = userWorkoutsRef.child(workoutName);
 
-            int i = 0;
-            for (Map.Entry<String, Float> entry : newWeights.entrySet()) {
-                workoutRef.child("exercises").child(String.valueOf(i)).child("weight").setValue(entry.getValue());
-                i++;
+            for (int i = 0; i < newWeights.size(); i++) {
+                workoutRef.child("exercises").child(String.valueOf(i)).child("weight").setValue(newWeights.get(i));
             }
         }
 

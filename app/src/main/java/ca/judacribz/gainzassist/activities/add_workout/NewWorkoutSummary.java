@@ -62,8 +62,6 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     int num_reps, num_sets, minInt = 1; // for min num_reps/num_sets
     float weight, minWeight, weightChange;
 
-    WorkoutHelper workoutHelper;
-
     WorkoutViewModel workoutViewModel;
 
     // UI Elements
@@ -118,7 +116,6 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
             etWorkoutName.setText(workoutName);
         }
 
-//        setSpinnerWithArray(this, R.array.exerciseType, sprType);
         setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment);
 
         // ExerciseSet the layout manager
@@ -281,7 +278,6 @@ Exercise ex;
         etNumReps.setText(String.valueOf(ex.getReps()));
         etWeight.setText(String.valueOf(ex.getWeight()));
         sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex.getEquipment()));
-//        sprType.setSelection(EXERCISE_TYPES.indexOf(ex.getType()));
     }
 
     @Override
@@ -414,11 +410,10 @@ Exercise ex;
     @OnClick(R.id.btn_clear_exercise)
     public void clearExercise() {
         clearFormEntry(etExerciseName);
-        etNumReps.setText(String.valueOf(minInt));
-        etNumSets.setText(String.valueOf(minInt));
-        etWeight.setText(String.valueOf(minWeight));
+        etNumReps.setText(getString(R.string.starting_reps));
+        etNumSets.setText(getString(R.string.starting_sets));
+        etWeight.setText(getString(R.string.starting_weight));
         sprEquipment.setSelection(0);
-//        sprType.setSelection(0);
     }
 
     /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
@@ -427,22 +422,9 @@ Exercise ex;
         finish();
     }
 
-//    @OnItemSelected(R.id.spr_type)
-//    public void changeSprEquipment(Spinner spr) {
-//        if (spr.getSelectedItemPosition() == POS_CARDIO) {
-//            sprEquipment.setSelection(POS_NA);
-//        }
-//    }
-
     @OnItemSelected(R.id.spr_equipment)
     public void changeSprType(Spinner spr) {
         Toast.makeText(this, spr.getItemAtPosition(POS_NA).toString(), Toast.LENGTH_SHORT).show();
-
-//        if (spr.getSelectedItemPosition() != POS_NA) {
-//            if (sprType.getSelectedItemPosition() == POS_CARDIO) {
-//                sprType.setSelection(POS_STREN);
-//            }
-//        }
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -20,6 +20,7 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_below="@id/tv_sets"
+        android:cursorVisible="false"
         android:gravity="center"
         android:inputType="number"/>
 
@@ -34,6 +35,7 @@
             android:id="@+id/et_weight"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:cursorVisible="false"
             android:inputType="numberDecimal"
             android:textSize="20sp"/>
     </me.grantland.widget.AutofitLayout>

@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.models;
 
 import android.arch.persistence.room.*;
+import android.util.SparseArray;
 import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class Session {
     ArrayList<Exercise> sessionExs = new ArrayList<>();
 
     @Ignore
-    Map<String, Float> avgWeights = new HashMap<>();
+    SparseArray<Float> avgWeights = new SparseArray<>();
     // --------------------------------------------------------------------------------------------
 
     // ######################################################################################### //
@@ -81,7 +82,7 @@ public class Session {
         return sessionExs;
     }
 
-    public Map<String, Float> getAvgWeights() {
+    public SparseArray<Float> getAvgWeights() {
         return this.avgWeights;
     }
     // ============================================================================================
@@ -99,13 +100,17 @@ public class Session {
         weight = weight / exercise.getFinishedSetsList().size() + weightChange;
         weight -= weight % weightChange;
 
-        if (avgWeights.containsKey(exercise.getName())) {
-            this.sessionExs.set(this.sessionExs.size()-1, exercise);
+        if (avgWeights.get(exercise.getExerciseNumber(), -1f) != -1f) {
+            this.sessionExs.set(exercise.getExerciseNumber(), exercise);
         } else {
             this.sessionExs.add(exercise);
         }
 
-        this.avgWeights.put(exercise.getName(), weight);
+        this.avgWeights.put(exercise.getExerciseNumber(), weight);
+
+//        for (Exercise ex : sessionExs) {
+//            Logger.d("EXERCISE # " + ex.getName() + " " + avgWeights.get(ex.getName()));
+//        }
     }
 
     public void remLastExercise() {

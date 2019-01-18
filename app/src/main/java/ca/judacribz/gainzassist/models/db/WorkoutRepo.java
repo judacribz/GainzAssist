@@ -246,7 +246,7 @@ public class WorkoutRepo {
         private String workoutName = null;
         private Workout workout = null;
         private Exercise exercise = null;
-        private Map<String, Float> newWeights = null;
+        private SparseArray<Float> newWeights = null;
         private ExerciseSet exerciseSet = null;
         private Session session = null;
         private long timestamp = -1;
@@ -280,7 +280,7 @@ public class WorkoutRepo {
             setExerciseWeights(session.getAvgWeights());
         }
 
-        public void setExerciseWeights(Map<String, Float> newWeights) {
+        public void setExerciseWeights(SparseArray<Float> newWeights) {
             this.newWeights = newWeights;
         }
 
@@ -345,9 +345,9 @@ public class WorkoutRepo {
                             }
                         }
 
-                        for (Map.Entry<String, Float> entry : newWeights.entrySet()) {
+                        for (int i = 0; i < newWeights.size(); i++) {
 //                            Logger.d("failing weight" + Float.valueOf(entry.getValue()));
-                            exerciseDao.updateWeight(entry.getValue(), exerciseDao.getId(entry.getKey(), workoutId));
+                            exerciseDao.updateWeight(newWeights.get(i), exerciseDao.getId(sessExs.get(i).getName(), workoutId));
                         }
 
                         break;

@@ -20,6 +20,7 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_MAIN_EXERCISES;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
 
 public class ExercisesList extends Fragment {
 
@@ -80,7 +81,7 @@ View view;
                 for (int i = exercises.size()-1; i >= 0; --i) {
 
                     act.displaySets(
-                            200 + i,
+                            MAIN_SET,
                             exercises.get(i),
 //                            llExSubInsert,
                             llExSetsInsert
