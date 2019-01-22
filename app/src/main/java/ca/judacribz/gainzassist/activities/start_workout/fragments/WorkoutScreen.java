@@ -5,9 +5,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +24,16 @@ import ca.judacribz.gainzassist.activities.start_workout.EquipmentView;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
+import ca.judacribz.gainzassist.adapters.SingleItemAdapter.*;
 import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
 
-
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
+import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
 import static ca.judacribz.gainzassist.util.Preferences.*;
+import static ca.judacribz.gainzassist.util.UI.getTextInt;
 import static ca.judacribz.gainzassist.util.UI.handleFocusLeft;
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 
@@ -56,25 +62,41 @@ public class WorkoutScreen extends Fragment implements
     CurrWorkout currWorkout = CurrWorkout.getInstance();
     ArrayList<Exercise> finExercises;
     float weight;
+
+    SparseArray<PROGRESS_STATUS>
+            exProgress = new SparseArray<>(),
+            setProgress = new SparseArray<>();
     // --------------------------------------------------------------------------------------------
 
     // UI Elements
-    @BindView(R.id.equip_view) EquipmentView equipmentView;
-    @BindView(R.id.tv_timer) TextView tvTimer;
+    @BindView(R.id.equip_view)
+    EquipmentView equipmentView;
+    @BindView(R.id.tv_timer)
+    TextView tvTimer;
 
-    @BindView(R.id.tv_exercise_title) TextView tvExerciseTitle;
-    @BindView(R.id.tv_set_info) TextView tvSetInfo;
-    @BindView(R.id.tv_ex_info) TextView tvExInfo;
+    @BindView(R.id.tv_exercise_title)
+    TextView tvExerciseTitle;
+    @BindView(R.id.tv_set_info)
+    TextView tvSetInfo;
+    @BindView(R.id.tv_ex_info)
+    TextView tvExInfo;
 
-    @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
-    @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
+    @BindView(R.id.btn_dec_reps)
+    ImageButton btnDecReps;
+    @BindView(R.id.btn_dec_weight)
+    ImageButton btnDecWeight;
 
-    @BindView(R.id.et_reps) EditText etCurrReps;
-    @BindView(R.id.et_weight) EditText etCurrWeight;
+    @BindView(R.id.et_reps)
+    EditText etCurrReps;
+    @BindView(R.id.et_weight)
+    EditText etCurrWeight;
 
-    @BindView(R.id.rv_exercise_num) RecyclerView rvExercise;
-    @BindView(R.id.rv_exercise_set) RecyclerView rvSet;
+    @BindView(R.id.rv_exercise_num)
+    RecyclerView rvExercise;
+    @BindView(R.id.rv_exercise_set)
+    RecyclerView rvSet;
     // --------------------------------------------------------------------------------------------
+
 
     // ######################################################################################### //
     // WorkoutScreen Constructor/Instance                                                        //
@@ -86,6 +108,7 @@ public class WorkoutScreen extends Fragment implements
         return new WorkoutScreen();
     }
     // ######################################################################################### //
+
 
     // Fragment Override
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +187,6 @@ public class WorkoutScreen extends Fragment implements
     public void startTimer(long timeInMillis) {
         if (countDownTimer != null) {
             countDownTimer.cancel();
-            Logger.d("CANCEL TIME");
         }
 
         countDownTimer = getCountDownTimer(timeInMillis);
@@ -173,7 +195,7 @@ public class WorkoutScreen extends Fragment implements
 
     /* Creates and returns a new CountDownTimer with the rest time to count down from. Has the
      * following format: 0:00
-     */
+     *********************************************************************************************/
     CountDownTimer getCountDownTimer(long milliseconds) {
 
         return new CountDownTimer(milliseconds, 1000) {
@@ -199,43 +221,89 @@ public class WorkoutScreen extends Fragment implements
         };
     }
 
-    int setPos, exPos;
     @Override
     public void updateProgressExs(int numExs) {
-        rvExercise.setAdapter(exerciseAdapter = new SingleItemAdapter(
-                act,
+        exerciseAdapter = setupProgressAdapter(
+                rvExercise,
                 numExs,
-                R.layout.part_text_view_progress,
-                R.id.tv_progress
-        ));
+                exProgress = setupProgress(numExs)
+        );
+
         exerciseAdapter.setItemClickObserver(this);
-//        selectProgressAdapterPos(exerciseAdapter, rvExercise, currWorkout.getCurrExNum());
     }
 
     @Override
     public void updateProgressSets(int numSets) {
-        rvSet.setAdapter(setAdapter = new SingleItemAdapter(
-                act,
+        setAdapter = setupProgressAdapter(
+                rvSet,
                 numSets,
-                R.layout.part_text_view_progress,
-                R.id.tv_progress
-        ));
-        setAdapter.setItemClickObserver(this);
-//        selectProgressAdapterPos(setAdapter, rvSet, currWorkout.getCurrSetNum());
+                setProgress = setupProgress(numSets)
+        );
     }
 
+    private SparseArray<PROGRESS_STATUS> setupProgress(int numItems) {
+        SparseArray<PROGRESS_STATUS> progressStatus = new SparseArray<>();
+
+        progressStatus.put(0, SELECTED);
+        for (int i = 1; i < numItems; i++) {
+            progressStatus.put(i, UNSELECTED);
+        }
+
+        return progressStatus;
+    }
+
+    private SingleItemAdapter setupProgressAdapter(RecyclerView rv,
+                                                   int numItems,
+                                                   SparseArray<PROGRESS_STATUS> progressStatus) {
+        SingleItemAdapter adapter = new SingleItemAdapter(
+                act,
+                numItems,
+                R.layout.part_text_view_progress,
+                R.id.tv_progress,
+                progressStatus
+        );
+
+        rv.setAdapter(adapter);
+
+        return adapter;
+    }
     //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
 
+    ArrayList<ExerciseSet> setsToUpdate;
 
+    // SingleItemAdapter.ItemClickObserver Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void onItemClick(View view) {
+        Exercise ex = currWorkout.getSessionExercise(getTextInt((TextView) view));
 
+        if (ex != null) {
+            Logger.d(writeValueAsString(ex.setsToMap()));
+            SparseArray<PROGRESS_STATUS> progressStatus = new SparseArray<>();
+            setsToUpdate = ex.getFinishedSetsList();
+            for (ExerciseSet set : setsToUpdate) {
+                if (set.getReps() >= ex.getReps() && set.getWeight() >= ex.getWeight()) {
+                    progressStatus.put(set.getSetNumber(), SUCCESS);
+                } else {
+                    progressStatus.put(set.getSetNumber(), FAIL);
+                }
+            }
+
+
+            setAdapter = setupProgressAdapter(
+                    rvSet,
+                    ex.getNumSets(),
+                    progressStatus
+            );
+        }
     }
 
     @Override
     public void onItemLongClick(View view) {
 
     }
+    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
+
 
     // TextWatcher Handling
     // =============================================================================================
@@ -381,6 +449,7 @@ public class WorkoutScreen extends Fragment implements
         }
     }
 
+    int exNum = -1;
     public void updateUI() {
         String setType;
 
@@ -400,26 +469,42 @@ public class WorkoutScreen extends Fragment implements
         if (!currWorkout.getLockWeight())
             setWeight();
 
-        tvExInfo.setText(String.format(
-                "%s %s/%s",
-                setType,
-                currWorkout.getCurrExNum(),
-                currWorkout.getCurrNumExs())
-        );
-
-
-        tvSetInfo.setText(String.format(
-                "Set %s/%s",
-                currWorkout.getCurrSetNum(),
-                currWorkout.getCurrNumSets())
-        );
+//        tvExInfo.setText(String.format(
+//                "%s %s/%s",
+//                setType,
+//                currWorkout.getCurrExNum(),
+//                currWorkout.getCurrNumExs())
+//        );
+//
+//
+//        tvSetInfo.setText(String.format(
+//                "Set %s/%s",
+//                currWorkout.getCurrSetNum(),
+//                currWorkout.getCurrNumSets())
+//        );
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
 
-        selectProgressAdapterPos(exerciseAdapter, rvExercise, currWorkout.getCurrExNum());
-        selectProgressAdapterPos(setAdapter, rvSet, currWorkout.getCurrSetNum());
+        int num = currWorkout.getCurrExNum();
+        selectProgressAdapterPos(
+                (exNum != num) ? exerciseAdapter : null,
+                rvExercise,
+                exNum = num,
+                currWorkout.getExSuccess());
+        selectProgressAdapterPos(setAdapter, rvSet, currWorkout.getCurrSetNum(), currWorkout.getSetSuccess());
     }
 
+    private void selectProgressAdapterPos(
+            @Nullable SingleItemAdapter adapter,
+            RecyclerView rv,
+            int pos, boolean success) {
+        if (adapter != null) {
+            adapter.setCurrItem(pos, success);
+        }
+
+
+        rv.scrollToPosition(pos - 1);
+    }
 
 
     private void setReps() {
@@ -439,11 +524,4 @@ public class WorkoutScreen extends Fragment implements
     }
     //=Click=Handling===============================================================================
 
-    private void selectProgressAdapterPos(
-            SingleItemAdapter adapter,
-            RecyclerView rv,
-            int pos) {
-        adapter.setCurrItem(pos);
-        rv.scrollToPosition(pos - 1);
-    }
 }

@@ -166,7 +166,6 @@ public class Exercise {
         this.equipment = equipment;
 
         if (BARBELL.equals(this.equipment)) {
-            Logger.d("SET MIN WEIGHT");
             this.minWeight = BB_MIN_WEIGHT;
             this.weightChange = BB_WEIGHT_CHANGE;
         } else if (DUMBBELL.equals(this.equipment)) {
@@ -253,7 +252,6 @@ public class Exercise {
         for (ExerciseSet exerciseSet : setsList) {
             weight += exerciseSet.getWeight();
         }
-Logger.d("setlist size " + setsList.size());
         return weight / (float) getSets();
     }
 

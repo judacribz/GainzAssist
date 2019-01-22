@@ -67,7 +67,6 @@ public class Misc {
 
     public static Session extractSession(DataSnapshot sessionShot) {
         Session session = sessionShot.getValue(Session.class);
-        Logger.d(session.getWorkoutId() + "workoutid");
 
         if (session != null) {
             long timestamp = session.getTimestamp();
@@ -104,8 +103,6 @@ public class Misc {
             }
         }
 
-        Logger.d(session.sessionStateMap(1, 1));
-        Logger.d(sessionShot.toString());
         return session;
     }
 

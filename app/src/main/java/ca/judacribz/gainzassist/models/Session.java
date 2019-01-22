@@ -96,7 +96,6 @@ public class Session {
             weight += exerciseSet.getWeight() * (float)exerciseSet.getReps()/expectedReps;
         }
 
-        Logger.d(weight + "yo");
         weight = weight / exercise.getFinishedSetsList().size() + weightChange;
         weight -= weight % weightChange;
 

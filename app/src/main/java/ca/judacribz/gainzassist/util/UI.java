@@ -130,18 +130,19 @@ public class UI {
         return spr.getSelectedItem().toString().toLowerCase();
     }
 
-    public static String getTextString(TextView tv) {
-        return tv.getText().toString().trim();
-    }
 
     /* Gets integer value of text from EditText element */
-    public static int getTextInt(EditText et) {
-        return Integer.valueOf(getTextString(et));
+    public static int getTextInt(TextView tv) {
+        return Integer.valueOf(getTextString(tv));
     }
 
     /* Gets float value of text from EditText element */
     public static float getTextFloat(EditText et) {
         return Float.valueOf(getTextString(et));
+    }
+
+    public static String getTextString(TextView tv) {
+        return tv.getText().toString().trim();
     }
 
     /* Validates EditTexts to be non-empty or else an error is set */

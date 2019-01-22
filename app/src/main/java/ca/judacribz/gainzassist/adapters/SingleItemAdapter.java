@@ -3,16 +3,16 @@ package ca.judacribz.gainzassist.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import ca.judacribz.gainzassist.R;
-import me.grantland.widget.AutofitHelper;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
 
 public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> {
 
@@ -30,13 +30,25 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         this.itemClickObserver = itemClickObserver;
     }
     // --------------------------------------------------------------------------------------------
-
-    private final Context context;
-    private ArrayList<TextView> listViews = new ArrayList<>();
-    private int listItemLayout, listItemId;
-    private ArrayList<String> itemNames;
+    private Context context;
     private LayoutInflater inflater;
-    private int currSelected = -1;
+
+    public enum PROGRESS_STATUS {
+        UNSELECTED,
+        SELECTED,
+        SUCCESS,
+        FAIL
+    }
+    private SparseArray<PROGRESS_STATUS> progStatus;
+
+    private ArrayList<TextView> listViews;
+    private ArrayList<String> itemNames;
+
+    private int
+            listItemLayout,
+            listItemId,
+            currSelected = -1;
+
     private boolean dontRecycle = false;
 
     // Adapter Constructor
@@ -44,6 +56,8 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
                              ArrayList<String> itemNames,
                              int listItemLayout,
                              int listItemId) {
+        listViews = new ArrayList<>();
+
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.itemNames = itemNames;
@@ -54,7 +68,9 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     public SingleItemAdapter(Context context,
                              int numItems,
                              int listItemLayout,
-                             int listItemId) {
+                             int listItemId, SparseArray<PROGRESS_STATUS> progStatus) {
+        listViews = new ArrayList<>();
+
         this.context = context;
         this.inflater = LayoutInflater.from(context);
 
@@ -62,9 +78,10 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         for (int i = 1; i <= numItems; i++) {
             this.itemNames.add(String.valueOf(i));
         }
-
+        this.progStatus = progStatus;
         this.listItemLayout = listItemLayout;
         this.listItemId = listItemId;
+
         dontRecycle = true;
     }
 
@@ -74,8 +91,8 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = inflater.inflate(listItemLayout, parent, false);
-
         ItemViewHolder holder = new ItemViewHolder(view);
+
         if (dontRecycle) {
             holder.setIsRecyclable(false);
         }
@@ -85,7 +102,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        holder.bind(itemNames.get(position), position);
+        holder.bind(position);
     }
 
     @Override
@@ -98,21 +115,32 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         this.itemNames = itemNames;
     }
 
-    public void setCurrItem(int currSetNum) {
-        deselectAll(currSetNum);
-        if (currSetNum <= listViews.size()) {
-            listViews.get(currSetNum - 1).setBackground(context.getDrawable(R.drawable.textview_circle_selected));
+    public void setCurrItem(int currSetNum, boolean success) {
 
-            currSelected = -1;
-        } else {
-            currSelected = currSetNum - 1;
+        progStatus.put(currSetNum - 1, SELECTED);
+        if (currSetNum > 1) {
+            if (success) {
+                progStatus.put(currSetNum - 2, SUCCESS);
+            } else {
+                progStatus.put(currSetNum - 2, FAIL);
+            }
         }
+
+        notifyDataSetChanged();
+//        deselectAll(currSetNum);
+//        if (currSetNum <= listViews.size()) {
+//            listViews.get(currSetNum - 1).setBackground(context.getDrawable(R.drawable.textview_circle_selected));
+//
+//            currSelected = -1;
+//        } else {
+//            currSelected = currSetNum - 1;
+//        }
     }
 
     private void deselectAll(int currSetInd) {
-        for (TextView listView : listViews.subList(0, currSetInd - 1)) {
-            listView.setBackground(context.getDrawable(R.drawable.textview_circle));
-        }
+//        for (TextView listView : listViews.subList(0, currSetInd - 1)) {
+//            listView.setBackground(context.getDrawable(R.drawable.textview_circle));
+//        }
     }
 
     // Custom ViewHolder class for the recyclerView
@@ -128,30 +156,55 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
             super(itemView);
 
             listViews.add(listItemView = itemView.findViewById(listItemId));
-            if (listViews.indexOf(listItemView) == currSelected) {
-                listItemView.setBackground(context.getDrawable(R.drawable.textview_circle_selected));
-            }
-
             listItemView.setOnClickListener(this);
             listItemView.setOnLongClickListener(this);
-
         }
 
         // Sets the text for each button item
-        void bind(String btnText, int position) {
-            listItemView.setText(btnText);
+        void bind(int pos) {
+            listItemView.setText(itemNames.get(pos));
+
+            if (progStatus != null) {
+                int drawId = -1;
+                switch (progStatus.get(pos)) {
+                    case UNSELECTED:
+                        drawId = R.drawable.textview_circle;
+                        break;
+
+                    case SELECTED:
+                        drawId = R.drawable.textview_circle_selected;
+                        break;
+
+                    case SUCCESS:
+                        drawId = R.drawable.textview_circle_success;
+                        break;
+
+                    case FAIL:
+                        drawId = R.drawable.textview_circle_fail;
+                        break;
+                }
+
+                if (drawId != -1) {
+                    listItemView.setBackground(context.getDrawable(drawId));
+                }
+            }
         }
 
         @Override
         public void onClick(View view) {
-            itemClickObserver.onItemClick(view);
+            if (itemClickObserver != null) {
+                itemClickObserver.onItemClick(view);
+            }
         }
 
         @Override
         public boolean onLongClick(View view) {
-            itemClickObserver.onItemLongClick(view);
+            if (itemClickObserver != null) {
+                itemClickObserver.onItemLongClick(view);
+            }
             return true;
         }
     }
+
     // ============================================================================================
 }

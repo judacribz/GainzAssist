@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
+import android.support.annotation.Nullable;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
@@ -151,8 +152,6 @@ public class CurrWorkout {
 
         setCurrMainExercises(exercises);
 
-
-        Logger.d("EXERCISE SIZE HERE = " + exercises.size());
         for (Exercise ex: exercises) {
             equip = ex.getEquipment();
             minWeight = ex.getMinWeight();
@@ -316,6 +315,7 @@ public class CurrWorkout {
         setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
     }
 
+    boolean setSuccess = true, exSuccess = true, lastExSuccess = true;
     public boolean finishCurrSet() {
         this.set_i++;
 
@@ -344,6 +344,8 @@ public class CurrWorkout {
 
             // Not end of all exercises, set next exercise
             } else {
+                lastExSuccess = exSuccess;
+                exSuccess = true;
                 setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
             }
 
@@ -359,10 +361,25 @@ public class CurrWorkout {
                 }
             }
 
+            if (this.currReps >= this.currExercise.getReps() &&  this.currWeight >= this.currExercise.getWeight()) {
+                setSuccess = true;
+            } else {
+                setSuccess = false;
+                exSuccess = false;
+            }
+
             setCurrExerciseSet(currExercise.getSet(this.set_i));
         }
 
         return true;
+    }
+
+    public boolean getSetSuccess() {
+        return setSuccess;
+    }
+
+    public boolean getExSuccess() {
+        return lastExSuccess;
     }
 
     public void resetLocks() {
@@ -434,7 +451,7 @@ public class CurrWorkout {
         if (getIsWarmup()) {
             return currMainInd + 1;
         }
-        return  currMainInd = currMains.indexOf(currExercise) + 1;
+        return currMainInd = currMains.indexOf(currExercise) + 1;
     }
 
     public String getCurrExName() {
@@ -569,5 +586,14 @@ public class CurrWorkout {
 
     public boolean getLockWeight() {
         return this.lockWeight;
+    }
+
+    public Exercise getSessionExercise(int ex_i) {
+        Exercise exercise = null;
+        if (ex_i < getCurrExNum()) {
+            exercise =  this.currSession.getSessionExs().get(ex_i - 1);
+        }
+
+        return exercise;
     }
 }
