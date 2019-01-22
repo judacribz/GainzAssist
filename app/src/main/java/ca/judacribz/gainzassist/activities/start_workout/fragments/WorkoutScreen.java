@@ -114,6 +114,9 @@ public class WorkoutScreen extends Fragment implements
         setManager = setProgressLayoutManagers(rvSet);
         exerciseManager = setProgressLayoutManagers(rvExercise);
 
+        rvSet.setHasFixedSize(true);
+        rvExercise.setHasFixedSize(true);
+
         return view;
     }
 
@@ -206,7 +209,7 @@ public class WorkoutScreen extends Fragment implements
                 R.id.tv_progress
         ));
         exerciseAdapter.setItemClickObserver(this);
-        selectProgressAdapterPos(exerciseAdapter, exerciseManager, currWorkout.getCurrExNum());
+//        selectProgressAdapterPos(exerciseAdapter, rvExercise, currWorkout.getCurrExNum());
     }
 
     @Override
@@ -218,7 +221,7 @@ public class WorkoutScreen extends Fragment implements
                 R.id.tv_progress
         ));
         setAdapter.setItemClickObserver(this);
-        selectProgressAdapterPos(setAdapter, setManager, currWorkout.getCurrSetNum());
+//        selectProgressAdapterPos(setAdapter, rvSet, currWorkout.getCurrSetNum());
     }
 
     //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
@@ -413,8 +416,8 @@ public class WorkoutScreen extends Fragment implements
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
 
-        selectProgressAdapterPos(exerciseAdapter, exerciseManager, currWorkout.getCurrExNum());
-        selectProgressAdapterPos(setAdapter, setManager, currWorkout.getCurrSetNum());
+        selectProgressAdapterPos(exerciseAdapter, rvExercise, currWorkout.getCurrExNum());
+        selectProgressAdapterPos(setAdapter, rvSet, currWorkout.getCurrSetNum());
     }
 
 
@@ -438,9 +441,9 @@ public class WorkoutScreen extends Fragment implements
 
     private void selectProgressAdapterPos(
             SingleItemAdapter adapter,
-            LinearLayoutManager manager,
+            RecyclerView rv,
             int pos) {
         adapter.setCurrItem(pos);
-        manager.scrollToPosition(pos - 1);
+        rv.scrollToPosition(pos - 1);
     }
 }

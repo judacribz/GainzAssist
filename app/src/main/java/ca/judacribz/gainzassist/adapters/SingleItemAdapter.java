@@ -85,7 +85,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        holder.bind(itemNames.get(position));
+        holder.bind(itemNames.get(position), position);
     }
 
     @Override
@@ -138,7 +138,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         }
 
         // Sets the text for each button item
-        void bind(String btnText) {
+        void bind(String btnText, int position) {
             listItemView.setText(btnText);
         }
 
