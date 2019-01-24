@@ -1,6 +1,8 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.support.annotation.Nullable;
+import android.util.SparseArray;
+import ca.judacribz.gainzassist.adapters.SingleItemAdapter.*;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
@@ -10,8 +12,8 @@ import com.orhanobut.logger.Logger;
 import java.util.ArrayList;
 import java.util.Map;
 
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType;
 import static ca.judacribz.gainzassist.util.Misc.enablePrettyMapper;
 import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
@@ -51,6 +53,10 @@ public class CurrWorkout {
             lockReps = false,
             lockWeight = false;
     private Session currSession = null;
+
+    SparseArray<PROGRESS_STATUS>
+            exStatus,
+            setStatus;
     // --------------------------------------------------------------------------------------------
 
 
@@ -58,9 +64,10 @@ public class CurrWorkout {
     // --------------------------------------------------------------------------------------------
     private DataListener dataListener;
 
+
+
     public interface DataListener {
         void startTimer(long timeInMillis);
-        void updateProgressExs(int numExs);
         void updateProgressSets(int numSets);
     }
     public void setDataListener(DataListener dataListener) {
@@ -95,7 +102,10 @@ public class CurrWorkout {
         Map<String, Object> exsMap, exMap;
         Map<String, Object> setsMap, setMap;
 
-        currWarmups = new ArrayList<>();
+        this.exStatus = new SparseArray<>();
+        this.setStatus = new SparseArray<>();
+
+        this.currWarmups = new ArrayList<>();
         this.currWorkout = workout;
         this.currSession = new Session(workout);
 
@@ -103,15 +113,31 @@ public class CurrWorkout {
         this.set_i = Integer.valueOf(String.valueOf(map.get(SET_INDEX)));
 
         exsMap =  readValue(readValue(map.get(SESSION)).get(EXERCISES));
+        String exNum = "0";
+        Exercise exercise = null;
         for (Map.Entry<String, Object> exEntry : exsMap.entrySet()) {
-            String exNum = exEntry.getKey();
+            exNum = exEntry.getKey();
             exMap = readValue(exEntry.getValue());
 
             //TODO test without using map
-            Exercise exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
+            exercise = workout.getExerciseFromIndex(Integer.valueOf(exNum));
             exercise.setSetsType(MAIN_SET);
 
-            setsMap = readValue(readValue(exEntry.getValue()).get(SET_LIST));
+            Object succ = exMap.get("success");
+
+            if (succ != null) {
+                this.exStatus.put(
+                        Integer.valueOf(exNum),
+                        Boolean.valueOf(String.valueOf(succ)) ?
+                                PROGRESS_STATUS.SUCCESS :
+                                PROGRESS_STATUS.FAIL
+                );
+            } else {
+                this.exStatus.put(Integer.valueOf(exNum), PROGRESS_STATUS.SELECTED);
+            }
+
+
+            setsMap = readValue(readValue(exMap).get(SET_LIST));
             for (Map.Entry<String, Object> setEntry : setsMap.entrySet()) {
                 setMap = readValue(setEntry.getValue());
                 exercise.addSet(new ExerciseSet(
@@ -123,6 +149,11 @@ public class CurrWorkout {
             }
 
             this.currSession.addExercise(exercise);
+        }
+
+        // Setup progress textview circle data
+        for (int i = Integer.valueOf(exNum) + 1; i < workout.getNumExercises(); i++) {
+            exStatus.put(i, PROGRESS_STATUS.UNSELECTED);
         }
 
         genWarmups(workout.getExercises());
@@ -315,7 +346,10 @@ public class CurrWorkout {
         setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
     }
 
-    boolean setSuccess = true, exSuccess = true, lastExSuccess = true;
+    boolean
+            setSuccess = true,
+            exSuccess = true,
+            lastExSuccess = true;
     public boolean finishCurrSet() {
         this.set_i++;
 
@@ -558,6 +592,8 @@ public class CurrWorkout {
         this.ex_i = -1;
         this.set_i = -1;
         this.currMainInd = 0;
+        exStatus = null;
+        setStatus = null;
     }
 
     String saveSessionState() {
@@ -595,5 +631,17 @@ public class CurrWorkout {
         }
 
         return exercise;
+    }
+
+    public SparseArray<PROGRESS_STATUS> getExProgress() {
+        return this.exStatus;
+    }
+
+    public SparseArray<PROGRESS_STATUS> getSetProgress() {
+        return this.setStatus;
+    }
+
+    public SetsType getCurrExType() {
+        return this.currExercise.getSetsType();
     }
 }

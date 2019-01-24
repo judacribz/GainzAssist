@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,6 +30,8 @@ import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.getTextInt;
@@ -47,6 +48,7 @@ public class WorkoutScreen extends Fragment implements
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    CurrWorkout currWorkout = CurrWorkout.getInstance();
     StartWorkout act;
     Bundle bundle;
     CountDownTimer countDownTimer;
@@ -59,13 +61,12 @@ public class WorkoutScreen extends Fragment implements
             exerciseManager;
 
     long currTime;
-    CurrWorkout currWorkout = CurrWorkout.getInstance();
     ArrayList<Exercise> finExercises;
     float weight;
 
     SparseArray<PROGRESS_STATUS>
-            exProgress = new SparseArray<>(),
-            setProgress = new SparseArray<>();
+            exProgress,
+            setProgress;
     // --------------------------------------------------------------------------------------------
 
     // UI Elements
@@ -76,10 +77,8 @@ public class WorkoutScreen extends Fragment implements
 
     @BindView(R.id.tv_exercise_title)
     TextView tvExerciseTitle;
-    @BindView(R.id.tv_set_info)
-    TextView tvSetInfo;
-    @BindView(R.id.tv_ex_info)
-    TextView tvExInfo;
+    @BindView(R.id.tv_set_num)
+    TextView tvSetNum;
 
     @BindView(R.id.btn_dec_reps)
     ImageButton btnDecReps;
@@ -134,6 +133,7 @@ public class WorkoutScreen extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
 
+        currWorkout.setDataListener(this);
         setManager = setProgressLayoutManagers(rvSet);
         exerciseManager = setProgressLayoutManagers(rvExercise);
 
@@ -149,7 +149,6 @@ public class WorkoutScreen extends Fragment implements
                 LinearLayoutManager.HORIZONTAL,
                 false
         );
-        manager.setSmoothScrollbarEnabled(true);
         rv.setLayoutManager(manager);
         rv.setHasFixedSize(true);
 
@@ -159,12 +158,24 @@ public class WorkoutScreen extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        currWorkout.setDataListener(this);
-
         updateProgressExs(currWorkout.getCurrNumExs());
         updateProgressSets(currWorkout.getCurrNumSets());
 
         updateUI();
+    }
+
+    public void updateProgressExs(int numExs) {
+        exProgress = currWorkout.getExProgress();
+        if (exProgress == null) {
+            exProgress = setupProgress(numExs, currWorkout.getCurrExNum(), null);
+        }
+        exerciseAdapter = setupProgressAdapter(
+                rvExercise,
+                numExs,
+                exProgress
+        );
+
+        exerciseAdapter.setItemClickObserver(this);
     }
 
     @Override
@@ -222,35 +233,19 @@ public class WorkoutScreen extends Fragment implements
     }
 
     @Override
-    public void updateProgressExs(int numExs) {
-        exerciseAdapter = setupProgressAdapter(
-                rvExercise,
-                numExs,
-                exProgress = setupProgress(numExs)
-        );
-
-        exerciseAdapter.setItemClickObserver(this);
-    }
-
-    @Override
     public void updateProgressSets(int numSets) {
         setAdapter = setupProgressAdapter(
                 rvSet,
                 numSets,
-                setProgress = setupProgress(numSets)
+                setProgress = setupProgress(
+                        numSets,
+                        currWorkout.getCurrSetNum(),
+                        currWorkout.getCurrExType()
+                )
         );
     }
 
-    private SparseArray<PROGRESS_STATUS> setupProgress(int numItems) {
-        SparseArray<PROGRESS_STATUS> progressStatus = new SparseArray<>();
-
-        progressStatus.put(0, SELECTED);
-        for (int i = 1; i < numItems; i++) {
-            progressStatus.put(i, UNSELECTED);
-        }
-
-        return progressStatus;
-    }
+    //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
 
     private SingleItemAdapter setupProgressAdapter(RecyclerView rv,
                                                    int numItems,
@@ -262,12 +257,23 @@ public class WorkoutScreen extends Fragment implements
                 R.id.tv_progress,
                 progressStatus
         );
-
         rv.setAdapter(adapter);
 
         return adapter;
     }
-    //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
+
+
+    private SparseArray<PROGRESS_STATUS> setupProgress(int numItems, int itemInd, SetsType setType) {
+        SparseArray<PROGRESS_STATUS> progressStatus = new SparseArray<>();
+
+        for (int i = 0; i < numItems; i++) {
+            progressStatus.put(i, UNSELECTED);
+        }
+        progressStatus.put(itemInd - 1, SELECTED);
+
+        return progressStatus;
+    }
+
 
     ArrayList<ExerciseSet> setsToUpdate;
 
@@ -288,7 +294,6 @@ public class WorkoutScreen extends Fragment implements
                     progressStatus.put(set.getSetNumber(), FAIL);
                 }
             }
-
 
             setAdapter = setupProgressAdapter(
                     rvSet,
@@ -427,6 +432,7 @@ public class WorkoutScreen extends Fragment implements
         setWeight();
     }
 
+    // Finish set
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
         if (currWorkout.finishCurrSet()) {
@@ -434,13 +440,10 @@ public class WorkoutScreen extends Fragment implements
 
         // End of workout
         } else {
-            if (removeIncompleteWorkoutPref(act, currWorkout.getWorkoutName())) {
-                removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
-            }
-
             ViewModelProviders.of(act)
                     .get(WorkoutViewModel.class)
                     .insertSession(currWorkout.getCurrSession());
+
             if (removeIncompleteWorkoutPref(act, currWorkout.getWorkoutName())) {
                 removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
             }
@@ -449,7 +452,6 @@ public class WorkoutScreen extends Fragment implements
         }
     }
 
-    int exNum = -1;
     public void updateUI() {
         String setType;
 
@@ -463,46 +465,37 @@ public class WorkoutScreen extends Fragment implements
             setType = "Main";
         }
 
-        if (!currWorkout.getLockReps())
+        if (!currWorkout.getLockReps()) {
             setReps();
+        }
 
-        if (!currWorkout.getLockWeight())
+        if (!currWorkout.getLockWeight()) {
             setWeight();
-
-//        tvExInfo.setText(String.format(
-//                "%s %s/%s",
-//                setType,
-//                currWorkout.getCurrExNum(),
-//                currWorkout.getCurrNumExs())
-//        );
-//
-//
-//        tvSetInfo.setText(String.format(
-//                "Set %s/%s",
-//                currWorkout.getCurrSetNum(),
-//                currWorkout.getCurrNumSets())
-//        );
+        }
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
 
-        int num = currWorkout.getCurrExNum();
         selectProgressAdapterPos(
-                (exNum != num) ? exerciseAdapter : null,
+                exerciseAdapter,
                 rvExercise,
-                exNum = num,
+                currWorkout.getCurrExNum(),
                 currWorkout.getExSuccess());
-        selectProgressAdapterPos(setAdapter, rvSet, currWorkout.getCurrSetNum(), currWorkout.getSetSuccess());
+
+        tvSetNum.setText(String.format(getString(R.string.set_num), setType));
+        selectProgressAdapterPos(
+                setAdapter,
+                rvSet,
+                currWorkout.getCurrSetNum(),
+                currWorkout.getSetSuccess()
+        );
     }
 
     private void selectProgressAdapterPos(
-            @Nullable SingleItemAdapter adapter,
+            SingleItemAdapter adapter,
             RecyclerView rv,
             int pos, boolean success) {
-        if (adapter != null) {
-            adapter.setCurrItem(pos, success);
-        }
 
-
+        adapter.setCurrItem(pos, success);
         rv.scrollToPosition(pos - 1);
     }
 

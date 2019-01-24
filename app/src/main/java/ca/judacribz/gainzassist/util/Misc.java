@@ -125,6 +125,13 @@ public class Misc {
         return exs;
     }
 
+    public static void enablePrettyMapper() {
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
+
+    public static Map<String, Object> readValue(Object childObj) {
+        return readValue(writeValueAsString(childObj));
+    }
 
     public static String writeValueAsString(Object object) {
         String jsonStr = "";
@@ -136,13 +143,6 @@ public class Misc {
         }
 
         return  jsonStr;
-    }
-    public static void enablePrettyMapper() {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
-
-    public static Map<String, Object> readValue(Object childObj) {
-        return readValue(writeValueAsString(childObj));
     }
 
     public static Map<String, Object> readValue(String childStr) {

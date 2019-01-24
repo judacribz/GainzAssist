@@ -291,12 +291,20 @@ public class Exercise {
         Map<String, Object>
                 setMap = new HashMap<>(),
                 exMap = toMap();
+        boolean success = true;
 
         for (ExerciseSet set : this.finSets) {
             setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
+
+            if (set.getReps() < this.reps || set.getWeight() < this.weight) {
+                success = false;
+            }
         }
 
         exMap.put("setList", setMap);
+        if (finSets.size() == sets) {
+            exMap.put("success", success);
+        }
 
         return exMap;
     }

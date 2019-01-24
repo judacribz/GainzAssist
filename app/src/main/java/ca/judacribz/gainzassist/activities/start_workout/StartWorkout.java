@@ -42,6 +42,10 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.Warmu
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
+    SetsAdapter adapter;
+    ArrayList<SetsAdapter>
+            warmupAdapter = new ArrayList<>(),
+            mainAdapters = new ArrayList<>();
     Workout workout;
     ArrayList<Exercise> exercises;
 
@@ -104,6 +108,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.Warmu
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
+
         return super.onSupportNavigateUp();
     }
 
@@ -209,10 +214,6 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.Warmu
      * dynamically to the view.
      * Called in ExercisesList and WarmupsList
      */
-    SetsAdapter adapter;
-    ArrayList<SetsAdapter>
-            warmupAdapter = new ArrayList<>(),
-            mainAdapters = new ArrayList<>();
     public void displaySets(SetsType setsType,
                             Exercise exercise,
                             LinearLayout llSets) {
@@ -229,8 +230,7 @@ public class StartWorkout extends AppCompatActivity implements CurrWorkout.Warmu
         tvExerciseName = setsView.findViewById(R.id.tv_exercise_name);
         tvExerciseName.setText(exercise.getName());
 
-        // ExerciseSet the recyclerView list to be horizontal and pass in the exercise sets through the
-        // adapter
+
         setList = setsView.findViewById(R.id.rv_exercise_sets);
         setList.setHasFixedSize(true);
         setList.setLayoutManager(new LinearLayoutManager(

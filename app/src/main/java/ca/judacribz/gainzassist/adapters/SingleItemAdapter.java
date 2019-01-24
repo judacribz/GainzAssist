@@ -41,7 +41,6 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     }
     private SparseArray<PROGRESS_STATUS> progStatus;
 
-    private ArrayList<TextView> listViews;
     private ArrayList<String> itemNames;
 
     private int
@@ -56,8 +55,6 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
                              ArrayList<String> itemNames,
                              int listItemLayout,
                              int listItemId) {
-        listViews = new ArrayList<>();
-
         this.context = context;
         this.inflater = LayoutInflater.from(context);
         this.itemNames = itemNames;
@@ -69,8 +66,6 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
                              int numItems,
                              int listItemLayout,
                              int listItemId, SparseArray<PROGRESS_STATUS> progStatus) {
-        listViews = new ArrayList<>();
-
         this.context = context;
         this.inflater = LayoutInflater.from(context);
 
@@ -109,7 +104,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     public int getItemCount() {
         return itemNames.size();
     }
-    //RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>//Override///////////////////////////////
+    //RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>//Override/////////////////////////////
 
     public void setItems(ArrayList<String> itemNames) {
         this.itemNames = itemNames;
@@ -127,20 +122,11 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         }
 
         notifyDataSetChanged();
-//        deselectAll(currSetNum);
-//        if (currSetNum <= listViews.size()) {
-//            listViews.get(currSetNum - 1).setBackground(context.getDrawable(R.drawable.textview_circle_selected));
-//
-//            currSelected = -1;
-//        } else {
-//            currSelected = currSetNum - 1;
-//        }
     }
 
-    private void deselectAll(int currSetInd) {
-//        for (TextView listView : listViews.subList(0, currSetInd - 1)) {
-//            listView.setBackground(context.getDrawable(R.drawable.textview_circle));
-//        }
+    public void setExProgress(SparseArray<PROGRESS_STATUS> exStatus) {
+        this.progStatus = exStatus;
+        notifyDataSetChanged();
     }
 
     // Custom ViewHolder class for the recyclerView
@@ -155,7 +141,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         ItemViewHolder(View itemView) {
             super(itemView);
 
-            listViews.add(listItemView = itemView.findViewById(listItemId));
+            listItemView = itemView.findViewById(listItemId);
             listItemView.setOnClickListener(this);
             listItemView.setOnLongClickListener(this);
         }
