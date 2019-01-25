@@ -129,5 +129,5 @@
 	<string name="lbs">lbs</string>
 	<string name="exercise">Exercise</string>
 	<string name="exercise_num">Exercise # </string>
-	<string name="set_num">%s\nSet # </string>
+	<string name="set_num">Set # </string>
 </resources>

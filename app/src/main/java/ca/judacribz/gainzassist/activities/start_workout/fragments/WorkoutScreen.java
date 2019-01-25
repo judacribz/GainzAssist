@@ -28,6 +28,8 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
+import me.grantland.widget.AutofitHelper;
+import me.grantland.widget.AutofitTextView;
 
 import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
@@ -67,33 +69,25 @@ public class WorkoutScreen extends Fragment implements
     SparseArray<PROGRESS_STATUS>
             exProgress,
             setProgress;
+
+    String setNum;
     // --------------------------------------------------------------------------------------------
 
     // UI Elements
-    @BindView(R.id.equip_view)
-    EquipmentView equipmentView;
-    @BindView(R.id.tv_timer)
-    TextView tvTimer;
+    @BindView(R.id.equip_view) EquipmentView equipmentView;
+    @BindView(R.id.tv_timer) TextView tvTimer;
 
-    @BindView(R.id.tv_exercise_title)
-    TextView tvExerciseTitle;
-    @BindView(R.id.tv_set_num)
-    TextView tvSetNum;
+    @BindView(R.id.tv_exercise_title) TextView tvExerciseTitle;
+    @BindView(R.id.tv_set_num) TextView tvSetNum;
 
-    @BindView(R.id.btn_dec_reps)
-    ImageButton btnDecReps;
-    @BindView(R.id.btn_dec_weight)
-    ImageButton btnDecWeight;
+    @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
+    @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
 
-    @BindView(R.id.et_reps)
-    EditText etCurrReps;
-    @BindView(R.id.et_weight)
-    EditText etCurrWeight;
+    @BindView(R.id.et_reps) EditText etCurrReps;
+    @BindView(R.id.et_weight) EditText etCurrWeight;
 
-    @BindView(R.id.rv_exercise_num)
-    RecyclerView rvExercise;
-    @BindView(R.id.rv_exercise_set)
-    RecyclerView rvSet;
+    @BindView(R.id.rv_exercise_num) RecyclerView rvExercise;
+    @BindView(R.id.rv_exercise_set) RecyclerView rvSet;
     // --------------------------------------------------------------------------------------------
 
 
@@ -133,6 +127,8 @@ public class WorkoutScreen extends Fragment implements
         View view = inflater.inflate(R.layout.fragment_workout_screen, container, false);
         ButterKnife.bind(this, view);
 
+        setNum = "%s " + getString(R.string.set_num);
+
         currWorkout.setDataListener(this);
         setManager = setProgressLayoutManagers(rvSet);
         exerciseManager = setProgressLayoutManagers(rvExercise);
@@ -159,7 +155,7 @@ public class WorkoutScreen extends Fragment implements
     public void onResume() {
         super.onResume();
         updateProgressExs(currWorkout.getCurrNumExs());
-        updateProgressSets(currWorkout.getCurrNumSets());
+        updateProgSets(currWorkout.getCurrNumSets());
 
         updateUI();
     }
@@ -176,6 +172,19 @@ public class WorkoutScreen extends Fragment implements
         );
 
         exerciseAdapter.setItemClickObserver(this);
+    }
+
+    public void updateProgSets(int numSets) {
+        setProgress = currWorkout.getSetProgress();
+        if (setProgress == null) {
+            setProgress = setupProgress(numSets, currWorkout.getCurrSetNum(), null);
+        }
+        setAdapter = setupProgressAdapter(
+                rvSet,
+                numSets,
+                setProgress
+        );
+
     }
 
     @Override
@@ -481,7 +490,7 @@ public class WorkoutScreen extends Fragment implements
                 currWorkout.getCurrExNum(),
                 currWorkout.getExSuccess());
 
-        tvSetNum.setText(String.format(getString(R.string.set_num), setType));
+        tvSetNum.setText(String.format(setNum, setType));
         selectProgressAdapterPos(
                 setAdapter,
                 rvSet,
@@ -494,7 +503,7 @@ public class WorkoutScreen extends Fragment implements
             SingleItemAdapter adapter,
             RecyclerView rv,
             int pos, boolean success) {
-
+Logger.d("POSSSS " + pos);
         adapter.setCurrItem(pos, success);
         rv.scrollToPosition(pos - 1);
     }

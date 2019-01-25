@@ -103,7 +103,6 @@ public class CurrWorkout {
         Map<String, Object> setsMap, setMap;
 
         this.exStatus = new SparseArray<>();
-        this.setStatus = new SparseArray<>();
 
         this.currWarmups = new ArrayList<>();
         this.currWorkout = workout;
@@ -149,6 +148,31 @@ public class CurrWorkout {
             }
 
             this.currSession.addExercise(exercise);
+        }
+
+        ArrayList<Exercise> exs = this.currSession.getSessionExs();
+        int size = 0;
+        if (exs != null && !exs.isEmpty()) {
+            exercise = exs.get(exs.size()-1);
+
+            ArrayList<ExerciseSet> exerciseSets = exercise.getFinishedSetsList();
+            if (!exerciseSets.isEmpty()) {
+                this.setStatus = new SparseArray<>();
+                size = exerciseSets.size();
+                for (ExerciseSet set : exerciseSets) {
+                    if (set.getReps() < exercise.getReps() || set.getWeight() < exercise.getWeight()) {
+                        setStatus.put(set.getSetNumber(), PROGRESS_STATUS.FAIL);
+                    } else {
+                        setStatus.put(set.getSetNumber(), PROGRESS_STATUS.SUCCESS);
+                    }
+                }
+
+                setStatus.put(size, PROGRESS_STATUS.SELECTED);
+                for (int i = size + 1; i < exercise.getSets(); i++) {
+                    setStatus.put(size, PROGRESS_STATUS.UNSELECTED);
+                }
+                Logger.d("YOOOOOO" + setStatus.size());
+            }
         }
 
         // Setup progress textview circle data
@@ -217,6 +241,8 @@ public class CurrWorkout {
 
         setCurrWarmupExercises(warmups);
         setAllCurrExercises(allExs);
+
+        currMainInd = allExs.get(ex_i).getExerciseNumber();
     }
 
     private ArrayList<ExerciseSet> genBBWarmups(Exercise ex) {
@@ -379,7 +405,9 @@ public class CurrWorkout {
             // Not end of all exercises, set next exercise
             } else {
                 lastExSuccess = exSuccess;
-                exSuccess = true;
+                if (getIsWarmup()) {
+                    exSuccess = true;
+                }
                 setCurrExercise(this.currWorkout.getExerciseFromIndex(this.ex_i));
             }
 
@@ -609,6 +637,7 @@ public class CurrWorkout {
         ));
 
         Logger.d("leave" + jsonStr);
+        resetIndices();
         return jsonStr;
     }
 

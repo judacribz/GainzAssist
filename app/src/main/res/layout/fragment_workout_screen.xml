@@ -25,16 +25,15 @@
 		<me.grantland.widget.AutofitTextView
 			android:id="@+id/tv_exercise_title"
 			android:layout_width="match_parent"
-			android:layout_height="50dp"
+			android:layout_height="wrap_content"
 			android:layout_alignParentTop="true"
 			android:layout_above="@id/rv_exercise_num"
 			android:layout_margin="2dp"
-			android:background="@color/colorLightBg"
 			android:fontFamily="@font/staatliches"
 			android:gravity="center"
-			android:maxLines="2"
-			autofit:sizeToFit="true"
-			android:textSize="60sp"/>
+			android:textSize="60sp"
+			android:singleLine="true"
+			android:maxLines="2"/>
 
 		<me.grantland.widget.AutofitTextView
 			android:id="@+id/tv_exercise_num"

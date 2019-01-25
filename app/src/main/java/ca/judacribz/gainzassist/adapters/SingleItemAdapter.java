@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import ca.judacribz.gainzassist.R;
+import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
@@ -89,7 +90,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         ItemViewHolder holder = new ItemViewHolder(view);
 
         if (dontRecycle) {
-            holder.setIsRecyclable(false);
+//            holder.setIsRecyclable(false);
         }
 
         return holder;
@@ -124,10 +125,6 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         notifyDataSetChanged();
     }
 
-    public void setExProgress(SparseArray<PROGRESS_STATUS> exStatus) {
-        this.progStatus = exStatus;
-        notifyDataSetChanged();
-    }
 
     // Custom ViewHolder class for the recyclerView
     // ============================================================================================
@@ -152,22 +149,24 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
 
             if (progStatus != null) {
                 int drawId = -1;
-                switch (progStatus.get(pos)) {
-                    case UNSELECTED:
-                        drawId = R.drawable.textview_circle;
-                        break;
+                if (pos < progStatus.size()) {
+                    switch (progStatus.get(pos)) {
+                        case UNSELECTED:
+                            drawId = R.drawable.textview_circle;
+                            break;
 
-                    case SELECTED:
-                        drawId = R.drawable.textview_circle_selected;
-                        break;
+                        case SELECTED:
+                            drawId = R.drawable.textview_circle_selected;
+                            break;
 
-                    case SUCCESS:
-                        drawId = R.drawable.textview_circle_success;
-                        break;
+                        case SUCCESS:
+                            drawId = R.drawable.textview_circle_success;
+                            break;
 
-                    case FAIL:
-                        drawId = R.drawable.textview_circle_fail;
-                        break;
+                        case FAIL:
+                            drawId = R.drawable.textview_circle_fail;
+                            break;
+                    }
                 }
 
                 if (drawId != -1) {
