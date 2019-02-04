@@ -83,6 +83,10 @@ public class WorkoutScreen extends Fragment implements
     @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
     @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
 
+    @BindView(R.id.btn_finish_set) Button btnFinishSet;
+    @BindView(R.id.btn_update_set) Button btnUpdateSet;
+    @BindView(R.id.btn_resume_workout) Button btnResumeWorkout;
+
     @BindView(R.id.et_reps) EditText etCurrReps;
     @BindView(R.id.et_weight) EditText etCurrWeight;
 
@@ -293,6 +297,10 @@ public class WorkoutScreen extends Fragment implements
         Exercise ex = currWorkout.getSessionExercise(getTextInt((TextView) view));
 
         if (ex != null) {
+            btnFinishSet.setVisibility(View.INVISIBLE);
+            btnUpdateSet.setVisibility(View.VISIBLE);
+            btnResumeWorkout.setVisibility(View.VISIBLE);
+
             Logger.d(writeValueAsString(ex.setsToMap()));
             SparseArray<PROGRESS_STATUS> progressStatus = new SparseArray<>();
             setsToUpdate = ex.getFinishedSetsList();
