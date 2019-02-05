@@ -9,9 +9,8 @@ import java.util.List;
 @Dao
 public interface ExerciseDao {
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     Long insert(Exercise exercise);
-
 
     @Query("SELECT * from exercises WHERE workout_id = :workoutId")
     LiveData<List<Exercise>> getLiveFromWorkout(long workoutId);

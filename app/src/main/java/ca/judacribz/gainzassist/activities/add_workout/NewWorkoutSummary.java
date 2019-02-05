@@ -22,6 +22,10 @@ import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
+import static ca.judacribz.gainzassist.util.Misc.readValue;
+import static ca.judacribz.gainzassist.util.Preferences.getIncompleteSessionPref;
+import static ca.judacribz.gainzassist.util.Preferences.removeIncompleteSessionPref;
+import static ca.judacribz.gainzassist.util.Preferences.removeIncompleteWorkoutPref;
 import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutFirebase;
 import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -350,6 +354,7 @@ Exercise ex;
 
     private Exercise updateExerciseData(int exNumber, String exName) {
         Exercise exercise;
+        long id;
         etExerciseName.setText("");
         if (exNumber == -1) {
             exNumber = workout.getNumExercises();
@@ -366,7 +371,7 @@ Exercise ex;
                 MAIN_SET
         );
         exercise.setWorkoutId(workoutId);
-
+        exercise.setId(ex.getId());
         return exercise;
     }
 
@@ -392,12 +397,20 @@ Exercise ex;
             if (exercises.isEmpty()) {
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show();
             } else {
-
+                String btnText = getTextString(btnAddWorkout).toLowerCase();
                 workout.setName(getTextString(etWorkoutName));
                 workout.setExercises(exercises);
 
                 addWorkoutFirebase(workout);
-                workoutViewModel.insertWorkout(workout);
+
+                if ("add workout".equals(btnText)) {
+                    workoutViewModel.insertWorkout(workout);
+                } else {
+                    workoutViewModel.updateWorkout(workout);
+                    if (removeIncompleteWorkoutPref(this, workout.getName())) {
+                        removeIncompleteSessionPref(this, workout.getName());
+                    }
+                }
 
                 discardWorkout();
             }
@@ -418,6 +431,7 @@ Exercise ex;
     /* Adds workout to exercises ArrayList and updates exercises GridLayout display */
     @OnClick(R.id.btn_discard_workout)
     public void discardWorkout() {
+        setResult(RESULT_OK);
         finish();
     }
 

@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.add_workout;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Button;
@@ -18,6 +19,7 @@ public class WorkoutEntry extends AppCompatActivity{
 
     // Constants
     // --------------------------------------------------------------------------------------------
+    public static final int REQ_EXERCISES_ENTRY= 1001;
     public static final String EXTRA_WORKOUT_NAME
             = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT";
     public static final String EXTRA_NUM_EXERCISES
@@ -52,6 +54,16 @@ public class WorkoutEntry extends AppCompatActivity{
         finish();
         return super.onSupportNavigateUp();
     }
+
+    @Override
+    protected void onActivityResult(int req, int res, @Nullable Intent data) {
+        switch (res) {
+            case RESULT_OK:
+                finish();
+                break;
+        }
+    }
+
     //AppCompatActivity//Override//////////////////////////////////////////////////////////////////
 
 
@@ -120,7 +132,7 @@ public class WorkoutEntry extends AppCompatActivity{
 
 
             exercisesEntry.putExtra(EXTRA_NUM_EXERCISES, Math.max(MIN_INT, getTextInt(etNumExercises)));
-            startActivity(exercisesEntry);
+            startActivityForResult(exercisesEntry, REQ_EXERCISES_ENTRY);
         }
     }
 

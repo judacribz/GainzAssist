@@ -129,9 +129,12 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
     }
 
     @Override
-    protected void onActivityResult(int req, int res, Intent data) {
-        if (req == REQ_NEW_WORKOUT_SUMMARY) {
-            finish();
+    protected void onActivityResult(int req, int res, @Nullable Intent data) {
+        switch (res) {
+            case RESULT_OK:
+                setResult(RESULT_OK);
+                finish();
+                break;
         }
     }
 

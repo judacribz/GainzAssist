@@ -226,11 +226,14 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
         intent = newWorkoutSummaryIntent;
 
         workoutViewModel.getWorkoutFromName(act, workoutName);
+
+        dialog.dismiss();
     }
 
     private void deleteWorkout(String workoutName) {
         workoutViewModel.deleteWorkout(workoutName);
         deleteWorkoutFirebase(workoutName);
+        dialog.dismiss();
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
 

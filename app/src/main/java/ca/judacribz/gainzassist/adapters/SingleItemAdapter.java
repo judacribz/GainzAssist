@@ -129,19 +129,21 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     public void setSelected(int currSetNum) {
         deselectCurrSelected();
         currSetNum--;
+        PROGRESS_STATUS status = progStatus.get(currSetNum);
+        if (status != null) {
+            switch (status) {
+                case SUCCESS:
+                    progStatus.put(currSetNum, SUCCESS_SELECTED);
+                    break;
 
-        switch (progStatus.get(currSetNum)) {
-            case SUCCESS:
-                progStatus.put(currSetNum, SUCCESS_SELECTED);
-                break;
+                case FAIL:
+                    progStatus.put(currSetNum, FAIL_SELECTED);
+                    break;
 
-            case FAIL:
-                progStatus.put(currSetNum, FAIL_SELECTED);
-                break;
-
-            default:
-                progStatus.put(currSetNum, SELECTED);
-                break;
+                default:
+                    progStatus.put(currSetNum, SELECTED);
+                    break;
+            }
         }
 
         currSelected = currSetNum;
