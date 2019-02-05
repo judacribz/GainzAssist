@@ -17,7 +17,6 @@ import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.WorkoutHelper;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import org.parceler.Parcels;
 
@@ -74,9 +73,9 @@ public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAd
     @BindView(R.id.et_weight) EditText etWeight;
     @BindView(R.id.et_sets) EditText etNumSets;
 
-    @BindView(R.id.btn_dec_reps) ImageButton ibtnDecReps;
-    @BindView(R.id.btn_dec_weight) ImageButton ibtnDecWeight;
-    @BindView(R.id.btn_dec_sets) ImageButton ibtnDecSets;
+    @BindView(R.id.ibtn_dec_reps) ImageButton ibtnDecReps;
+    @BindView(R.id.ibtn_dec_weight) ImageButton ibtnDecWeight;
+    @BindView(R.id.ibtn_dec_sets) ImageButton ibtnDecSets;
 
     @BindView(R.id.btn_add_exercise) Button btnAddExercise;
     @BindView(R.id.btn_update_exercise) Button btnUpdateExercise;
@@ -289,37 +288,37 @@ Exercise ex;
     // Click Handling
     ///////////////////////////////////////////////////////////////////////////////////////////////
     /* Increase number of num_reps */
-    @OnClick(R.id.btn_inc_reps)
+    @OnClick(R.id.ibtn_inc_reps)
     public void incReps() {
         etNumReps.setText(String.valueOf(getTextInt(etNumReps) + MIN_INT));
     }
 
     /* Decrease number of num_reps */
-    @OnClick(R.id.btn_dec_reps)
+    @OnClick(R.id.ibtn_dec_reps)
     public void decReps() {
         etNumReps.setText(String.valueOf(Math.max(getTextInt(etNumReps) - MIN_INT, MIN_INT)));
     }
 
     /* Increase number of num_sets */
-    @OnClick(R.id.btn_inc_sets)
+    @OnClick(R.id.ibtn_inc_sets)
     public void incSets() {
         etNumSets.setText(String.valueOf(getTextInt(etNumSets) + MIN_INT));
     }
 
     /* Decrease number of num_sets */
-    @OnClick(R.id.btn_dec_sets)
+    @OnClick(R.id.ibtn_dec_sets)
     public void decSets() {
         etNumSets.setText(String.valueOf(Math.max(getTextInt(etNumSets) - MIN_INT, MIN_INT)));
     }
 
     /* Increase weight */
-    @OnClick(R.id.btn_inc_weight)
+    @OnClick(R.id.ibtn_inc_weight)
     public void incWeight() {
         etWeight.setText(String.valueOf(getTextFloat(etWeight) + MIN_FLOAT));
     }
 
     /* Decrease weight*/
-    @OnClick(R.id.btn_dec_weight)
+    @OnClick(R.id.ibtn_dec_weight)
     public void decWeight() {
         etWeight.setText(String.valueOf(Math.max(getTextFloat(etWeight) - MIN_FLOAT, MIN_FLOAT)));
     }

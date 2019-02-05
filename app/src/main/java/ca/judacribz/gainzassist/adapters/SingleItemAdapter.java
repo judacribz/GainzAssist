@@ -38,7 +38,9 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         UNSELECTED,
         SELECTED,
         SUCCESS,
-        FAIL
+        FAIL,
+        SUCCESS_SELECTED,
+        FAIL_SELECTED
     }
     private SparseArray<PROGRESS_STATUS> progStatus;
 
@@ -112,8 +114,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
     }
 
     public void setCurrItem(int currSetNum, boolean success) {
-
-        progStatus.put(currSetNum - 1, SELECTED);
+        setSelected(currSetNum);
         if (currSetNum > 1) {
             if (success) {
                 progStatus.put(currSetNum - 2, SUCCESS);
@@ -123,6 +124,48 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         }
 
         notifyDataSetChanged();
+    }
+
+    public void setSelected(int currSetNum) {
+        deselectCurrSelected();
+        currSetNum--;
+
+        switch (progStatus.get(currSetNum)) {
+            case SUCCESS:
+                progStatus.put(currSetNum, SUCCESS_SELECTED);
+                break;
+
+            case FAIL:
+                progStatus.put(currSetNum, FAIL_SELECTED);
+                break;
+
+            default:
+                progStatus.put(currSetNum, SELECTED);
+                break;
+        }
+
+        currSelected = currSetNum;
+
+        notifyDataSetChanged();
+    }
+
+    private void deselectCurrSelected() {
+        PROGRESS_STATUS status = progStatus.get(currSelected);
+        if (status != null) {
+            switch (status) {
+                case SELECTED:
+                    progStatus.put(currSelected, UNSELECTED);
+                    break;
+
+                case SUCCESS_SELECTED:
+                    progStatus.put(currSelected, SUCCESS);
+                    break;
+
+                case FAIL_SELECTED:
+                    progStatus.put(currSelected, FAIL);
+                    break;
+            }
+        }
     }
 
 
@@ -165,6 +208,14 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
 
                         case FAIL:
                             drawId = R.drawable.textview_circle_fail;
+                            break;
+
+                        case SUCCESS_SELECTED:
+                            drawId = R.drawable.textview_circle_success_selected;
+                            break;
+
+                        case FAIL_SELECTED:
+                            drawId = R.drawable.textview_circle_fail_selected;
                             break;
                     }
                 }

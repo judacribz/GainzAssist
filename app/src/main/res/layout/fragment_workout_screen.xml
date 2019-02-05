@@ -156,7 +156,7 @@
 			layout="@layout/part_edit_text_reps"/>
 
 		<ImageButton
-			android:id="@+id/btn_dec_reps"
+			android:id="@+id/ibtn_dec_reps"
 			android:layout_width="50dp"
 			android:layout_height="50dp"
 			android:layout_alignStart="@id/part_et_reps"
@@ -165,7 +165,7 @@
 			android:src="@drawable/ic_minus"/>
 
 		<ImageButton
-			android:id="@+id/btn_inc_reps"
+			android:id="@+id/ibtn_inc_reps"
 			android:layout_width="50dp"
 			android:layout_height="50dp"
 			android:layout_alignEnd="@id/part_et_reps"
@@ -194,7 +194,7 @@
 			layout="@layout/part_edit_text_weight" />
 
 		<ImageButton
-			android:id="@+id/btn_dec_weight"
+			android:id="@+id/ibtn_dec_weight"
 			android:layout_width="50dp"
 			android:layout_height="50dp"
 			android:layout_alignStart="@id/part_et_weight"
@@ -203,7 +203,7 @@
 			android:src="@drawable/ic_minus"/>
 
 		<ImageButton
-			android:id="@+id/btn_inc_weight"
+			android:id="@+id/ibtn_inc_weight"
 			android:layout_width="50dp"
 			android:layout_height="50dp"
 			android:layout_alignEnd="@id/part_et_weight"

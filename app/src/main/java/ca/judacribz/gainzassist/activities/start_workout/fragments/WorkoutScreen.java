@@ -28,11 +28,8 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
-import me.grantland.widget.AutofitHelper;
-import me.grantland.widget.AutofitTextView;
 
 import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.*;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
 import static ca.judacribz.gainzassist.util.Preferences.*;
@@ -62,8 +59,11 @@ public class WorkoutScreen extends Fragment implements
             setManager,
             exerciseManager;
 
-    long currTime;
     ArrayList<Exercise> finExercises;
+    Exercise updateEx;
+    ExerciseSet currSet = null;
+    boolean updateSetMode = false;
+    long currTime;
     float weight;
 
     SparseArray<PROGRESS_STATUS>
@@ -80,8 +80,8 @@ public class WorkoutScreen extends Fragment implements
     @BindView(R.id.tv_exercise_title) TextView tvExerciseTitle;
     @BindView(R.id.tv_set_num) TextView tvSetNum;
 
-    @BindView(R.id.btn_dec_reps) ImageButton btnDecReps;
-    @BindView(R.id.btn_dec_weight) ImageButton btnDecWeight;
+    @BindView(R.id.ibtn_dec_reps) ImageButton btnDecReps;
+    @BindView(R.id.ibtn_dec_weight) ImageButton btnDecWeight;
 
     @BindView(R.id.btn_finish_set) Button btnFinishSet;
     @BindView(R.id.btn_update_set) Button btnUpdateSet;
@@ -172,10 +172,21 @@ public class WorkoutScreen extends Fragment implements
         exerciseAdapter = setupProgressAdapter(
                 rvExercise,
                 numExs,
-                exProgress
+                exProgress,
+                false
         );
 
-        exerciseAdapter.setItemClickObserver(this);
+        exerciseAdapter.setItemClickObserver(new ItemClickObserver() {
+
+            @Override
+            public void onItemClick(View view) {
+                exerciseItemClick(view);
+            }
+
+            @Override
+            public void onItemLongClick(View view) {
+            }
+        });
     }
 
     public void updateProgSets(int numSets) {
@@ -186,9 +197,9 @@ public class WorkoutScreen extends Fragment implements
         setAdapter = setupProgressAdapter(
                 rvSet,
                 numSets,
-                setProgress
+                setProgress,
+                true
         );
-
     }
 
     @Override
@@ -254,7 +265,8 @@ public class WorkoutScreen extends Fragment implements
                         numSets,
                         currWorkout.getCurrSetNum(),
                         currWorkout.getCurrExType()
-                )
+                ),
+                true
         );
     }
 
@@ -262,7 +274,8 @@ public class WorkoutScreen extends Fragment implements
 
     private SingleItemAdapter setupProgressAdapter(RecyclerView rv,
                                                    int numItems,
-                                                   SparseArray<PROGRESS_STATUS> progressStatus) {
+                                                   SparseArray<PROGRESS_STATUS> progressStatus,
+                                                   boolean setClickListener) {
         SingleItemAdapter adapter = new SingleItemAdapter(
                 act,
                 numItems,
@@ -271,6 +284,10 @@ public class WorkoutScreen extends Fragment implements
                 progressStatus
         );
         rv.setAdapter(adapter);
+
+        if (setClickListener) {
+            adapter.setItemClickObserver(this);
+        }
 
         return adapter;
     }
@@ -286,46 +303,6 @@ public class WorkoutScreen extends Fragment implements
 
         return progressStatus;
     }
-
-
-    ArrayList<ExerciseSet> setsToUpdate;
-
-    // SingleItemAdapter.ItemClickObserver Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onItemClick(View view) {
-        Exercise ex = currWorkout.getSessionExercise(getTextInt((TextView) view));
-
-        if (ex != null) {
-            btnFinishSet.setVisibility(View.INVISIBLE);
-            btnUpdateSet.setVisibility(View.VISIBLE);
-            btnResumeWorkout.setVisibility(View.VISIBLE);
-
-            Logger.d(writeValueAsString(ex.setsToMap()));
-            SparseArray<PROGRESS_STATUS> progressStatus = new SparseArray<>();
-            setsToUpdate = ex.getFinishedSetsList();
-            for (ExerciseSet set : setsToUpdate) {
-                if (set.getReps() >= ex.getReps() && set.getWeight() >= ex.getWeight()) {
-                    progressStatus.put(set.getSetNumber(), SUCCESS);
-                } else {
-                    progressStatus.put(set.getSetNumber(), FAIL);
-                }
-            }
-
-            setAdapter = setupProgressAdapter(
-                    rvSet,
-                    ex.getNumSets(),
-                    progressStatus
-            );
-        }
-    }
-
-    @Override
-    public void onItemLongClick(View view) {
-
-    }
-    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
-
 
     // TextWatcher Handling
     // =============================================================================================
@@ -422,13 +399,13 @@ public class WorkoutScreen extends Fragment implements
     }
 
     // Reps change
-    @OnClick({R.id.btn_inc_reps, R.id.btn_dec_reps})
+    @OnClick({R.id.ibtn_inc_reps, R.id.ibtn_dec_reps})
     public void changeReps(ImageButton repsBtn) {
         switch (repsBtn.getId()) {
-            case R.id.btn_inc_reps:
+            case R.id.ibtn_inc_reps:
                 currWorkout.incReps();
                 break;
-            case R.id.btn_dec_reps:
+            case R.id.ibtn_dec_reps:
                 currWorkout.decReps();
                 break;
         }
@@ -436,17 +413,44 @@ public class WorkoutScreen extends Fragment implements
     }
 
     // Weight change
-    @OnClick({R.id.btn_inc_weight, R.id.btn_dec_weight})
+    @OnClick({R.id.ibtn_inc_weight, R.id.ibtn_dec_weight})
     public void changeWeight(ImageButton weightBtn) {
         switch (weightBtn.getId()) {
-            case R.id.btn_inc_weight:
+            case R.id.ibtn_inc_weight:
                 currWorkout.incWeight();
                 break;
-            case R.id.btn_dec_weight:
+            case R.id.ibtn_dec_weight:
                 currWorkout.decWeight();
                 break;
         }
         setWeight();
+    }
+
+    @OnClick(R.id.btn_resume_workout)
+    public void resumeWorkout() {
+        updateSetMode = false;
+
+        btnFinishSet.setVisibility(View.VISIBLE);
+        btnUpdateSet.setVisibility(View.INVISIBLE);
+        btnResumeWorkout.setVisibility(View.INVISIBLE);
+
+        setAdapter = setupProgressAdapter(
+                rvSet,
+                currWorkout.getCurrNumSets(),
+                setProgress,
+                true
+        );
+
+        exerciseAdapter.setSelected(currWorkout.getCurrExNum());
+
+        tvExerciseTitle.setText(currWorkout.getCurrExName());
+        equipmentView.setup(currSet.getWeight(), currWorkout.getCurrEquip());
+        etCurrReps.setText(String.valueOf(currSet.getReps()));
+        etCurrWeight.setText(String.valueOf(currSet.getWeight()));
+
+        updateUI();
+
+        currSet = null;
     }
 
     // Finish set
@@ -507,15 +511,7 @@ public class WorkoutScreen extends Fragment implements
         );
     }
 
-    private void selectProgressAdapterPos(
-            SingleItemAdapter adapter,
-            RecyclerView rv,
-            int pos, boolean success) {
-Logger.d("POSSSS " + pos);
-        adapter.setCurrItem(pos, success);
-        rv.scrollToPosition(pos - 1);
-    }
-
+    ArrayList<ExerciseSet> setsToUpdate;
 
     private void setReps() {
         etCurrReps.setText(String.valueOf(currWorkout.getCurrReps()));
@@ -532,6 +528,91 @@ Logger.d("POSSSS " + pos);
             }
         });
     }
+
+    private void selectProgressAdapterPos(
+            SingleItemAdapter adapter,
+            RecyclerView rv,
+            int pos, boolean success) {
+
+        adapter.setCurrItem(pos, success);
+        rv.scrollToPosition(pos - 1);
+    }
+
+    // SingleItemAdapter.ItemClickObserver Override
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    private void exerciseItemClick(View view) {
+        int ind = getTextInt((TextView) view);
+        updateEx = currWorkout.getSessionExercise(ind);
+
+        if (updateEx != null) {
+            SparseArray<PROGRESS_STATUS> setStatus = new SparseArray<>();
+
+            updateSetMode = true;
+
+            if (btnFinishSet.getVisibility() == View.VISIBLE) {
+                btnFinishSet.setVisibility(View.INVISIBLE);
+                btnUpdateSet.setVisibility(View.VISIBLE);
+                btnResumeWorkout.setVisibility(View.VISIBLE);
+            }
+            if (currSet == null) {
+                currSet = new ExerciseSet(
+                        updateEx,
+                        currWorkout.getCurrSetNum(),
+                        currWorkout.getCurrReps(),
+                        currWorkout.getCurrWeight()
+                );
+            }
+
+            exerciseAdapter.setSelected(ind);
+            setsToUpdate = updateEx.getFinishedSetsList();
+            for (ExerciseSet set : setsToUpdate) {
+                if (set.getReps() >= updateEx.getReps() && set.getWeight() >= updateEx.getWeight()) {
+                    setStatus.put(set.getSetNumber(), SUCCESS);
+                } else {
+                    setStatus.put(set.getSetNumber(), FAIL);
+                }
+            }
+
+            setAdapter = setupProgressAdapter(
+                    rvSet,
+                    updateEx.getNumSets(),
+                    setStatus,
+                    true
+            );
+
+            setAdapter.setSelected(1);
+
+            updateUI(updateEx, 0);
+        }
+    }
+
+    @Override
+    public void onItemClick(View view) {
+        int ind = getTextInt((TextView) view);
+
+        if (updateSetMode || (!currWorkout.getIsWarmup() && ind < currWorkout.getCurrSetNum())) {
+            setAdapter.setSelected(ind);
+            updateUI(updateEx, ind - 1);
+        }
+    }
+
+    private void updateUI(Exercise updateEx, int setInd) {
+        ExerciseSet set = updateEx.getFinishedSetsList().get(setInd);
+
+        tvExerciseTitle.setText(updateEx.getName());
+        tvSetNum.setText(String.format(setNum, "Main"));
+
+        equipmentView.setup(set.getWeight(), updateEx.getEquipment());
+        tvTimer.setText(R.string.update_set);
+        etCurrReps.setText(String.valueOf(set.getReps()));
+        etCurrWeight.setText(String.valueOf(set.getWeight()));
+    }
+
+    @Override
+    public void onItemLongClick(View view) {
+
+    }
+    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
     //=Click=Handling===============================================================================
 
 }

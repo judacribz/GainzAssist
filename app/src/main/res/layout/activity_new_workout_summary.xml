@@ -168,7 +168,7 @@
             layout="@layout/part_edit_text_weight"/>
 
         <ImageButton
-            android:id="@+id/btn_inc_weight"
+            android:id="@+id/ibtn_inc_weight"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignEnd="@id/part_et_weight"
@@ -178,7 +178,7 @@
             android:src="@drawable/selector_plus_btn"/>
 
         <ImageButton
-            android:id="@+id/btn_dec_weight"
+            android:id="@+id/ibtn_dec_weight"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignStart="@id/part_et_weight"
@@ -250,7 +250,7 @@
             layout="@layout/part_edit_text_sets"/>
 
         <ImageButton
-            android:id="@+id/btn_inc_sets"
+            android:id="@+id/ibtn_inc_sets"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignEnd="@id/part_et_sets"
@@ -260,7 +260,7 @@
             android:src="@drawable/selector_plus_btn"/>
 
         <ImageButton
-            android:id="@+id/btn_dec_sets"
+            android:id="@+id/ibtn_dec_sets"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignStart="@id/part_et_sets"
@@ -294,7 +294,7 @@
             layout="@layout/part_edit_text_reps" />
 
         <ImageButton
-            android:id="@+id/btn_inc_reps"
+            android:id="@+id/ibtn_inc_reps"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignEnd="@id/part_et_reps"
@@ -304,7 +304,7 @@
             android:src="@drawable/selector_plus_btn"/>
 
         <ImageButton
-            android:id="@+id/btn_dec_reps"
+            android:id="@+id/ibtn_dec_reps"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignStart="@id/part_et_reps"
