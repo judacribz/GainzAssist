@@ -24,6 +24,7 @@ public class ExerciseConst {
 
     public static final String INCOMPLETE_WORKOUTS = "incomplete workouts";
     public static final String WORKOUT_EX_IND = "%s exercise index";
+    public static final String WORKOUT_PROGRESS = "%s progress";
 
     public static final String MAIN_EXERCISES = "main exercises";
     public static final String WARMUP_EXERCISES = "warmup exercises";

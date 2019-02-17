@@ -54,9 +54,8 @@ public class CurrWorkout {
             lockWeight = false;
     private Session currSession = null;
 
-    SparseArray<PROGRESS_STATUS>
-            exStatus,
-            setStatus;
+
+    Map<String, Object> retrievedWorkout;
     // --------------------------------------------------------------------------------------------
 
 
@@ -98,11 +97,12 @@ public class CurrWorkout {
         return INST;
     }
     // ######################################################################################### //
+
     public void setRetrievedWorkout(Map<String, Object> map, Workout workout) {
         Map<String, Object> exsMap, exMap;
         Map<String, Object> setsMap, setMap;
 
-        this.exStatus = new SparseArray<>();
+        this.retrievedWorkout = map;
 
         this.currWarmups = new ArrayList<>();
         this.currWorkout = workout;
@@ -124,17 +124,6 @@ public class CurrWorkout {
 
             Object succ = exMap.get("success");
 
-            if (succ != null) {
-                this.exStatus.put(
-                        Integer.valueOf(exNum),
-                        Boolean.valueOf(String.valueOf(succ)) ?
-                                PROGRESS_STATUS.SUCCESS :
-                                PROGRESS_STATUS.FAIL
-                );
-            } else {
-                this.exStatus.put(Integer.valueOf(exNum), PROGRESS_STATUS.SELECTED);
-            }
-
 
             setsMap = readValue(readValue(exMap).get(SET_LIST));
             for (Map.Entry<String, Object> setEntry : setsMap.entrySet()) {
@@ -148,36 +137,6 @@ public class CurrWorkout {
             }
 
             this.currSession.addExercise(exercise);
-        }
-
-        ArrayList<Exercise> exs = this.currSession.getSessionExs();
-        int size = 0;
-        if (exs != null && !exs.isEmpty()) {
-            exercise = exs.get(exs.size()-1);
-
-            ArrayList<ExerciseSet> exerciseSets = exercise.getFinishedSetsList();
-            if (!exerciseSets.isEmpty()) {
-                this.setStatus = new SparseArray<>();
-                size = exerciseSets.size();
-                for (ExerciseSet set : exerciseSets) {
-                    if (set.getReps() < exercise.getReps() || set.getWeight() < exercise.getWeight()) {
-                        setStatus.put(set.getSetNumber(), PROGRESS_STATUS.FAIL);
-                    } else {
-                        setStatus.put(set.getSetNumber(), PROGRESS_STATUS.SUCCESS);
-                    }
-                }
-
-                setStatus.put(size, PROGRESS_STATUS.SELECTED);
-                for (int i = size + 1; i < exercise.getSets(); i++) {
-                    setStatus.put(size, PROGRESS_STATUS.UNSELECTED);
-                }
-                Logger.d("YOOOOOO" + setStatus.size());
-            }
-        }
-
-        // Setup progress textview circle data
-        for (int i = Integer.valueOf(exNum) + 1; i < workout.getNumExercises(); i++) {
-            exStatus.put(i, PROGRESS_STATUS.UNSELECTED);
         }
 
         genWarmups(workout.getExercises());
@@ -620,8 +579,7 @@ public class CurrWorkout {
         this.ex_i = -1;
         this.set_i = -1;
         this.currMainInd = 0;
-        exStatus = null;
-        setStatus = null;
+        this.retrievedWorkout = null;
     }
 
     String saveSessionState() {
@@ -660,14 +618,6 @@ public class CurrWorkout {
         }
 
         return exercise;
-    }
-
-    public SparseArray<PROGRESS_STATUS> getExProgress() {
-        return this.exStatus;
-    }
-
-    public SparseArray<PROGRESS_STATUS> getSetProgress() {
-        return this.setStatus;
     }
 
     public SetsType getCurrExType() {

@@ -103,6 +103,21 @@ public class Preferences {
         editor.apply();
     }
 
+
+    public static void addSessionProgressPref(Context context, String workoutName, String progressJson) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
+        editor.putString(String.format(WORKOUT_PROGRESS, workoutName), progressJson);
+        editor.apply();
+    }
+
+    public static String getSessionProgressPref(Context context, String workoutName) {
+        return getSharedPref(
+                context,
+                R.string.file_workout_info
+        ).getString(String.format(WORKOUT_PROGRESS, workoutName), null);
+    }
+
+
     public static SharedPreferences getSharedPref(Context context, int fileId) {
         return context.getSharedPreferences(
                 context.getString(fileId),

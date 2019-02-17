@@ -15,7 +15,9 @@ import android.view.ViewGroup;
 import android.widget.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.*;
 import ca.judacribz.gainzassist.R;
@@ -30,7 +32,10 @@ import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
 import com.orhanobut.logger.Logger;
 
 import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
+import static ca.judacribz.gainzassist.constants.UIConst.PROGRESS_CODE_MAP;
+import static ca.judacribz.gainzassist.constants.UIConst.PROGRESS_STATUS_MAP;
 import static ca.judacribz.gainzassist.models.Exercise.SetsType;
+import static ca.judacribz.gainzassist.util.Misc.readValue;
 import static ca.judacribz.gainzassist.util.Misc.writeValueAsString;
 import static ca.judacribz.gainzassist.util.Preferences.*;
 import static ca.judacribz.gainzassist.util.UI.getTextInt;
@@ -158,6 +163,34 @@ public class WorkoutScreen extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
+        String progressJson = getSessionProgressPref(act, currWorkout.getWorkoutName());
+
+        if (progressJson != null) {
+            Map<String, Object>
+                    map = readValue(progressJson),
+                    exMap,
+                    setMap;
+            exMap = readValue(map.get("exercise progress"));
+            setMap = readValue(map.get("set progress"));
+
+            exProgress = new SparseArray<>();
+            for (Map.Entry<String, Object> exEntry : exMap.entrySet()) {
+                exProgress.put(
+                        Integer.valueOf(exEntry.getKey()),
+                        PROGRESS_STATUS_MAP.get(Integer.valueOf(String.valueOf(exEntry.getValue())))
+                );
+            }
+            setProgress = new SparseArray<>();
+            for (Map.Entry<String, Object> setEntry : setMap.entrySet()) {
+                setProgress.put(
+                        Integer.valueOf(setEntry.getKey()),
+                        PROGRESS_STATUS_MAP.get(Integer.valueOf(String.valueOf(setEntry.getValue())))
+                );
+            }
+
+
+        }
+
         updateProgressExs(currWorkout.getCurrNumExs());
         updateProgSets(currWorkout.getCurrNumSets());
 
@@ -165,7 +198,6 @@ public class WorkoutScreen extends Fragment implements
     }
 
     public void updateProgressExs(int numExs) {
-        exProgress = currWorkout.getExProgress();
         if (exProgress == null) {
             exProgress = setupProgress(numExs, currWorkout.getCurrExNum(), null);
         }
@@ -190,7 +222,6 @@ public class WorkoutScreen extends Fragment implements
     }
 
     public void updateProgSets(int numSets) {
-        setProgress = currWorkout.getSetProgress();
         if (setProgress == null) {
             setProgress = setupProgress(numSets, currWorkout.getCurrSetNum(), null);
         }
@@ -205,8 +236,33 @@ public class WorkoutScreen extends Fragment implements
     @Override
     public void onPause() {
         super.onPause();
+        addSessionProgressPref(
+                act,
+                currWorkout.getWorkoutName(),
+                writeValueAsString(getProgressMap())
+        );
 
         currWorkout.setDataListener(null);
+    }
+
+    public Map<String, Object> getProgressMap() {
+        Map<String, Object>
+                progressMap = new HashMap<>(),
+                exMap = new HashMap<>(),
+                setMap = new HashMap<>();
+
+        for (int i = 0; i < exProgress.size(); i++) {
+            exMap.put(String.valueOf(i), PROGRESS_CODE_MAP.get(exProgress.get(i)));
+        }
+
+        for (int i = 0; i < setProgress.size(); i++) {
+            setMap.put(String.valueOf(i), PROGRESS_CODE_MAP.get(setProgress.get(i)));
+        }
+
+        progressMap.put("exercise progress", exMap);
+        progressMap.put("set progress", setMap);
+
+        return  progressMap;
     }
 
     @Override
@@ -258,16 +314,16 @@ public class WorkoutScreen extends Fragment implements
 
     @Override
     public void updateProgressSets(int numSets) {
-        setAdapter = setupProgressAdapter(
-                rvSet,
-                numSets,
-                setProgress = setupProgress(
-                        numSets,
-                        currWorkout.getCurrSetNum(),
-                        currWorkout.getCurrExType()
-                ),
-                true
-        );
+//        setAdapter = setupProgressAdapter(
+//                rvSet,
+//                numSets,
+//                setProgress = setupProgress(
+//                        numSets,
+//                        currWorkout.getCurrSetNum(),
+//                        currWorkout.getCurrExType()
+//                ),
+//                true
+//        );
     }
 
     //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
