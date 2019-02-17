@@ -165,7 +165,7 @@ public class WorkoutScreen extends Fragment implements
         super.onResume();
         String progressJson = getSessionProgressPref(act, currWorkout.getWorkoutName());
 
-        if (progressJson != null) {
+        if (progressJson != null && setProgress == null) {
             Map<String, Object>
                     map = readValue(progressJson),
                     exMap,
@@ -236,16 +236,13 @@ public class WorkoutScreen extends Fragment implements
     @Override
     public void onPause() {
         super.onPause();
-        addSessionProgressPref(
-                act,
-                currWorkout.getWorkoutName(),
-                writeValueAsString(getProgressMap())
-        );
-
+        if (!workoutFinished) {
+            saveProgressMap();
+        }
         currWorkout.setDataListener(null);
     }
 
-    public Map<String, Object> getProgressMap() {
+    public void saveProgressMap() {
         Map<String, Object>
                 progressMap = new HashMap<>(),
                 exMap = new HashMap<>(),
@@ -261,14 +258,19 @@ public class WorkoutScreen extends Fragment implements
 
         progressMap.put("exercise progress", exMap);
         progressMap.put("set progress", setMap);
-
-        return  progressMap;
+        addSessionProgressPref(
+                act,
+                currWorkout.getWorkoutName(),
+                writeValueAsString(progressMap)
+        );
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
+
+
     //Fragment//Override///////////////////////////////////////////////////////////////////////////
 
 
@@ -314,16 +316,16 @@ public class WorkoutScreen extends Fragment implements
 
     @Override
     public void updateProgressSets(int numSets) {
-//        setAdapter = setupProgressAdapter(
-//                rvSet,
-//                numSets,
-//                setProgress = setupProgress(
-//                        numSets,
-//                        currWorkout.getCurrSetNum(),
-//                        currWorkout.getCurrExType()
-//                ),
-//                true
-//        );
+        setAdapter = setupProgressAdapter(
+                rvSet,
+                numSets,
+                setProgress = setupProgress(
+                        numSets,
+                        currWorkout.getCurrSetNum(),
+                        currWorkout.getCurrExType()
+                ),
+                true
+        );
     }
 
     //CurrWorkout.DataListener//Override///////////////////////////////////////////////////////////
@@ -509,6 +511,7 @@ public class WorkoutScreen extends Fragment implements
         currSet = null;
     }
 
+    boolean workoutFinished = false;
     // Finish set
     @OnClick(R.id.btn_finish_set)
     public void finishSet() {
@@ -517,6 +520,7 @@ public class WorkoutScreen extends Fragment implements
 
         // End of workout
         } else {
+            workoutFinished = true;
             ViewModelProviders.of(act)
                     .get(WorkoutViewModel.class)
                     .insertSession(currWorkout.getCurrSession());
@@ -525,6 +529,7 @@ public class WorkoutScreen extends Fragment implements
                 removeIncompleteSessionPref(act, currWorkout.getWorkoutName());
             }
 
+            removeSessionProgressPref(act, currWorkout.getWorkoutName());
             act.finish();
         }
     }
@@ -647,6 +652,7 @@ public class WorkoutScreen extends Fragment implements
         int ind = getTextInt((TextView) view);
 
         if (updateSetMode || (!currWorkout.getIsWarmup() && ind < currWorkout.getCurrSetNum())) {
+            saveProgressMap();
             setAdapter.setSelected(ind);
             updateUI(updateEx, ind - 1);
         }

@@ -117,6 +117,11 @@ public class Preferences {
         ).getString(String.format(WORKOUT_PROGRESS, workoutName), null);
     }
 
+    public static void removeSessionProgressPref(Context context, String workoutName) {
+        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
+        editor.remove(String.format(WORKOUT_PROGRESS, workoutName));
+        editor.apply();
+    }
 
     public static SharedPreferences getSharedPref(Context context, int fileId) {
         return context.getSharedPreferences(
