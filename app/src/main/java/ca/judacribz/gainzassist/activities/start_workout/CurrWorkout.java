@@ -62,9 +62,6 @@ public class CurrWorkout {
     // Interfaces
     // --------------------------------------------------------------------------------------------
     private DataListener dataListener;
-
-
-
     public interface DataListener {
         void startTimer(long timeInMillis);
         void updateProgressSets(int numSets);

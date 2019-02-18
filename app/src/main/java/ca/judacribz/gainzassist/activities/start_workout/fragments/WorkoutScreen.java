@@ -187,16 +187,12 @@ public class WorkoutScreen extends Fragment implements
                         PROGRESS_STATUS_MAP.get(Integer.valueOf(String.valueOf(setEntry.getValue())))
                 );
             }
-
-
         }
 
         updateProgressExs(currWorkout.getCurrNumExs());
         updateProgSets(currWorkout.getCurrNumSets());
 
-        if (updateUI) {
-            updateUI();
-        }
+        updateUI();
     }
 
     public void updateProgressExs(int numExs) {
@@ -222,13 +218,13 @@ public class WorkoutScreen extends Fragment implements
             }
         });
     }
-boolean updateUI = false;
+boolean updateProgress = true;
     public void updateProgSets(int numSets) {
         if (setProgress == null) {
             setProgress = setupProgress(numSets, currWorkout.getCurrSetNum(), null);
-            updateUI = true;
+            updateProgress = true;
         } else {
-            updateUI = false;
+            updateProgress = false;
         }
         setAdapter = setupProgressAdapter(
                 rvSet,
@@ -561,20 +557,25 @@ boolean updateUI = false;
         }
 
         tvExerciseTitle.setText(currWorkout.getCurrExName());
-
-        selectProgressAdapterPos(
-                exerciseAdapter,
-                rvExercise,
-                currWorkout.getCurrExNum(),
-                currWorkout.getExSuccess());
-
         tvSetNum.setText(String.format(setNum, setType));
-        selectProgressAdapterPos(
-                setAdapter,
-                rvSet,
-                currWorkout.getCurrSetNum(),
-                currWorkout.getSetSuccess()
-        );
+
+        if (updateProgress) {
+            selectProgressAdapterPos(
+                    exerciseAdapter,
+                    rvExercise,
+                    currWorkout.getCurrExNum(),
+                    currWorkout.getExSuccess());
+
+
+            selectProgressAdapterPos(
+                    setAdapter,
+                    rvSet,
+                    currWorkout.getCurrSetNum(),
+                    currWorkout.getSetSuccess()
+            );
+        } else {
+            updateProgress = true;
+        }
 
         Logger.d("CURR SET NUM = "+ currWorkout.getCurrSetNum());
     }
