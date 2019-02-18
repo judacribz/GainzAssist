@@ -102,6 +102,8 @@ public class CurrWorkout {
         Map<String, Object> exsMap, exMap;
         Map<String, Object> setsMap, setMap;
 
+        resetIndices();
+
         this.retrievedWorkout = map;
 
         this.currWarmups = new ArrayList<>();
@@ -149,6 +151,7 @@ public class CurrWorkout {
     }
 
     void setCurrWorkout(Workout workout) {
+        resetIndices();
         this.currWorkout = workout;
         this.currSession = new Session(workout);
         genWarmups(workout.getExercises());
@@ -595,7 +598,6 @@ public class CurrWorkout {
         ));
 
         Logger.d("leave" + jsonStr);
-        resetIndices();
         return jsonStr;
     }
 

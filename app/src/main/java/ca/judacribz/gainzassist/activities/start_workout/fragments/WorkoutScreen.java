@@ -138,7 +138,6 @@ public class WorkoutScreen extends Fragment implements
 
         setNum = "%s " + getString(R.string.set_num);
 
-        currWorkout.setDataListener(this);
         setManager = setProgressLayoutManagers(rvSet);
         exerciseManager = setProgressLayoutManagers(rvExercise);
 
@@ -163,6 +162,7 @@ public class WorkoutScreen extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
+        currWorkout.setDataListener(this);
         String progressJson = getSessionProgressPref(act, currWorkout.getWorkoutName());
 
         if (progressJson != null && setProgress == null) {
@@ -194,7 +194,9 @@ public class WorkoutScreen extends Fragment implements
         updateProgressExs(currWorkout.getCurrNumExs());
         updateProgSets(currWorkout.getCurrNumSets());
 
-        updateUI();
+        if (updateUI) {
+            updateUI();
+        }
     }
 
     public void updateProgressExs(int numExs) {
@@ -220,10 +222,13 @@ public class WorkoutScreen extends Fragment implements
             }
         });
     }
-
+boolean updateUI = false;
     public void updateProgSets(int numSets) {
         if (setProgress == null) {
             setProgress = setupProgress(numSets, currWorkout.getCurrSetNum(), null);
+            updateUI = true;
+        } else {
+            updateUI = false;
         }
         setAdapter = setupProgressAdapter(
                 rvSet,
@@ -570,6 +575,8 @@ public class WorkoutScreen extends Fragment implements
                 currWorkout.getCurrSetNum(),
                 currWorkout.getSetSuccess()
         );
+
+        Logger.d("CURR SET NUM = "+ currWorkout.getCurrSetNum());
     }
 
     ArrayList<ExerciseSet> setsToUpdate;
@@ -593,7 +600,8 @@ public class WorkoutScreen extends Fragment implements
     private void selectProgressAdapterPos(
             SingleItemAdapter adapter,
             RecyclerView rv,
-            int pos, boolean success) {
+            int pos,
+            boolean success) {
 
         adapter.setCurrItem(pos, success);
         rv.scrollToPosition(pos - 1);

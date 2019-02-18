@@ -92,7 +92,7 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         ItemViewHolder holder = new ItemViewHolder(view);
 
         if (dontRecycle) {
-//            holder.setIsRecyclable(false);
+            holder.setIsRecyclable(false);
         }
 
         return holder;
