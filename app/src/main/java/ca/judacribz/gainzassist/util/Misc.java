@@ -43,7 +43,6 @@ public class Misc {
         Exercise exercise;
         long workoutId = Long.valueOf(String.valueOf(workoutShot.child("id").getValue()));
 
-
         for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
 
             // Adds exerciseSets to exercise object, and add exercise to exercises list
@@ -55,6 +54,7 @@ public class Misc {
                             Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()))
                     );
                     exercise.setWorkoutId(workoutId);
+                    Logger.d("WORKOUT ID " + workoutId);
                     exercises.add(exercise);
                 }
             }

@@ -18,6 +18,7 @@ import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Workout;
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+import com.orhanobut.logger.Logger;
 import org.parceler.Parcels;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
@@ -30,7 +31,7 @@ import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutFirebase
 import static ca.judacribz.gainzassist.models.Exercise.*;
 import static ca.judacribz.gainzassist.util.UI.*;
 
-public class NewWorkoutSummary extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver {
+public class Summary extends AppCompatActivity implements SingleItemAdapter.ItemClickObserver {
 
     // Constants
     // --------------------------------------------------------------------------------------------
@@ -354,10 +355,14 @@ Exercise ex;
 
     private Exercise updateExerciseData(int exNumber, String exName) {
         Exercise exercise;
-        long id;
+        long id = -1;
         etExerciseName.setText("");
         if (exNumber == -1) {
             exNumber = workout.getNumExercises();
+
+            Logger.d(exNumber);
+        } else {
+            id = ex.getId();
         }
 
         exercise = new Exercise(
@@ -371,7 +376,9 @@ Exercise ex;
                 MAIN_SET
         );
         exercise.setWorkoutId(workoutId);
-        exercise.setId(ex.getId());
+        if (id != -1) {
+            exercise.setId(id);
+        }
         return exercise;
     }
 

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary;
+import ca.judacribz.gainzassist.activities.add_workout.Summary;
 import ca.judacribz.gainzassist.activities.main.Main;
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
@@ -32,8 +32,8 @@ import com.orhanobut.dialogplus.ViewHolder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.WORKOUTS_LIST;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.EXTRA_CALLING_ACTIVITY;
+import static ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.WORKOUTS_LIST;
+import static ca.judacribz.gainzassist.activities.add_workout.Summary.EXTRA_CALLING_ACTIVITY;
 import static ca.judacribz.gainzassist.util.UI.getTextString;
 import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 
@@ -218,11 +218,11 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
     private void editWorkout(String workoutName) {
         Intent newWorkoutSummaryIntent = new Intent(
                 act,
-                NewWorkoutSummary.class
+                Summary.class
         );
         newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
 
-        extraKey = NewWorkoutSummary.EXTRA_WORKOUT;
+        extraKey = Summary.EXTRA_WORKOUT;
         intent = newWorkoutSummaryIntent;
 
         workoutViewModel.getWorkoutFromName(act, workoutName);
@@ -232,7 +232,6 @@ public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObs
 
     private void deleteWorkout(String workoutName) {
         workoutViewModel.deleteWorkout(workoutName);
-        deleteWorkoutFirebase(workoutName);
         dialog.dismiss();
     }
     //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////

@@ -24,6 +24,7 @@ import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;
 import static ca.judacribz.gainzassist.models.db.WorkoutRepo.TableTxn.*;
 import static ca.judacribz.gainzassist.util.Misc.extractWorkout;
 import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
+import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 
 public class WorkoutRepo {
     static private WorkoutDao workoutDao;
@@ -76,22 +77,35 @@ public class WorkoutRepo {
     // CREATE
     // --------------------------------------------------------------------------------------------
     public void insertWorkout(Workout workout) {
-        setRepoAsyncConfig(INSERT_WORKOUT, WORKOUTS_TXN, null, workout);
+        new Thread(() -> {
+            workoutDao.insert(workout);
+            insertExercise(workout.getExercises().toArray(new Exercise[0]));
+        }).start();
     }
 
-    void insertExercise(Exercise exercise) {
-        setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
+    void insertExercise(Exercise...exercises) {
+        for (Exercise ex : exercises) {
+            exerciseDao.insert(ex);
+        }
     }
 
     public void insertSession(Session session, boolean toFireBase) {
-        setRepoAsyncConfig(INSERT_SESSION, SESSIONS_TXN, null, session, toFireBase);
+        new Thread(() -> {
+            sessionDao.insert(session);
+            for (Exercise ex : session.getSessionExs()) {
+                insertSet(ex.getFinishedSetsList().toArray(new ExerciseSet[0]));
+            }
+        }).start();
+
         if (toFireBase) {
             addWorkoutSessionFirebase(session);
         }
     }
 
-    static void insertSet(ExerciseSet exerciseSet) {
-        setRepoAsyncConfig(INSERT_SET, SETS_TXN, null, exerciseSet);
+    static void insertSet(ExerciseSet...exerciseSets) {
+        for (ExerciseSet set : exerciseSets) {
+            new Thread(() -> setDao.insert(set)).start();
+        }
     }
     // --------------------------------------------------------------------------------------------
 
@@ -112,9 +126,24 @@ public class WorkoutRepo {
     LiveData<Workout> getWorkout(long id) {
         return workoutDao.get(id);
     }
+    OnWorkoutReceivedListener onWorkoutReceivedListener;
+    private void setOnWorkoutReceivedListener(OnWorkoutReceivedListener onWorkoutReceivedListener) {
+        this.onWorkoutReceivedListener = onWorkoutReceivedListener;
+    }
+    void getWorkoutFromName(Context context, String name) {
+        new Thread(() -> {
+            setOnWorkoutReceivedListener((OnWorkoutReceivedListener) context);
+            Workout workout = workoutDao.getFromName(name);
 
-    public void getWorkoutFromName(Context context, String name) {
-        setRepoAsyncConfig(GET_WORKOUT, WORKOUTS_TXN, context, name);
+            for (Exercise exercise : exerciseDao.getFromWorkout(workout.getId())) {
+                exercise.setSetsList(null);
+                workout.addExercise(exercise);
+            }
+
+            onWorkoutReceivedListener.onWorkoutsReceived(workout);
+            setOnWorkoutReceivedListener(null);
+        }).start();
+
     }
 
     LiveData<List<Exercise>> getExercisesFromWorkout(long workoutId) {
@@ -138,19 +167,20 @@ public class WorkoutRepo {
     // UPDATE
     // --------------------------------------------------------------------------------------------
     public void updateWorkout(Workout workout) {
-        setRepoAsyncConfig(UPDATE_WORKOUT, WORKOUTS_TXN, null, workout);
+        new Thread(() -> workoutDao.update(workout)).start();
+        updateExercise(workout.getExercises().toArray(new Exercise[0]));
     }
 
-    void updateExercise(Exercise exercise) {
-        setRepoAsyncConfig(UPDATE_EXERCISE, EXERCISES_TXN, null, exercise);
-    }
-
-    void updateExerciseWeight(SparseArray<Float> newWeights) {
-        setRepoAsyncConfig(UPDATE_EXERCISE_WEIGHT, EXERCISES_TXN, null, newWeights);
-    }
-
-    void updateSet(ExerciseSet exerciseSet) {
-        setRepoAsyncConfig(UPDATE_SET, SETS_TXN, null, exerciseSet);
+    void updateExercise(Exercise...exercises) {
+        for (Exercise ex : exercises) {
+            new Thread(() -> {
+                if (exerciseDao.get(ex.getId()) == null) {
+                    insertExercise(ex);
+                } else {
+                    exerciseDao.update(ex);
+                }
+            }).start();
+        }
     }
     // --------------------------------------------------------------------------------------------
 
@@ -158,248 +188,26 @@ public class WorkoutRepo {
     // DELETE
     // --------------------------------------------------------------------------------------------
     void deleteAllWorkouts() {
-        setRepoAsyncConfig(DELETE_ALL_WORKOUTS, WORKOUTS_TXN, null, (Object) null);
+        new Thread(() -> workoutDao.deleteAll()).start();
     }
 
-    public void deleteWorkout(final Workout workout) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                workoutDao.delete(workout);
-            }
-        });
+    public void deleteWorkout(Workout workout) {
+        new Thread(() -> workoutDao.delete(workout)).start();
+        deleteWorkoutFirebase(workout.getName());
     }
 
-    public void deleteWorkout(String workoutName) {
-        setRepoAsyncConfig(DELETE_WORKOUT, WORKOUTS_TXN, null, workoutName);
+    void deleteWorkout(String workoutName) {
+        new Thread(() -> workoutDao.delete(workoutName)).start();
+        deleteWorkoutFirebase(workoutName);
     }
 
-    void deleteExercise(Exercise exercise) {
-        setRepoAsyncConfig(DELETE_EXERCISE, EXERCISES_TXN, null, exercise);
+    void deleteExercise(Exercise...exercise) {
+        new Thread(() -> exerciseDao.delete(exercise)).start();
     }
 
     void deleteSet(ExerciseSet exerciseSet) {
-        setRepoAsyncConfig(DELETE_SET, SETS_TXN, null, exerciseSet);
+        new Thread(() -> setDao.delete(exerciseSet)).start();
     }
     // --------------------------------------------------------------------------------------------
     // ============================================================================================
-
-
-    private static void setRepoAsyncConfig(RepoTask repoTask,
-                                           TableTxn tableTxn,
-                                           @Nullable Context context,
-                                           Object... obj) {
-
-        RepoAsyncTask repoAsyncTask = new RepoAsyncTask();
-        switch(tableTxn) {
-            case WORKOUTS_TXN:
-                switch (repoTask) {
-                    case INSERT_WORKOUT:
-                    case UPDATE_WORKOUT:
-                        repoAsyncTask.setWorkout((Workout) obj[0]);
-                        break;
-
-                    case GET_WORKOUT:
-                        if (context != null) {
-                            repoAsyncTask.setOnWorkoutReceivedListener(
-                                    (OnWorkoutReceivedListener) context
-                            );
-                        }
-                    case DELETE_WORKOUT:
-                        repoAsyncTask.setWorkoutName((String) obj[0]);
-                        break;
-                }
-            break;
-
-            case EXERCISES_TXN:
-
-                switch (repoTask) {
-                    case UPDATE_EXERCISE_WEIGHT:
-//                        repoAsyncTask.setExerciseWeights((SparseArray<Float>) obj[0]);
-                        break;
-                    case UPDATE_EXERCISE:
-                    default:
-                        repoAsyncTask.setExercise((Exercise) obj[0]);
-                        break;
-                }
-                break;
-            case SESSIONS_TXN:
-                repoAsyncTask.setSession((Session) obj[0]);
-                break;
-
-
-            case SETS_TXN:
-                repoAsyncTask.setExerciseSet((ExerciseSet) obj[0]);
-                break;
-        }
-
-        repoAsyncTask.execute(repoTask);
-    }
-
-
-
-    public static class RepoAsyncTask extends AsyncTask<RepoTask, Void, Void> {
-
-        OnWorkoutReceivedListener onWorkoutReceivedListener = null;
-
-        private DataSnapshot workoutShot = null;
-        private String workoutName = null;
-        private Workout workout = null;
-        private Exercise exercise = null;
-        private SparseArray<Float> newWeights = null;
-        private ExerciseSet exerciseSet = null;
-        private Session session = null;
-        private long timestamp = -1;
-        private long workoutId = -1;
-
-        private long id = -1;
-
-        RepoAsyncTask() {
-        }
-
-        void setWorkout(Workout workout) {
-            this.workout = workout;
-            setWorkoutName(workout.getName());
-        }
-
-        void setWorkoutName(String workoutName) {
-            this.workoutName = workoutName;
-        }
-        void setWorkoutShot(DataSnapshot workoutShot) {
-            this.workoutShot = workoutShot;
-        }
-
-        void setExercise(Exercise exercise) {
-            this.exercise = exercise;
-        }
-
-        void setSession(Session session) {
-            this.session = session;
-            setTimestamp(session.getTimestamp());
-            setWorkoutId(session.getWorkoutId());
-            setExerciseWeights(session.getAvgWeights());
-        }
-
-        public void setExerciseWeights(SparseArray<Float> newWeights) {
-            this.newWeights = newWeights;
-        }
-
-        void setTimestamp(long timestamp) {
-            this.timestamp = timestamp;
-        }
-
-        void setWorkoutId(long workoutId) {
-            this.workoutId = workoutId;
-        }
-
-        void setExerciseSet(ExerciseSet exerciseSet) {
-            this.exerciseSet = exerciseSet;
-        }
-
-        void setOnWorkoutReceivedListener(OnWorkoutReceivedListener onWorkoutReceivedListener) {
-            this.onWorkoutReceivedListener = onWorkoutReceivedListener;
-        }
-
-
-        @Override
-        protected Void doInBackground(RepoTask... tasks) {
-
-            for (RepoTask task : tasks) {
-                switch (task) {
-                    case GET_WORKOUT:
-                        workout = workoutDao.getFromName(workoutName);
-
-                        for (Exercise exercise : exerciseDao.getFromWorkout(workout.getId())) {
-                            exercise.setSetsList(null);
-                            workout.addExercise(exercise);
-                        }
-
-                        onWorkoutReceivedListener.onWorkoutsReceived(workout);
-                        setOnWorkoutReceivedListener(null);
-                        break;
-
-
-                    case INSERT_WORKOUT:
-                        if (workoutDao.getId(workout.getName()) == null) {
-                            workoutDao.insert(workout);
-                            for (Exercise exercise : workout.getExercises()) {
-                                setRepoAsyncConfig(INSERT_EXERCISE, EXERCISES_TXN, null, exercise);
-                            }
-                        }
-                        break;
-
-                    case INSERT_EXERCISE:
-                        if (exerciseDao.get(exercise.getId()) == null) {
-                            exerciseDao.insert(exercise);
-                        }
-
-                        break;
-
-                    case INSERT_SESSION:
-                        sessionDao.insert(session);
-                        ArrayList<Exercise> sessExs = session.getSessionExs();
-                        for (Exercise ex : sessExs){
-                            for (ExerciseSet exerciseSet : ex.getFinishedSetsList()) {
-                                exerciseSet.setSessionId(session.getTimestamp());
-                                insertSet(exerciseSet);
-                            }
-                        }
-
-                        for (int i = 0; i < newWeights.size(); i++) {
-//                            Logger.d("failing weight" + Float.valueOf(entry.getValue()));
-                            exerciseDao.updateWeight(newWeights.get(i), exerciseDao.getId(sessExs.get(i).getName(), workoutId));
-                        }
-
-                        break;
-
-                    case INSERT_SET:
-                        if (setDao.getId(exerciseSet.getId()) == null) {
-                            setDao.insert(exerciseSet);
-                        }
-                        break;
-
-
-                    case UPDATE_WORKOUT:
-                        workoutDao.update(workout);
-                        id = workout.getId();
-                        for (Exercise exercise : workout.getExercises()) {
-                            setRepoAsyncConfig(UPDATE_EXERCISE, EXERCISES_TXN, null, exercise);
-                        }
-                        break;
-
-                    case UPDATE_EXERCISE:
-//                        exercise.setId(exerciseDao.getId(exercise.getName(), exercise.getWorkoutId()));
-                        exerciseDao.update(exercise);
-                        break;
-
-                    case UPDATE_SET:
-                        setDao.update(exerciseSet);
-                        break;
-
-
-                    case DELETE_ALL_WORKOUTS:
-                        workoutDao.deleteAll();
-                        break;
-
-                    case DELETE_WORKOUT:
-                        workoutDao.delete(workoutDao.getFromName(workoutName));
-                        break;
-
-                    case DELETE_EXERCISE:
-                        exerciseDao.delete(exercise);
-                        break;
-
-                    case DELETE_SET:
-                        setDao.delete(exerciseSet);
-                        break;
-                }
-            }
-
-            return null;
-        }
-
-
-
-    }
-
 }

@@ -63,9 +63,9 @@
                 android:name=".activities.start_workout.StartWorkout"
                 android:windowSoftInputMode="adjustPan|stateHidden"/>
 
-        <!-- NewWorkoutSummary Activity -->
+        <!-- Summary Activity -->
         <activity
-                android:name=".activities.add_workout.NewWorkoutSummary"
+                android:name=".activities.add_workout.Summary"
                 android:windowSoftInputMode="adjustPan|stateHidden"/>
         <activity android:name=".activities.add_workout.WorkoutEntry"/>
         <activity android:name=".activities.add_workout.ExercisesEntry"/>

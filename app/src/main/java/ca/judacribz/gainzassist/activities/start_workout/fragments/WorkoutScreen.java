@@ -613,7 +613,7 @@ boolean updateProgress = true;
     private void exerciseItemClick(View view) {
         int ind = getTextInt((TextView) view);
         updateEx = currWorkout.getSessionExercise(ind);
-
+        Logger.d("OHH " + ind );
         if (updateEx != null) {
             SparseArray<PROGRESS_STATUS> setStatus = new SparseArray<>();
 

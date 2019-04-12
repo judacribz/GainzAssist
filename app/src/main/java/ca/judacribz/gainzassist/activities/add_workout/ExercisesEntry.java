@@ -17,8 +17,8 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 
 import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.CALLING_ACTIVITY.*;
-import static ca.judacribz.gainzassist.activities.add_workout.NewWorkoutSummary.*;
+import static ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.*;
+import static ca.judacribz.gainzassist.activities.add_workout.Summary.*;
 import static ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.*;
 import static ca.judacribz.gainzassist.util.Misc.shrinkTo;
 import static ca.judacribz.gainzassist.util.UI.*;
@@ -238,7 +238,7 @@ public class ExercisesEntry extends AppCompatActivity implements ExEntry.ExEntry
         if (addedExs >= numExs) {
             workout.setExercises(exercises);
 
-            Intent newWorkoutSummaryIntent = new Intent(this, NewWorkoutSummary.class);
+            Intent newWorkoutSummaryIntent = new Intent(this, Summary.class);
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout));
             newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY);
             startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY);

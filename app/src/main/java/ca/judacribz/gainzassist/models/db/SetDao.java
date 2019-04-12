@@ -10,7 +10,7 @@ import java.util.List;
 @Dao
 public interface SetDao {
 
-    @Insert(onConflict = OnConflictStrategy.FAIL)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(ExerciseSet exerciseSet);
 
     @Query("SELECT * from  exercise_sets")

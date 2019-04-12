@@ -92,9 +92,7 @@ public class WorkoutViewModel extends AndroidViewModel {
         workoutRepo.updateExercise(exercise);
     }
 
-    void updateSet(ExerciseSet exerciseSet) {
-        workoutRepo.updateSet(exerciseSet);
-    }
+
     // --------------------------------------------------------------------------------------------
 
 

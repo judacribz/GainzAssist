@@ -39,8 +39,8 @@ public interface WorkoutDao {
     @Query("DELETE FROM workouts")
     void deleteAll();
 
-//    @Query("DELETE from workouts WHERE name = :name")
-//    void delete(String name);
+    @Query("DELETE from workouts WHERE name = :name")
+    void delete(String name);
 
     @Delete
     void delete(Workout workout);
