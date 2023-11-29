@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GainzAssist.iml" filepath="$PROJECT_DIR$/GainzAssist.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/GainzAssist.iml" filepath="$PROJECT_DIR$/.idea/modules/GainzAssist.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/GainzAssist.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/library/GainzAssist.library.iml" filepath="$PROJECT_DIR$/.idea/modules/library/GainzAssist.library.iml" />
     </modules>
   </component>
 </project>
