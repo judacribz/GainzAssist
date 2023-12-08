@@ -1,19 +1,25 @@
 package ca.judacribz.gainzassist.adapters;
 
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL;
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL_SELECTED;
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SELECTED;
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS;
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS_SELECTED;
+import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.UNSELECTED;
+
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import ca.judacribz.gainzassist.R;
-import com.orhanobut.logger.Logger;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
+import ca.judacribz.gainzassist.R;
 
 public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> {
 

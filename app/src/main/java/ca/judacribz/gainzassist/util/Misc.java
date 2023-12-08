@@ -1,12 +1,12 @@
 package ca.judacribz.gainzassist.util;
 
+import static ca.judacribz.gainzassist.constants.ExerciseConst.EXERCISES;
+import static ca.judacribz.gainzassist.constants.ExerciseConst.SET_LIST;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.ExerciseSet;
-import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Workout;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,9 +15,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
+import ca.judacribz.gainzassist.models.Exercise;
+import ca.judacribz.gainzassist.models.ExerciseSet;
+import ca.judacribz.gainzassist.models.Session;
+import ca.judacribz.gainzassist.models.Workout;
 
 
 public class Misc {
@@ -50,10 +57,8 @@ public class Misc {
                 exercise = exerciseShot.getValue(Exercise.class);
 
                 if (exercise != null) {
-                    exercise.setExerciseNumber(
-                            Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()))
-                    );
-                    exercise.setWorkoutId(workoutId);
+                    exercise.exerciseNumber = Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()));
+                    exercise.workoutId = workoutId;
                     Logger.d("WORKOUT ID " + workoutId);
                     exercises.add(exercise);
                 }
@@ -72,7 +77,7 @@ public class Misc {
             long timestamp = session.getTimestamp();
             Exercise exercise;
             ExerciseSet set;
-            session.setTimestamp(Long.valueOf(Objects.requireNonNull(sessionShot.getKey())));
+            session.setTimestamp1(Long.valueOf(Objects.requireNonNull(sessionShot.getKey())));
 
             String exerciseName;
             long exerciseId;
@@ -82,18 +87,18 @@ public class Misc {
 
                 if (exercise != null) {
                     exerciseId = exercise.getId();
-                    exerciseName = exercise.getName();
+                    exerciseName = exercise.name;
 
-                    exercise.setExerciseNumber(Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey())));
+                    exercise.exerciseNumber = Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()));
 
                     for (DataSnapshot setShot : exerciseShot.child(SET_LIST).getChildren()) {
                         set = setShot.getValue(ExerciseSet.class);
 
                         if (set != null) {
-                            set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
-                            set.setExerciseId(exerciseId);
-                            set.setExerciseName(exerciseName);
-                            set.setSessionId(timestamp);
+                            set.setNumber = Integer.valueOf(Objects.requireNonNull(setShot.getKey()));
+                            set.exerciseId = exerciseId;
+                            set.exerciseName = exerciseName;
+                            set.sessionId = timestamp;
                             exercise.addSet(set, false);
                         }
                     }
@@ -110,7 +115,7 @@ public class Misc {
     public static Map<String, Object> exerciseToMap(ArrayList<Exercise> exercises)  {
         Map<String, Object> exs = new HashMap<>();
         for (Exercise exercise: exercises) {
-            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.toMap());
+            exs.put(String.valueOf(exercise.exerciseNumber), exercise.toMap());
         }
 
         return exs;
@@ -119,7 +124,7 @@ public class Misc {
     public static Map<String, Object> exerciseSetsToMap(ArrayList<Exercise> exercises)  {
         Map<String, Object> exs = new HashMap<>();
         for (Exercise exercise: exercises) {
-            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.setsToMap());
+            exs.put(String.valueOf(exercise.exerciseNumber), exercise.setsToMap());
         }
 
         return exs;

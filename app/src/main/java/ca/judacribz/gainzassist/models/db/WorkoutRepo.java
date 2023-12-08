@@ -1,30 +1,22 @@
 package ca.judacribz.gainzassist.models.db;
 
+import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
+import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
+
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-import android.util.SparseArray;
+
+import androidx.lifecycle.LiveData;
+
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.List;
+
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.ExerciseSet;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
-import com.google.firebase.database.DataSnapshot;
-import com.orhanobut.logger.Logger;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
-import static ca.judacribz.gainzassist.models.db.WorkoutRepo.RepoTask.*;
-import static ca.judacribz.gainzassist.models.db.WorkoutRepo.TableTxn.*;
-import static ca.judacribz.gainzassist.util.Misc.extractWorkout;
-import static ca.judacribz.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
-import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 
 public class WorkoutRepo {
     static private WorkoutDao workoutDao;
@@ -79,7 +71,7 @@ public class WorkoutRepo {
     public void insertWorkout(Workout workout) {
         new Thread(() -> {
             workoutDao.insert(workout);
-            insertExercise(workout.getExercises().toArray(new Exercise[0]));
+            insertExercise(workout.exercises.toArray(new Exercise[0]));
         }).start();
     }
 
@@ -168,7 +160,7 @@ public class WorkoutRepo {
     // --------------------------------------------------------------------------------------------
     public void updateWorkout(Workout workout) {
         new Thread(() -> workoutDao.update(workout)).start();
-        updateExercise(workout.getExercises().toArray(new Exercise[0]));
+        updateExercise(workout.exercises.toArray(new Exercise[0]));
     }
 
     void updateExercise(Exercise...exercises) {
@@ -193,7 +185,7 @@ public class WorkoutRepo {
 
     public void deleteWorkout(Workout workout) {
         new Thread(() -> workoutDao.delete(workout)).start();
-        deleteWorkoutFirebase(workout.getName());
+        deleteWorkoutFirebase(workout.name);
     }
 
     void deleteWorkout(String workoutName) {

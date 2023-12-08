@@ -1,11 +1,16 @@
 package ca.judacribz.gainzassist.models.db;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.*;
-import ca.judacribz.gainzassist.models.ExerciseSet;
-import ca.judacribz.gainzassist.models.Session;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
+
+import ca.judacribz.gainzassist.models.ExerciseSet;
 
 @Dao
 public interface SetDao {
@@ -25,10 +30,8 @@ public interface SetDao {
     @Query("SELECT * from exercise_sets WHERE id = :id")
     ExerciseSet getId(long id);
 
-
     @Update
     void update(ExerciseSet... exerciseSets);
-
 
     @Delete
     void delete(ExerciseSet... exerciseSets);

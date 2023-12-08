@@ -153,8 +153,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
     public void addWorkout(Workout workout) {
         db = this.getWritableDatabase();
         cv.clear();
-        cv.put(WORKOUT_NAME,  workout.getName());
-        cv.put(EXERCISES,     getBlobFromExercises(workout.getExercises()));
+        cv.put(WORKOUT_NAME, workout.name);
+        cv.put(EXERCISES,     getBlobFromExercises(workout.exercises));
 
 //        long i =  db.insert(TABLE_WORKOUTS, null, cv);
 
@@ -206,8 +206,8 @@ public class WorkoutHelper extends SQLiteOpenHelper {
      */
     ArrayList<String> getAllExerciseNames(String workoutName) {
         ArrayList<String> exerciseNames = new ArrayList<>();
-        for (Exercise exercise : getWorkout(workoutName).getExercises()) {
-            exerciseNames.add(exercise.getName());
+        for (Exercise exercise : getWorkout(workoutName).exercises) {
+            exerciseNames.add(exercise.name);
         }
 
         return exerciseNames;
@@ -307,7 +307,7 @@ public class WorkoutHelper extends SQLiteOpenHelper {
         db = this.getWritableDatabase();
 
         cv.clear();
-        cv.put(EXERCISES, getBlobFromExercises(workout.getExercises()));
+        cv.put(EXERCISES, getBlobFromExercises(workout.exercises));
 
         String where = WORKOUT_NAME + " = ?";
         String[] whereArgs = new String[] {workoutName};

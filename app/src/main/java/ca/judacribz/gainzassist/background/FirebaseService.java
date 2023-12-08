@@ -1,26 +1,25 @@
 package ca.judacribz.gainzassist.background;
 
+import static ca.judacribz.gainzassist.util.Misc.extractSession;
+import static ca.judacribz.gainzassist.util.Misc.extractWorkout;
+import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef;
+import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
+
 import android.app.IntentService;
 import android.app.Service;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.widget.Toast;
-import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
-import ca.judacribz.gainzassist.models.*;
-import ca.judacribz.gainzassist.models.db.WorkoutRepo;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.orhanobut.logger.Logger;
 
-import static ca.judacribz.gainzassist.util.Misc.extractSession;
-import static ca.judacribz.gainzassist.util.Misc.extractWorkout;
-import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef;
-import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
+import ca.judacribz.gainzassist.models.db.WorkoutRepo;
 
 
 public class FirebaseService extends IntentService {

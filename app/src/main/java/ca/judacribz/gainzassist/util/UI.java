@@ -1,26 +1,30 @@
 package ca.judacribz.gainzassist.util;
 
+import static ca.judacribz.gainzassist.util.Preferences.getThemePref;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.*;
-import butterknife.ButterKnife;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import ca.judacribz.gainzassist.R;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.facebook.rebound.SpringUtil;
-import io.alterac.blurkit.BlurLayout;
 
-import static ca.judacribz.gainzassist.util.Preferences.getThemePref;
+import butterknife.ButterKnife;
+import ca.judacribz.gainzassist.R;
 
 public class UI {
 
@@ -81,7 +85,7 @@ public class UI {
     }
     public static String setToolbar(AppCompatActivity act, String title, boolean setBackArrow) {
         // ExerciseSet the part_title_bar to the activity
-        act.setSupportActionBar((Toolbar) act.findViewById(R.id.toolbar));
+        act.setSupportActionBar(act.findViewById(R.id.toolbar));
 
 
         ActionBar actionBar = act.getSupportActionBar();
@@ -263,13 +267,11 @@ public class UI {
         private static String DOT = "...";
 
         ProgressDialog progress;
-        BlurLayout blurLayout;
         String msg, newMsg;
         int count = 0;
 
-        public void setProgress(Context context, String msg, BlurLayout blurLayout) {
+        public void setProgress(Context context, String msg) {
             this.progress = new ProgressDialog(context);
-            this.blurLayout = blurLayout;
             this.msg = msg + DOT;
 
             this.progress.setMessage(this.msg);
@@ -283,11 +285,6 @@ public class UI {
         public void show() {
             if (this.progress != null) {
                 this.progress.show();
-                if (this.blurLayout != null) {
-                    blurLayout.setVisibility(View.VISIBLE);
-                    blurLayout.setTop(0);
-                    blurLayout.startBlur();
-                }
 
                 new Thread(new Runnable() {
                     @Override
@@ -296,7 +293,6 @@ public class UI {
                             while (progress.isShowing()) {
                                 Thread.sleep(10);
                                 progress.setMessage(msg.substring(0, msg.length() - 1 - (++count % 3)));
-                                blurLayout.pauseBlur();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -309,8 +305,6 @@ public class UI {
         public void dismiss() {
             if (this.progress != null) {
                 this.progress.dismiss();
-                this.blurLayout.pauseBlur();
-                this.blurLayout.setVisibility(View.GONE);
             }
         }
     }

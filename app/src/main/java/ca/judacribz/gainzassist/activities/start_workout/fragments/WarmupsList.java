@@ -1,25 +1,25 @@
 package ca.judacribz.gainzassist.activities.start_workout.fragments;
 
+import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_WARMUPS;
+import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
+
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
+import ca.judacribz.gainzassist.activities.start_workout.StartWorkoutActivity;
 import ca.judacribz.gainzassist.models.Exercise;
-import org.parceler.Parcels;
-
-import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_WARMUPS;
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.WARMUP_SET;
 
 public class WarmupsList extends Fragment {
 
@@ -29,7 +29,7 @@ public class WarmupsList extends Fragment {
 
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    StartWorkout act;
+    StartWorkoutActivity act;
     Bundle bundle;
 
 //    @BindView(R.id.ll_exercise_subtitle_insert) LinearLayout llExSubInsert;
@@ -54,7 +54,7 @@ public class WarmupsList extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        act = (StartWorkout) context;
+        act = (StartWorkoutActivity) context;
         bundle = this.getArguments();
     }
 
@@ -75,7 +75,7 @@ View view;
         ButterKnife.bind(this, view);
 
         if (bundle != null) {
-            ArrayList<Exercise> warmups = Parcels.unwrap(bundle.getParcelable(EXTRA_WARMUPS));
+            ArrayList<Exercise> warmups = bundle.getParcelableArrayList(EXTRA_WARMUPS);
             if (warmups != null) {
 
                 for (int i = warmups.size()-1; i >= 0; --i) {

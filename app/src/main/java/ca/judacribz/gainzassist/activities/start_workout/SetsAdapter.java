@@ -1,20 +1,20 @@
 package ca.judacribz.gainzassist.activities.start_workout;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 import ca.judacribz.gainzassist.R;
 import ca.judacribz.gainzassist.models.ExerciseSet;
-
-import static ca.judacribz.gainzassist.util.Calculations.dpToPix;
 
 
 public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder> {
@@ -41,7 +41,7 @@ public class SetsAdapter extends RecyclerView.Adapter<SetsAdapter.SetsViewHolder
     public void onBindViewHolder(@NonNull SetsViewHolder holder, int position) {
 
         ExerciseSet exerciseSet = exerciseSets.get(position);
-        holder.bind(exerciseSet.getSetNumber(), exerciseSet.getReps(), exerciseSet.getWeight());
+        holder.bind(exerciseSet.setNumber, exerciseSet.reps, exerciseSet.weight);
     }
 
     @Override

@@ -7,7 +7,7 @@
 	android:layout_height="match_parent"
 	android:orientation="vertical"
 	android:padding="4dp"
-	tools:context=".activities.add_workout.ExercisesEntry">
+	tools:context=".activities.add_workout.ExercisesEntryActivity">
 
 	<!-- Exercise Name EditText -->
 	<!--========================================================================================-->

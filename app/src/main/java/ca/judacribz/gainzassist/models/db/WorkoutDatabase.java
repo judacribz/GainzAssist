@@ -1,12 +1,17 @@
 package ca.judacribz.gainzassist.models.db;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.*;
+
 import android.content.Context;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.ExerciseSet;
+import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.Workout;
 
 @Database(entities = {Workout.class, Exercise.class, ExerciseSet.class, Session.class},
