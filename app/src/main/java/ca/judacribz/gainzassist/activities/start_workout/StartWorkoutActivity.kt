@@ -203,7 +203,7 @@ class StartWorkoutActivity : AppCompatActivity(), WarmupsListener {
                 false
             )
         )
-        adapter = SetsAdapter(exercise.getSetsList())
+        adapter = SetsAdapter(exercise.setsList)
         setList.setAdapter(adapter)
         when (setsType) {
             SetsType.MAIN_SET -> mainAdapters.add(adapter)

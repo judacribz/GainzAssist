@@ -39,6 +39,7 @@ class Exercise(
     var name: String = "",
     @JvmField
     var type: String = "",
+    @JvmField
     var equipment: String = "",
     @JvmField
     var sets: Int = 0,
@@ -48,15 +49,20 @@ class Exercise(
     var weight: Float = 0f
 ) : Parcelable {
 
+    @Ignore
     @IgnoredOnParcel
     var weightChange = 0f
 
+    @Ignore
     @IgnoredOnParcel
     var minWeight = 0f
 
+    @JvmField
+    @Ignore
     @IgnoredOnParcel
     var setsList: ArrayList<ExerciseSet> = ArrayList()
 
+    @Ignore
     @IgnoredOnParcel
     var finishedSetsList = ArrayList<ExerciseSet>()
 
@@ -65,6 +71,7 @@ class Exercise(
         MAIN_SET
     }
 
+    @Ignore
     @IgnoredOnParcel
     var setsType: SetsType = SetsType.MAIN_SET
 
@@ -154,7 +161,7 @@ class Exercise(
         }
     }
 
-    private fun setSetsList(setsList: ArrayList<ExerciseSet>?) {
+    fun setSetsList(setsList: ArrayList<ExerciseSet>?) {
         if (setsList != null) {
             this.setsList = setsList.toList() as ArrayList<ExerciseSet>
         } else {

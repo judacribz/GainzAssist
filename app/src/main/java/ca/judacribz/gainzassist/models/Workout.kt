@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import ca.judacribz.gainzassist.util.Misc
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.Date
 import java.util.Locale
@@ -22,6 +23,7 @@ class Workout(
 var name: String = "",
 ) : Parcelable {
 
+    @IgnoredOnParcel
     @JvmField
     @Ignore
     var exercises = ArrayList<Exercise>()
@@ -30,7 +32,7 @@ var name: String = "",
     // ######################################################################################### //
     // ExerciseConst Constructor                                                                 //
     // ######################################################################################### //
-    constructor(name: String, exercises: ArrayList<Exercise>?) : this() {
+    constructor(name: String, exercises: ArrayList<Exercise>) : this() {
         if (id == -1L) setId(-1)
         this.name = name
         if (exercises != null) {

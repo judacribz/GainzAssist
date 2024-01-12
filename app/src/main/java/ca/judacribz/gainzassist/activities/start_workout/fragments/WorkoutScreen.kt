@@ -50,7 +50,7 @@ class WorkoutScreen  // --------------------------------------------------------
     // --------------------------------------------------------------------------------------------
     // Global Vars
     // --------------------------------------------------------------------------------------------
-    var currWorkout = CurrWorkout.instance
+    var currWorkout = CurrWorkout
     var act: StartWorkoutActivity? = null
     var bundle: Bundle? = null
     var countDownTimer: CountDownTimer? = null
@@ -608,7 +608,7 @@ class WorkoutScreen  // --------------------------------------------------------
         val set = updateEx!!.finishedSetsList[setInd]
         tvExerciseTitle!!.text = updateEx.name
         tvSetNum!!.text = String.format(setNum!!, "Main")
-        equipmentView!!.setup(set.weight!!, updateEx.getEquipment())
+        equipmentView!!.setup(set.weight, updateEx.equipment)
         tvTimer!!.setText(R.string.update_set)
         etCurrReps!!.setText(set.reps.toString())
         etCurrWeight!!.setText(set.weight.toString())

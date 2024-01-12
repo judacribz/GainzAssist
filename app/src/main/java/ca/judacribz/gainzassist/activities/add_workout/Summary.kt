@@ -429,7 +429,7 @@ class Summary : AppCompatActivity(), ItemClickObserver {
             } else {
                 val btnText: String = getTextString(btnAddWorkout).toLowerCase()
                 workout?.name = getTextString(etWorkoutName)
-                workout?.exercises = exercises.orEmpty() as ArrayList<Exercise?>
+                workout?.exercises = exercises.orEmpty() as ArrayList<Exercise>
                 workout?.let { addWorkoutFirebase(it) }
                 if ("add workout" == btnText) {
                     workoutViewModel?.insertWorkout(workout)

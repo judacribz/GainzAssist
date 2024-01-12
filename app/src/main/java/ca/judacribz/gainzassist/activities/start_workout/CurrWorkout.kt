@@ -40,7 +40,7 @@ object CurrWorkout  {// --------------------------------------------------------
         private set
     var warmups: ArrayList<Exercise>? = null
         private set
-    private var currMains: ArrayList<Exercise?>? = null
+    private var currMains: ArrayList<Exercise>? = null
     var currRestTime: Long = 0
         private set
     private var timerSet = false
@@ -51,6 +51,8 @@ object CurrWorkout  {// --------------------------------------------------------
     var currSession: Session? = null
         private set
     var retrievedWorkout: Map<String, Any>? = null
+
+    @JvmField
     var warmupsListener: WarmupsListener? = null
 
     // --------------------------------------------------------------------------------------------
@@ -136,10 +138,10 @@ object CurrWorkout  {// --------------------------------------------------------
         genWarmups(workout.exercises)
     }
 
-    private fun genWarmups(exercises: ArrayList<Exercise?>) {
-        val allExs = ArrayList<Exercise?>()
+    private fun genWarmups(exercises: ArrayList<Exercise>) {
+        val allExs = ArrayList<Exercise>()
         val warmups = ArrayList<Exercise>()
-        var exerciseSets: ArrayList<ExerciseSet?>
+        var exerciseSets: ArrayList<ExerciseSet>
         var warmup: Exercise
         var oneRepMax: Float
         var minWeight: Float
@@ -163,10 +165,10 @@ object CurrWorkout  {// --------------------------------------------------------
                 genWarmups(ex)
             }
             warmup = Exercise(
-                ex?.exerciseNumber,
-                ex?.name,
-                ex?.type,
-                ex?.equipment,
+                ex.exerciseNumber,
+                ex.name,
+                ex.type,
+                ex.equipment,
                 exerciseSets,
                 SetsType.WARMUP_SET
             )
@@ -176,11 +178,11 @@ object CurrWorkout  {// --------------------------------------------------------
         }
         setCurrWarmupExercises(warmups)
         setAllCurrExercises(allExs)
-        currMainInd = allExs[exInd]!!.exerciseNumber!!
+        currMainInd = allExs[exInd]!!.exerciseNumber
     }
 
-    private fun genBBWarmups(ex: Exercise?): ArrayList<ExerciseSet?> {
-        val exerciseSets = ArrayList<ExerciseSet?>()
+    private fun genBBWarmups(ex: Exercise?): ArrayList<ExerciseSet> {
+        val exerciseSets = ArrayList<ExerciseSet>()
         var setNum = 0
         var reps = ex!!.avgReps
         val minWeight = ex.minWeight
@@ -233,8 +235,8 @@ object CurrWorkout  {// --------------------------------------------------------
         } while (true)
     }
 
-    private fun genWarmups(ex: Exercise?): ArrayList<ExerciseSet?> {
-        val exerciseSets = ArrayList<ExerciseSet?>()
+    private fun genWarmups(ex: Exercise): ArrayList<ExerciseSet> {
+        val exerciseSets = ArrayList<ExerciseSet>()
         var setNum = 0
         var reps = ex!!.avgReps
         val minWeight = ex.minWeight
@@ -268,7 +270,7 @@ object CurrWorkout  {// --------------------------------------------------------
         return exerciseSets
     }
 
-    private fun setCurrMainExercises(exercises: ArrayList<Exercise?>) {
+    private fun setCurrMainExercises(exercises: ArrayList<Exercise>) {
         currMains = exercises
         currNumExs = exercises.size
     }
@@ -279,8 +281,8 @@ object CurrWorkout  {// --------------------------------------------------------
         warmupsListener!!.warmupsGenerated(warmups)
     }
 
-    private fun setAllCurrExercises(allExercises: ArrayList<Exercise?>) {
-        currWorkout!!.exercises = allExercises
+    private fun setAllCurrExercises(allExercises: ArrayList<Exercise>) {
+        currWorkout?.exercises = allExercises
         if (exInd == -1) {
             exInd = 0
         }
