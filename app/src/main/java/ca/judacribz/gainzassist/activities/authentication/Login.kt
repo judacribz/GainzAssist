@@ -14,7 +14,7 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.main.Main
-import ca.judacribz.gainzassist.activities.main.Main.EXTRA_LOGOUT_USER
+import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_LOGOUT_USER
 import ca.judacribz.gainzassist.util.Preferences.setUserInfoPref
 import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.setInitView
