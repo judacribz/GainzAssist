@@ -14,12 +14,11 @@
 		 https://thenounproject.com/term/muscle/15255/ -->
 
 
-	<io.alterac.blurkit.BlurLayout
+	<View
 		android:id="@+id/blurLayout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		style="@style/AppTheme"
-		blurkit:blk_fps="1000"/>
+		style="@style/AppTheme"/>
 
 	<RelativeLayout
 		android:id="@+id/ll_signin_methods"

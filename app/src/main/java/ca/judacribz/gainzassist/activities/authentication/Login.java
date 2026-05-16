@@ -37,7 +37,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.R;
-import io.alterac.blurkit.BlurLayout;
 
 import static ca.judacribz.gainzassist.activities.main.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
@@ -77,7 +76,7 @@ public class Login extends AppCompatActivity implements
     public boolean linkGoogle;
     Spring loginSpring, signUpSpring;
 
-    @BindView(R.id.blurLayout) BlurLayout blurLayout;
+    @BindView(R.id.blurLayout) View blurLayout;
 
     @BindView(R.id.tv_sign_up_here) TextView tvSignUpHere;
     @BindView(R.id.tv_login_here) TextView tvLoginHere;
