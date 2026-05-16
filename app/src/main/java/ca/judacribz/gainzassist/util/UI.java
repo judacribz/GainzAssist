@@ -18,7 +18,6 @@ import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
 import com.facebook.rebound.SpringUtil;
-import io.alterac.blurkit.BlurLayout;
 
 import static ca.judacribz.gainzassist.util.Preferences.getThemePref;
 
@@ -263,11 +262,11 @@ public class UI {
         private static String DOT = "...";
 
         ProgressDialog progress;
-        BlurLayout blurLayout;
+        View blurLayout;
         String msg, newMsg;
         int count = 0;
 
-        public void setProgress(Context context, String msg, BlurLayout blurLayout) {
+        public void setProgress(Context context, String msg, View blurLayout) {
             this.progress = new ProgressDialog(context);
             this.blurLayout = blurLayout;
             this.msg = msg + DOT;
@@ -286,7 +285,7 @@ public class UI {
                 if (this.blurLayout != null) {
                     blurLayout.setVisibility(View.VISIBLE);
                     blurLayout.setTop(0);
-                    blurLayout.startBlur();
+//                    blurLayout.startBlur();
                 }
 
                 new Thread(new Runnable() {
@@ -296,7 +295,7 @@ public class UI {
                             while (progress.isShowing()) {
                                 Thread.sleep(10);
                                 progress.setMessage(msg.substring(0, msg.length() - 1 - (++count % 3)));
-                                blurLayout.pauseBlur();
+//                                blurLayout.pauseBlur();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -309,7 +308,7 @@ public class UI {
         public void dismiss() {
             if (this.progress != null) {
                 this.progress.dismiss();
-                this.blurLayout.pauseBlur();
+//                this.blurLayout.pauseBlur();
                 this.blurLayout.setVisibility(View.GONE);
             }
         }
