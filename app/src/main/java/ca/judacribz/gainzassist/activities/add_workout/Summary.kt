@@ -166,7 +166,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     fun onExerciseNameChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         val exerciseName = s.toString()
 
-        if (!exerciseName.isEmpty()) {
+        if (exerciseName.isNotEmpty()) {
             if (workout!!.containsExercise(exerciseName)) {
                 switchExerciseBtns(btnAddExercise, btnUpdateExercise)
             } else {
@@ -195,7 +195,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     @OnTextChanged(value = [R.id.et_weight], callback = OnTextChanged.Callback.TEXT_CHANGED)
     fun onWeightChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         val weightStr = s.toString()
-        weight = if (weightStr.isEmpty()) minWeight else java.lang.Float.valueOf(weightStr)
+        weight = if (weightStr.isEmpty()) minWeight else weightStr.toFloat()
 
         if (weight <= minWeight) {
             ibtnDecWeight.isEnabled = false

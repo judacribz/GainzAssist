@@ -137,14 +137,14 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     }
 
     override fun exerciseDoesNotExist(fmt: ExEntry, exerciseName: String, skipIndex: Int): Boolean {
-        var name: String?
 
         for (ex in exercises!!) {
             if (skipIndex == exercises!!.indexOf(ex)) {
                 continue
             }
 
-            if (ex.name.also { name = it } != null) {
+            val name = ex.name
+            if (name != null) {
                 if (name == exerciseName) {
                     fmt.setExerciseExists()
                     return false
@@ -169,13 +169,10 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     private fun lognow() {
         var e: Exercise
-        for (i in exercises!!.indices) {
-            e = exercises!![i]
-            val g: String? = if (e == null) {
-                "null"
-            } else {
-                e.name
-            }
+        val exs = exercises!!
+        for (i in exs.indices) {
+            e = exs[i]
+            val g: String? = e.name ?: "null"
             Logger.d("INDEX = " + (i + 1) + " value=  " + g)
         }
         Logger.d("INDEX = -----------------------------------")
