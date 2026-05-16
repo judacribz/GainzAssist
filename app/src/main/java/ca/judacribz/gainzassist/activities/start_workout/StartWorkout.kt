@@ -1,0 +1,203 @@
+package ca.judacribz.gainzassist.activities.start_workout
+
+import android.content.Intent
+import android.os.Bundle
+import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.TextView
+import butterknife.BindView
+import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos
+import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_WORKOUT
+import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
+import ca.judacribz.gainzassist.models.Exercise
+import ca.judacribz.gainzassist.models.Exercise.SetsType
+import ca.judacribz.gainzassist.models.Workout
+import ca.judacribz.gainzassist.util.Misc.readValue
+import ca.judacribz.gainzassist.util.Preferences.*
+import ca.judacribz.gainzassist.util.UI.setInitView
+import com.facebook.rebound.ui.Util.dpToPx
+import org.parceler.Parcels
+import java.util.*
+
+class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
+
+    companion object {
+        const val EXTRA_HOW_TO_VID = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_HOW_TO_VID"
+    }
+
+    var adapter: SetsAdapter? = null
+    var warmupAdapter = ArrayList<SetsAdapter>()
+    var mainAdapters = ArrayList<SetsAdapter>()
+    var workout: Workout? = null
+    var exercises: ArrayList<Exercise>? = null
+
+    var layInflater: LayoutInflater? = null
+    var setsView: View? = null
+
+    var currWorkout = CurrWorkout.getInstance()
+
+    var tvExerciseName: TextView? = null
+    var setList: RecyclerView? = null
+
+    var lp: RelativeLayout.LayoutParams? = null
+
+    @BindView(R.id.tlay_navbar)
+    lateinit var tabLayout: TabLayout
+
+    @BindView(R.id.vp_fmt_container)
+    lateinit var viewPager: ViewPager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val intent = intent
+        workout = Parcels.unwrap<Workout>(intent.getParcelableExtra(EXTRA_WORKOUT))
+        exercises = workout!!.exercises
+        setInitView(this, R.layout.activity_start_workout, workout!!.name, true)
+
+        lp = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        val dpval = dpToPx(5f, resources)
+        lp!!.setMargins(dpval, dpval, dpval, dpval)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewPager.adapter == null) {
+            setCurrSession()
+        }
+    }
+
+    fun setCurrSession() {
+        currWorkout.setDataListener(this)
+        if (removeIncompleteWorkoutPref(this, workout!!.name)) {
+            currWorkout.setRetrievedWorkout(
+                readValue(getIncompleteSessionPref(this, workout!!.name)),
+                workout
+            )
+            removeIncompleteSessionPref(this, workout!!.name)
+        } else {
+            currWorkout.setCurrWorkout(workout)
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        currWorkout.resetIndices()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        handleLeavingScreen()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        currWorkout.unsetTimer()
+        handleLeavingScreen()
+    }
+
+    fun handleLeavingScreen() {
+        val jsonStr = currWorkout.saveSessionState()
+        if (!jsonStr.isEmpty()) {
+            addIncompleteSessionPref(
+                this,
+                workout!!.name,
+                jsonStr
+            )
+        }
+        addIncompleteWorkoutPref(this, workout!!.name)
+        currWorkout.resetLocks()
+    }
+
+    override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_start_workout, mainMenu)
+        return super.onCreateOptionsMenu(mainMenu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.act_how_to -> {
+                val intent = Intent(this, HowToVideos::class.java)
+                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
+                startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun warmupsGenerated(warmups: ArrayList<Exercise>) {
+        setupPager(warmups)
+    }
+
+    private fun setupPager(warmups: ArrayList<Exercise>) {
+        layInflater = layoutInflater
+        viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
+        tabLayout.addOnTabSelectedListener(object : TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                super.onTabSelected(tab)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                super.onTabUnselected(tab)
+            }
+        })
+
+        if (warmups.size == 0) {
+            tabLayout.removeTabAt(0)
+        }
+
+        viewPager.adapter = WorkoutPagerAdapter(
+            supportFragmentManager,
+            exercises,
+            warmups
+        )
+        viewPager.currentItem = tabLayout.tabCount - 2
+    }
+
+    fun displaySets(
+        setsType: SetsType,
+        exercise: Exercise,
+        llSets: LinearLayout
+    ) {
+        layInflater = layoutInflater
+        setsView = layInflater!!.inflate(R.layout.part_horizontal_rv, llSets, false)
+        setsView!!.layoutParams = lp
+        llSets.addView(setsView, 0)
+
+        tvExerciseName = setsView!!.findViewById(R.id.tv_exercise_name)
+        tvExerciseName!!.text = exercise.name
+
+        setList = setsView!!.findViewById(R.id.rv_exercise_sets)
+        setList!!.setHasFixedSize(true)
+        setList!!.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+
+        adapter = SetsAdapter(exercise.setsList)
+        setList!!.adapter = adapter
+
+        when (setsType) {
+            SetsType.MAIN_SET -> mainAdapters.add(adapter!!)
+            SetsType.WARMUP_SET -> warmupAdapter.add(adapter!!)
+        }
+    }
+}
