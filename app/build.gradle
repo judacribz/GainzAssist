@@ -1,7 +1,20 @@
 apply plugin: 'com.android.application'
 
+def secretsPropertiesFile = rootProject.file("secrets.properties")
+def secretsProperties = new Properties()
+if (secretsPropertiesFile.exists()) {
+    secretsProperties.load(new FileInputStream(secretsPropertiesFile))
+}
+
+def googleAuthId = (System.getenv("GOOGLE_AUTH_ID") ?: secretsProperties['GOOGLE_AUTH_ID'] ?: "").trim()
+println "Google Auth ID present? ${!googleAuthId.isEmpty()}"
+
 android {
+    namespace "ca.judacribz.gainzassist"
     compileSdkVersion 28
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId "ca.judacribz.gainzassist"
         minSdkVersion 21
@@ -9,6 +22,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        
+        buildConfigField "String", "GOOGLE_AUTH_ID", "\"${googleAuthId}\""
+        manifestPlaceholders = [GOOGLE_AUTH_ID: googleAuthId]
     }
     buildTypes {
         release {

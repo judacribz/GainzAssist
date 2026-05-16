@@ -45,13 +45,11 @@ public class Main extends AppCompatActivity implements
     public static final String EXTRA_LOGOUT_USER = "ca.judacribz.gainzassist.EXTRA_LOGOUT_USER";
     public static final String EXTRA_WORKOUT
             = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT";
-    final private ArrayList<Fragment> FMTS = new ArrayList<Fragment>()  {
-        {
-            add(Resume.getInstance());
-            add(Workouts.getInstance());
-            add(Settings.getInstance());
-        }
-    };
+    final private ArrayList<Fragment> FMTS = new ArrayList<>(Arrays.asList(
+            Resume.getInstance(),
+            Workouts.getInstance(),
+            Settings.getInstance()
+    ));
     // --------------------------------------------------------------------------------------------
 
     // Global Vars
@@ -79,34 +77,39 @@ public class Main extends AppCompatActivity implements
         setInitView(this, R.layout.activity_main, ca.judacribz.gainzassist.R.string.app_name, false);
 
         tabLayoutOnPageChangeListener = new TabLayout.TabLayoutOnPageChangeListener(tabLayout);
-        viewPagerOnTabSelectedListener = new TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+        viewPagerOnTabSelectedListener = new ViewPagerOnTabSelectedListener(viewPager);
+    }
 
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                super.onTabSelected(tab);
-                pos = tab.getPosition();
-                searchView.closeSearch();
+    private class ViewPagerOnTabSelectedListener extends TabLayout.ViewPagerOnTabSelectedListener {
+        public ViewPagerOnTabSelectedListener(ViewPager viewPager) {
+            super(viewPager);
+        }
 
-                if (search != null && addWorkout != null) {
-                    switch (tab.getPosition()) {
-                        case 2:
-                            search.setVisible(false);
-                        case 0:
-                            addWorkout.setVisible(false);
-                            break;
-                        case 1:
-                            search.setVisible(true);
-                            addWorkout.setVisible(true);
-                            break;
-                    }
+        @Override
+        public void onTabSelected(TabLayout.Tab tab) {
+            super.onTabSelected(tab);
+            pos = tab.getPosition();
+            searchView.closeSearch();
+
+            if (search != null && addWorkout != null) {
+                switch (tab.getPosition()) {
+                    case 2:
+                        search.setVisible(false);
+                    case 0:
+                        addWorkout.setVisible(false);
+                        break;
+                    case 1:
+                        search.setVisible(true);
+                        addWorkout.setVisible(true);
+                        break;
                 }
             }
+        }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                super.onTabUnselected(tab);
-            }
-        };
+        @Override
+        public void onTabUnselected(TabLayout.Tab tab) {
+            super.onTabUnselected(tab);
+        }
     }
 
     @Override
