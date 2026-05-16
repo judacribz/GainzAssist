@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.util.firebase;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.WorkoutHelper;
@@ -68,7 +69,12 @@ public class Authentication {
             // Sign up fail
         } else {
             userCreated = false;
-            msg = getExceptionMsg(act, task.getException());
+            Exception ex = task.getException();
+            if (ex != null) {
+                Log.e(Authentication.class.getSimpleName(), "Firebase Auth Error: " + ex.getClass().getName());
+                Log.e(Authentication.class.getSimpleName(), "Message: " + ex.getMessage());
+            }
+            msg = getExceptionMsg(act, ex);
 
             ((Login) act).loginFail();
 
@@ -147,7 +153,7 @@ public class Authentication {
 
             // Other exceptions
             } catch (Exception ex) {
-                msg = ex.toString();
+                msg = "Login failed. Check Firebase configuration.";
             }
         }
 

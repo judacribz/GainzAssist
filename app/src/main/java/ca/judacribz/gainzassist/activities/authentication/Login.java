@@ -36,7 +36,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.BuildConfig;
 
 import static ca.judacribz.gainzassist.activities.main.Main.EXTRA_LOGOUT_USER;
 import static ca.judacribz.gainzassist.util.firebase.Authentication.*;
@@ -137,7 +136,7 @@ public class Login extends AppCompatActivity implements
 
         // Configure Google Sign In
         signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(BuildConfig.GOOGLE_AUTH_ID)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         signInClient = GoogleSignIn.getClient(this, signInOptions);
