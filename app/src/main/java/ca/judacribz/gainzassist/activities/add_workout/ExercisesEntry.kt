@@ -9,8 +9,8 @@ import android.view.LayoutInflater
 import butterknife.BindView
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.EXERCISES_ENTRY
-import ca.judacribz.gainzassist.activities.add_workout.Summary.EXTRA_CALLING_ACTIVITY
-import ca.judacribz.gainzassist.activities.add_workout.Summary.EXTRA_WORKOUT
+import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
+import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_NUM_EXERCISES
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_WORKOUT_NAME
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
