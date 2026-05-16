@@ -13,8 +13,6 @@ import com.orhanobut.logger.Logger;
 
 import java.util.ArrayList;
 
-import static ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*;
-
 public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> {
 
 
@@ -117,9 +115,9 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         setSelected(currSetNum);
         if (currSetNum > 1) {
             if (success) {
-                progStatus.put(currSetNum - 2, SUCCESS);
+                progStatus.put(currSetNum - 2, PROGRESS_STATUS.SUCCESS);
             } else {
-                progStatus.put(currSetNum - 2, FAIL);
+                progStatus.put(currSetNum - 2, PROGRESS_STATUS.FAIL);
             }
         }
 
@@ -133,15 +131,15 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         if (status != null) {
             switch (status) {
                 case SUCCESS:
-                    progStatus.put(currSetNum, SUCCESS_SELECTED);
+                    progStatus.put(currSetNum, PROGRESS_STATUS.SUCCESS_SELECTED);
                     break;
 
                 case FAIL:
-                    progStatus.put(currSetNum, FAIL_SELECTED);
+                    progStatus.put(currSetNum, PROGRESS_STATUS.FAIL_SELECTED);
                     break;
 
                 default:
-                    progStatus.put(currSetNum, SELECTED);
+                    progStatus.put(currSetNum, PROGRESS_STATUS.SELECTED);
                     break;
             }
         }
@@ -156,15 +154,15 @@ public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.It
         if (status != null) {
             switch (status) {
                 case SELECTED:
-                    progStatus.put(currSelected, UNSELECTED);
+                    progStatus.put(currSelected, PROGRESS_STATUS.UNSELECTED);
                     break;
 
                 case SUCCESS_SELECTED:
-                    progStatus.put(currSelected, SUCCESS);
+                    progStatus.put(currSelected, PROGRESS_STATUS.SUCCESS);
                     break;
 
                 case FAIL_SELECTED:
-                    progStatus.put(currSelected, FAIL);
+                    progStatus.put(currSelected, PROGRESS_STATUS.FAIL);
                     break;
             }
         }

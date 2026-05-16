@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.view.View;
@@ -26,20 +27,16 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
             "ca.judacribz.gainzassist.activities.start_workout.EXTRA_EX_INDEX";
 
 
-    final private ArrayList<Fragment> FMTS = new ArrayList<Fragment>()  {
-        {
-            add(WarmupsList.getInstance());
-            add(WorkoutScreen.getInstance());
-            add(ExercisesList.getInstance());
-        }
-    };
+    final private ArrayList<Fragment> FMTS = new ArrayList<>(Arrays.asList(
+            WarmupsList.getInstance(),
+            WorkoutScreen.getInstance(),
+            ExercisesList.getInstance()
+    ));
 
-    final private ArrayList<Fragment> FMTS_NO_WARMUPS = new ArrayList<Fragment>()  {
-        {
-            add(WorkoutScreen.getInstance());
-            add(ExercisesList.getInstance());
-        }
-    };
+    final private ArrayList<Fragment> FMTS_NO_WARMUPS = new ArrayList<>(Arrays.asList(
+            WorkoutScreen.getInstance(),
+            ExercisesList.getInstance()
+    ));
 
     // --------------------------------------------------------------------------------------------
 
@@ -54,7 +51,7 @@ public class WorkoutPagerAdapter extends FragmentPagerAdapter {
     // ######################################################################################### //
     // WorkoutPagerAdapter Constructor                                                           //
     // ######################################################################################### //
-    @SafeVarargs
+    @SuppressWarnings("unchecked")
     public WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Exercise>... exercises) {
         super(fragmentManager);
 

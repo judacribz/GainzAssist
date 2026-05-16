@@ -16,7 +16,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.*;
-;
 import ca.judacribz.gainzassist.activities.main.Main;
 import com.facebook.*;
 import com.facebook.login.LoginManager;

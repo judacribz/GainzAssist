@@ -1,7 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace "ca.judacribz.gainzassist"
     compileSdkVersion 28
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId "ca.judacribz.gainzassist"
         minSdkVersion 21
