@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace "ca.judacribz.gainzassist"
@@ -22,7 +24,7 @@ android {
     }
     sourceSets {
         main {
-            java.srcDirs = ['src/main/java']
+            java.srcDirs = ['src/main/java', 'src/main/kotlin']
         }
     }
     lintOptions {
@@ -44,6 +46,9 @@ android {
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
 }
@@ -88,6 +93,7 @@ dependencies {
     // Butterknife
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    kapt 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // Pretty Logging
     implementation 'com.orhanobut:logger:2.2.0'
