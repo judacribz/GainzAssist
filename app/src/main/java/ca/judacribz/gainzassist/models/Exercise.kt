@@ -2,6 +2,14 @@ package ca.judacribz.gainzassist.models
 
 import android.arch.persistence.room.*
 import ca.judacribz.gainzassist.constants.ExerciseConst
+import ca.judacribz.gainzassist.constants.ExerciseConst.BARBELL
+import ca.judacribz.gainzassist.constants.ExerciseConst.DUMBBELL
+import ca.judacribz.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
+import ca.judacribz.gainzassist.constants.ExerciseConst.BB_WEIGHT_CHANGE
+import ca.judacribz.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
+import ca.judacribz.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
+import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_WEIGHT
+import ca.judacribz.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
 import org.parceler.Parcel
 import org.parceler.Parcel.Serialization
 import java.util.*
@@ -22,7 +30,9 @@ class Exercise {
 
     @PrimaryKey
     var id: Long = -1
-
+        set(value) {
+            field = if (value == -1L) Date().time else value
+        }
     @ColumnInfo(name = "workout_id")
     var workoutId: Long = -1
 
@@ -32,6 +42,24 @@ class Exercise {
     var name: String? = null
     var type: String? = null
     var equipment: String? = null
+        set(value) {
+            field = value
+
+            when (value) {
+                BARBELL -> {
+                    minWeight = BB_MIN_WEIGHT
+                    weightChange = BB_WEIGHT_CHANGE
+                }
+                DUMBBELL -> {
+                    minWeight = DB_MIN_WEIGHT
+                    weightChange = DB_WEIGHT_CHANGE
+                }
+                else -> {
+                    minWeight = MIN_WEIGHT
+                    weightChange = WEIGHT_CHANGE
+                }
+            }
+        }
 
     var sets: Int = 0
     var reps: Int = 0
@@ -96,11 +124,11 @@ class Exercise {
         type: String?,
         equipment: String?
     ) {
-        this.initId(-1)
+        this.id = -1
         this.exerciseNumber = exerciseNumber
         this.name = name
         this.type = type
-        this.initEquipment(equipment)
+        this.equipment = equipment
     }
 
     fun initSetsList(setsList: ArrayList<ExerciseSet>?) {
@@ -108,30 +136,13 @@ class Exercise {
             this.setsList = setsList
         } else {
             this.setsList = ArrayList()
-            for (i in 0 until sets) {
+            for (i in 0..sets) {
                 this.setsList.add(ExerciseSet(id, name, i, reps, weight))
             }
         }
     }
 
     fun getFinishedSetsList(): ArrayList<ExerciseSet> = finSets
-    fun initEquipment(equipment: String?) {
-        this.equipment = equipment
-        when (equipment) {
-            ExerciseConst.BARBELL -> {
-                minWeight = ExerciseConst.BB_MIN_WEIGHT
-                weightChange = ExerciseConst.BB_WEIGHT_CHANGE
-            }
-            ExerciseConst.DUMBBELL -> {
-                minWeight = ExerciseConst.DB_MIN_WEIGHT
-                weightChange = ExerciseConst.DB_WEIGHT_CHANGE
-            }
-            else -> {
-                minWeight = ExerciseConst.MIN_WEIGHT
-                weightChange = ExerciseConst.WEIGHT_CHANGE
-            }
-        }
-    }
 
     fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
 
@@ -141,7 +152,7 @@ class Exercise {
 
     fun addSet(set: ExerciseSet, genId: Boolean) {
         if (genId) {
-            set.initId(-1)
+            set.id = -1
         }
         finSets.add(set)
     }

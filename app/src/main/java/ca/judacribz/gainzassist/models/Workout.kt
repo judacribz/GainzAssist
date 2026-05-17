@@ -15,7 +15,9 @@ class Workout {
 
     @PrimaryKey
     var id: Long = -1
-
+        set(value) {
+            field = if (value == -1L) Date().time else value
+        }
     var name: String? = null
 
     @Ignore
@@ -25,7 +27,7 @@ class Workout {
 
     @Ignore
     constructor(name: String?, exercises: ArrayList<Exercise>?) {
-        this.initId(-1)
+        this.id = -1
         this.name = name
         if (exercises != null) {
             this.exercises = (exercises)

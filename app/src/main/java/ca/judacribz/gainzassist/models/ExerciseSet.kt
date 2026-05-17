@@ -14,7 +14,9 @@ class ExerciseSet {
 
     @PrimaryKey
     var id: Long = -1
-
+        set(value) {
+            field = if (value == -1L) Date().time else value
+        }
     @ColumnInfo(name = "session_id")
     var sessionId: Long = 0
 
@@ -44,7 +46,7 @@ class ExerciseSet {
 
     @Ignore
     constructor(exerciseId: Long, exerciseName: String?, setNumber: Int, reps: Int, weight: Float) {
-        this.initId(-1)
+        this.id = -1
         this.exerciseId = exerciseId
         this.exerciseName = exerciseName
         this.setNumber = setNumber
