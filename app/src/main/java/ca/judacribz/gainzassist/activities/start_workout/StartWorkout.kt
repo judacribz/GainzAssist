@@ -82,15 +82,33 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
     fun setCurrSession() {
         currWorkout.setDataListener(this)
-        if (removeIncompleteWorkoutPref(this, workout!!.name!!)) {
-            @Suppress("UNCHECKED_CAST")
-            currWorkout.setRetrievedWorkout(
-                (readValue(getIncompleteSessionPref(this, workout!!.name!!)) as Map<String, Any?>),
-                workout!!
-            )
-            removeIncompleteSessionPref(this, workout!!.name!!)
+
+        val currentWorkout = workout ?: return
+        val workoutName = currentWorkout.name ?: return
+
+        if (removeIncompleteWorkoutPref(this, workoutName)) {
+            try {
+                val savedSession = getIncompleteSessionPref(this, workoutName)
+
+                if (savedSession.isNullOrEmpty()) {
+                    currWorkout.setCurrWorkout(currentWorkout)
+                    return
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                currWorkout.setRetrievedWorkout(
+                    readValue(savedSession) as Map<String, Any?>,
+                    currentWorkout
+                )
+
+                removeIncompleteSessionPref(this, workoutName)
+            } catch (ex: Exception) {
+                com.orhanobut.logger.Logger.e(ex, "Failed to restore incomplete workout. Starting fresh.")
+                removeIncompleteSessionPref(this, workoutName)
+                currWorkout.setCurrWorkout(currentWorkout)
+            }
         } else {
-            currWorkout.setCurrWorkout(workout!!)
+            currWorkout.setCurrWorkout(currentWorkout)
         }
     }
 

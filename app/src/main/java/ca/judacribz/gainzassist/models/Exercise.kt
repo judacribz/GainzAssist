@@ -116,6 +116,7 @@ class Exercise {
         this.reps = reps
         this.weight = weight
         this.setsType = setsType
+        initSetsList(null)
     }
 
     private fun setExerciseBase(
@@ -134,9 +135,9 @@ class Exercise {
     fun initSetsList(setsList: ArrayList<ExerciseSet>?) {
         if (setsList != null) {
             this.setsList = setsList
-        } else {
+        } else if (this.setsList.isEmpty() && sets > 0) {
             this.setsList = ArrayList()
-            for (i in 0..sets) {
+            for (i in 0 until sets) {
                 this.setsList.add(ExerciseSet(id, name, i, reps, weight))
             }
         }
@@ -158,6 +159,8 @@ class Exercise {
     }
 
     fun getAvgWeight(): Float {
+        initSetsList(null)
+
         var totalWeight = 0.0f
         for (exerciseSet in setsList) {
             totalWeight += exerciseSet.weight
@@ -166,6 +169,8 @@ class Exercise {
     }
 
     fun getAvgReps(): Int {
+        initSetsList(null)
+
         var totalReps = 0
         for (exerciseSet in setsList) {
             totalReps += exerciseSet.reps
@@ -174,10 +179,19 @@ class Exercise {
     }
 
     fun getSet(setIndex: Int): ExerciseSet {
+        initSetsList(null)
+
+        if (setIndex < 0 || setIndex >= setsList.size) {
+            throw IllegalStateException(
+                "Exercise '$name' has invalid setIndex=$setIndex, sets=$sets, setsList.size=${setsList.size}, reps=$reps, weight=$weight, equipment=$equipment"
+            )
+        }
+
         return setsList[setIndex]
     }
 
     fun getNumSets(): Int {
+        initSetsList(null)
         return setsList.size
     }
 
