@@ -83,8 +83,14 @@ object Database {
     @JvmStatic
     fun addWorkoutFirebase(workout: Workout) {
         userWorkoutsRef = getWorkoutsRef()
-        if (userWorkoutsRef != null) {
-            userWorkoutsRef!!.child(workout.name!!).setValue(workout.toMap())
+
+        val workoutName = workout.name
+        if (userWorkoutsRef != null && !workoutName.isNullOrBlank()) {
+            userWorkoutsRef!!.child(workoutName).setValue(workout.toMap())
+        } else {
+            com.orhanobut.logger.Logger.e(
+                "Cannot add workout to Firebase. userWorkoutsRef=$userWorkoutsRef, workoutName=$workoutName"
+            )
         }
     }
 

@@ -10,9 +10,8 @@ import butterknife.BindView
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_NUM_EXERCISES
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_WORKOUT_NAME
-import ca.judacribz.gainzassist.activities.main.Main.Companion.EXERCISES_ENTRY
-import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_CALLING_ACTIVITY
-import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_WORKOUT
+import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
+import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_INT
 import ca.judacribz.gainzassist.models.Exercise
@@ -144,7 +143,10 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
             val newWorkoutSummaryIntent = Intent(this, Summary::class.java)
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
-            newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, EXERCISES_ENTRY)
+            newWorkoutSummaryIntent.putExtra(
+                EXTRA_CALLING_ACTIVITY,
+                Summary.CALLING_ACTIVITY.EXERCISES_ENTRY
+            )
             startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY)
         } else {
             setFirstEmptyTab()
