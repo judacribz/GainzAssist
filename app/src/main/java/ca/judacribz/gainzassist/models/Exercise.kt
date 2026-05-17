@@ -1,7 +1,7 @@
 package ca.judacribz.gainzassist.models
 
 import android.arch.persistence.room.*
-import ca.judacribz.gainzassist.constants.ExerciseConst.*
+import ca.judacribz.gainzassist.constants.ExerciseConst
 import org.parceler.Parcel
 import org.parceler.Parcel.Serialization
 import java.util.*
@@ -22,9 +22,6 @@ class Exercise {
 
     @PrimaryKey
     var id: Long = -1
-        set(id) {
-            field = if (id == -1L) Date().time else id
-        }
 
     @ColumnInfo(name = "workout_id")
     var workoutId: Long = -1
@@ -35,23 +32,6 @@ class Exercise {
     var name: String? = null
     var type: String? = null
     var equipment: String? = null
-        set(equipment) {
-            field = equipment
-            when (equipment) {
-                BARBELL -> {
-                    minWeight = BB_MIN_WEIGHT
-                    weightChange = BB_WEIGHT_CHANGE
-                }
-                DUMBBELL -> {
-                    minWeight = DB_MIN_WEIGHT
-                    weightChange = DB_WEIGHT_CHANGE
-                }
-                else -> {
-                    minWeight = MIN_WEIGHT
-                    weightChange = WEIGHT_CHANGE
-                }
-            }
-        }
 
     var sets: Int = 0
     var reps: Int = 0
@@ -59,11 +39,13 @@ class Exercise {
 
     @Ignore
     var weightChange: Float = 0f
+    
     @Ignore
     var minWeight: Float = 0f
 
     @Ignore
     var setsList = ArrayList<ExerciseSet>()
+    
     @Ignore
     var finSets = ArrayList<ExerciseSet>()
 
@@ -86,7 +68,7 @@ class Exercise {
         setsType: SetsType
     ) {
         setExerciseBase(exerciseNumber, name, type, equipment)
-        setSetsList(setsList)
+        initSetsList(setsList)
         this.setsType = setsType
     }
 
@@ -114,14 +96,14 @@ class Exercise {
         type: String?,
         equipment: String?
     ) {
-        id = -1
+        this.initId(-1)
         this.exerciseNumber = exerciseNumber
         this.name = name
         this.type = type
-        this.equipment = equipment
+        this.initEquipment(equipment)
     }
 
-    fun setSetsList(setsList: ArrayList<ExerciseSet>?) {
+    fun initSetsList(setsList: ArrayList<ExerciseSet>?) {
         if (setsList != null) {
             this.setsList = setsList
         } else {
@@ -132,41 +114,61 @@ class Exercise {
         }
     }
 
+    fun getFinishedSetsList(): ArrayList<ExerciseSet> = finSets
+    fun initEquipment(equipment: String?) {
+        this.equipment = equipment
+        when (equipment) {
+            ExerciseConst.BARBELL -> {
+                minWeight = ExerciseConst.BB_MIN_WEIGHT
+                weightChange = ExerciseConst.BB_WEIGHT_CHANGE
+            }
+            ExerciseConst.DUMBBELL -> {
+                minWeight = ExerciseConst.DB_MIN_WEIGHT
+                weightChange = ExerciseConst.DB_WEIGHT_CHANGE
+            }
+            else -> {
+                minWeight = ExerciseConst.MIN_WEIGHT
+                weightChange = ExerciseConst.WEIGHT_CHANGE
+            }
+        }
+    }
+
+    fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
+
     fun updateSet(set: ExerciseSet) {
         finSets[set.setNumber] = set
     }
 
     fun addSet(set: ExerciseSet, genId: Boolean) {
         if (genId) {
-            set.id = -1
+            set.initId(-1)
         }
         finSets.add(set)
     }
 
-    val avgWeight: Float
-        get() {
-            var totalWeight = 0.0f
-            for (exerciseSet in setsList) {
-                totalWeight += exerciseSet.weight
-            }
-            return if (sets > 0) totalWeight / sets.toFloat() else 0f
+    fun getAvgWeight(): Float {
+        var totalWeight = 0.0f
+        for (exerciseSet in setsList) {
+            totalWeight += exerciseSet.weight
         }
+        return if (sets > 0) totalWeight / sets.toFloat() else 0f
+    }
 
-    val avgReps: Int
-        get() {
-            var totalReps = 0
-            for (exerciseSet in setsList) {
-                totalReps += exerciseSet.reps
-            }
-            return if (sets > 0) totalReps / sets else 0
+    fun getAvgReps(): Int {
+        var totalReps = 0
+        for (exerciseSet in setsList) {
+            totalReps += exerciseSet.reps
         }
+        return if (sets > 0) totalReps / sets else 0
+    }
 
     fun getSet(setIndex: Int): ExerciseSet {
         return setsList[setIndex]
     }
 
-    val numSets: Int
-        get() = setsList.size
+    fun getNumSets(): Int {
+        return setsList.size
+    }
 
     fun toMap(): Map<String, Any?> {
         val map = HashMap<String, Any?>()
@@ -203,10 +205,10 @@ class Exercise {
     companion object {
         @Ignore
         @JvmField
-        val EQUIPMENT_TYPES = arrayListOf(BARBELL, DUMBBELL, NA)
+        val EQUIPMENT_TYPES = arrayListOf(ExerciseConst.BARBELL, ExerciseConst.DUMBBELL, ExerciseConst.NA)
 
         @Ignore
         @JvmField
-        val EXERCISE_TYPES = arrayListOf(STRENGTH, CARDIOVASCULAR, PLYOMETRICS)
+        val EXERCISE_TYPES = arrayListOf(ExerciseConst.STRENGTH, ExerciseConst.CARDIOVASCULAR, ExerciseConst.PLYOMETRICS)
     }
 }

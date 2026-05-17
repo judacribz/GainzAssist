@@ -2,7 +2,7 @@ package ca.judacribz.gainzassist.models
 
 import android.arch.persistence.room.*
 import android.util.SparseArray
-import ca.judacribz.gainzassist.constants.ExerciseConst.*
+import ca.judacribz.gainzassist.constants.ExerciseConst
 import java.util.*
 
 @Entity(
@@ -16,9 +16,6 @@ class Session {
 
     @PrimaryKey
     var timestamp: Long = 0
-        set(timestamp) {
-            field = if (timestamp == -1L) Date().time else timestamp
-        }
 
     @ColumnInfo(name = "workout_id")
     var workoutId: Long = 0
@@ -36,22 +33,24 @@ class Session {
 
     @Ignore
     constructor(workout: Workout) {
-        timestamp = -1
-        workoutId = workout.id
-        workoutName = workout.name
+        this.initTimestamp(-1)
+        this.workoutId = workout.id
+        this.workoutName = workout.name
     }
+
+    fun initTimestamp(timestamp: Long) { this.timestamp = if (timestamp == -1L) Date().time else timestamp }
 
     fun addExercise(exercise: Exercise) {
         var weight = 0.0f
         val weightChange = exercise.weightChange
         val expectedReps = exercise.reps.toFloat()
-        val finishedSets = exercise.finishedSetsList
+        val finishedSets = exercise.getFinishedSetsList()
         
         for (exerciseSet in finishedSets) {
             weight += exerciseSet.weight * exerciseSet.reps.toFloat() / if (expectedReps == 0f) 1f else expectedReps
         }
 
-        weight = weight / if (finishedSets.size == 0) 1 else finishedSets.size + weightChange
+        weight = weight / (if (finishedSets.size == 0) 1 else finishedSets.size).toFloat() + weightChange
         if (weightChange != 0f) {
             weight -= weight % weightChange
         }
@@ -74,13 +73,13 @@ class Session {
     fun toMap(): Map<String, Any?> {
         val exsMap = HashMap<String, Any?>()
         val sessionMap = HashMap<String, Any?>()
-        sessionMap[WORKOUT_NAME] = workoutName
-        sessionMap[WORKOUT_ID] = workoutId
+        sessionMap[ExerciseConst.WORKOUT_NAME] = workoutName
+        sessionMap[ExerciseConst.WORKOUT_ID] = workoutId
         
         for (ex in sessionExs) {
             exsMap[ex.exerciseNumber.toString()] = ex.setsToMap()
         }
-        sessionMap[EXERCISES] = exsMap
+        sessionMap[ExerciseConst.EXERCISES] = exsMap
 
         return sessionMap
     }
@@ -89,9 +88,9 @@ class Session {
         val sessionStateMap = HashMap<String, Any?>()
         val sessionMap = this.toMap()
 
-        sessionStateMap[SESSION] = sessionMap
-        sessionStateMap[EXERCISE_INDEX] = exerciseIndex
-        sessionStateMap[SET_INDEX] = setIndex
+        sessionStateMap[ExerciseConst.SESSION] = sessionMap
+        sessionStateMap[ExerciseConst.EXERCISE_INDEX] = exerciseIndex
+        sessionStateMap[ExerciseConst.SET_INDEX] = setIndex
 
         return sessionStateMap
     }

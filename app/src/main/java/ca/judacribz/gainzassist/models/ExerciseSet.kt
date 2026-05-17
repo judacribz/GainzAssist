@@ -23,7 +23,9 @@ class ExerciseSet {
 
     @ColumnInfo(name = "set_number")
     var setNumber: Int = 0
+    
     var reps: Int = 0
+    
     var weight: Float = 0f
 
     @ColumnInfo(name = "exercise_name")
@@ -42,13 +44,15 @@ class ExerciseSet {
 
     @Ignore
     constructor(exerciseId: Long, exerciseName: String?, setNumber: Int, reps: Int, weight: Float) {
-        id = -1
+        this.initId(-1)
         this.exerciseId = exerciseId
         this.exerciseName = exerciseName
         this.setNumber = setNumber
         this.reps = reps
         this.weight = weight
     }
+
+    fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
 
     fun toMap(): Map<String, Any?> {
         val exerciseSetMap = HashMap<String, Any?>()

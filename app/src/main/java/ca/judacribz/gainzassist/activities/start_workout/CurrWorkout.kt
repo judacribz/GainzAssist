@@ -142,7 +142,7 @@ class CurrWorkout private constructor() {
         for (ex in exercises) {
             val equip = ex.equipment
             val minWeight = ex.minWeight
-            val weight = ex.avgWeight
+            val weight = ex.getAvgWeight()
 
             if (weight == minWeight) {
                 allExs.add(ex)
@@ -175,10 +175,10 @@ class CurrWorkout private constructor() {
     private fun genBBWarmups(ex: Exercise): ArrayList<ExerciseSet> {
         val exerciseSets = ArrayList<ExerciseSet>()
         var setNum = 0
-        var reps = ex.avgReps
+        var reps = ex.getAvgReps()
         val minWeight = ex.minWeight
         val weightChange = ex.weightChange
-        val weight = ex.avgWeight
+        val weight = ex.getAvgWeight()
         var weightInc: Float
         var newWeight = minWeight
 
@@ -231,10 +231,10 @@ class CurrWorkout private constructor() {
     private fun generateWarmups(ex: Exercise): ArrayList<ExerciseSet> {
         val exerciseSets = ArrayList<ExerciseSet>()
         var setNum = 0
-        var reps = ex.avgReps
+        var reps = ex.getAvgReps()
         val minWeight = ex.minWeight
         val weightChange = ex.weightChange
-        val weight = ex.avgWeight
+        val weight = ex.getAvgWeight()
         var newWeight = minWeight
         val diff = weight - minWeight
 
@@ -242,12 +242,12 @@ class CurrWorkout private constructor() {
             return exerciseSets
         }
 
-        var sets = Math.min(5, (diff / (weightChange * 2)).toInt())
-        sets += (weight / 100).toInt()
-        val percInc = 0.91f / sets.toFloat()
+        var setsCount = Math.min(5, (diff / (weightChange * 2)).toInt())
+        setsCount += (weight / 100).toInt()
+        val percInc = 0.91f / setsCount.toFloat()
         var perc = percInc
 
-        for (i in 0 until sets) {
+        for (i in 0 until setsCount) {
             newWeight = perc * weight
             newWeight -= newWeight % (weightChange * 2)
             if (newWeight >= 0.65f * weight) {
@@ -339,7 +339,7 @@ class CurrWorkout private constructor() {
     }
 
     fun atEndOfSets(): Boolean {
-        return this.set_i >= this.currExercise!!.numSets
+        return this.set_i >= this.currExercise!!.getNumSets()
     }
 
     private fun atEndOfExercises(): Boolean {
@@ -357,7 +357,7 @@ class CurrWorkout private constructor() {
             this.set_i = 0
         }
         this.currExercise = exercise
-        dataListener?.updateProgressSets(exercise.numSets)
+        dataListener?.updateProgressSets(exercise.getNumSets())
         this.currMinWeight = exercise.minWeight
         this.currWeightChange = exercise.weightChange
         setCurrExerciseSet(this.currExercise!!.getSet(this.set_i))
@@ -368,6 +368,8 @@ class CurrWorkout private constructor() {
         setCurrReps(this.currExerciseSet!!.reps, true)
         if (!lockWeight) this.currWeight = this.currExerciseSet!!.weight
     }
+
+    fun getIsWarmup(): Boolean = isWarmup
 
     val warmups: ArrayList<Exercise>?
         get() = currWarmups
@@ -395,7 +397,7 @@ class CurrWorkout private constructor() {
         get() = currExercise!!.equipment!!
 
     val currNumSets: Int
-        get() = currExercise!!.numSets
+        get() = currExercise!!.getNumSets()
 
     val currSetNum: Int
         get() = set_i + 1

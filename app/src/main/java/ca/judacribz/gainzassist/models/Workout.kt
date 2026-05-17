@@ -15,9 +15,6 @@ class Workout {
 
     @PrimaryKey
     var id: Long = -1
-        set(id) {
-            field = if (id == -1L) Date().time else id
-        }
 
     var name: String? = null
 
@@ -28,12 +25,14 @@ class Workout {
 
     @Ignore
     constructor(name: String?, exercises: ArrayList<Exercise>?) {
-        this.id = -1
+        this.initId(-1)
         this.name = name
         if (exercises != null) {
-            this.exercises = exercises
+            this.exercises = (exercises)
         }
     }
+
+    fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
 
     fun addExercise(exercise: Exercise?) {
         if (exercise != null) {
@@ -80,7 +79,7 @@ class Workout {
 
     fun containsExercise(exerciseName: String): Boolean {
         for (exercise in exercises) {
-            if (exercise.name?.lowercase(Locale.getDefault()) == exerciseName.lowercase(Locale.getDefault())) {
+            if (exercise.name.equals(exerciseName, ignoreCase = true)) {
                 return true
             }
         }
@@ -91,7 +90,7 @@ class Workout {
         get() {
             val names = ArrayList<String>()
             for (exercise in exercises) {
-                exercise.name?.let { names.add(it) }
+                exercise.name?.let(names::add)
             }
             return names
         }

@@ -38,7 +38,7 @@ import ca.judacribz.gainzassist.models.ExerciseSet
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.Misc.readValue
 import ca.judacribz.gainzassist.util.Misc.writeValueAsString
-import ca.judacribz.gainzassist.util.Preferences.*
+import ca.judacribz.gainzassist.util.Preferences
 import ca.judacribz.gainzassist.util.UI.getTextInt
 import ca.judacribz.gainzassist.util.UI.handleFocusLeft
 import com.orhanobut.logger.Logger
@@ -60,7 +60,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     private var currSet: ExerciseSet? = null
     private var updateSetMode = false
     private var currTime: Long = 0
-    private var weight = 0f
+    private var weightVal = 0f
 
     private var exProgress: SparseArray<PROGRESS_STATUS>? = null
     private var setProgress: SparseArray<PROGRESS_STATUS>? = null
@@ -141,7 +141,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     override fun onResume() {
         super.onResume()
         currWorkout.setDataListener(this)
-        val progressJson = getSessionProgressPref(act, currWorkout.workoutName)
+        val progressJson = Preferences.getSessionProgressPref(act, currWorkout.workoutName)
 
         if (progressJson != null && setProgress == null) {
             val map = readValue(progressJson)
@@ -216,7 +216,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
         progressMap["exercise progress"] = exMap
         progressMap["set progress"] = setMap
-        addSessionProgressPref(
+        Preferences.addSessionProgressPref(
             act,
             currWorkout.workoutName,
             writeValueAsString(progressMap)
@@ -403,17 +403,17 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             val a = act
             if (a != null) {
                 ViewModelProviders.of(a).get(WorkoutViewModel::class.java).insertSession(currWorkout.currSession!!)
-                if (removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {
-                    removeIncompleteSessionPref(a, currWorkout.workoutName)
+                if (Preferences.removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {
+                    Preferences.removeIncompleteSessionPref(a, currWorkout.workoutName)
                 }
-                removeSessionProgressPref(a, currWorkout.workoutName)
+                Preferences.removeSessionProgressPref(a, currWorkout.workoutName)
                 a.finish()
             }
         }
     }
 
     fun updateUI() {
-        val setType = if (currWorkout.isWarmup) {
+        val setType = if (currWorkout.getIsWarmup()) {
             countDownTimer?.onFinish()
             countDownTimer = null
             "Warmup"
@@ -445,9 +445,9 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     fun setWeight() {
-        weight = currWorkout.currWeight
-        etCurrWeight.setText(weight.toString())
-        equipmentView.post { equipmentView.setup(weight, currWorkout.currEquip) }
+        weightVal = currWorkout.currWeight
+        etCurrWeight.setText(weightVal.toString())
+        equipmentView.post { equipmentView.setup(weightVal, currWorkout.currEquip) }
     }
 
     private fun selectProgressAdapterPos(adapter: SingleItemAdapter, rv: RecyclerView, pos: Int, success: Boolean) {
@@ -472,7 +472,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                 currSet = ExerciseSet(ex, currWorkout.currSetNum, currWorkout.currReps, currWorkout.currWeight)
             }
             exerciseAdapter!!.setSelected(ind)
-            val setsToUpdate = ex.finishedSetsList
+            val setsToUpdate = ex.getFinishedSetsList()
             for (set in setsToUpdate) {
                 if (set.reps >= ex.reps && set.weight >= ex.weight) {
                     setStatus.put(set.setNumber, SUCCESS)
@@ -480,7 +480,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                     setStatus.put(set.setNumber, FAIL)
                 }
             }
-            setAdapter = setupProgressAdapter(rvSet, ex.numSets, setStatus, true)
+            setAdapter = setupProgressAdapter(rvSet, ex.getNumSets(), setStatus, true)
             setAdapter!!.setSelected(1)
             updateUI(ex, 0)
         }
@@ -488,7 +488,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
     override fun onItemClick(view: View?) {
         val ind = getTextInt(view as TextView)
-        if (updateSetMode || (!currWorkout.isWarmup && ind < currWorkout.currSetNum)) {
+        if (updateSetMode || (!currWorkout.getIsWarmup() && ind < currWorkout.currSetNum)) {
             saveProgressMap()
             setAdapter!!.setSelected(ind)
             updateUI(updateEx!!, ind - 1)
@@ -496,7 +496,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     private fun updateUI(updateEx: Exercise, setInd: Int) {
-        val set = updateEx.finishedSetsList[setInd]
+        val set = updateEx.getFinishedSetsList()[setInd]
         tvExerciseTitle.text = updateEx.name
         tvSetNum.text = String.format(setNum!!, "Main")
         equipmentView.setup(set.weight, updateEx.equipment!!)

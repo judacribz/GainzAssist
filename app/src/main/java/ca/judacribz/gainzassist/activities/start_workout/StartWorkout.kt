@@ -69,7 +69,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
             RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.WRAP_CONTENT
         )
-        val dpval = dpToPx(5.0, resources).toInt()
+        val dpval = dpToPx(5f, resources)
         lp!!.setMargins(dpval, dpval, dpval, dpval)
     }
 
@@ -85,7 +85,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         if (removeIncompleteWorkoutPref(this, workout!!.name!!)) {
             @Suppress("UNCHECKED_CAST")
             currWorkout.setRetrievedWorkout(
-                readValue(getIncompleteSessionPref(this, workout!!.name!!)) as Map<String, Any?>,
+                (readValue(getIncompleteSessionPref(this, workout!!.name!!)) as Map<String, Any?>),
                 workout!!
             )
             removeIncompleteSessionPref(this, workout!!.name!!)
