@@ -3,6 +3,7 @@ package ca.judacribz.gainzassist.util.firebase;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.util.SparseArray;
 import ca.judacribz.gainzassist.background.FirebaseService;
 import ca.judacribz.gainzassist.models.Session;
@@ -126,7 +127,17 @@ public class Database {
         userWorkoutsRef = getWorkoutsRef();
 
         if (userWorkoutsRef != null) {
-            userWorkoutsRef.child(workout.getName()).setValue(workout.toMap());
+            userWorkoutsRef.child(workout.getName()).setValue(workout.toMap(), new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null) {
+                        Log.e("FirebaseDatabase", "Workout push failed: " + databaseError.getMessage());
+                        Log.e("FirebaseDatabase", "Code: " + databaseError.getCode());
+                    } else {
+                        Log.d("FirebaseDatabase", "Workout pushed successfully to: " + databaseReference.getPath().toString());
+                    }
+                }
+            });
         }
     }
 
@@ -134,7 +145,16 @@ public class Database {
         DatabaseReference userWorkoutSessionsRef = getWorkoutSessionsRef();
 
         if (userWorkoutSessionsRef != null) {
-            userWorkoutSessionsRef.child(String.valueOf(session.getTimestamp())).setValue(session.toMap());
+            userWorkoutSessionsRef.child(String.valueOf(session.getTimestamp())).setValue(session.toMap(), new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null) {
+                        Log.e("FirebaseDatabase", "Session push failed: " + databaseError.getMessage());
+                    } else {
+                        Log.d("FirebaseDatabase", "Session pushed successfully to: " + databaseReference.getPath().toString());
+                    }
+                }
+            });
         }
 
 
