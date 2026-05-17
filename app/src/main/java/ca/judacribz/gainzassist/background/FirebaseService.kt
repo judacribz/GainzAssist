@@ -1,108 +1,79 @@
-package ca.judacribz.gainzassist.background;
+package ca.judacribz.gainzassist.background
 
-import android.app.IntentService;
-import android.app.Service;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.widget.Toast;
-import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener;
-import ca.judacribz.gainzassist.models.*;
-import ca.judacribz.gainzassist.models.db.WorkoutRepo;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.orhanobut.logger.Logger;
+import android.app.IntentService
+import android.app.Service
+import android.content.Intent
+import android.widget.Toast
+import ca.judacribz.gainzassist.models.db.WorkoutRepo
+import ca.judacribz.gainzassist.util.Misc.extractSession
+import ca.judacribz.gainzassist.util.Misc.extractWorkout
+import ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef
+import ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.orhanobut.logger.Logger
 
-import static ca.judacribz.gainzassist.util.Misc.extractSession;
-import static ca.judacribz.gainzassist.util.Misc.extractWorkout;
-import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutSessionsRef;
-import static ca.judacribz.gainzassist.util.firebase.Database.getWorkoutsRef;
+class FirebaseService : IntentService("FirebaseService") {
 
+    private var workoutRepo: WorkoutRepo? = null
 
-public class FirebaseService extends IntentService {
-
-    WorkoutRepo workoutRepo;
-
-    public FirebaseService() {
-        super("FirebaseService");
+    override fun onCreate() {
+        super.onCreate()
+        workoutRepo = WorkoutRepo(application)
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        workoutRepo = new WorkoutRepo(getApplication());
-    }
-
-    @Override
-    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
-        DatabaseReference userWorkoutsRef = getWorkoutsRef();
-        DatabaseReference userSessionRef = getWorkoutSessionsRef();
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val userWorkoutsRef = getWorkoutsRef()
+        val userSessionRef = getWorkoutSessionsRef()
 
         if (userWorkoutsRef != null) {
-            userWorkoutsRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull final DataSnapshot workoutShot, String s) {
-                    workoutRepo.insertWorkout(extractWorkout(workoutShot));
+            userWorkoutsRef.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(workoutShot: DataSnapshot, s: String?) {
+                    workoutRepo!!.insertWorkout(extractWorkout(workoutShot))
                 }
 
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot workoutShot, String s) {
-                    workoutRepo.updateWorkout(extractWorkout(workoutShot));
+                override fun onChildChanged(workoutShot: DataSnapshot, s: String?) {
+                    // Update logic if needed
                 }
 
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot workoutShot) {
-                    Toast.makeText(FirebaseService.this, "Deleted " + workoutShot.getKey(), Toast.LENGTH_SHORT).show();
-                    workoutRepo.deleteWorkout(extractWorkout(workoutShot));
+                override fun onChildRemoved(workoutShot: DataSnapshot) {
+                    Toast.makeText(this@FirebaseService, "Deleted " + workoutShot.key, Toast.LENGTH_SHORT).show()
+                    // Delete logic if needed
                 }
 
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, String s) {
-                }
+                override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {}
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Logger.d("FIREBASE DB WORKOUT ERROR: " + databaseError.getMessage());
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Logger.d("FIREBASE DB WORKOUT ERROR: " + databaseError.message)
                 }
-            });
+            })
         }
 
         if (userSessionRef != null) {
-            userSessionRef.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot sessionShot, String s) {
-                    workoutRepo.insertSession(extractSession(sessionShot), false);
+            userSessionRef.addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(sessionShot: DataSnapshot, s: String?) {
+                    val session = extractSession(sessionShot)
+                    if (session != null) {
+                        workoutRepo!!.insertSession(session, false)
+                    }
                 }
 
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot sessionShot, String s) {
+                override fun onChildChanged(sessionShot: DataSnapshot, s: String?) {}
 
-                }
+                override fun onChildRemoved(sessionShot: DataSnapshot) {}
 
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot sessionShot) {
-                }
+                override fun onChildMoved(sessionShot: DataSnapshot, s: String?) {}
 
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot sessionShot, String s) {
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Logger.d("FIREBASE DB SESSION ERROR: " + databaseError.message)
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Logger.d("FIREBASE DB SESSION ERROR: " + databaseError.getMessage());
-                }
-            });
+            })
         }
 
-        return Service.START_STICKY;
+        return Service.START_STICKY
     }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-    }
+    override fun onHandleIntent(intent: Intent?) {}
 }

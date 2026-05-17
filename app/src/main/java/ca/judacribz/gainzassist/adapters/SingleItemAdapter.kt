@@ -1,246 +1,175 @@
-package ca.judacribz.gainzassist.adapters;
+package ca.judacribz.gainzassist.adapters
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import ca.judacribz.gainzassist.R;
-import com.orhanobut.logger.Logger;
+import android.content.Context
+import android.support.v7.widget.RecyclerView
+import android.util.SparseArray
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import ca.judacribz.gainzassist.R
+import java.util.*
 
-import java.util.ArrayList;
+class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> {
 
-public class SingleItemAdapter extends RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> {
-
-
-    // Interfaces
-    // --------------------------------------------------------------------------------------------
-    private ItemClickObserver itemClickObserver;
-
-    public interface ItemClickObserver {
-        void onItemClick(View view);
-        void onItemLongClick(View view);
+    interface ItemClickObserver {
+        fun onItemClick(view: View?)
+        fun onItemLongClick(view: View?)
     }
 
-    public void setItemClickObserver(ItemClickObserver itemClickObserver) {
-        this.itemClickObserver = itemClickObserver;
-    }
-    // --------------------------------------------------------------------------------------------
-    private Context context;
-    private LayoutInflater inflater;
+    private var itemClickObserver: ItemClickObserver? = null
 
-    public enum PROGRESS_STATUS {
-        UNSELECTED,
-        SELECTED,
-        SUCCESS,
-        FAIL,
-        SUCCESS_SELECTED,
-        FAIL_SELECTED
-    }
-    private SparseArray<PROGRESS_STATUS> progStatus;
-
-    private ArrayList<String> itemNames;
-
-    private int
-            listItemLayout,
-            listItemId,
-            currSelected = -1;
-
-    private boolean dontRecycle = false;
-
-    // Adapter Constructor
-    public SingleItemAdapter(Context context,
-                             ArrayList<String> itemNames,
-                             int listItemLayout,
-                             int listItemId) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
-        this.itemNames = itemNames;
-        this.listItemLayout = listItemLayout;
-        this.listItemId = listItemId;
+    fun setItemClickObserver(itemClickObserver: ItemClickObserver?) {
+        this.itemClickObserver = itemClickObserver
     }
 
-    public SingleItemAdapter(Context context,
-                             int numItems,
-                             int listItemLayout,
-                             int listItemId, SparseArray<PROGRESS_STATUS> progStatus) {
-        this.context = context;
-        this.inflater = LayoutInflater.from(context);
+    private var context: Context? = null
+    private var inflater: LayoutInflater? = null
 
-        this.itemNames = new ArrayList<>();
-        for (int i = 1; i <= numItems; i++) {
-            this.itemNames.add(String.valueOf(i));
+    enum class PROGRESS_STATUS {
+        UNSELECTED, SELECTED, SUCCESS, FAIL, SUCCESS_SELECTED, FAIL_SELECTED
+    }
+
+    private var progStatus: SparseArray<PROGRESS_STATUS>? = null
+    private var itemNames: ArrayList<String>? = null
+    private var listItemLayout = 0
+    private var listItemId = 0
+    private var currSelected = -1
+    private var dontRecycle = false
+
+    constructor(
+        context: Context?,
+        itemNames: ArrayList<String>?,
+        listItemLayout: Int,
+        listItemId: Int
+    ) {
+        this.context = context
+        inflater = LayoutInflater.from(context)
+        this.itemNames = itemNames
+        this.listItemLayout = listItemLayout
+        this.listItemId = listItemId
+    }
+
+    constructor(
+        context: Context?,
+        numItems: Int,
+        listItemLayout: Int,
+        listItemId: Int,
+        progStatus: SparseArray<PROGRESS_STATUS>?
+    ) {
+        this.context = context
+        inflater = LayoutInflater.from(context)
+        itemNames = ArrayList()
+        for (i in 1..numItems) {
+            itemNames!!.add(i.toString())
         }
-        this.progStatus = progStatus;
-        this.listItemLayout = listItemLayout;
-        this.listItemId = listItemId;
-
-        dontRecycle = true;
+        this.progStatus = progStatus
+        this.listItemLayout = listItemLayout
+        this.listItemId = listItemId
+        dontRecycle = true
     }
 
-    // RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder> Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @NonNull
-    @Override
-    public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(listItemLayout, parent, false);
-        ItemViewHolder holder = new ItemViewHolder(view);
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+        val view = inflater!!.inflate(listItemLayout, parent, false)
+        val holder = ItemViewHolder(view)
         if (dontRecycle) {
-            holder.setIsRecyclable(false);
+            holder.setIsRecyclable(false)
         }
-
-        return holder;
+        return holder
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        holder.bind(position);
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        holder.bind(position)
     }
 
-    @Override
-    public int getItemCount() {
-        return itemNames.size();
-    }
-    //RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>//Override/////////////////////////////
-
-    public void setItems(ArrayList<String> itemNames) {
-        this.itemNames = itemNames;
+    override fun getItemCount(): Int {
+        return itemNames!!.size
     }
 
-    public void setCurrItem(int currSetNum, boolean success) {
-        setSelected(currSetNum);
+    fun setItems(itemNames: ArrayList<String>?) {
+        this.itemNames = itemNames
+    }
+
+    fun setCurrItem(currSetNum: Int, success: Boolean) {
+        setSelected(currSetNum)
         if (currSetNum > 1) {
             if (success) {
-                progStatus.put(currSetNum - 2, PROGRESS_STATUS.SUCCESS);
+                progStatus!!.put(currSetNum - 2, PROGRESS_STATUS.SUCCESS)
             } else {
-                progStatus.put(currSetNum - 2, PROGRESS_STATUS.FAIL);
+                progStatus!!.put(currSetNum - 2, PROGRESS_STATUS.FAIL)
             }
         }
-
-        notifyDataSetChanged();
+        notifyDataSetChanged()
     }
 
-    public void setSelected(int currSetNum) {
-        deselectCurrSelected();
-        currSetNum--;
-        PROGRESS_STATUS status = progStatus.get(currSetNum);
+    fun setSelected(currSetNum: Int) {
+        var newCurrSetNum = currSetNum
+        deselectCurrSelected()
+        newCurrSetNum--
+        val status = progStatus!![newCurrSetNum]
         if (status != null) {
-            switch (status) {
-                case SUCCESS:
-                    progStatus.put(currSetNum, PROGRESS_STATUS.SUCCESS_SELECTED);
-                    break;
-
-                case FAIL:
-                    progStatus.put(currSetNum, PROGRESS_STATUS.FAIL_SELECTED);
-                    break;
-
-                default:
-                    progStatus.put(currSetNum, PROGRESS_STATUS.SELECTED);
-                    break;
+            when (status) {
+                PROGRESS_STATUS.SUCCESS -> progStatus!!.put(newCurrSetNum, PROGRESS_STATUS.SUCCESS_SELECTED)
+                PROGRESS_STATUS.FAIL -> progStatus!!.put(newCurrSetNum, PROGRESS_STATUS.FAIL_SELECTED)
+                else -> progStatus!!.put(newCurrSetNum, PROGRESS_STATUS.SELECTED)
             }
         }
-
-        currSelected = currSetNum;
-
-        notifyDataSetChanged();
+        currSelected = newCurrSetNum
+        notifyDataSetChanged()
     }
 
-    private void deselectCurrSelected() {
-        PROGRESS_STATUS status = progStatus.get(currSelected);
+    private fun deselectCurrSelected() {
+        val status = progStatus!![currSelected]
         if (status != null) {
-            switch (status) {
-                case SELECTED:
-                    progStatus.put(currSelected, PROGRESS_STATUS.UNSELECTED);
-                    break;
-
-                case SUCCESS_SELECTED:
-                    progStatus.put(currSelected, PROGRESS_STATUS.SUCCESS);
-                    break;
-
-                case FAIL_SELECTED:
-                    progStatus.put(currSelected, PROGRESS_STATUS.FAIL);
-                    break;
+            when (status) {
+                PROGRESS_STATUS.SELECTED -> progStatus!!.put(currSelected, PROGRESS_STATUS.UNSELECTED)
+                PROGRESS_STATUS.SUCCESS_SELECTED -> progStatus!!.put(currSelected, PROGRESS_STATUS.SUCCESS)
+                PROGRESS_STATUS.FAIL_SELECTED -> progStatus!!.put(currSelected, PROGRESS_STATUS.FAIL)
+                else -> {}
             }
         }
     }
 
+    inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener,
+        View.OnLongClickListener {
+        private val listItemView: TextView = itemView.findViewById(listItemId)
 
-    // Custom ViewHolder class for the recyclerView
-    // ============================================================================================
-    class ItemViewHolder extends RecyclerView.ViewHolder implements
-            View.OnClickListener,
-            View.OnLongClickListener {
-
-        private TextView listItemView;
-
-        // ViewHolder Constructor
-        ItemViewHolder(View itemView) {
-            super(itemView);
-
-            listItemView = itemView.findViewById(listItemId);
-            listItemView.setOnClickListener(this);
-            listItemView.setOnLongClickListener(this);
+        init {
+            listItemView.setOnClickListener(this)
+            listItemView.setOnLongClickListener(this)
         }
 
-        // Sets the text for each button item
-        void bind(int pos) {
-            listItemView.setText(itemNames.get(pos));
-
+        fun bind(pos: Int) {
+            listItemView.text = itemNames!![pos]
             if (progStatus != null) {
-                int drawId = -1;
-                if (pos < progStatus.size()) {
-                    switch (progStatus.get(pos)) {
-                        case UNSELECTED:
-                            drawId = R.drawable.textview_circle;
-                            break;
-
-                        case SELECTED:
-                            drawId = R.drawable.textview_circle_selected;
-                            break;
-
-                        case SUCCESS:
-                            drawId = R.drawable.textview_circle_success;
-                            break;
-
-                        case FAIL:
-                            drawId = R.drawable.textview_circle_fail;
-                            break;
-
-                        case SUCCESS_SELECTED:
-                            drawId = R.drawable.textview_circle_success_selected;
-                            break;
-
-                        case FAIL_SELECTED:
-                            drawId = R.drawable.textview_circle_fail_selected;
-                            break;
+                var drawId = -1
+                if (pos < progStatus!!.size()) {
+                    when (progStatus!![pos]) {
+                        PROGRESS_STATUS.UNSELECTED -> drawId = R.drawable.textview_circle
+                        PROGRESS_STATUS.SELECTED -> drawId = R.drawable.textview_circle_selected
+                        PROGRESS_STATUS.SUCCESS -> drawId = R.drawable.textview_circle_success
+                        PROGRESS_STATUS.FAIL -> drawId = R.drawable.textview_circle_fail
+                        PROGRESS_STATUS.SUCCESS_SELECTED -> drawId = R.drawable.textview_circle_success_selected
+                        PROGRESS_STATUS.FAIL_SELECTED -> drawId = R.drawable.textview_circle_fail_selected
                     }
                 }
-
                 if (drawId != -1) {
-                    listItemView.setBackground(context.getDrawable(drawId));
+                    listItemView.background = context!!.getDrawable(drawId)
                 }
             }
         }
 
-        @Override
-        public void onClick(View view) {
+        override fun onClick(view: View) {
             if (itemClickObserver != null) {
-                itemClickObserver.onItemClick(view);
+                itemClickObserver!!.onItemClick(view)
             }
         }
 
-        @Override
-        public boolean onLongClick(View view) {
+        override fun onLongClick(view: View): Boolean {
             if (itemClickObserver != null) {
-                itemClickObserver.onItemLongClick(view);
+                itemClickObserver!!.onItemLongClick(view)
             }
-            return true;
+            return true
         }
     }
-
-    // ============================================================================================
 }

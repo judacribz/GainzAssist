@@ -1,154 +1,105 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*;
-import org.parceler.Parcel;
-import android.support.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.Index
+import android.arch.persistence.room.PrimaryKey
+import ca.judacribz.gainzassist.util.Misc.exerciseToMap
+import org.parceler.Parcel
+import org.parceler.Parcel.Serialization
+import java.util.Date
 
-import static ca.judacribz.gainzassist.util.Misc.exerciseToMap;
+@Parcel(Serialization.BEAN)
+@Entity(
+    tableName = "workouts",
+    indices = [Index(value = ["name"], unique = true)]
+)
+class Workout {
 
-@Parcel
-@Entity(tableName = "workouts",
-        indices = {@Index(value = {"name"}, unique = true)})
-public class Workout {
-
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
     @PrimaryKey
-    long id = -1;
-    String name;
+    var id: Long = -1
+
+    var name: String? = null
 
     @Ignore
-    ArrayList<Exercise> exercises = new ArrayList<>();
-    // --------------------------------------------------------------------------------------------
+    var exercises = ArrayList<Exercise>()
 
+    constructor()
 
-    // ######################################################################################### //
-    // ExerciseConst Constructor                                                                 //
-    // ######################################################################################### //
-    public Workout() {
-    }
-
-
-    public Workout(String name, @Nullable ArrayList<Exercise> exercises) {
-        if (id == -1)
-            setId(-1);
-        setName(name);
-        if (exercises != null){
-            this.exercises = exercises;
+    @Ignore
+    constructor(name: String?, exercises: ArrayList<Exercise>?) {
+        initId()
+        this.name = name
+        if (exercises != null) {
+            this.exercises = exercises
         }
     }
-    // ######################################################################################### //
 
-
-    // Getters and setters
-    // ============================================================================================
-    public long getId() {
-        return this.id;
-    }
-
-    public void setId(long id) {
-        this.id = (id == -1) ? new Date().getTime() : id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void addExercise(@Nullable Exercise exercise) {
+    fun addExercise(exercise: Exercise?) {
         if (exercise != null) {
-            if (this.id != -1) {
-                exercise.setWorkoutId(id);
+            if (id != -1L) {
+                exercise.workoutId = id
             }
-            this.exercises.add(exercise);
+            exercises.add(exercise)
         }
     }
 
-    public void removeExercise(Exercise exercise) {
-        this.exercises.remove(exercise);
-        this.exercises.trimToSize();
-        int i;
-        for (Exercise ex : exercises) {
-            i = exercises.indexOf(ex);
-            ex.setExerciseNumber(i);
+    fun removeExercise(exercise: Exercise) {
+        exercises.remove(exercise)
+        exercises.trimToSize()
+        for (ex in exercises) {
+            ex.exerciseNumber = exercises.indexOf(ex)
         }
     }
 
-    public int getExerciseNumber(String exerciseName) {
-        Exercise ex = getExerciseFromName(exerciseName);
-
-        return (ex != null) ? ex.getExerciseNumber() : -1;
+    fun getExerciseNumber(exerciseName: String): Int {
+        val ex = getExerciseFromName(exerciseName)
+        return ex?.exerciseNumber ?: -1
     }
 
-    public Exercise getExerciseFromName(String exName) {
-        for (Exercise exercise : exercises) {
-            if (exercise.getName().equals(exName)) {
-                return exercise;
+    fun getExerciseFromName(exName: String): Exercise? {
+        for (exercise in exercises) {
+            if (exercise.name == exName) {
+                return exercise
             }
         }
-
-        return null;
+        return null
     }
 
-    public Exercise getExerciseFromIndex(int exIndex) {
-        return this.exercises.get(exIndex);
+    fun getExerciseFromIndex(exIndex: Int): Exercise {
+        return exercises[exIndex]
     }
 
-    public void setExercises(ArrayList<Exercise> exercises) {
-        this.exercises = exercises;
+    fun toMap(): Map<String, Any?> {
+        val workout = HashMap<String, Any?>()
+        val exs = exerciseToMap(exercises)
+        workout["id"] = id
+        workout["exercises"] = exs
+        return workout
     }
 
-    public ArrayList<Exercise> getExercises() {
-        return exercises;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-    // ============================================================================================
-
-
-    // Misc functions
-    // --------------------------------------------------------------------------------------------
-    /* Misc function used to store ExerciseConst information in the FireBase db */
-    public Map<String, Object> toMap() {
-        Map<String, Object> workout = new HashMap<>();
-        Map<String, Object> exs = exerciseToMap(exercises);
-
-        workout.put("id", id);
-        workout.put("exercises", exs);
-
-        return workout;
-    }
-
-
-    /* Returns true if the exercise exist, false if not */
-    public boolean containsExercise(String exerciseName) {
-        for (Exercise exercise : exercises) {
-            if (exercise.getName().toLowerCase().equals(exerciseName.toLowerCase())) {
-                return true;
+    fun containsExercise(exerciseName: String): Boolean {
+        for (exercise in exercises) {
+            if (exercise.name?.lowercase() == exerciseName.lowercase()) {
+                return true
             }
         }
-
-        return false;
+        return false
     }
 
-    public ArrayList<String> getExerciseNames() {
-        ArrayList<String> exerciseNames = new ArrayList<>();
-        for (Exercise exercise : exercises) {
-            exerciseNames.add(exercise.getName());
+    val exerciseNames: ArrayList<String>
+        get() {
+            val names = ArrayList<String>()
+            for (exercise in exercises) {
+                exercise.name?.let { names.add(it) }
+            }
+            return names
         }
 
-        return  exerciseNames;
+    val numExercises: Int
+        get() = exercises.size
+
+    fun initId(id: Long= -1L) {
+        this.id = if (id == -1L) Date().getTime() else id
     }
-
-
-
-    public int getNumExercises() {
-        return this.exercises.size();
-    }
-    // --------------------------------------------------------------------------------------------
 }

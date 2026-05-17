@@ -1,317 +1,263 @@
-package ca.judacribz.gainzassist.util;
+package ca.judacribz.gainzassist.util
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Handler;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
-import android.view.View;
-import android.widget.*;
-import butterknife.ButterKnife;
+import android.app.Activity
+import android.app.ProgressDialog
+import android.content.Context
+import android.content.Intent
+import android.os.Handler
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
+import android.util.DisplayMetrics
+import android.view.View
+import android.widget.*
+import butterknife.ButterKnife
+import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.util.Preferences.getThemePref
+import com.facebook.rebound.SimpleSpringListener
+import com.facebook.rebound.Spring
+import com.facebook.rebound.SpringSystem
+import com.facebook.rebound.SpringUtil
+import java.util.*
 
-import ca.judacribz.gainzassist.R;
-import com.facebook.rebound.SimpleSpringListener;
-import com.facebook.rebound.Spring;
-import com.facebook.rebound.SpringSystem;
-import com.facebook.rebound.SpringUtil;
+object UI {
 
-import static ca.judacribz.gainzassist.util.Preferences.getThemePref;
+    private var backPressedTwice = false
 
-public class UI {
-
-    // Constants
-    // --------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------
-
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
-    private static boolean backPressedTwice = false;
-    // --------------------------------------------------------------------------------------------
-
-    /* Sets the content view, title bar and ButterKnife for the given activity
-     *
-     * (REQUIRED) Include following as top element in activity layout file:
-     *
-    <include
-       android:id="@id/toolbar"
-       layout="@layout/part_title_bar"/>
-     */
-    public static void setInitView(Activity act, int layoutId, int titleId, boolean setBackArrow) {
-        setInitView(act, layoutId, act.getResources().getString(titleId), setBackArrow);
+    @JvmStatic
+    fun setInitView(act: Activity, layoutId: Int, titleId: Int, setBackArrow: Boolean) {
+        setInitView(act, layoutId, act.resources.getString(titleId), setBackArrow)
     }
-    public static void setInitView(Activity act, int layoutId, String title, boolean setBackArrow) {
-        setInitTheme(act);
-        act.setContentView(layoutId);
-        ButterKnife.bind(act);
+
+    @JvmStatic
+    fun setInitView(act: Activity, layoutId: Int, title: String?, setBackArrow: Boolean) {
+        setInitTheme(act)
+        act.setContentView(layoutId)
+        ButterKnife.bind(act)
         if (title != null) {
-            setToolbar((AppCompatActivity) act, title, setBackArrow);
+            setToolbar(act as AppCompatActivity, title, setBackArrow)
         }
     }
 
-
-    /* Exits app and goes to home screen if back pressed twice from this screen */
-    public static void handleBackButton(Context context) {
+    @JvmStatic
+    fun handleBackButton(context: Context) {
         if (backPressedTwice) {
             context.startActivity(
-                    new Intent(Intent.ACTION_MAIN)
+                Intent(Intent.ACTION_MAIN)
                     .addCategory(Intent.CATEGORY_HOME)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            );
+            )
         } else {
-            backPressedTwice = true;
-            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show();
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    backPressedTwice = false;
-                }
-            }, 2000);
+            backPressedTwice = true
+            Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            Handler().postDelayed({ backPressedTwice = false }, 2000)
         }
     }
 
-    /* Sets up the title bar */
-    public static String setToolbar(AppCompatActivity act, int titleId, boolean setBackArrow) {
-        return setToolbar(act, act.getResources().getString(titleId), setBackArrow);
+    @JvmStatic
+    fun setToolbar(act: AppCompatActivity, titleId: Int, setBackArrow: Boolean): String {
+        return setToolbar(act, act.resources.getString(titleId), setBackArrow)
     }
-    public static String setToolbar(AppCompatActivity act, String title, boolean setBackArrow) {
-        // ExerciseSet the part_title_bar to the activity
-        act.setSupportActionBar((Toolbar) act.findViewById(R.id.toolbar));
 
-
-        ActionBar actionBar = act.getSupportActionBar();
+    @JvmStatic
+    fun setToolbar(act: AppCompatActivity, title: String, setBackArrow: Boolean): String {
+        act.setSupportActionBar(act.findViewById<View>(R.id.toolbar) as Toolbar)
+        val actionBar = act.supportActionBar
         if (actionBar != null) {
-
-            actionBar.setDisplayShowTitleEnabled(false);
-
+            actionBar.setDisplayShowTitleEnabled(false)
             if (setBackArrow) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-                actionBar.setDisplayShowHomeEnabled(true);
+                actionBar.setDisplayHomeAsUpEnabled(true)
+                actionBar.setDisplayShowHomeEnabled(true)
             }
         }
-
-        // ExerciseSet the title for the part_title_bar
-        ((TextView) act.findViewById(R.id.title)).setText(title);
-
-        return title;
+        (act.findViewById<View>(R.id.title) as TextView).text = title
+        return title
     }
 
-    public static void setInitTheme(Activity act) {
-        String col = getThemePref(act);
-
+    @JvmStatic
+    fun setInitTheme(act: Activity) {
+        val col = getThemePref(act)
         if (col != null) {
-            if (col.equals("blue")) {
-                act.setTheme(R.style.BlueTheme);
-            }    else if (col.equals("green")) {
-
-                act.setTheme(R.style.GreenTheme);
+            if (col == "blue") {
+                act.setTheme(R.style.BlueTheme)
+            } else if (col == "green") {
+                act.setTheme(R.style.GreenTheme)
             }
         }
     }
 
-    /* Sets the spinner with the given array resource in the Activity */
-    public static void setSpinnerWithArray(Activity act, int arrResId, Spinner spr) {
-
-        ArrayAdapter<CharSequence> adapter =
-                ArrayAdapter.createFromResource(act,
-                                                arrResId,
-                                                android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spr.setAdapter(adapter);
+    @JvmStatic
+    fun setSpinnerWithArray(act: Activity?, arrResId: Int, spr: Spinner) {
+        val adapter = ArrayAdapter.createFromResource(
+            act!!,
+            arrResId,
+            android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spr.adapter = adapter
     }
 
-    /* Gets string value from EditText element */
-    public static String getTextString(Spinner spr) {
-        return spr.getSelectedItem().toString().toLowerCase();
+    @JvmStatic
+    fun getTextString(spr: Spinner): String {
+        return spr.selectedItem.toString().lowercase(Locale.getDefault())
     }
 
-
-    /* Gets integer value of text from EditText element */
-    public static int getTextInt(TextView tv) {
-        return Integer.valueOf(getTextString(tv));
+    @JvmStatic
+    fun getTextInt(tv: TextView): Int {
+        return getTextString(tv).toInt()
     }
 
-    /* Gets float value of text from EditText element */
-    public static float getTextFloat(EditText et) {
-        return Float.valueOf(getTextString(et));
+    @JvmStatic
+    fun getTextFloat(et: EditText): Float {
+        return getTextString(et).toFloat()
     }
 
-    public static String getTextString(TextView tv) {
-        return tv.getText().toString().trim();
+    @JvmStatic
+    fun getTextString(tv: TextView): String {
+        return tv.text.toString().trim { it <= ' ' }
     }
 
-    /* Validates EditTexts to be non-empty or else an error is set */
-    public static boolean validateForm(Activity act, EditText[] ets) {
-        boolean isValid = true;
-
-        for (EditText et : ets) {
-            isValid &= validateFormEntry(act, et);
+    @JvmStatic
+    fun validateForm(act: Activity, ets: Array<EditText>): Boolean {
+        var isValid = true
+        for (et in ets) {
+            isValid = isValid and validateFormEntry(act, et)
         }
-
-        return isValid;
+        return isValid
     }
 
-    /* Validates an EditText to be non-empty or else an error is set */
-    public static boolean validateFormEntry(Activity act, EditText et) {
-        String text = et.getText().toString().trim();
-
+    @JvmStatic
+    fun validateFormEntry(act: Activity, et: EditText): Boolean {
+        val text = et.text.toString().trim { it <= ' ' }
         if (text.isEmpty()) {
-            et.setError(act.getString(R.string.err_required));
-            return false;
+            et.error = act.getString(R.string.err_required)
+            return false
         }
-
-        return true;
+        return true
     }
 
-    public static void clearForm(EditText[] ets) {
-        for (EditText et : ets) {
-            clearFormEntry(et);
+    @JvmStatic
+    fun clearForm(ets: Array<EditText>) {
+        for (et in ets) {
+            clearFormEntry(et)
         }
     }
 
-    public static void clearFormEntry(EditText et) {
-        et.setText("");
+    @JvmStatic
+    fun clearFormEntry(et: EditText) {
+        et.setText("")
     }
 
-    public static int calculateNoOfColumns(Context context) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-
-        return (int) (dpWidth / 180);
+    @JvmStatic
+    fun calculateNoOfColumns(context: Context): Int {
+        val displayMetrics = context.resources.displayMetrics
+        val dpWidth = displayMetrics.widthPixels / displayMetrics.density
+        return (dpWidth / 180).toInt()
     }
 
-
-    public static Spring setSpring(final View view) {
-        // Create a system to run the physics loop for a set of springs.
-        SpringSystem springSystem = SpringSystem.create();
-
-        // Add a spring to the system.
-        Spring spring = springSystem.createSpring();
-        // Add a listener to observe the motion of the spring.
-        spring.addListener(new SimpleSpringListener() {
-
-            @Override
-            public void onSpringUpdate(Spring spring) {
-                // You can observe the updates in the spring
-                // state by asking its current value in onSpringUpdate.
-                float value = (float) SpringUtil.mapValueFromRangeToRange(spring.getCurrentValue(), 0, 1, 1, 0);
-//                float value = (float) spring.getCurrentValue();
-//                float scale = 1f - (value * 0.9f);
-                view.setScaleX(value);
-                view.setScaleY(value);
-
-                if (spring.isAtRest()) {
-                    spring.setEndValue(0);
+    @JvmStatic
+    fun setSpring(view: View): Spring {
+        val springSystem = SpringSystem.create()
+        val spring = springSystem.createSpring()
+        spring.addListener(object : SimpleSpringListener() {
+            override fun onSpringUpdate(spring: Spring) {
+                val value = SpringUtil.mapValueFromRangeToRange(spring.currentValue, 0.0, 1.0, 1.0, 0.0).toFloat()
+                view.scaleX = value
+                view.scaleY = value
+                if (spring.isAtRest) {
+                    spring.endValue = 0.0
                 }
             }
-        });
-
-        // Set the spring in motion; moving from 0 to 1
-        return spring;
+        })
+        return spring
     }
 
-
-    public static void handleFocusLeft(EditText et, Number min, Number res) {
-        String etStr = getTextString(et);
-
+    @JvmStatic
+    fun handleFocusLeft(et: EditText, min: Number, res: Number) {
+        val etStr = getTextString(et)
         if (etStr.isEmpty()) {
-            et.setText(String.valueOf(res));
-        } else if(Float.valueOf(etStr) < min.floatValue()) {
-            et.setText(String.valueOf(min));
+            et.setText(res.toString())
+        } else if (etStr.toFloat() < min.toFloat()) {
+            et.setText(min.toString())
         }
     }
 
-
-    /* Text changed handling */
-    public static void setVisibleIfDisabled(View view) {
-        if (!view.isEnabled()) {
-            view.setEnabled(true);
-            view.setVisibility(View.VISIBLE);
+    @JvmStatic
+    fun setVisibleIfDisabled(view: View) {
+        if (!view.isEnabled) {
+            view.isEnabled = true
+            view.visibility = View.VISIBLE
         }
     }
 
-    public static Number handleNumChanged(View  view, String str, Number min) {
-        Number num = (str.isEmpty()) ? min : Float.valueOf(str);
-
-        if (num.floatValue() <= min.floatValue()) {
-            setGoneIfEnabled(view);
+    @JvmStatic
+    fun handleNumChanged(view: View, str: String, min: Number): Number {
+        val num: Number = if (str.isEmpty()) min else str.toFloat()
+        if (num.toFloat() <= min.toFloat()) {
+            setGoneIfEnabled(view)
         }
+        return num
+    }
 
-        return num;
-    };
-
-    public static void setGoneIfEnabled(View view) {
-        if (view.isEnabled()) {
-            view.setEnabled(false);
-            view.setVisibility(View.GONE);
+    @JvmStatic
+    fun setGoneIfEnabled(view: View) {
+        if (view.isEnabled) {
+            view.isEnabled = false
+            view.visibility = View.GONE
         }
     }
 
-    public static void setText(EditText view, Number num) {
-        view.setText(String.valueOf(num));
+    @JvmStatic
+    fun setText(view: EditText, num: Number) {
+        view.setText(num.toString())
     }
 
+    class ProgressHandler : Handler() {
+        private var progress: ProgressDialog? = null
+        private var blurLayout: View? = null
+        private var msg: String? = null
+        private var count = 0
 
-    /* Progress display */
-    public static class ProgressHandler extends Handler {
-
-        private static String DOT = "...";
-
-        ProgressDialog progress;
-        View blurLayout;
-        String msg, newMsg;
-        int count = 0;
-
-        public void setProgress(Context context, String msg, View blurLayout) {
-            this.progress = new ProgressDialog(context);
-            this.blurLayout = blurLayout;
-            this.msg = msg + DOT;
-
-            this.progress.setMessage(this.msg);
-            this.progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        fun setProgress(context: Context?, msg: String, blurLayout: View?) {
+            progress = ProgressDialog(context)
+            this.blurLayout = blurLayout
+            this.msg = msg + DOT
+            progress!!.setMessage(this.msg)
+            progress!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
         }
 
-        public  void setTitle(String title) {
-            this.progress.setTitle(title);
+        fun setTitle(title: String?) {
+            progress!!.setTitle(title)
         }
 
-        public void show() {
-            if (this.progress != null) {
-                this.progress.show();
-                if (this.blurLayout != null) {
-                    blurLayout.setVisibility(View.VISIBLE);
-                    blurLayout.setTop(0);
-//                    blurLayout.startBlur();
+        fun show() {
+            if (progress != null) {
+                progress!!.show()
+                if (blurLayout != null) {
+                    blurLayout!!.visibility = View.VISIBLE
+                    blurLayout!!.top = 0
                 }
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while (progress.isShowing()) {
-                                Thread.sleep(10);
-                                progress.setMessage(msg.substring(0, msg.length() - 1 - (++count % 3)));
-//                                blurLayout.pauseBlur();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                Thread {
+                    try {
+                        while (progress!!.isShowing) {
+                            Thread.sleep(10)
+                            progress!!.setMessage(msg!!.substring(0, msg!!.length - 1 - ++count % 3))
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
-                }).start();
+                }.start()
             }
         }
 
-        public void dismiss() {
-            if (this.progress != null) {
-                this.progress.dismiss();
-//                this.blurLayout.pauseBlur();
-                this.blurLayout.setVisibility(View.GONE);
+        fun dismiss() {
+            if (progress != null) {
+                progress!!.dismiss()
+                blurLayout!!.visibility = View.GONE
             }
+        }
+
+        companion object {
+            private const val DOT = "..."
         }
     }
-
 }

@@ -1,155 +1,100 @@
-package ca.judacribz.gainzassist.activities.main.fragments;
+package ca.judacribz.gainzassist.activities.main.fragments
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
+import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import butterknife.BindView
+import butterknife.ButterKnife
+import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
+import ca.judacribz.gainzassist.adapters.SingleItemAdapter
+import ca.judacribz.gainzassist.models.Workout
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel
+import ca.judacribz.gainzassist.util.Preferences.getIncompleteWorkouts
+import ca.judacribz.gainzassist.util.UI.getTextString
+import java.util.*
 
-import android.widget.TextView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.main.Main;
-import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
-import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
-import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
+class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
 
-import java.util.ArrayList;
-import java.util.Set;
+    var intent: Intent? = null
+    var extraKey: String? = null
+    var workoutViewModel: WorkoutViewModel? = null
+    var adapter: SingleItemAdapter? = null
+    var allWorkouts: List<Workout>? = null
+    var filteredWorkouts = ArrayList<Workout>()
 
-import static ca.judacribz.gainzassist.util.Preferences.getIncompleteWorkouts;
-import static ca.judacribz.gainzassist.util.UI.getTextString;
+    @BindView(R.id.rv_res_workout_btns)
+    lateinit var workoutsList: RecyclerView
 
-public class Resume extends Fragment implements SingleItemAdapter.ItemClickObserver {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_resume, container, false)
+        ButterKnife.bind(this, view)
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
-    // Constants
-    // --------------------------------------------------------------------------------------------
-    private static final Resume INST = new Resume();
-    // --------------------------------------------------------------------------------------------
+        workoutsList.layoutManager = LinearLayoutManager(context)
+        workoutsList.setHasFixedSize(true)
 
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
-    View view;
-    Main act;
-    SingleItemAdapter workoutAdapter;
-    LinearLayoutManager layoutManager;
+        workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
+            allWorkouts = workouts
+            updateWorkouts()
+        })
 
-    WorkoutViewModel workoutViewModel;
+        return view
+    }
 
-    ArrayList<String>
+    override fun onResume() {
+        super.onResume()
+        updateWorkouts()
+    }
+
+    private fun updateWorkouts() {
+        if (allWorkouts == null) return
+        val incomplete = getIncompleteWorkouts(context!!)
+        filteredWorkouts = ArrayList()
+        if (incomplete != null) {
+            for (workout in allWorkouts!!) {
+                if (incomplete.contains(workout.name)) {
+                    filteredWorkouts.add(workout)
+                }
+            }
+        }
+        val workoutNames = ArrayList<String>()
+        for (workout in filteredWorkouts) {
+            workoutNames.add(workout.name!!)
+        }
+        adapter = SingleItemAdapter(
+            context,
             workoutNames,
-            filteredWorkouts;
-
-    public Intent intent;
-    public String extraKey;
-
-    // UI Elements
-    @BindView(R.id.rv_res_workout_btns) RecyclerView workoutsList;
-    // --------------------------------------------------------------------------------------------
-
-    // ######################################################################################### //
-    // WarmupsList Constructor/Instance                                                        //
-    // ######################################################################################### //
-    public Resume() {
+            R.layout.part_button,
+            R.id.btnListItem
+        )
+        adapter!!.setItemClickObserver(this)
+        workoutsList.adapter = adapter
     }
 
-    public static Resume getInstance() {
-        return INST;
-    }
-    // ######################################################################################### //
-
-    // Fragment Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        act = (Main) context;
+    override fun onItemClick(view: View?) {
+        intent = Intent(context, StartWorkout::class.java)
+        extraKey = ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT
+        workoutViewModel!!.getWorkoutFromName(context, getTextString(view as TextView))
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    override fun onItemLongClick(view: View?) {}
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-        if (view != null) {
-            return view;
-        }
-
-        ButterKnife.bind(
-                this,
-                view =  inflater.inflate(R.layout.fragment_resume, container, false)
-        );
-        setRetainInstance(true);
-
-        // ExerciseSet the layout manager for the localWorkouts
-        layoutManager = new LinearLayoutManager(act);
-        workoutsList.setLayoutManager(layoutManager);
-        workoutsList.setHasFixedSize(true);
-
-        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel.class);
-
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        filteredWorkouts = new ArrayList<>();
-        Set<String> names = getIncompleteWorkouts(act);
-        if (names != null) {
-            filteredWorkouts.addAll(names);
-            displayWorkoutList(null);
+    companion object {
+        @JvmStatic
+        fun getInstance(): Resume {
+            return Resume()
         }
     }
-
-    /* Helper function to display button list of workouts */
-    public void displayWorkoutList(@Nullable ArrayList<String> workouts) {
-        if (workouts != null) {
-            filteredWorkouts = workouts;
-        }
-        workoutAdapter = new SingleItemAdapter(
-                act,
-                filteredWorkouts,
-                R.layout.part_button,
-                R.id.btnListItem
-        );
-        workoutAdapter.setItemClickObserver(this);
-        workoutsList.setAdapter(workoutAdapter);
-    }
-    //Fragment//Override///////////////////////////////////////////////////////////////////////////
-
-
-
-    // SingleItemAdapter.ItemClickObserver Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onItemClick(View view) {
-        intent = new Intent(act, StartWorkout.class);
-        extraKey = Main.EXTRA_WORKOUT;
-        workoutViewModel.getWorkoutFromName(act, getTextString((TextView) view));
-    }
-
-    @Override
-    public void onItemLongClick(View view) {
-
-    }
-    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
-
-
-    // Click Handling
-    // ============================================================================================
-
-    //=Click=Handling==============================================================================
 }

@@ -1,96 +1,53 @@
-package ca.judacribz.gainzassist.activities.start_workout.fragments;
+package ca.judacribz.gainzassist.activities.start_workout.fragments
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import butterknife.BindView
+import butterknife.ButterKnife
+import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
+import ca.judacribz.gainzassist.activities.start_workout.fragments.ExercisesList
+import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.Companion.EXTRA_MAIN_EXERCISES
+import ca.judacribz.gainzassist.models.Exercise
+import ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET
+import org.parceler.Parcels
+import java.util.*
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
-import ca.judacribz.gainzassist.models.Exercise;
-import com.orhanobut.logger.Logger;
-import org.parceler.Parcels;
+class ExercisesList : Fragment() {
 
-import java.util.ArrayList;
+    private var exercises: ArrayList<Exercise>? = null
 
-import static ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter.EXTRA_MAIN_EXERCISES;
-import static ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET;
+    @BindView(R.id.ll_exercise_sets_insert)
+    lateinit var llExSetsInsert: LinearLayout
 
-public class ExercisesList extends Fragment {
-
-    // Constants
-    // --------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------
-
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
-    StartWorkout act;
-    Bundle bundle;
-
-//    @BindView(R.id.ll_exercise_subtitle_insert) LinearLayout llExSubInsert;
-    @BindView(R.id.ll_exercise_sets_insert) LinearLayout llExSetsInsert;
-    // --------------------------------------------------------------------------------------------
-
-    // ######################################################################################### //
-    // ExercisesList Constructor/Instance                                                        //
-    // ######################################################################################### //
-    public ExercisesList() {
-        // Required empty public constructor
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_exercises_list, container, false)
+        ButterKnife.bind(this, view)
+        exercises = Parcels.unwrap(arguments!!.getParcelable(EXTRA_MAIN_EXERCISES))
+        return view
     }
 
-    public static ExercisesList getInstance() {
-        return new ExercisesList();
-    }
-    // ######################################################################################### //
-
-
-    // Fragment Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        act = (StartWorkout) getActivity();
-        bundle = getArguments();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-View view;
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-        if (view != null) {
-            return  view;
+    override fun onResume() {
+        super.onResume()
+        if (llExSetsInsert.childCount > 0) {
+            llExSetsInsert.removeAllViews()
         }
-        // Inflate the layout for this fragment
-        view =  inflater.inflate(R.layout.fragment_exercises_list, container, false);
-        ButterKnife.bind(this, view);
-
-        if (bundle != null) {
-            ArrayList<Exercise> exercises = Parcels.unwrap(bundle.getParcelable(EXTRA_MAIN_EXERCISES));
-            if (exercises != null) {
-                for (int i = exercises.size()-1; i >= 0; --i) {
-
-                    act.displaySets(
-                            MAIN_SET,
-                            exercises.get(i),
-//                            llExSubInsert,
-                            llExSetsInsert
-                    );
-                }
-            }
+        for (exercise in exercises!!) {
+            (activity as StartWorkout?)?.displaySets(MAIN_SET, exercise, llExSetsInsert)
         }
-
-       return view;
     }
-    //Fragment//Override///////////////////////////////////////////////////////////////////////////
+
+    companion object {
+        @JvmStatic
+        fun getInstance(): ExercisesList {
+            return ExercisesList()
+        }
+    }
 }

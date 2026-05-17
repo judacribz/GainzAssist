@@ -10,7 +10,14 @@ import android.widget.Toast
 import butterknife.*
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_INT
-import ca.judacribz.gainzassist.util.UI.*
+import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setVisibleIfDisabled
+import ca.judacribz.gainzassist.util.UI.handleNumChanged
+import ca.judacribz.gainzassist.util.UI.handleFocusLeft
+import ca.judacribz.gainzassist.util.UI.setText
+import ca.judacribz.gainzassist.util.UI.validateFormEntry
+import ca.judacribz.gainzassist.util.UI.getTextString
+import ca.judacribz.gainzassist.util.UI.getTextInt
 
 class WorkoutEntry : AppCompatActivity() {
 

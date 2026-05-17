@@ -1,148 +1,101 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*;
-import android.util.SparseArray;
-import com.orhanobut.logger.Logger;
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.Index
+import android.arch.persistence.room.PrimaryKey
+import android.util.SparseArray
+import ca.judacribz.gainzassist.constants.ExerciseConst.EXERCISES
+import ca.judacribz.gainzassist.constants.ExerciseConst.EXERCISE_INDEX
+import ca.judacribz.gainzassist.constants.ExerciseConst.SESSION
+import ca.judacribz.gainzassist.constants.ExerciseConst.SET_INDEX
+import ca.judacribz.gainzassist.constants.ExerciseConst.WORKOUT_ID
+import ca.judacribz.gainzassist.constants.ExerciseConst.WORKOUT_NAME
+import java.util.Date
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+@Entity(
+    tableName = "sessions",
+    indices = [
+        Index("workout_id"),
+        Index(value = ["workout_id", "timestamp"])
+    ]
+)
+class Session {
 
-import static android.arch.persistence.room.ForeignKey.*;
-import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
-
-@Entity(tableName = "sessions",
-        indices = {
-                @Index("workout_id"),
-                @Index(value = {"workout_id", "timestamp"})})
-public class Session {
-
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
     @PrimaryKey
-    long timestamp;
+    var timestamp: Long = 0
 
     @ColumnInfo(name = "workout_id")
-    long workoutId;
+    var workoutId: Long = 0
 
     @ColumnInfo(name = "workout_name")
-    String workoutName;
+    var workoutName: String? = null
 
     @Ignore
-    ArrayList<Exercise> sessionExs = new ArrayList<>();
+    var sessionExs = ArrayList<Exercise>()
 
     @Ignore
-    SparseArray<Float> avgWeights = new SparseArray<>();
-    // --------------------------------------------------------------------------------------------
+    var avgWeights = SparseArray<Float>()
 
-    // ######################################################################################### //
-    // Session Constructors                                                                     //
-    // ######################################################################################### //
-    public Session() {
-    }
+    constructor()
 
     @Ignore
-    public Session(Workout workout) {
-        setTimestamp(-1);
-        setWorkoutId(workout.getId());
-        setWorkoutName(workout.getName());
-    }
-    // ######################################################################################### //
-
-
-    // Getters and setters
-    // ============================================================================================
-    public long getWorkoutId() {
-        return workoutId;
+    constructor(workout: Workout) {
+        initializeTimestamp()
+        workoutId = workout.id
+        workoutName = workout.name
     }
 
-    public void setWorkoutId(long workoutId) {
-        this.workoutId = workoutId;
-    }
-
-    public void setWorkoutName(String workoutName) {
-        this.workoutName = workoutName;
-    }
-
-    public String getWorkoutName() {
-        return workoutName;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-            this.timestamp = (timestamp == -1) ? new Date().getTime() : timestamp;
-    }
-
-
-    public ArrayList<Exercise> getSessionExs() {
-        return sessionExs;
-    }
-
-    public SparseArray<Float> getAvgWeights() {
-        return this.avgWeights;
-    }
-    // ============================================================================================
-
-    public void addExercise(Exercise exercise) {
-        float
-                weight = 0.0f,
-                weightChange = exercise.getWeightChange(),
-                expectedReps = (float)exercise.getReps();
-        for (ExerciseSet exerciseSet : exercise.getFinishedSetsList()) {
-            weight += exerciseSet.getWeight() * (float)exerciseSet.getReps()/expectedReps;
+    fun addExercise(exercise: Exercise) {
+        if (exercise.finishedSetsList.isEmpty()) return
+        
+        var weight = 0.0f
+        val weightChange = exercise.weightChange
+        val expectedReps = exercise.reps.toFloat()
+        for (exerciseSet in exercise.finishedSetsList) {
+            weight += exerciseSet.weight * exerciseSet.reps.toFloat() / if (expectedReps == 0f) 1f else expectedReps
         }
-
-        weight = weight / exercise.getFinishedSetsList().size() + weightChange;
-        weight -= weight % weightChange;
-
-        if (avgWeights.get(exercise.getExerciseNumber(), -1f) != -1f) {
-            this.sessionExs.set(exercise.getExerciseNumber(), exercise);
+        weight = weight / exercise.finishedSetsList.size + weightChange
+        if (weightChange != 0f) {
+            weight -= weight % weightChange
+        }
+        if (avgWeights.get(exercise.exerciseNumber, -1f) != -1f) {
+            sessionExs[exercise.exerciseNumber] = exercise
         } else {
-            this.sessionExs.add(exercise);
+            sessionExs.add(exercise)
         }
-
-        this.avgWeights.put(exercise.getExerciseNumber(), weight);
-
-//        for (Exercise ex : sessionExs) {
-//            Logger.d("EXERCISE # " + ex.getName() + " " + avgWeights.get(ex.getName()));
-//        }
+        avgWeights.put(exercise.exerciseNumber, weight)
     }
 
-    public void remLastExercise() {
-
-        this.sessionExs.remove(this.sessionExs.size() - 1);
-    }
-
-    /* Misc function used to store Session information in the firebase db */
-    public Map<String, Object> toMap() {
-        Map<String, Object>
-                exsMap = new HashMap<>(),
-                sessionMap = new HashMap<String, Object>() {{
-                    put(WORKOUT_NAME, workoutName);
-                    put(WORKOUT_ID, workoutId);
-                }};
-
-        for (Exercise ex : sessionExs){
-            exsMap.put(String.valueOf(ex.getExerciseNumber()), ex.setsToMap());
+    fun remLastExercise() {
+        if (sessionExs.isNotEmpty()) {
+            sessionExs.removeAt(sessionExs.size - 1)
         }
-        sessionMap.put(EXERCISES, exsMap);
-
-        return  sessionMap;
     }
 
-    public Map<String, Object> sessionStateMap(int exerciseIndex, int setIndex) {
-        Map<String, Object>
-                sessionStateMap = new HashMap<>(),
-                sessionMap = this.toMap();
+    fun toMap(): Map<String, Any?> {
+        val exsMap = HashMap<String, Any?>()
+        val sessionMap = HashMap<String, Any?>()
+        sessionMap[WORKOUT_NAME] = workoutName
+        sessionMap[WORKOUT_ID] = workoutId
+        for (ex in sessionExs) {
+            exsMap[ex.exerciseNumber.toString()] = ex.setsToMap()
+        }
+        sessionMap[EXERCISES] = exsMap
+        return sessionMap
+    }
 
-        sessionStateMap.put(SESSION, sessionMap);
-        sessionStateMap.put(EXERCISE_INDEX, exerciseIndex);
-        sessionStateMap.put(SET_INDEX, setIndex);
+    fun sessionStateMap(exerciseIndex: Int, setIndex: Int): Map<String, Any?> {
+        val sessionStateMap = HashMap<String, Any?>()
+        val sessionMap = toMap()
+        sessionStateMap[SESSION] = sessionMap
+        sessionStateMap[EXERCISE_INDEX] = exerciseIndex
+        sessionStateMap[SET_INDEX] = setIndex
+        return sessionStateMap
+    }
 
-        return  sessionStateMap;
+    private fun initializeTimestamp(timestamp: Long = -1L) {
+        this.timestamp = if (timestamp == -1L) Date().time else timestamp
     }
 }

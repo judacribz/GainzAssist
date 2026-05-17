@@ -1,182 +1,118 @@
-package ca.judacribz.gainzassist.util.firebase;
+package ca.judacribz.gainzassist.util.firebase
 
-import android.app.Activity;
-import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import android.util.SparseArray;
-import ca.judacribz.gainzassist.background.FirebaseService;
-import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Workout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import android.app.Activity
+import android.content.Intent
+import android.util.SparseArray
+import ca.judacribz.gainzassist.background.FirebaseService
+import ca.judacribz.gainzassist.models.Session
+import ca.judacribz.gainzassist.models.Workout
+import ca.judacribz.gainzassist.util.Misc.isMyServiceRunning
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
 
-import java.util.Map;
+object Database {
 
-import static ca.judacribz.gainzassist.util.Misc.*;
+    private const val EMAIL = "email"
+    private const val WORKOUTS = "workouts"
+    private const val SESSIONS = "sessions"
+    private const val DEFAULT_WORKOUTS_PATH = "default_workouts"
+    private const val USER_PATH = "users/%s"
 
-public class Database {
+    private var firebaseUser: FirebaseUser? = null
+    private var userRef: DatabaseReference? = null
+    private var userWorkoutsRef: DatabaseReference? = null
 
-    // Constants
-    // --------------------------------------------------------------------------------------------
-    private final static String EMAIL = "email";
-    private final static String USERNAME = "username";
-    private final static String WORKOUTS = "workouts";
-    private final static String SESSIONS = "sessions";
-    private final static String SETS = "sets";
-
-    private final static String DEFAULT_WORKOUTS_PATH = "default_workouts";
-    private static final String USER_PATH = "users/%s";
-
-    private static FirebaseUser firebaseUser;
-    private static DatabaseReference
-            userRef;
-    private static DatabaseReference userWorkoutsRef;
-
-    // --------------------------------------------------------------------------------------------
-
-    //TODO change to getLive ref for a specific user when friends/chatting added
-    /* Gets firebase db reference for 'users/<uid>/' */
-    private static DatabaseReference getUserRef() {
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        return (firebaseUser != null) ?
-                firebaseDatabase.getReference(String.format(USER_PATH, firebaseUser.getUid())) :
-                null;
+    private fun getUserRef(): DatabaseReference? {
+        val firebaseDatabase = FirebaseDatabase.getInstance()
+        firebaseUser = FirebaseAuth.getInstance().currentUser
+        return if (firebaseUser != null) {
+            firebaseDatabase.getReference(String.format(USER_PATH, firebaseUser!!.uid))
+        } else null
     }
 
-    /* Gets firebase db reference for 'users/<uid>/workouts/' */
-    public static DatabaseReference getWorkoutsRef() {
-        userRef = getUserRef();
-
-        return (userRef != null) ? userRef.child(WORKOUTS) : null;
+    @JvmStatic
+    fun getWorkoutsRef(): DatabaseReference? {
+        userRef = getUserRef()
+        return userRef?.child(WORKOUTS)
     }
 
-    /* Gets firebase db reference for 'users/<uid>/sessions/' */
-    public static DatabaseReference getWorkoutSessionsRef() {
-        userRef = getUserRef();
-
-        return (userRef != null) ? userRef.child(SESSIONS) : null;
+    @JvmStatic
+    fun getWorkoutSessionsRef(): DatabaseReference? {
+        userRef = getUserRef()
+        return userRef?.child(SESSIONS)
     }
 
-
-    /* Sets the user email in firebase db under 'users/<uid>/email' */
-    public static void setUserInfo(final Activity act) {
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        // FIREBASE: add user data
+    @JvmStatic
+    fun setUserInfo(act: Activity) {
+        firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {
-            userRef = getUserRef();
-
+            userRef = getUserRef()
             if (userRef != null) {
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot userShot) {
-
-                        // If newly added user
+                userRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(userShot: DataSnapshot) {
                         if (!userShot.hasChildren()) {
-                            userRef.child(EMAIL).setValue(firebaseUser.getEmail());
-
-                            // Copy default workouts from 'default_workouts/' to  'user/<uid>/workouts/'
-                            copyDefaultWorkoutsFirebase();
+                            userRef!!.child(EMAIL).setValue(firebaseUser!!.email)
+                            copyDefaultWorkoutsFirebase()
                         }
-
-                        if (!isMyServiceRunning(act, FirebaseService.class)) {
-                            act.startService(new Intent(act, FirebaseService.class));
+                        if (!isMyServiceRunning(act, FirebaseService::class.java)) {
+                            act.startService(Intent(act, FirebaseService::class.java))
                         }
                     }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
+                    override fun onCancelled(databaseError: DatabaseError) {}
+                })
             }
         }
     }
 
-    /* Gets workouts from firebase db under 'default_workouts/' and adds it to
-     * 'users/<uid>/workouts/' */
-    private static void copyDefaultWorkoutsFirebase() {
-        DatabaseReference defaultWorkoutsRef = FirebaseDatabase.getInstance().getReference(DEFAULT_WORKOUTS_PATH);
-        userWorkoutsRef = getWorkoutsRef();
-
+    private fun copyDefaultWorkoutsFirebase() {
+        val defaultWorkoutsRef = FirebaseDatabase.getInstance().getReference(DEFAULT_WORKOUTS_PATH)
+        userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
-            defaultWorkoutsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot defaultWorkoutsShot) {
-                    userWorkoutsRef.setValue(defaultWorkoutsShot.getValue());
+            defaultWorkoutsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(defaultWorkoutsShot: DataSnapshot) {
+                    userWorkoutsRef!!.setValue(defaultWorkoutsShot.value)
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                }
-            });
+                override fun onCancelled(databaseError: DatabaseError) {}
+            })
         }
     }
 
-
-    /* Adds a workout under "users/<uid>/workouts/" */
-    public static void addWorkoutFirebase(Workout workout) {
-        userWorkoutsRef = getWorkoutsRef();
-
+    @JvmStatic
+    fun addWorkoutFirebase(workout: Workout) {
+        userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
-            userWorkoutsRef.child(workout.getName()).setValue(workout.toMap(), new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError != null) {
-                        Log.e("FirebaseDatabase", "Workout push failed: " + databaseError.getMessage());
-                        Log.e("FirebaseDatabase", "Code: " + databaseError.getCode());
-                    } else {
-                        Log.d("FirebaseDatabase", "Workout pushed successfully to: " + databaseReference.getPath().toString());
-                    }
-                }
-            });
+            userWorkoutsRef!!.child(workout.name!!).setValue(workout.toMap())
         }
     }
 
-    public static void addWorkoutSessionFirebase(Session session) {
-        DatabaseReference userWorkoutSessionsRef = getWorkoutSessionsRef();
-
+    @JvmStatic
+    fun addWorkoutSessionFirebase(session: Session) {
+        val userWorkoutSessionsRef = getWorkoutSessionsRef()
         if (userWorkoutSessionsRef != null) {
-            userWorkoutSessionsRef.child(String.valueOf(session.getTimestamp())).setValue(session.toMap(), new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError != null) {
-                        Log.e("FirebaseDatabase", "Session push failed: " + databaseError.getMessage());
-                    } else {
-                        Log.d("FirebaseDatabase", "Session pushed successfully to: " + databaseReference.getPath().toString());
-                    }
-                }
-            });
+            userWorkoutSessionsRef.child(session.timestamp.toString()).setValue(session.toMap())
         }
-
-
-        updateWorkoutWeights(session.getWorkoutName(), session.getAvgWeights());
+        updateWorkoutWeights(session.workoutName!!, session.avgWeights)
     }
 
-    public static void updateWorkoutWeights(String workoutName, SparseArray<Float> newWeights) {
-        userWorkoutsRef = getWorkoutsRef();
+    @JvmStatic
+    fun updateWorkoutWeights(workoutName: String, newWeights: SparseArray<Float>) {
+        userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
-            DatabaseReference workoutRef = userWorkoutsRef.child(workoutName);
-
-            for (int i = 0; i < newWeights.size(); i++) {
-                workoutRef.child("exercises").child(String.valueOf(i)).child("weight").setValue(newWeights.get(i));
+            val workoutRef = userWorkoutsRef!!.child(workoutName)
+            for (i in 0 until newWeights.size()) {
+                workoutRef.child("exercises").child(i.toString()).child("weight").setValue(newWeights.get(i))
             }
         }
-
     }
-    public static void deleteWorkoutFirebase(String workoutName) {
-        userWorkoutsRef = getWorkoutsRef();
 
-        if (userWorkoutsRef != null) {
-            userWorkoutsRef.child(workoutName).removeValue();
+    @JvmStatic
+    fun deleteWorkoutFirebase(workoutName: String?) {
+        userWorkoutsRef = getWorkoutsRef()
+        if (userWorkoutsRef != null && workoutName != null) {
+            userWorkoutsRef!!.child(workoutName).removeValue()
         }
     }
 }

@@ -1,133 +1,131 @@
-package ca.judacribz.gainzassist.util;
+package ca.judacribz.gainzassist.util
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import ca.judacribz.gainzassist.R;
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
+import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.constants.AccountConst.EMAIL
+import ca.judacribz.gainzassist.constants.ExerciseConst.INCOMPLETE_WORKOUTS
+import ca.judacribz.gainzassist.constants.ExerciseConst.WORKOUT_EX_IND
+import ca.judacribz.gainzassist.constants.ExerciseConst.WORKOUT_PROGRESS
+import java.util.*
 
-import java.util.HashSet;
-import java.util.Set;
+object Preferences {
 
-import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
-import static ca.judacribz.gainzassist.constants.AccountConst.*;
-
-public class Preferences {
-
-    // User Info
-    // -------------------------------------------------------------------------------------------
-    public static String getEmailPref(Context context) {
-        return getSharedPref(context, R.string.file_user_info).getString(EMAIL, null);
+    @JvmStatic
+    fun getEmailPref(context: Context): String? {
+        return getSharedPref(context, R.string.file_user_info).getString(EMAIL, null)
     }
 
-    public static void setUserInfoPref(Context context, String email, String uid) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_user_info).edit();
-        editor.putString(EMAIL, email);
-        editor.apply();
+    @JvmStatic
+    fun setUserInfoPref(context: Context, email: String?, uid: String?) {
+        val editor = getSharedPref(context, R.string.file_user_info).edit()
+        editor.putString(EMAIL, email)
+        editor.apply()
     }
-    // -------------------------------------------------------------------------------------------
 
-
-    // Workouts
-    // -------------------------------------------------------------------------------------------
-    public static void addIncompleteWorkoutPref(Context context, String workoutName) {
-        Set<String> incompleteWorkouts = getIncompleteWorkouts(context);
+    @JvmStatic
+    fun addIncompleteWorkoutPref(context: Context, workoutName: String) {
+        var incompleteWorkouts = getIncompleteWorkouts(context)
         if (incompleteWorkouts == null) {
-            incompleteWorkouts = new HashSet<>();
+            incompleteWorkouts = HashSet()
         }
-        incompleteWorkouts.add(workoutName);
-        addIncompleteWorkoutPref(context, incompleteWorkouts);
+        incompleteWorkouts.add(workoutName)
+        addIncompleteWorkoutPref(context, incompleteWorkouts)
     }
-    public static void setTheme(Context context, String themeName) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_settings_info).edit();
-        editor.putString("THEME", themeName);
-        editor.apply();
+
+    @JvmStatic
+    fun setTheme(context: Context?, themeName: String?) {
+        val editor = getSharedPref(context!!, R.string.file_settings_info).edit()
+        editor.putString("THEME", themeName)
+        editor.apply()
     }
-    public static String getThemePref(Activity context) {
+
+    @JvmStatic
+    fun getThemePref(context: Activity): String? {
         return getSharedPref(
-                context,
-                R.string.file_settings_info
-        ).getString("THEME", null);
+            context,
+            R.string.file_settings_info
+        ).getString("THEME", null)
     }
 
-    private static void addIncompleteWorkoutPref(Context context, Set<String> incompleteWorkouts) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
-        editor.putStringSet(INCOMPLETE_WORKOUTS, incompleteWorkouts);
-        editor.apply();
+    private fun addIncompleteWorkoutPref(context: Context, incompleteWorkouts: Set<String>) {
+        val editor = getSharedPref(context, R.string.file_workout_info).edit()
+        editor.putStringSet(INCOMPLETE_WORKOUTS, incompleteWorkouts)
+        editor.apply()
     }
 
-    public static Set<String> getIncompleteWorkouts(Context context) {
+    @JvmStatic
+    fun getIncompleteWorkouts(context: Context): MutableSet<String>? {
         return getSharedPref(
-                context,
-                R.string.file_workout_info
-        ).getStringSet(INCOMPLETE_WORKOUTS, null);
+            context,
+            R.string.file_workout_info
+        ).getStringSet(INCOMPLETE_WORKOUTS, null)
     }
 
-    public static boolean removeIncompleteWorkoutPref(Context context, String workoutName) {
-        Set<String> incompleteWorkouts = getIncompleteWorkouts(context);
-        if (incompleteWorkouts == null) {
-            return false;
-        }
-        boolean removed = incompleteWorkouts.remove(workoutName);
-
-        if (incompleteWorkouts.size() == 0) {
-            SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
-            editor.remove(INCOMPLETE_WORKOUTS);
-            editor.apply();
+    @JvmStatic
+    fun removeIncompleteWorkoutPref(context: Context, workoutName: String): Boolean {
+        val incompleteWorkouts = getIncompleteWorkouts(context) ?: return false
+        val removed = incompleteWorkouts.remove(workoutName)
+        if (incompleteWorkouts.size == 0) {
+            val editor = getSharedPref(context, R.string.file_workout_info).edit()
+            editor.remove(INCOMPLETE_WORKOUTS)
+            editor.apply()
         } else {
-            addIncompleteWorkoutPref(context, incompleteWorkouts);
+            addIncompleteWorkoutPref(context, incompleteWorkouts)
         }
-        return removed;
-    }
-    // -------------------------------------------------------------------------------------------
-
-
-    // ExerciseConst Sessions    // Workouts
-    //    // -------------------------------------------------------------------------------------------
-    public static void addIncompleteSessionPref(Context context, String workoutName, String sessionJson) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
-        editor.putString(String.format(WORKOUT_EX_IND, workoutName), sessionJson);
-        editor.apply();
+        return removed
     }
 
+    @JvmStatic
+    fun addIncompleteSessionPref(context: Context, workoutName: String, sessionJson: String?) {
+        val editor = getSharedPref(context, R.string.file_workout_info).edit()
+        editor.putString(String.format(WORKOUT_EX_IND, workoutName), sessionJson)
+        editor.apply()
+    }
 
-    public static String getIncompleteSessionPref(Context context, String workoutName) {
+    @JvmStatic
+    fun getIncompleteSessionPref(context: Context, workoutName: String): String? {
         return getSharedPref(
-                context,
-                R.string.file_workout_info
-        ).getString(String.format(WORKOUT_EX_IND, workoutName), null);
+            context,
+            R.string.file_workout_info
+        ).getString(String.format(WORKOUT_EX_IND, workoutName), null)
     }
 
-    public static void removeIncompleteSessionPref(Context context, String workoutName) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
-        editor.remove(String.format(WORKOUT_EX_IND, workoutName));
-        editor.apply();
+    @JvmStatic
+    fun removeIncompleteSessionPref(context: Context, workoutName: String) {
+        val editor = getSharedPref(context, R.string.file_workout_info).edit()
+        editor.remove(String.format(WORKOUT_EX_IND, workoutName))
+        editor.apply()
     }
 
-
-    public static void addSessionProgressPref(Context context, String workoutName, String progressJson) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
-        editor.putString(String.format(WORKOUT_PROGRESS, workoutName), progressJson);
-        editor.apply();
+    @JvmStatic
+    fun addSessionProgressPref(context: Context?, workoutName: String, progressJson: String?) {
+        val editor = getSharedPref(context!!, R.string.file_workout_info).edit()
+        editor.putString(String.format(WORKOUT_PROGRESS, workoutName), progressJson)
+        editor.apply()
     }
 
-    public static String getSessionProgressPref(Context context, String workoutName) {
+    @JvmStatic
+    fun getSessionProgressPref(context: Context?, workoutName: String): String? {
         return getSharedPref(
-                context,
-                R.string.file_workout_info
-        ).getString(String.format(WORKOUT_PROGRESS, workoutName), null);
+            context!!,
+            R.string.file_workout_info
+        ).getString(String.format(WORKOUT_PROGRESS, workoutName), null)
     }
 
-    public static void removeSessionProgressPref(Context context, String workoutName) {
-        SharedPreferences.Editor editor = getSharedPref(context, R.string.file_workout_info).edit();
-        editor.remove(String.format(WORKOUT_PROGRESS, workoutName));
-        editor.apply();
+    @JvmStatic
+    fun removeSessionProgressPref(context: Context?, workoutName: String) {
+        val editor = getSharedPref(context!!, R.string.file_workout_info).edit()
+        editor.remove(String.format(WORKOUT_PROGRESS, workoutName))
+        editor.apply()
     }
 
-    public static SharedPreferences getSharedPref(Context context, int fileId) {
+    @JvmStatic
+    fun getSharedPref(context: Context, fileId: Int): SharedPreferences {
         return context.getSharedPreferences(
-                context.getString(fileId),
-                Context.MODE_PRIVATE
-        );
+            context.getString(fileId),
+            Context.MODE_PRIVATE
+        )
     }
-    // -------------------------------------------------------------------------------------------
 }

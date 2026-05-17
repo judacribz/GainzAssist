@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -12,6 +13,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
+import butterknife.BindView
+import butterknife.OnClick
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.main.Main
 import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_LOGOUT_USER
@@ -19,16 +22,21 @@ import ca.judacribz.gainzassist.util.Preferences.setUserInfoPref
 import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.setInitView
 import ca.judacribz.gainzassist.util.UI.setSpring
-import ca.judacribz.gainzassist.util.firebase.Authentication.*
+import ca.judacribz.gainzassist.util.firebase.Authentication
+import ca.judacribz.gainzassist.util.firebase.Authentication.RC_SIGN_IN
+import ca.judacribz.gainzassist.util.firebase.Authentication.createUser
+import ca.judacribz.gainzassist.util.firebase.Authentication.linkUser
+import ca.judacribz.gainzassist.util.firebase.Authentication.signIn
+import ca.judacribz.gainzassist.util.firebase.Authentication.signOut
 import ca.judacribz.gainzassist.util.firebase.Database.setUserInfo
-import com.facebook.AccessToken
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
+import com.facebook.*
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
+import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
+import com.facebook.rebound.SpringSystem
+import com.facebook.rebound.SpringUtil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -36,39 +44,30 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import java.io.IOException
-import butterknife.BindView
-import butterknife.OnClick
+import java.util.*
 
-class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.AuthStateListener {
+class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
 
     companion object {
-        private const val RC_SIGN_IN = 9001
         private const val MIN_PASSWORD_LEN = 6
-        private const val SLIDE_DURATION = 1000
-
         private const val LOGIN_IMG = "squat.png"
         private const val SIGN_UP_IMG = "fatman.png"
-
-        private const val PROGRESS_MAX = 100
-        
-        private val progressHandler = ProgressHandler()
     }
 
-    var auth: FirebaseAuth? = null
-    var credential: AuthCredential? = null
-    var googleCred: AuthCredential? = null
-    var signInOptions: GoogleSignInOptions? = null
-    var signInClient: GoogleSignInClient? = null
-    var callbackManager: CallbackManager? = null
+    private val progressHandler = ProgressHandler()
 
-    var email: String? = null
-    var password: String? = null
-    var slide_end: Animation? = null
-    var isLoggedIn = false
-    @JvmField
+    private var auth: FirebaseAuth? = null
+    private var credential: AuthCredential? = null
+    private var googleCred: AuthCredential? = null
+    private var signInClient: GoogleSignInClient? = null
+    private var callbackManager: CallbackManager? = null
+
+    private var email: String? = null
+    private var password: String? = null
+    private var slide_end: Animation? = null
     var linkGoogle = false
-    var loginSpring: Spring? = null
-    var signUpSpring: Spring? = null
+    private var loginSpring: Spring? = null
+    private var signUpSpring: Spring? = null
 
     @BindView(R.id.blurLayout)
     lateinit var blurLayout: View
@@ -130,40 +129,30 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
 
     private fun setupSignInMethods() {
         auth = FirebaseAuth.getInstance()
-
-        signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
-        signInClient = GoogleSignIn.getClient(this, signInOptions!!)
-
+        signInClient = GoogleSignIn.getClient(this, gso)
         callbackManager = CallbackManager.Factory.create()
         LoginManager.getInstance().registerCallback(callbackManager, this)
-        val accessToken = AccessToken.getCurrentAccessToken()
-        isLoggedIn = accessToken != null && !accessToken.isExpired
     }
 
     private fun setupMainImages() {
         val assetManager = assets
         try {
             ivLoginImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(LOGIN_IMG)))
-        } catch (ioe: IOException) {
-            ioe.printStackTrace()
-        }
-
-        try {
             ivSignUpImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(SIGN_UP_IMG)))
         } catch (ioe: IOException) {
             ioe.printStackTrace()
         }
-
         slide_end = AnimationUtils.loadAnimation(this, R.anim.slide_end)
     }
 
     override fun onStart() {
         super.onStart()
         if (intent.getBooleanExtra(EXTRA_LOGOUT_USER, false)) {
-            signOut(this, signInClient)
+            signOut(this, signInClient!!)
             LoginManager.getInstance().logOut()
         }
         auth!!.addAuthStateListener(this)
@@ -171,7 +160,6 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 RC_SIGN_IN -> {
@@ -180,7 +168,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
                     try {
                         val account = task.getResult(ApiException::class.java)
                         googleCred = GoogleAuthProvider.getCredential(account!!.idToken, null)
-                        signIn(this, googleCred, signInClient)
+                        signIn(this, googleCred!!, signInClient!!)
                     } catch (ex: ApiException) {
                         ex.printStackTrace()
                     }
@@ -202,35 +190,29 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
 
     override fun onAuthStateChanged(firebaseAuth: FirebaseAuth) {
         val firebaseUser = firebaseAuth.currentUser
-
         if (firebaseUser != null) {
             progressHandler.show()
-
             Toast.makeText(
                 this,
                 String.format(getString(R.string.txt_logged_in), firebaseUser.email),
                 Toast.LENGTH_SHORT
             ).show()
-
             if (linkGoogle) {
-                linkUser(this, credential, firebaseUser)
+                linkUser(this, credential!!, firebaseUser)
             }
-
             setUserInfoPref(this, firebaseUser.email, firebaseUser.uid)
             setUserInfo(this)
-
             startActivity(Intent(this, Main::class.java))
             finish()
         }
     }
 
-    override fun onSuccess(result: LoginResult?) {
-        credential = FacebookAuthProvider.getCredential(result!!.accessToken.token)
-        signIn(this, credential, signInClient)
+    override fun onSuccess(result: LoginResult) {
+        credential = FacebookAuthProvider.getCredential(result.accessToken.token)
+        signIn(this, credential!!, signInClient!!)
     }
 
     override fun onCancel() {}
-
     override fun onError(error: FacebookException) {
         error.printStackTrace()
     }
@@ -238,7 +220,6 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
     fun validateForm(email: String, password: String): Boolean {
         var emailIsValid = false
         var passwordIsValid = false
-
         if (email.isEmpty()) {
             etEmail.error = getString(R.string.err_required)
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
@@ -246,7 +227,6 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
         } else {
             emailIsValid = true
         }
-
         if (password.isEmpty()) {
             etPassword.error = getString(R.string.err_required)
         } else if (password.length < MIN_PASSWORD_LEN) {
@@ -254,7 +234,6 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
         } else {
             passwordIsValid = true
         }
-
         return emailIsValid && passwordIsValid
     }
 
@@ -276,10 +255,9 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
         if (validateForm(email!!, password!!)) {
             progressHandler.setTitle("Login")
             progressHandler.show()
-
             credential = EmailAuthProvider.getCredential(email!!, password!!)
-            signIn(this, credential, signInClient)
-            loginSpring!!.endValue = 0.9
+            signIn(this, credential!!, signInClient!!)
+            loginSpring?.endValue = 0.9
         }
     }
 
@@ -290,10 +268,9 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
         if (validateForm(email!!, password!!)) {
             progressHandler.setTitle("Sign Up")
             progressHandler.show()
-
             credential = EmailAuthProvider.getCredential(email!!, password!!)
-            createUser(this, email, password, signInClient)
-            signUpSpring!!.endValue = 0.9
+            createUser(this, email!!, password!!, signInClient!!)
+            signUpSpring?.endValue = 0.9
         }
     }
 
@@ -307,8 +284,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
 
     @OnClick(R.id.iv_login_image, R.id.iv_sign_up_image)
     fun bounceImg() {
-        loginSpring!!.endValue = 0.3
-        signUpSpring!!.endValue = 0.9
+        loginSpring?.endValue = 0.3
+        signUpSpring?.endValue = 0.9
     }
 
     @OnClick(R.id.tv_login_here)
@@ -327,11 +304,10 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult?>, FirebaseAuth.
             inView.width / 2,
             inView.height / 2,
             0.0f,
-            Math.hypot(inView.width.toDouble(), inView.height.toDouble()).toFloat()
+            Math.hypot((inView.width / 2).toDouble(), (inView.height / 2).toDouble()).toFloat() * 2
         )
         animator.interpolator = AccelerateDecelerateInterpolator()
         animator.start()
-
         if (navTextView != null) {
             slide_end!!.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation) {

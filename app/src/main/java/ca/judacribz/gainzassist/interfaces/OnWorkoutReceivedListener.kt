@@ -1,7 +1,7 @@
-package ca.judacribz.gainzassist.interfaces;
+package ca.judacribz.gainzassist.interfaces
 
-import ca.judacribz.gainzassist.models.Workout;
+import ca.judacribz.gainzassist.models.Workout
 
-public interface OnWorkoutReceivedListener {
-    void onWorkoutsReceived(Workout workout);
+interface OnWorkoutReceivedListener {
+    fun onWorkoutsReceived(workout: Workout)
 }

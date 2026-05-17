@@ -1,127 +1,60 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*;
-import org.parceler.Parcel;
+import android.arch.persistence.room.ColumnInfo
+import android.arch.persistence.room.Entity
+import android.arch.persistence.room.Ignore
+import android.arch.persistence.room.PrimaryKey
+import org.parceler.Parcel
+import org.parceler.Parcel.Serialization
+import java.util.*
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import static android.arch.persistence.room.ForeignKey.*;
-
-@Parcel
+@Parcel(Serialization.BEAN)
 @Entity(tableName = "exercise_sets")
-public class ExerciseSet {
+class ExerciseSet {
 
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
     @PrimaryKey
-    long id = -1;
+    var id: Long = -1
 
     @ColumnInfo(name = "session_id")
-    long sessionId;
+    var sessionId: Long = 0
 
     @ColumnInfo(name = "exercise_id")
-    long exerciseId;
+    var exerciseId: Long = 0
 
     @ColumnInfo(name = "set_number")
-    int setNumber;
-    int reps;
-    float weight;
+    var setNumber: Int = 0
+    var reps: Int = 0
+    var weight: Float = 0f
 
     @ColumnInfo(name = "exercise_name")
-    public String exerciseName;
-    // --------------------------------------------------------------------------------------------
+    var exerciseName: String? = null
 
-    // ######################################################################################### //
-    // ExerciseSet Constructors                                                                          //
-    // ######################################################################################### //
-    public ExerciseSet() {
-    }
+    constructor()
 
     @Ignore
-    public ExerciseSet(Exercise exercise, int setNumber, int reps, float weight) {
-        this(exercise.getId(), exercise.getName(), setNumber, reps, weight);
-    }
+    constructor(exercise: Exercise, setNumber: Int, reps: Int, weight: Float) : this(
+        exercise.id,
+        exercise.name,
+        setNumber,
+        reps,
+        weight
+    )
 
     @Ignore
-    public ExerciseSet(long exerciseId, String exerciseName, int setNumber, int reps, float weight) {
-        setId(-1);
-        setExerciseId(exerciseId);
-        setExerciseName(exerciseName);
-        setSetNumber(setNumber);
-        setReps(reps);
-        setWeight(weight);
-    }
-    // ######################################################################################### //
-
-    // Getters and setters
-    // ============================================================================================
-    public long getId() {
-        return id;
+    constructor(exerciseId: Long, exerciseName: String?, setNumber: Int, reps: Int, weight: Float) {
+        id = -1
+        this.exerciseId = exerciseId
+        this.exerciseName = exerciseName
+        this.setNumber = setNumber
+        this.reps = reps
+        this.weight = weight
     }
 
-    public void setId(long id) {
-        this.id = (id == -1) ? new Date().getTime() : id;
-    }
-
-    public long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(long sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public long getExerciseId() {
-        return exerciseId;
-    }
-
-    public void setExerciseId(long exerciseId) {
-        this.exerciseId = exerciseId;
-    }
-
-    public void setExerciseName(String exerciseName) {
-        this.exerciseName = exerciseName;
-    }
-    public String getExerciseName() {
-        return exerciseName;
-    }
-    public int getSetNumber() {
-        return setNumber;
-    }
-
-    public void setSetNumber(int setNumber) {
-        this.setNumber = setNumber;
-    }
-
-    public int getReps() {
-        return reps;
-    }
-
-    public void setReps(int reps) {
-        this.reps = reps;
-    }
-
-    public float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    // ============================================================================================
-
-
-    // Misc function used to store ExerciseSet information in the FireBase db
-    Map<String, Object> toMap() {
-        Map<String, Object> exerciseSetMap = new HashMap<>();
-
-        exerciseSetMap.put("id", id);
-        exerciseSetMap.put("reps", reps);
-        exerciseSetMap.put("weight", weight);
-
-        return exerciseSetMap;
+    fun toMap(): Map<String, Any?> {
+        val exerciseSetMap = HashMap<String, Any?>()
+        exerciseSetMap["id"] = id
+        exerciseSetMap["reps"] = reps
+        exerciseSetMap["weight"] = weight
+        return exerciseSetMap
     }
 }

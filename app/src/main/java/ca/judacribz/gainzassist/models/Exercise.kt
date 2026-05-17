@@ -1,311 +1,217 @@
-package ca.judacribz.gainzassist.models;
+package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*;
-import android.support.annotation.Nullable;
-import com.orhanobut.logger.Logger;
-import org.parceler.Parcel;
-import java.util.*;
+import android.arch.persistence.room.*
+import ca.judacribz.gainzassist.constants.ExerciseConst.BARBELL
+import ca.judacribz.gainzassist.constants.ExerciseConst.DUMBBELL
+import ca.judacribz.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
+import ca.judacribz.gainzassist.constants.ExerciseConst.BB_WEIGHT_CHANGE
+import ca.judacribz.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
+import ca.judacribz.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
+import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_WEIGHT
+import ca.judacribz.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
+import ca.judacribz.gainzassist.constants.ExerciseConst.NA
+import ca.judacribz.gainzassist.constants.ExerciseConst.STRENGTH
+import ca.judacribz.gainzassist.constants.ExerciseConst.CARDIOVASCULAR
+import ca.judacribz.gainzassist.constants.ExerciseConst.PLYOMETRICS
+import org.parceler.Parcel
+import org.parceler.Parcel.Serialization
+import org.parceler.Parcels
+import java.util.*
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
+@Parcel(Serialization.BEAN)
+@Entity(
+    tableName = "exercises",
+    foreignKeys = [ForeignKey(
+        entity = Workout::class,
+        parentColumns = ["id"],
+        childColumns = ["workout_id"],
+        onUpdate = ForeignKey.CASCADE,
+        onDelete = ForeignKey.CASCADE
+    )],
+    indices = [Index(value = ["workout_id", "exercise_number"])]
+)
+class Exercise {
 
-@Parcel
-@Entity(tableName = "exercises",
-        foreignKeys = @ForeignKey(
-                entity = Workout.class,
-                parentColumns = "id",
-                childColumns = "workout_id",
-                onUpdate = CASCADE,
-                onDelete = CASCADE),
-                indices = {@Index(value = {"workout_id", "exercise_number"})})
-public class Exercise {
-
-    @Ignore
-    public static final ArrayList<String> EQUIPMENT_TYPES = new ArrayList<>(Arrays.asList(
-            BARBELL,
-            DUMBBELL,
-            NA
-    ));
-    @Ignore
-    public static final ArrayList<String> EXERCISE_TYPES = new ArrayList<>(Arrays.asList(
-            STRENGTH,
-            CARDIOVASCULAR,
-            PLYOMETRICS
-    ));
-
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
     @PrimaryKey
-    long id = -1;
+    var id: Long = -1
 
     @ColumnInfo(name = "workout_id")
-    long workoutId = -1;
+    var workoutId: Long = -1
 
     @ColumnInfo(name = "exercise_number")
-    int exerciseNumber;
+    var exerciseNumber: Int = 0
 
-    String name;
-    String type;
-    String equipment;
-    int sets;
-    int reps;
-    float weight;
-
-    @Ignore
-    float weightChange, minWeight;
+    var name: String? = null
+    var type: String? = null
+    var equipment: String? = null
+    var sets: Int = 0
+    var reps: Int = 0
+    var weight: Float = 0f
 
     @Ignore
-    ArrayList<ExerciseSet> setsList = new ArrayList<>();
+    var weightChange: Float = 0f
     @Ignore
-    ArrayList<ExerciseSet> finSets = new ArrayList<>();
-
-    public enum SetsType {
-        WARMUP_SET,
-        MAIN_SET
-    }
+    var minWeight: Float = 0f
 
     @Ignore
-    SetsType setsType = SetsType.MAIN_SET;
-    // --------------------------------------------------------------------------------------------
+    var setsList = ArrayList<ExerciseSet>()
+    @Ignore
+    var finSets = ArrayList<ExerciseSet>()
 
-    // ######################################################################################### //
-    // Exercise Constructors                                                                     //
-    // ######################################################################################### //
-    // ######################################################################################### //
-    public Exercise() {
-        /* Required empty constructor for Firebase */
+    val finishedSetsList: ArrayList<ExerciseSet>
+        get() = finSets
+
+    enum class SetsType {
+        WARMUP_SET, MAIN_SET
     }
 
     @Ignore
-    public Exercise(int exerciseNumber,
-                    String name,
-                    String type,
-                    String equipment,
-                    @Nullable ArrayList<ExerciseSet> setsList,
-                    SetsType setsType) {
-        setExerciseBase(exerciseNumber, name, type, equipment);
-        setSetsList(setsList);
-        setSetsType(setsType);
-    }
+    var setsType = SetsType.MAIN_SET
+
+    constructor()
 
     @Ignore
-    public Exercise(int exerciseNumber,
-                    String name,
-                    String type,
-                    String equipment,
-                    int sets,
-                    int reps,
-                    float weight,
-                    SetsType setsType) {
-        setExerciseBase(exerciseNumber, name, type, equipment);
-        setSets(sets);
-        setReps(reps);
-        setWeight(weight);
-        setSetsType(setsType);
-    }
-
-    private void setExerciseBase(int exerciseNumber,
-                                String name,
-                                String type,
-                                String equipment) {
-        setId(-1);
-        setExerciseNumber(exerciseNumber);
-        setName(name);
-        setType(type);
-        setEquipment(equipment);
-    }
-    // ============================================================================================
-
-    // Getters and setters
-    // ============================================================================================
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = (id == -1) ? new Date().getTime() : id;
-    }
-
-    public long getWorkoutId() {
-        return this.workoutId;
-    }
-
-    public void setWorkoutId(long workoutId) {
-        this.workoutId = workoutId;
-    }
-
-    public int getExerciseNumber() {
-        return this.exerciseNumber;
-    }
-
-    public void setExerciseNumber(int exerciseNumber) {
-        this.exerciseNumber = exerciseNumber;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getEquipment() {
-        return equipment;
-    }
-
-    public void setEquipment(String equipment) {
-        this.equipment = equipment;
-
-        if (BARBELL.equals(this.equipment)) {
-            this.minWeight = BB_MIN_WEIGHT;
-            this.weightChange = BB_WEIGHT_CHANGE;
-        } else if (DUMBBELL.equals(this.equipment)) {
-            this.minWeight = DB_MIN_WEIGHT;
-            this.weightChange = DB_WEIGHT_CHANGE;
-        } else {
-            this.minWeight = MIN_WEIGHT;
-            this.weightChange = WEIGHT_CHANGE;
-        }
-    }
-
-    public int getSets() {
-        return sets;
-    }
-
-    public void setSets(int sets) {
-        this.sets = sets;
-    }
-
-    public int getReps() {
-        return this.reps;
-    }
-
-    public void setReps(int reps) {
-        this.reps = reps;
-    }
-
-    public float getWeight() {
-        return this.weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-
-    }
-
-    public float getMinWeight() {
-        return this.minWeight;
-    }
-
-    public float getWeightChange() {
-        return this.weightChange;
-    }
-
-    public void setSetsType(SetsType setsType) {
-        this.setsType = setsType;
-    }
-
-    public SetsType getSetsType() {
-        return this.setsType;
-    }
-
-    public ArrayList<ExerciseSet> getSetsList() {
-        return this.setsList;
-    }
-
-    public ArrayList<ExerciseSet> getFinishedSetsList() {
-        return this.finSets;
-    }
-
-    public void setSetsList(@Nullable ArrayList<ExerciseSet> setsList) {
+    constructor(
+        exerciseNumber: Int,
+        name: String?,
+        type: String?,
+        equipment: String?,
+        setsList: ArrayList<ExerciseSet>?,
+        setsType: SetsType
+    ) {
+        setExerciseBase(exerciseNumber, name, type, equipment)
+        this.setsType = setsType
         if (setsList != null) {
-            this.setsList = setsList;
-        } else {
-            for (int i = 0; i < sets; i++) {
-                this.setsList.add(new ExerciseSet(id, name, i, reps, weight));
+            this.setsList = setsList
+            this.sets = setsList.size
+            if (sets > 0) {
+                this.reps = setsList[0].reps
+                this.weight = setsList[0].weight
             }
         }
     }
 
-    public void updateSet(ExerciseSet set) {
-        this.finSets.set(set.getSetNumber(), set);
+    @Ignore
+    constructor(
+        exerciseNumber: Int,
+        name: String?,
+        type: String?,
+        equipment: String?,
+        sets: Int,
+        reps: Int,
+        weight: Float,
+        setsType: SetsType
+    ) {
+        setExerciseBase(exerciseNumber, name, type, equipment)
+        this.sets = sets
+        this.reps = reps
+        this.weight = weight
+        this.setsType = setsType
+        initializeSetsList()
     }
 
-    public void addSet(ExerciseSet set, boolean genId) {
+    fun initializeSetsList() {
+        if (setsList.isEmpty()) {
+            for (i in 0 until sets) {
+                setsList.add(ExerciseSet(id, name, i, reps, weight))
+            }
+        }
+    }
+
+    private fun setExerciseBase(
+        exerciseNumber: Int,
+        name: String?,
+        type: String?,
+        equipment: String?
+    ) {
+        id = -1
+        this.exerciseNumber = exerciseNumber
+        this.name = name
+        this.type = type
+        this.equipment = equipment
+    }
+
+    fun updateSet(set: ExerciseSet) {
+        finSets[set.setNumber] = set
+    }
+
+    fun addSet(set: ExerciseSet, genId: Boolean) {
         if (genId) {
-            set.setId(-1);
+            set.id = -1
         }
-        this.finSets.add(set);
+        finSets.add(set)
     }
 
-    public float getAvgWeight() {
-        float weight = 0.0f;
-        for (ExerciseSet exerciseSet : setsList) {
-            weight += exerciseSet.getWeight();
-        }
-        return weight / (float) getSets();
-    }
-
-    public int getAvgReps() {
-        int reps = 0;
-        for (ExerciseSet exerciseSet : setsList) {
-            reps += exerciseSet.getReps();
+    val avgWeight: Float
+        get() {
+            initializeSetsList()
+            var weight = 0.0f
+            for (exerciseSet in setsList) {
+                weight += exerciseSet.weight
+            }
+            return if (sets > 0) weight / sets.toFloat() else 0f
         }
 
-        return reps / getSets();
+    val avgReps: Int
+        get() {
+            initializeSetsList()
+            var reps = 0
+            for (exerciseSet in setsList) {
+                reps += exerciseSet.reps
+            }
+            return if (sets > 0) reps / sets else 0
+        }
+
+    fun getSet(setIndex: Int): ExerciseSet {
+        initializeSetsList()
+        return setsList[setIndex]
     }
 
-    public ExerciseSet getSet(int setIndex) {
-        return this.setsList.get(setIndex);
+    val numSets: Int
+        get() {
+            initializeSetsList()
+            return setsList.size
+        }
+
+    fun toMap(): Map<String, Any?> {
+        val map = HashMap<String, Any?>()
+        map["id"] = id
+        map["name"] = name
+        map["type"] = type
+        map["equipment"] = equipment
+        map["sets"] = sets
+        map["reps"] = reps
+        map["weight"] = weight
+        return map
     }
 
-    public int getNumSets() {
-        return this.setsList.size();
-    }
-    // ============================================================================================
+    fun setsToMap(): Map<String, Any?> {
+        val setMap = HashMap<String, Any?>()
+        val exMap = toMap() as HashMap<String, Any?>
+        var success = true
 
-
-    /* Misc function used to store Exercise information in the firebase db */
-    public Map<String, Object> toMap() {
-        return new HashMap<String, Object>() {{
-            put("id",        id);
-            put("name",      name);
-            put("type",      type);
-            put("equipment", equipment);
-            put("sets",      sets);
-            put("reps",      reps);
-            put("weight",    weight);
-        }};
-    }
-
-    public Map<String, Object> setsToMap() {
-        Map<String, Object>
-                setMap = new HashMap<>(),
-                exMap = toMap();
-        boolean success = true;
-
-        for (ExerciseSet set : this.finSets) {
-            setMap.put(String.valueOf(set.getSetNumber()), set.toMap());
-
-            if (set.getReps() < this.reps || set.getWeight() < this.weight) {
-                success = false;
+        for (set in finSets) {
+            setMap[set.setNumber.toString()] = set.toMap()
+            if (set.reps < reps || set.weight < weight) {
+                success = false
             }
         }
 
-        exMap.put("setList", setMap);
-        if (finSets.size() == sets) {
-            exMap.put("success", success);
+        exMap["setList"] = setMap
+        if (finSets.size == sets) {
+            exMap["success"] = success
         }
 
-        return exMap;
+        return exMap
+    }
+
+    companion object {
+        @Ignore
+        @JvmField
+        val EQUIPMENT_TYPES = arrayListOf(BARBELL, DUMBBELL, NA)
+
+        @Ignore
+        @JvmField
+        val EXERCISE_TYPES = arrayListOf(STRENGTH, CARDIOVASCULAR, PLYOMETRICS)
     }
 }

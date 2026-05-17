@@ -1,169 +1,154 @@
-package ca.judacribz.gainzassist.util;
+package ca.judacribz.gainzassist.util
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.Context;
-import ca.judacribz.gainzassist.models.Exercise;
-import ca.judacribz.gainzassist.models.ExerciseSet;
-import ca.judacribz.gainzassist.models.Session;
-import ca.judacribz.gainzassist.models.Workout;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.firebase.database.DataSnapshot;
-import com.orhanobut.logger.Logger;
+import android.app.Activity
+import android.app.ActivityManager
+import android.content.Context
+import ca.judacribz.gainzassist.models.Exercise
+import ca.judacribz.gainzassist.models.ExerciseSet
+import ca.judacribz.gainzassist.models.Session
+import ca.judacribz.gainzassist.models.Workout
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.google.firebase.database.DataSnapshot
+import com.orhanobut.logger.Logger
+import java.io.IOException
+import java.util.*
+import ca.judacribz.gainzassist.constants.ExerciseConst.EXERCISES
+import ca.judacribz.gainzassist.constants.ExerciseConst.SET_LIST
 
-import java.io.IOException;
-import java.util.*;
+object Misc {
 
-import static ca.judacribz.gainzassist.constants.ExerciseConst.*;
+    private val mapper = ObjectMapper()
 
-
-public class Misc {
-
-    private static ObjectMapper mapper = new ObjectMapper();
-
-    @SuppressWarnings("deprecation")
-    public static boolean isMyServiceRunning(Activity act, Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) act.getSystemService(Context.ACTIVITY_SERVICE);
+    @JvmStatic
+    @Suppress("deprecation")
+    fun isMyServiceRunning(act: Activity, serviceClass: Class<*>): Boolean {
+        val manager = act.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
         if (manager != null) {
-            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-                if (serviceClass.getName().equals(service.service.getClassName())) {
-                    return true;
+            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+                if (serviceClass.name == service.service.className) {
+                    return true
                 }
             }
         }
-        return false;
+        return false
     }
 
+    @JvmStatic
+    fun extractWorkout(workoutShot: DataSnapshot): Workout {
+        val exercises = ArrayList<Exercise>()
+        var exercise: Exercise?
+        val workoutId = workoutShot.child("id").value.toString().toLong()
 
-    public static Workout extractWorkout(DataSnapshot workoutShot) {
-        ArrayList<Exercise> exercises = new ArrayList<>();
-        Exercise exercise;
-        long workoutId = Long.valueOf(String.valueOf(workoutShot.child("id").getValue()));
-
-        for (DataSnapshot exerciseShot : workoutShot.child("exercises").getChildren()) {
-
-            // Adds exerciseSets to exercise object, and add exercise to exercises list
+        for (exerciseShot in workoutShot.child("exercises").children) {
             if (exerciseShot != null) {
-                exercise = exerciseShot.getValue(Exercise.class);
-
+                exercise = exerciseShot.getValue(Exercise::class.java)
                 if (exercise != null) {
-                    exercise.setExerciseNumber(
-                            Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey()))
-                    );
-                    exercise.setWorkoutId(workoutId);
-                    Logger.d("WORKOUT ID " + workoutId);
-                    exercises.add(exercise);
+                    exercise.exerciseNumber = exerciseShot.key!!.toInt()
+                    exercise.workoutId = workoutId
+                    Logger.d("WORKOUT ID $workoutId")
+                    exercises.add(exercise)
                 }
             }
         }
-        Workout workout = new Workout(workoutShot.getKey(), exercises);
-        workout.setId(workoutId);
-
-        return workout;
+        val workout = Workout(workoutShot.key, exercises)
+        workout.id = workoutId
+        return workout
     }
 
-    public static Session extractSession(DataSnapshot sessionShot) {
-        Session session = sessionShot.getValue(Session.class);
-
+    @JvmStatic
+    fun extractSession(sessionShot: DataSnapshot): Session? {
+        val session = sessionShot.getValue(Session::class.java)
         if (session != null) {
-            long timestamp = session.getTimestamp();
-            Exercise exercise;
-            ExerciseSet set;
-            session.setTimestamp(Long.valueOf(Objects.requireNonNull(sessionShot.getKey())));
-
-            String exerciseName;
-            long exerciseId;
-            long workoutId;
-            for (DataSnapshot exerciseShot : sessionShot.child(EXERCISES).getChildren()) {
-                exercise = exerciseShot.getValue(Exercise.class);
-
+            val timestamp = session.timestamp
+            var exercise: Exercise?
+            var set: ExerciseSet?
+            session.timestamp = sessionShot.key!!.toLong()
+            var exerciseName: String?
+            var exerciseId: Long
+            for (exerciseShot in sessionShot.child(EXERCISES).children) {
+                exercise = exerciseShot.getValue(Exercise::class.java)
                 if (exercise != null) {
-                    exerciseId = exercise.getId();
-                    exerciseName = exercise.getName();
-
-                    exercise.setExerciseNumber(Integer.valueOf(Objects.requireNonNull(exerciseShot.getKey())));
-
-                    for (DataSnapshot setShot : exerciseShot.child(SET_LIST).getChildren()) {
-                        set = setShot.getValue(ExerciseSet.class);
-
+                    exerciseId = exercise.id
+                    exerciseName = exercise.name
+                    exercise.exerciseNumber = exerciseShot.key!!.toInt()
+                    for (setShot in exerciseShot.child(SET_LIST).children) {
+                        set = setShot.getValue(ExerciseSet::class.java)
                         if (set != null) {
-                            set.setSetNumber(Integer.valueOf(Objects.requireNonNull(setShot.getKey())));
-                            set.setExerciseId(exerciseId);
-                            set.setExerciseName(exerciseName);
-                            set.setSessionId(timestamp);
-                            exercise.addSet(set, false);
+                            set.setNumber = setShot.key!!.toInt()
+                            set.exerciseId = exerciseId
+                            set.exerciseName = exerciseName
+                            set.sessionId = timestamp
+                            exercise.addSet(set, false)
                         }
                     }
-
-                    session.addExercise(exercise);
+                    session.addExercise(exercise)
                 }
             }
         }
-
-        return session;
+        return session
     }
 
-
-    public static Map<String, Object> exerciseToMap(ArrayList<Exercise> exercises)  {
-        Map<String, Object> exs = new HashMap<>();
-        for (Exercise exercise: exercises) {
-            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.toMap());
+    @JvmStatic
+    fun exerciseToMap(exercises: ArrayList<Exercise>): Map<String, Any?> {
+        val exs = HashMap<String, Any?>()
+        for (exercise in exercises) {
+            exs[exercise.exerciseNumber.toString()] = exercise.toMap()
         }
-
-        return exs;
+        return exs
     }
 
-    public static Map<String, Object> exerciseSetsToMap(ArrayList<Exercise> exercises)  {
-        Map<String, Object> exs = new HashMap<>();
-        for (Exercise exercise: exercises) {
-            exs.put(String.valueOf(exercise.getExerciseNumber()), exercise.setsToMap());
+    @JvmStatic
+    fun exerciseSetsToMap(exercises: ArrayList<Exercise>): Map<String, Any?> {
+        val exs = HashMap<String, Any?>()
+        for (exercise in exercises) {
+            exs[exercise.exerciseNumber.toString()] = exercise.setsToMap()
         }
-
-        return exs;
+        return exs
     }
 
-    public static void enablePrettyMapper() {
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    @JvmStatic
+    fun enablePrettyMapper() {
+        mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
 
-    public static Map<String, Object> readValue(Object childObj) {
-        return readValue(writeValueAsString(childObj));
+    @JvmStatic
+    fun readValue(childObj: Any?): Map<String, Any?> {
+        return readValue(writeValueAsString(childObj))
     }
 
-    public static String writeValueAsString(Object object) {
-        String jsonStr = "";
-
+    @JvmStatic
+    fun writeValueAsString(`object`: Any?): String {
+        var jsonStr = ""
         try {
-            jsonStr = mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            jsonStr = mapper.writeValueAsString(`object`)
+        } catch (e: JsonProcessingException) {
+            e.printStackTrace()
         }
-
-        return  jsonStr;
+        return jsonStr
     }
 
-    public static Map<String, Object> readValue(String childStr) {
-        Map<String, Object> childMap = new HashMap<>();
-
+    @JvmStatic
+    fun readValue(childStr: String?): Map<String, Any?> {
+        var childMap: Map<String, Any?> = HashMap()
         try {
             childMap = mapper.readValue(
-                    childStr,
-                    new TypeReference<HashMap<String, Object>>() {}
-            );
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+                childStr,
+                object : TypeReference<HashMap<String, Any?>?>() {}
+            )!!
+        } catch (ioe: IOException) {
+            ioe.printStackTrace()
         }
-
-        return childMap;
+        return childMap
     }
 
-    public static void shrinkTo(List list, int newSize) {
-        int size = list.size();
-        for (int i = newSize; i < size; i++) {
-            list.remove(list.size() - 1);
+    @JvmStatic
+    fun shrinkTo(list: MutableList<*>?, newSize: Int) {
+        val size = list!!.size
+        for (i in newSize until size) {
+            list.removeAt(list.size - 1)
         }
     }
 }

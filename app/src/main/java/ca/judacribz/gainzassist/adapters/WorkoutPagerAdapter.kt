@@ -1,163 +1,127 @@
-package ca.judacribz.gainzassist.adapters;
+package ca.judacribz.gainzassist.adapters
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
+import ca.judacribz.gainzassist.activities.add_workout.ExEntry
+import ca.judacribz.gainzassist.activities.start_workout.fragments.ExercisesList
+import ca.judacribz.gainzassist.activities.start_workout.fragments.WarmupsList
+import ca.judacribz.gainzassist.activities.start_workout.fragments.WorkoutScreen
+import ca.judacribz.gainzassist.models.Exercise
+import org.parceler.Parcels
+import java.util.*
 
-import android.view.View;
-import ca.judacribz.gainzassist.activities.add_workout.ExEntry;
-import ca.judacribz.gainzassist.activities.start_workout.fragments.*;
-import ca.judacribz.gainzassist.models.Exercise;
-import org.parceler.Parcels;
+class WorkoutPagerAdapter : FragmentPagerAdapter {
 
-public class WorkoutPagerAdapter extends FragmentPagerAdapter {
-
-    // Constants
-    // --------------------------------------------------------------------------------------------
-    final public static String EXTRA_WARMUPS =
-            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS";
-    final public static String EXTRA_MAIN_EXERCISES =
-            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES";
-    final public static String EXTRA_EX_INDEX =
-            "ca.judacribz.gainzassist.activities.start_workout.EXTRA_EX_INDEX";
-
-
-    final private ArrayList<Fragment> FMTS = new ArrayList<>(Arrays.asList(
+    private val FMTS = ArrayList<Fragment>(
+        listOf(
             WarmupsList.getInstance(),
             WorkoutScreen.getInstance(),
             ExercisesList.getInstance()
-    ));
+        )
+    )
 
-    final private ArrayList<Fragment> FMTS_NO_WARMUPS = new ArrayList<>(Arrays.asList(
+    private val FMTS_NO_WARMUPS = ArrayList<Fragment>(
+        listOf(
             WorkoutScreen.getInstance(),
             ExercisesList.getInstance()
-    ));
+        )
+    )
 
-    // --------------------------------------------------------------------------------------------
+    private var fmts = FMTS
+    private var numExs = 0
+    private var baseId: Long = 0
 
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
-    private ArrayList<Fragment> fmts = FMTS;
-    private int
-            numExs,
-            baseId = 0;
-    // --------------------------------------------------------------------------------------------
-
-    // ######################################################################################### //
-    // WorkoutPagerAdapter Constructor                                                           //
-    // ######################################################################################### //
-    @SuppressWarnings("unchecked")
-    public WorkoutPagerAdapter(FragmentManager fragmentManager, ArrayList<Exercise>... exercises) {
-        super(fragmentManager);
-
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]));
-        ArrayList<Exercise> warmups = exercises[1];
-
-        if (warmups.size() > 0) {
-            bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]));
+    constructor(fragmentManager: FragmentManager, vararg exercises: ArrayList<Exercise>) : super(fragmentManager) {
+        val bundle = Bundle()
+        bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]))
+        val warmups = exercises[1]
+        if (warmups.size > 0) {
+            bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]))
         } else {
-            fmts =  FMTS_NO_WARMUPS;
+            fmts = FMTS_NO_WARMUPS
         }
-        for (Fragment fmt : fmts) {
-            fmt.setArguments(bundle);
-        }
-    }
-
-    public WorkoutPagerAdapter(FragmentManager fragmentManager, int numExs) {
-        super(fragmentManager);
-        this.numExs = numExs;
-        fmts = new ArrayList<>();
-
-        newEntries();
-    }
-
-    public WorkoutPagerAdapter(FragmentManager fragmentManager, List<Fragment> fmts) {
-        super(fragmentManager);
-        this.fmts = (ArrayList<Fragment>) fmts;
-    }
-    // ######################################################################################### //
-
-    // FragmentPagerAdapter Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    /* Returns total number of pages */
-    @Override
-    public int getCount() {
-        return fmts.size();
-    }
-
-    /* Returns the fragment to display for that page */
-    @Override
-    public Fragment getItem(int position) {
-        return fmts.get(position);
-    }
-    //FragmentPagerAdapter//Override///////////////////////////////////////////////////////////////
-
-
-    public void addTab() {
-        this.numExs++;
-        newEntry(getCount());
-    }
-
-    public void newEntries() {
-        for (int i = 0; i < this.numExs; i++) {
-            newEntry(i);
+        for (fmt in fmts) {
+            fmt.arguments = bundle
         }
     }
 
-    public void newEntry(int index) {
-        Fragment fmt = new ExEntry();
-        ((ExEntry) fmt).setInd(index);
-        fmts.add(fmt);
+    constructor(fragmentManager: FragmentManager, numExs: Int) : super(fragmentManager) {
+        this.numExs = numExs
+        fmts = ArrayList()
+        newEntries()
     }
 
-    public void removeFragment(int index, ArrayList<Exercise> exercises) {
-        this.fmts.remove(index);
-        this.numExs--;
+    constructor(fragmentManager: FragmentManager, fmts: List<Fragment>) : super(fragmentManager) {
+        this.fmts = fmts as ArrayList<Fragment>
+    }
 
-        notifyChangeInPosition();
-        int i;
-        Exercise exercise;
-        for (Fragment fmt : this.fmts) {
-            i = fmts.indexOf(fmt);
-            fmt = new ExEntry();
+    override fun getCount(): Int {
+        return fmts.size
+    }
 
-            ((ExEntry) fmt).setInd(i);
+    override fun getItem(position: Int): Fragment {
+        return fmts[position]
+    }
 
-            exercise = exercises.get(i);
-            if (exercise.getName() != null) {
-                ((ExEntry) fmt).updateExFields(exercise);
+    fun addTab() {
+        numExs++
+        newEntry(count)
+    }
+
+    fun newEntries() {
+        for (i in 0 until numExs) {
+            newEntry(i)
+        }
+    }
+
+    fun newEntry(index: Int) {
+        val fmt = ExEntry()
+        fmt.setInd(index)
+        fmts.add(fmt)
+    }
+
+    fun removeFragment(index: Int, exercises: ArrayList<Exercise>) {
+        fmts.removeAt(index)
+        numExs--
+        notifyChangeInPosition()
+        var i: Int
+        var exercise: Exercise
+        val newFmts = ArrayList<Fragment>()
+        for (fmt in fmts) {
+            i = fmts.indexOf(fmt)
+            val newFmt = ExEntry()
+            newFmt.setInd(i)
+            exercise = exercises[i]
+            if (exercise.name != null) {
+                newFmt.updateExFields(exercise)
             }
-
-            fmts.set(i, fmt);
+            newFmts.add(newFmt)
         }
+        fmts.clear()
+        fmts.addAll(newFmts)
     }
 
-
-    //this is called when notifyDataSetChanged() is called
-    @Override
-    public int getItemPosition(@NonNull Object object) {
-        // refresh all fragments when data set changed
-        return WorkoutPagerAdapter.POSITION_NONE;
+    override fun getItemPosition(`object`: Any): Int {
+        return POSITION_NONE
     }
 
-
-    @Override
-    public long getItemId(int position) {
-        // give an ID different from position when position has been changed
-        return baseId + position;
+    override fun getItemId(position: Int): Long {
+        return baseId + position
     }
 
-    private void notifyChangeInPosition() {
-        baseId += getCount() + 1;
+    private fun notifyChangeInPosition() {
+        baseId += (count + 1).toLong()
     }
 
-    public void hideDelete() {
-        ((ExEntry) this.fmts.get(0)).hideDelete();
+    fun hideDelete() {
+        (fmts[0] as ExEntry).hideDelete()
+    }
+
+    companion object {
+        const val EXTRA_WARMUPS = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_WARMUPS"
+        const val EXTRA_MAIN_EXERCISES = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES"
+        const val EXTRA_EX_INDEX = "ca.judacribz.gainzassist.activities.start_workout.EXTRA_EX_INDEX"
     }
 }

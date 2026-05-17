@@ -30,7 +30,7 @@ public abstract class WorkoutDatabase extends RoomDatabase {
                 }
             };
 
-    static WorkoutDatabase getDatabase(final Context context) {
+    public static WorkoutDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (WorkoutDatabase.class) {
                 if (INSTANCE == null) {

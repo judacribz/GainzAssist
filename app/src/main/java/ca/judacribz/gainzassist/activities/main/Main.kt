@@ -35,6 +35,8 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
     companion object {
         const val EXTRA_LOGOUT_USER = "ca.judacribz.gainzassist.EXTRA_LOGOUT_USER"
         const val EXTRA_WORKOUT = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT"
+        const val EXTRA_CALLING_ACTIVITY = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_CALLING_ACTIVITY"
+        const val EXERCISES_ENTRY = "ca.judacribz.gainzassist.activities.main.Main.EXERCISES_ENTRY"
         
         private val progressHandler = ProgressHandler()
     }

@@ -1,99 +1,84 @@
-package ca.judacribz.gainzassist.activities.how_to_videos;
+package ca.judacribz.gainzassist.activities.how_to_videos
 
-import android.os.AsyncTask;
-import com.google.gson.JsonObject;
-import com.orhanobut.logger.Logger;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.ArrayList;
+import android.os.AsyncTask
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.*
 
-import javax.net.ssl.HttpsURLConnection;
+class SearchVideosTask : AsyncTask<String, Void, List<ArrayList<String>>>() {
 
-public class SearchVideosTask extends AsyncTask<String, Void, JSONObject> {
-
-    // Interfaces
-    // --------------------------------------------------------------------------------------------
-    private YouTubeSearchObserver youTubeSearchObserver;
-
-    public interface YouTubeSearchObserver {
-        void videoSearchDataReceived(ArrayList<String> videoIds, ArrayList<String> videoTitles);
+    interface YouTubeSearchObserver {
+        fun videoSearchDataReceived(videoIds: ArrayList<String>, videoTitles: ArrayList<String>)
     }
 
-    void setYouTubeSearchObserver(YouTubeSearchObserver youTubeSearchObserver) {
-        this.youTubeSearchObserver = youTubeSearchObserver;
+    private var youTubeSearchObserver: YouTubeSearchObserver? = null
+
+    fun setYouTubeSearchObserver(youTubeSearchObserver: YouTubeSearchObserver?) {
+        this.youTubeSearchObserver = youTubeSearchObserver
     }
-    // --------------------------------------------------------------------------------------------
 
+    override fun doInBackground(vararg strings: String): List<ArrayList<String>>? {
+        val result = ArrayList<ArrayList<String>>()
+        var connection: HttpURLConnection? = null
+        var reader: BufferedReader? = null
 
-    // AsyncTask<String, Void, JSONObject> Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    protected JSONObject doInBackground(String... urls) {
-        HttpsURLConnection conn = null;
-
-
-        JSONObject jsonData = new JSONObject();
-        StringBuilder sb = new StringBuilder();
-
-        // Get the JSON format data from url
         try {
-            conn = (HttpsURLConnection) (new URL(urls[0])).openConnection();
-            conn.connect();
+            val url = URL(strings[0])
+            connection = url.openConnection() as HttpURLConnection
+            connection.connect()
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line.concat("\n"));
+            val stream = connection.inputStream
+            reader = BufferedReader(InputStreamReader(stream))
+
+            val buffer = StringBuilder()
+            var line: String?
+            while (reader.readLine().also { line = it } != null) {
+                buffer.append(line).append("\n")
             }
-            br.close();
 
-            jsonData = new JSONObject(sb.toString());
+            val jsonObject = JSONObject(buffer.toString())
+            val items = jsonObject.getJSONArray("items")
 
-        } catch (IOException | JSONException ex) {
-            ex.printStackTrace();
+            val videoIds = ArrayList<String>()
+            val videoTitles = ArrayList<String>()
 
+            for (i in 0 until items.length()) {
+                val item = items.getJSONObject(i)
+                val id = item.getJSONObject("id")
+                val snippet = item.getJSONObject("snippet")
+
+                videoIds.add(id.getString("videoId"))
+                videoTitles.add(snippet.getString("title"))
+            }
+
+            result.add(videoIds)
+            result.add(videoTitles)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } catch (e: JSONException) {
+            e.printStackTrace()
         } finally {
-            if (conn != null) {
-                conn.disconnect();
+            connection?.disconnect()
+            try {
+                reader?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
 
-        Logger.d("YOUTUBE SEARCH  " +jsonData.toString());
-
-        return jsonData;
+        return result
     }
 
-    @Override
-    protected void onPostExecute(JSONObject jsonData) {
-        ArrayList<String> videoIds = new ArrayList<>();
-        ArrayList<String> videoTitles = new ArrayList<>();
-        try {
-
-            JSONArray items = jsonData.getJSONArray("items");
-
-            for (int i = 0; i < items.length(); i++) {
-                videoIds.add(
-                        ((JSONObject) items.get(i))
-                                .getJSONObject("id")
-                                .getString("videoId")
-                );
-
-                videoTitles.add(
-                        ((JSONObject) items.get(i))
-                                .getJSONObject("snippet")
-                                .getString("title")
-                );
-            }
-        } catch (JSONException ex) {
-            ex.printStackTrace();
+    override fun onPostExecute(lists: List<ArrayList<String>>) {
+        super.onPostExecute(lists)
+        if (youTubeSearchObserver != null && lists.size == 2) {
+            youTubeSearchObserver!!.videoSearchDataReceived(lists[0], lists[1])
         }
-
-        youTubeSearchObserver.videoSearchDataReceived(videoIds, videoTitles);
     }
-    //AsyncTask<String//Void//JSONObject>//Override////////////////////////////////////////////////
 }

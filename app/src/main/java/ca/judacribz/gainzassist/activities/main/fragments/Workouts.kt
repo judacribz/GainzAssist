@@ -1,258 +1,106 @@
-package ca.judacribz.gainzassist.activities.main.fragments;
+package ca.judacribz.gainzassist.activities.main.fragments
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import ca.judacribz.gainzassist.R;
-import ca.judacribz.gainzassist.activities.add_workout.Summary;
-import ca.judacribz.gainzassist.activities.main.Main;
-import ca.judacribz.gainzassist.activities.start_workout.StartWorkout;
-import ca.judacribz.gainzassist.adapters.SingleItemAdapter;
-import ca.judacribz.gainzassist.models.Workout;
-import ca.judacribz.gainzassist.models.db.WorkoutViewModel;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.OnItemClickListener;
-import com.orhanobut.dialogplus.ViewHolder;
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.content.Intent
+import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import butterknife.BindView
+import butterknife.ButterKnife
+import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
+import ca.judacribz.gainzassist.adapters.SingleItemAdapter
+import ca.judacribz.gainzassist.models.Workout
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel
+import ca.judacribz.gainzassist.util.UI.getTextString
+import com.miguelcatalan.materialsearchview.MaterialSearchView
+import java.util.*
 
-import java.util.ArrayList;
-import java.util.List;
+class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearchView.OnQueryTextListener {
 
-import static ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.WORKOUTS_LIST;
-import static ca.judacribz.gainzassist.activities.add_workout.Summary.EXTRA_CALLING_ACTIVITY;
-import static ca.judacribz.gainzassist.util.UI.getTextString;
-import static ca.judacribz.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
+    var intent: Intent? = null
+    var extraKey: String? = null
+    var workoutViewModel: WorkoutViewModel? = null
+    var adapter: SingleItemAdapter? = null
+    var allWorkouts: List<Workout>? = null
+    var filteredWorkouts: List<Workout>? = null
+    var workoutNames: ArrayList<String>? = null
 
-public class Workouts extends Fragment implements SingleItemAdapter.ItemClickObserver {
+    @BindView(R.id.rv_workout_btns)
+    lateinit var workoutsList: RecyclerView
 
-    // Constants
-    // --------------------------------------------------------------------------------------------
-    private static final Workouts INST = new Workouts();
-    // --------------------------------------------------------------------------------------------
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_workouts, container, false)
+        ButterKnife.bind(this, view)
+        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
-    // Global Vars
-    // --------------------------------------------------------------------------------------------
-    Main act;
-    View view;
+        workoutsList.layoutManager = LinearLayoutManager(context)
+        workoutsList.setHasFixedSize(true)
 
-    SingleItemAdapter workoutAdapter;
-    LinearLayoutManager layoutManager;
-    DialogPlus dialog;
-
-    WorkoutViewModel workoutViewModel;
-    Observer<List<Workout>> workObs;
-    LiveData<List<Workout>> workLiv;
-
-    ArrayList<String>
-            workoutNames,
-            filteredWorkouts;
-
-    public Intent intent;
-    public String extraKey;
-
-    // UI Elements
-    @BindView(R.id.rv_workout_btns) RecyclerView workoutsList;
-    // --------------------------------------------------------------------------------------------
-
-
-    // ######################################################################################### //
-    // WarmupsList Constructor/Instance                                                          //
-    // ######################################################################################### //
-    public Workouts() {
-    }
-
-    public static Workouts getInstance() {
-        return INST;
-    }
-    // ######################################################################################### //
-
-
-    // Fragment Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        act = (Main) context;
-
-        dialog = DialogPlus.newDialog(act)
-                .setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                    }
-                })
-                .setContentHolder(new ViewHolder(R.layout.dialog_workout))
-                .setContentBackgroundResource(R.drawable.edit_text_box_blue)
-                .setExpanded(true)
-                .setGravity(Gravity.CENTER)
-                .setCancelable(true)
-                .create();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-        if (view != null) {
-            return view;
-        }
-
-        ButterKnife.bind(
-                this,
-                view = inflater.inflate(R.layout.fragment_workouts, container, false)
-        );
-        setRetainInstance(true);
-
-        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel.class);
-        workoutNames = new ArrayList<>();
-
-        layoutManager = new LinearLayoutManager(act);
-        workoutsList.setLayoutManager(layoutManager);
-        workoutsList.setHasFixedSize(true);
-
-        workObs = new Observer<List<Workout>>() {
-            @Override
-            public void onChanged(@Nullable List<Workout> workouts) {
-                if (workouts != null) {
-                    workoutNames = new ArrayList<>();
-                    for (Workout workout : workouts) {
-                        workoutNames.add(workout.getName());
-                    }
-                    if (workoutAdapter == null) {
-                        displayWorkoutList(workoutNames);
-                    } else {
-//                        workoutAdapter.setItems(workoutNames);
-//                        workoutAdapter.notifyDataSetChanged();
-
-                        displayWorkoutList(workoutNames);
-                    }
+        workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
+            allWorkouts = workouts
+            filteredWorkouts = workouts
+            workoutNames = ArrayList()
+            if (workouts != null) {
+                for (workout in workouts) {
+                    workoutNames!!.add(workout.name!!)
                 }
             }
-        };
-        workLiv = workoutViewModel.getAllWorkouts();
-        return view;
+            updateWorkouts()
+        })
+
+        return view
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        workLiv.observe(act, workObs);
+    private fun updateWorkouts() {
+        if (workoutNames == null) return
+        adapter = SingleItemAdapter(
+            context,
+            workoutNames,
+            R.layout.part_button,
+            R.id.btnListItem
+        )
+        adapter!!.setItemClickObserver(this)
+        workoutsList.adapter = adapter
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        workLiv.removeObserver(workObs);
+    override fun onItemClick(view: View?) {
+        intent = Intent(context, StartWorkout::class.java)
+        extraKey = ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT
+        workoutViewModel!!.getWorkoutFromName(context, getTextString(view as TextView))
     }
 
-    /* Helper function to display button list of workouts */
-    public void displayWorkoutList(@Nullable ArrayList<String> workouts) {
-        if (workouts != null) {
-            filteredWorkouts = workouts;
+    override fun onItemLongClick(view: View?) {}
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (allWorkouts == null) return false
+        val query = newText?.lowercase() ?: ""
+        filteredWorkouts = allWorkouts!!.filter { it.name!!.lowercase().contains(query) }
+        workoutNames = ArrayList()
+        for (workout in filteredWorkouts!!) {
+            workoutNames!!.add(workout.name!!)
         }
-
-        workoutAdapter = new SingleItemAdapter(
-                act,
-                filteredWorkouts,
-                R.layout.part_button,
-                R.id.btnListItem
-        );
-
-        workoutAdapter.setItemClickObserver(this);
-        workoutsList.setAdapter(workoutAdapter);
+        updateWorkouts()
+        return true
     }
 
-    //Fragment//Override///////////////////////////////////////////////////////////////////////////
-
-
-    // SingleItemAdapter.ItemClickObserver Override
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    @Override
-    public void onItemClick(View view) {
-        intent = new Intent(act, StartWorkout.class);
-        extraKey = Main.EXTRA_WORKOUT;
-        workoutViewModel.getWorkoutFromName(act, getTextString((TextView) view));
-    }
-
-    String workoutName;
-    @Override
-    public void onItemLongClick(View view) {
-        workoutName = getTextString((TextView) view);
-
-        ((TextView) dialog.findViewById(R.id.tv_workout_name)).setText(workoutName);
-
-        dialog.findViewById(R.id.btn_edit_workout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editWorkout(workoutName);
-            }
-        });
-
-        dialog.findViewById(R.id.btn_delete_workout).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                deleteWorkout(workoutName);
-            }
-        });
-
-        dialog.show();
-    }
-
-    private void editWorkout(String workoutName) {
-        Intent newWorkoutSummaryIntent = new Intent(
-                act,
-                Summary.class
-        );
-        newWorkoutSummaryIntent.putExtra(EXTRA_CALLING_ACTIVITY, WORKOUTS_LIST);
-
-        extraKey = Summary.EXTRA_WORKOUT;
-        intent = newWorkoutSummaryIntent;
-
-        workoutViewModel.getWorkoutFromName(act, workoutName);
-
-        dialog.dismiss();
-    }
-
-    private void deleteWorkout(String workoutName) {
-        workoutViewModel.deleteWorkout(workoutName);
-        dialog.dismiss();
-    }
-    //SingleItemAdapter.ItemClickObserver//Override////////////////////////////////////////////////
-
-
-    public void onQueryTextChange(String newText) {
-        String filterWord = newText.toLowerCase();
-
-        filteredWorkouts = new ArrayList<>();
-        for (String workoutName : workoutNames) {
-            if (workoutName.toLowerCase().contains(filterWord)) {
-                filteredWorkouts.add(workoutName);
-            }
+    companion object {
+        @JvmStatic
+        fun getInstance(): Workouts {
+            return Workouts()
         }
-
-        workoutAdapter.setItems(filteredWorkouts);
-        workoutAdapter.notifyDataSetChanged();
     }
-
-
-    // Click Handling
-    // ============================================================================================
-    //=Click=Handling==============================================================================
 }
