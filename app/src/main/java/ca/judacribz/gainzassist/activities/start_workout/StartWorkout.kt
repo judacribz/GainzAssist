@@ -1,6 +1,5 @@
 package ca.judacribz.gainzassist.activities.start_workout
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.TabLayout
@@ -13,15 +12,16 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import butterknife.BindView
+import butterknife.ButterKnife
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
 import ca.judacribz.gainzassist.models.Exercise
 import ca.judacribz.gainzassist.models.Exercise.SetsType
 import ca.judacribz.gainzassist.models.Workout
-import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.Misc.readValue
 import ca.judacribz.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.judacribz.gainzassist.util.Preferences.getIncompleteSessionPref
@@ -29,6 +29,7 @@ import ca.judacribz.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.addIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.addIncompleteWorkoutPref
 import ca.judacribz.gainzassist.util.UI.setInitView
+import com.facebook.rebound.ui.Util.dpToPx
 import org.parceler.Parcels
 import java.util.*
 
@@ -52,66 +53,79 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
     var setsView: View? = null
     var setList: RecyclerView? = null
     var tvExerciseName: TextView? = null
-    var lp: LinearLayout.LayoutParams? = null
+    var lp: RelativeLayout.LayoutParams? = null
     var adapter: SetsAdapter? = null
     var warmupAdapter = ArrayList<SetsAdapter>()
     var mainAdapters = ArrayList<SetsAdapter>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setInitView(this, R.layout.activity_start_workout, R.string.resume_workout, true)
+        val intent = intent
+        workout = Parcels.unwrap(intent.getParcelableExtra(ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT))
+        exercises = workout!!.exercises
+        setInitView(this, R.layout.activity_start_workout, workout!!.name, true)
 
-        val bundle = intent.extras
-        if (bundle != null) {
-            workout = Parcels.unwrap(bundle.getParcelable(ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT))
-            exercises = workout!!.exercises
-        }
-
-        tabLayout.setupWithViewPager(viewPager)
-
-        lp = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
+        lp = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
         )
-        lp!!.setMargins(0, 10, 0, 10)
+        val dpval = dpToPx(5.0, resources).toInt()
+        lp!!.setMargins(dpval, dpval, dpval, dpval)
+    }
 
-        setCurrSession()
+    override fun onResume() {
+        super.onResume()
+        if (viewPager.adapter == null) {
+            setCurrSession()
+        }
     }
 
     fun setCurrSession() {
         currWorkout.setDataListener(this)
-        val w = workout
-        if (w != null && removeIncompleteWorkoutPref(this, w.name!!)) {
+        if (removeIncompleteWorkoutPref(this, workout!!.name!!)) {
             @Suppress("UNCHECKED_CAST")
             currWorkout.setRetrievedWorkout(
-                readValue(getIncompleteSessionPref(this, w.name!!)) as Map<String, Any>,
-                w
+                readValue(getIncompleteSessionPref(this, workout!!.name!!)) as Map<String, Any?>,
+                workout!!
             )
-            removeIncompleteSessionPref(this, w.name!!)
+            removeIncompleteSessionPref(this, workout!!.name!!)
         } else {
-            currWorkout.setCurrWorkout(w!!)
+            currWorkout.setCurrWorkout(workout!!)
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        currWorkout.resetIndices()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        handleLeavingScreen()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        currWorkout.unsetTimer()
         handleLeavingScreen()
     }
 
     fun handleLeavingScreen() {
-        val w = workout
-        if (w != null) {
-            val jsonStr = currWorkout.saveSessionState()
-            if (jsonStr.isNotEmpty()) {
-                addIncompleteSessionPref(
-                    this,
-                    w.name!!,
-                    jsonStr
-                )
-            }
-            addIncompleteWorkoutPref(this, w.name!!)
-            currWorkout.resetLocks()
+        val jsonStr = currWorkout.saveSessionState()
+        if (jsonStr.isNotEmpty()) {
+            addIncompleteSessionPref(
+                this,
+                workout!!.name!!,
+                jsonStr
+            )
         }
+        addIncompleteWorkoutPref(this, workout!!.name!!)
+        currWorkout.resetLocks()
     }
 
     override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
@@ -174,11 +188,11 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
         setList = setsView!!.findViewById(R.id.rv_exercise_sets)
         setList!!.setHasFixedSize(true)
-        setList!!.layoutManager = LinearLayoutManager(
+        setList!!.setLayoutManager(LinearLayoutManager(
             this,
             LinearLayoutManager.HORIZONTAL,
             false
-        )
+        ))
 
         adapter = SetsAdapter(exercise.setsList)
         setList!!.adapter = adapter

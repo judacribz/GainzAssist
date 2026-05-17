@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.start_workout
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +11,13 @@ import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.models.ExerciseSet
 import java.util.*
 
-class SetsAdapter(private val exerciseSets: ArrayList<ExerciseSet>) : RecyclerView.Adapter<SetsAdapter.SetsViewHolder>() {
+class SetsAdapter(private val exerciseSets: ArrayList<ExerciseSet>) :
+    RecyclerView.Adapter<SetsAdapter.SetsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SetsViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.part_sets_input, parent, false)
-        return SetsViewHolder(view)
+        val inflater = LayoutInflater.from(parent.context)
+        val view = inflater.inflate(R.layout.part_sets_input, parent, false)
+        return SetsViewHolder(parent.context, view)
     }
 
     override fun onBindViewHolder(holder: SetsViewHolder, position: Int) {
@@ -30,7 +33,8 @@ class SetsAdapter(private val exerciseSets: ArrayList<ExerciseSet>) : RecyclerVi
         return exerciseSets
     }
 
-    class SetsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SetsViewHolder(private val context: Context, itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
         private val tvSetNum: TextView = itemView.findViewById(R.id.tv_sets)
         private val etReps: EditText = itemView.findViewById(R.id.et_reps)
         private val etWeight: EditText = itemView.findViewById(R.id.et_weight)

@@ -12,7 +12,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import butterknife.*
+import butterknife.BindView
+import butterknife.ButterKnife
+import butterknife.OnClick
+import butterknife.OnFocusChange
+import butterknife.OnTextChanged
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.start_workout.CurrWorkout
 import ca.judacribz.gainzassist.activities.start_workout.EquipmentView
@@ -20,30 +24,23 @@ import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*
-import ca.judacribz.gainzassist.models.Exercise
-import ca.judacribz.gainzassist.models.Exercise.SetsType
-import ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET
-import ca.judacribz.gainzassist.models.ExerciseSet
-import ca.judacribz.gainzassist.models.db.WorkoutViewModel
-import ca.judacribz.gainzassist.util.Misc.readValue
-import ca.judacribz.gainzassist.util.Misc.writeValueAsString
-import ca.judacribz.gainzassist.util.Preferences.getSessionProgressPref
-import ca.judacribz.gainzassist.util.Preferences.addSessionProgressPref
-import ca.judacribz.gainzassist.util.Preferences.removeIncompleteWorkoutPref
-import ca.judacribz.gainzassist.util.Preferences.removeIncompleteSessionPref
-import ca.judacribz.gainzassist.util.Preferences.removeSessionProgressPref
-import ca.judacribz.gainzassist.util.UI.getTextInt
-import ca.judacribz.gainzassist.util.UI.handleFocusLeft
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_REPS
 import ca.judacribz.gainzassist.constants.ExerciseConst.SESSION
 import ca.judacribz.gainzassist.constants.ExerciseConst.EXERCISES
 import ca.judacribz.gainzassist.constants.ExerciseConst.SET_LIST
 import ca.judacribz.gainzassist.constants.ExerciseConst.REPS
 import ca.judacribz.gainzassist.constants.ExerciseConst.WEIGHT
-import ca.judacribz.gainzassist.constants.ExerciseConst.EXERCISE_INDEX
-import ca.judacribz.gainzassist.constants.ExerciseConst.SET_INDEX
 import ca.judacribz.gainzassist.constants.UIConst.PROGRESS_CODE_MAP
 import ca.judacribz.gainzassist.constants.UIConst.PROGRESS_STATUS_MAP
+import ca.judacribz.gainzassist.models.Exercise
+import ca.judacribz.gainzassist.models.Exercise.SetsType
+import ca.judacribz.gainzassist.models.ExerciseSet
+import ca.judacribz.gainzassist.models.db.WorkoutViewModel
+import ca.judacribz.gainzassist.util.Misc.readValue
+import ca.judacribz.gainzassist.util.Misc.writeValueAsString
+import ca.judacribz.gainzassist.util.Preferences.*
+import ca.judacribz.gainzassist.util.UI.getTextInt
+import ca.judacribz.gainzassist.util.UI.handleFocusLeft
 import com.orhanobut.logger.Logger
 import java.util.*
 
@@ -128,6 +125,9 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         setManager = setProgressLayoutManagers(rvSet)
         exerciseManager = setProgressLayoutManagers(rvExercise)
 
+        rvSet.setHasFixedSize(true)
+        rvExercise.setHasFixedSize(true)
+
         return view
     }
 
@@ -169,7 +169,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         updateUI()
     }
 
-    private fun updateProgressExs(numExs: Int) {
+    fun updateProgressExs(numExs: Int) {
         if (exProgress == null) {
             exProgress = setupProgress(numExs, currWorkout.currExNum, null)
         }
@@ -183,7 +183,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         })
     }
 
-    private fun updateProgSets(numSets: Int) {
+    fun updateProgSets(numSets: Int) {
         if (setProgress == null) {
             setProgress = setupProgress(numSets, currWorkout.currSetNum, null)
             updateProgress = true
@@ -216,18 +216,17 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
         progressMap["exercise progress"] = exMap
         progressMap["set progress"] = setMap
-        val a = act
-        if (a != null) {
-            addSessionProgressPref(
-                a,
-                currWorkout.workoutName,
-                writeValueAsString(progressMap)
-            )
-        }
+        addSessionProgressPref(
+            act,
+            currWorkout.workoutName,
+            writeValueAsString(progressMap)
+        )
     }
 
     override fun startTimer(timeInMillis: Long) {
-        countDownTimer?.cancel()
+        if (countDownTimer != null) {
+            countDownTimer!!.cancel()
+        }
         countDownTimer = getCountDownTimer(timeInMillis)
         countDownTimer!!.start()
     }
@@ -251,8 +250,16 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     override fun updateProgressSets(numSets: Int) {
-        setProgress = setupProgress(numSets, currWorkout.currSetNum, currWorkout.currExType)
-        setAdapter = setupProgressAdapter(rvSet, numSets, setProgress!!, true)
+        setAdapter = setupProgressAdapter(
+            rvSet,
+            numSets,
+            setupProgress(
+                numSets,
+                currWorkout.currSetNum,
+                currWorkout.currExType
+            ).also { setProgress = it },
+            true
+        )
     }
 
     private fun setupProgressAdapter(
@@ -307,11 +314,15 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
     @OnTextChanged(value = [R.id.et_weight], callback = OnTextChanged.Callback.TEXT_CHANGED)
     fun onWeightChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        val weightStr = s.toString()
-        val weight = if (weightStr.isNotEmpty()) weightStr.toFloat() else currWorkout.currMinWeight
-        currWorkout.setWeight(weight)
-        equipmentView.post { equipmentView.setWeight(weight, currWorkout.currEquip) }
-        if (currWorkout.isMinWeight() || weight <= currWorkout.currMinWeight) {
+        val weightVal: Float
+        if (s.toString().isNotEmpty()) {
+            weightVal = s.toString().toFloat()
+            equipmentView.setup(weightVal, currWorkout.currEquip)
+        } else {
+            weightVal = currWorkout.currMinWeight
+        }
+        currWorkout.setWeight(weightVal)
+        if (currWorkout.isMinWeight() || weightVal <= currWorkout.currMinWeight) {
             btnDecWeight.isEnabled = false
             btnDecWeight.visibility = View.INVISIBLE
         }
@@ -320,14 +331,14 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     @OnFocusChange(value = [R.id.et_reps, R.id.et_weight])
     fun onFocusLeft(et: EditText, hasFocus: Boolean) {
         if (!hasFocus) {
-            val min: Float
-            val res: Float
+            val min: Number
+            val res: Number
             if (et.id == R.id.et_weight) {
                 min = currWorkout.currMinWeight
                 res = currWorkout.currWeight
             } else {
-                min = MIN_REPS.toFloat()
-                res = currWorkout.currReps.toFloat()
+                min = MIN_REPS
+                res = currWorkout.currReps
             }
             handleFocusLeft(et, min, res)
         }
@@ -345,23 +356,24 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         }
     }
 
-    @OnClick(R.id.ibtn_inc_reps, R.id.ibtn_dec_reps)
+    @OnClick(value = [R.id.ibtn_inc_reps, R.id.ibtn_dec_reps])
     fun changeReps(repsBtn: ImageButton) {
-        if (repsBtn.id == R.id.ibtn_inc_reps) {
-            currWorkout.incReps()
-        } else {
-            currWorkout.decReps()
+        when (repsBtn.id) {
+            R.id.ibtn_inc_reps -> currWorkout.incReps()
+            R.id.ibtn_dec_reps -> currWorkout.decReps()
         }
         setReps()
     }
 
-    @OnClick(R.id.ibtn_inc_weight, R.id.ibtn_dec_weight)
+    @OnClick(value = [R.id.ibtn_inc_weight, R.id.ibtn_dec_weight])
     fun changeWeight(weightBtn: ImageButton) {
-        if (weightBtn.id == R.id.ibtn_inc_weight) {
-            currWorkout.incWeight()
-        } else {
-            currWorkout.decWeight()
+        Logger.d("changeWeight clicked id=" + weightBtn.id)
+        Logger.d("before currWeight=" + currWorkout.currWeight)
+        when (weightBtn.id) {
+            R.id.ibtn_inc_weight -> currWorkout.incWeight()
+            R.id.ibtn_dec_weight -> currWorkout.decWeight()
         }
+        Logger.d("after currWeight=" + currWorkout.currWeight)
         setWeight()
     }
 
@@ -375,7 +387,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         setAdapter = setupProgressAdapter(rvSet, currWorkout.currNumSets, setProgress!!, true)
         exerciseAdapter!!.setSelected(currWorkout.currExNum)
         tvExerciseTitle.text = currWorkout.currExName
-        equipmentView.setWeight(currSet!!.weight, currWorkout.currEquip)
+        equipmentView.setup(currSet!!.weight, currWorkout.currEquip)
         etCurrReps.setText(currSet!!.reps.toString())
         etCurrWeight.setText(currSet!!.weight.toString())
         updateUI()
@@ -388,15 +400,15 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             updateUI()
         } else {
             workoutFinished = true
-        val a = act
-        if (a != null) {
-            ViewModelProviders.of(a).get(WorkoutViewModel::class.java).insertSession(currWorkout.currSession!!)
-            if (removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {
-                removeIncompleteSessionPref(a, currWorkout.workoutName)
+            val a = act
+            if (a != null) {
+                ViewModelProviders.of(a).get(WorkoutViewModel::class.java).insertSession(currWorkout.currSession!!)
+                if (removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {
+                    removeIncompleteSessionPref(a, currWorkout.workoutName)
+                }
+                removeSessionProgressPref(a, currWorkout.workoutName)
+                a.finish()
             }
-            removeSessionProgressPref(a, currWorkout.workoutName)
-            a.finish()
-        }
         }
     }
 
@@ -435,7 +447,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     fun setWeight() {
         weight = currWorkout.currWeight
         etCurrWeight.setText(weight.toString())
-        equipmentView.post { equipmentView.setWeight(weight, currWorkout.currEquip) }
+        equipmentView.post { equipmentView.setup(weight, currWorkout.currEquip) }
     }
 
     private fun selectProgressAdapterPos(adapter: SingleItemAdapter, rv: RecyclerView, pos: Int, success: Boolean) {
@@ -452,9 +464,9 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             val setStatus = SparseArray<PROGRESS_STATUS>()
             updateSetMode = true
             if (btnFinishSet.visibility == View.VISIBLE) {
-                btnFinishSet.setVisibility(View.INVISIBLE)
-                btnUpdateSet.setVisibility(View.VISIBLE)
-                btnResumeWorkout.setVisibility(View.VISIBLE)
+                btnFinishSet.visibility = View.INVISIBLE
+                btnUpdateSet.visibility = View.VISIBLE
+                btnResumeWorkout.visibility = View.VISIBLE
             }
             if (currSet == null) {
                 currSet = ExerciseSet(ex, currWorkout.currSetNum, currWorkout.currReps, currWorkout.currWeight)
@@ -487,7 +499,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         val set = updateEx.finishedSetsList[setInd]
         tvExerciseTitle.text = updateEx.name
         tvSetNum.text = String.format(setNum!!, "Main")
-        equipmentView.setWeight(set.weight, updateEx.equipment!!)
+        equipmentView.setup(set.weight, updateEx.equipment!!)
         tvTimer.setText(R.string.update_set)
         etCurrReps.setText(set.reps.toString())
         etCurrWeight.setText(set.weight.toString())

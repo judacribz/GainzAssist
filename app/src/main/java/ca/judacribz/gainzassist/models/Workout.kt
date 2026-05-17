@@ -1,13 +1,10 @@
 package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.Ignore
-import android.arch.persistence.room.Index
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 import ca.judacribz.gainzassist.util.Misc.exerciseToMap
 import org.parceler.Parcel
 import org.parceler.Parcel.Serialization
-import java.util.Date
+import java.util.*
 
 @Parcel(Serialization.BEAN)
 @Entity(
@@ -18,6 +15,9 @@ class Workout {
 
     @PrimaryKey
     var id: Long = -1
+        set(id) {
+            field = if (id == -1L) Date().time else id
+        }
 
     var name: String? = null
 
@@ -28,7 +28,7 @@ class Workout {
 
     @Ignore
     constructor(name: String?, exercises: ArrayList<Exercise>?) {
-        initId()
+        this.id = -1
         this.name = name
         if (exercises != null) {
             this.exercises = exercises
@@ -80,7 +80,7 @@ class Workout {
 
     fun containsExercise(exerciseName: String): Boolean {
         for (exercise in exercises) {
-            if (exercise.name?.lowercase() == exerciseName.lowercase()) {
+            if (exercise.name?.lowercase(Locale.getDefault()) == exerciseName.lowercase(Locale.getDefault())) {
                 return true
             }
         }
@@ -98,8 +98,4 @@ class Workout {
 
     val numExercises: Int
         get() = exercises.size
-
-    fun initId(id: Long= -1L) {
-        this.id = if (id == -1L) Date().getTime() else id
-    }
 }

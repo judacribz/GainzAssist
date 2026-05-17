@@ -14,31 +14,27 @@ import java.util.*
 
 class WorkoutPagerAdapter : FragmentPagerAdapter {
 
-    private val FMTS = ArrayList<Fragment>(
-        listOf(
-            WarmupsList.getInstance(),
-            WorkoutScreen.getInstance(),
-            ExercisesList.getInstance()
-        )
+    private val FMTS = arrayListOf(
+        WarmupsList.getInstance(),
+        WorkoutScreen.getInstance(),
+        ExercisesList.getInstance()
     )
 
-    private val FMTS_NO_WARMUPS = ArrayList<Fragment>(
-        listOf(
-            WorkoutScreen.getInstance(),
-            ExercisesList.getInstance()
-        )
+    private val FMTS_NO_WARMUPS = arrayListOf(
+        WorkoutScreen.getInstance(),
+        ExercisesList.getInstance()
     )
 
-    private var fmts = FMTS
+    private var fmts: ArrayList<Fragment> = FMTS
     private var numExs = 0
-    private var baseId: Long = 0
+    private var baseId = 0
 
     constructor(fragmentManager: FragmentManager, vararg exercises: ArrayList<Exercise>) : super(fragmentManager) {
         val bundle = Bundle()
         bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]))
         val warmups = exercises[1]
         if (warmups.size > 0) {
-            bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(exercises[1]))
+            bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(warmups))
         } else {
             fmts = FMTS_NO_WARMUPS
         }
@@ -88,7 +84,6 @@ class WorkoutPagerAdapter : FragmentPagerAdapter {
         notifyChangeInPosition()
         var i: Int
         var exercise: Exercise
-        val newFmts = ArrayList<Fragment>()
         for (fmt in fmts) {
             i = fmts.indexOf(fmt)
             val newFmt = ExEntry()
@@ -97,10 +92,8 @@ class WorkoutPagerAdapter : FragmentPagerAdapter {
             if (exercise.name != null) {
                 newFmt.updateExFields(exercise)
             }
-            newFmts.add(newFmt)
+            fmts[i] = newFmt
         }
-        fmts.clear()
-        fmts.addAll(newFmts)
     }
 
     override fun getItemPosition(`object`: Any): Int {
@@ -108,11 +101,11 @@ class WorkoutPagerAdapter : FragmentPagerAdapter {
     }
 
     override fun getItemId(position: Int): Long {
-        return baseId + position
+        return (baseId + position).toLong()
     }
 
     private fun notifyChangeInPosition() {
-        baseId += (count + 1).toLong()
+        baseId += count + 1
     }
 
     fun hideDelete() {
