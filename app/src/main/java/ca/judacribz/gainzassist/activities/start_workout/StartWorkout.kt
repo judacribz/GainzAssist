@@ -91,6 +91,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
                 val savedSession = getIncompleteSessionPref(this, workoutName)
 
                 if (savedSession.isNullOrEmpty()) {
+                    removeIncompleteSessionPref(this, workoutName)
                     currWorkout.setCurrWorkout(currentWorkout)
                     return
                 }
