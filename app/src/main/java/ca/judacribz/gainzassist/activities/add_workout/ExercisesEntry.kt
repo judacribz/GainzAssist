@@ -17,7 +17,8 @@ import ca.judacribz.gainzassist.databinding.ActivityExercisesEntryBinding
 import ca.judacribz.gainzassist.models.Exercise
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.util.Misc.shrinkTo
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import com.orhanobut.logger.Logger
 import org.parceler.Parcels
 import java.util.*
@@ -47,14 +48,10 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setInitView(
-            this,
-            R.layout.activity_exercises_entry,
-            "Exercises Entry",
-            true
-        )
-        binding = ActivityExercisesEntryBinding.bind(findViewById(R.id.cl_parent))
+        setInitTheme(this)
+        binding = ActivityExercisesEntryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, "Exercises Entry", true)
 
         val workoutEntryIntent = intent
 

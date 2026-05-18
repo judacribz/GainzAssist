@@ -48,20 +48,17 @@
             app:tabTextColor="@color/colorLightBg">
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tab_resume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorBg"
                 android:text="@string/resume"/>
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tab_workouts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/workouts" />
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tab_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings" />

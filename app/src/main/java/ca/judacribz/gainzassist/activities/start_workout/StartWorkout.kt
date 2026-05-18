@@ -27,7 +27,8 @@ import ca.judacribz.gainzassist.util.Preferences.getIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.addIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.addIncompleteWorkoutPref
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import com.facebook.rebound.ui.Util.dpToPx
 import org.parceler.Parcels
 import java.util.*
@@ -58,8 +59,10 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         val intent = intent
         workout = Parcels.unwrap(intent.getParcelableExtra(ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT))
         exercises = workout!!.exercises
-        setInitView(this, R.layout.activity_start_workout, workout!!.name, true)
-        binding = ActivityStartWorkoutBinding.bind(findViewById(R.id.rlay_parent))
+        setInitTheme(this)
+        binding = ActivityStartWorkoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, workout!!.name!!, true)
 
         lp = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,

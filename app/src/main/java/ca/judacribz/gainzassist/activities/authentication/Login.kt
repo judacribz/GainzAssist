@@ -65,6 +65,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     var linkGoogle = false
     private var loginSpring: Spring? = null
     private var signUpSpring: Spring? = null
+    private var initialLoginScreenRunnable: Runnable? = null
 
     private lateinit var binding: ActivityLoginBinding
 
@@ -80,7 +81,13 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
 
         binding.ivLoginImage.post { loginSpring = setSpring(binding.ivLoginImage) }
         binding.ivSignUpImage.post { signUpSpring = setSpring(binding.ivSignUpImage) }
-        binding.tvSignUpHere.post { loginScreen() }
+        
+        initialLoginScreenRunnable = Runnable {
+            if (canTouchLoginViews()) {
+                loginScreen()
+            }
+        }
+        binding.tvSignUpHere.post(initialLoginScreenRunnable!!)
 
         binding.btnGoogleSignIn.setOnClickListener { googleLogin() }
         binding.ibtnGoogle.setOnClickListener { googleLogin() }
@@ -149,9 +156,30 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     override fun onStop() {
+        initialLoginScreenRunnable?.let {
+            binding.tvSignUpHere.removeCallbacks(it)
+            binding.root.removeCallbacks(it)
+        }
+
         super.onStop()
         auth!!.removeAuthStateListener(this)
         progressHandler.dismiss()
+    }
+
+    override fun onDestroy() {
+        initialLoginScreenRunnable?.let {
+            binding.tvSignUpHere.removeCallbacks(it)
+            binding.root.removeCallbacks(it)
+        }
+        initialLoginScreenRunnable = null
+        super.onDestroy()
+    }
+
+    private fun canTouchLoginViews(): Boolean {
+        return !isFinishing &&
+            !isDestroyed &&
+            ::binding.isInitialized &&
+            binding.root.isAttachedToWindow
     }
 
     override fun onAuthStateChanged(firebaseAuth: FirebaseAuth) {
@@ -258,18 +286,37 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     fun animateView(inView: View, outView: View, navTextView: View?) {
+        if (!canTouchLoginViews()) {
+            return
+        }
+
         outView.visibility = View.INVISIBLE
         inView.visibility = View.VISIBLE
-        val animator = ViewAnimationUtils.createCircularReveal(
-            inView,
-            inView.width / 2,
-            inView.height / 2,
-            0.0f,
-            Math.hypot((inView.width / 2).toDouble(), (inView.height / 2).toDouble()).toFloat() * 2
-        )
-        animator.interpolator = AccelerateDecelerateInterpolator()
-        animator.start()
-        if (navTextView != null) {
+
+        val canRunCircularReveal =
+            inView.isAttachedToWindow &&
+                inView.width > 0 &&
+                inView.height > 0 &&
+                !isFinishing &&
+                !isDestroyed
+
+        if (canRunCircularReveal) {
+            val animator = ViewAnimationUtils.createCircularReveal(
+                inView,
+                inView.width / 2,
+                inView.height / 2,
+                0.0f,
+                Math.hypot(
+                    (inView.width / 2).toDouble(),
+                    (inView.height / 2).toDouble()
+                ).toFloat() * 2
+            )
+
+            animator.interpolator = AccelerateDecelerateInterpolator()
+            animator.start()
+        }
+
+        if (navTextView != null && navTextView.isAttachedToWindow) {
             slide_end!!.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation) {
                     navTextView.setPadding(100, 0, 0, 0)
@@ -279,7 +326,11 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                 override fun onAnimationEnd(animation: Animation) {}
                 override fun onAnimationRepeat(animation: Animation) {}
             })
+
             navTextView.startAnimation(slide_end)
+        } else if (navTextView != null && canTouchLoginViews()) {
+            navTextView.setPadding(100, 0, 0, 0)
+            navTextView.visibility = View.VISIBLE
         }
     }
 

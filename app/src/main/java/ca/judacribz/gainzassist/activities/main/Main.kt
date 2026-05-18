@@ -25,7 +25,8 @@ import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.handleBackButton
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import com.miguelcatalan.materialsearchview.MaterialSearchView
 import org.parceler.Parcels
 import java.util.*
@@ -59,9 +60,10 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setInitView(this, R.layout.activity_main, R.string.app_name, false)
+        setInitTheme(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setToolbar(this, R.string.app_name, false)
 
         tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar)
         viewPagerOnTabSelectedListener = ViewPagerOnTabSelectedListener(binding.vpFmtContainer)

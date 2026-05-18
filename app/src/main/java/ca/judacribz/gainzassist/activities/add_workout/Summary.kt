@@ -27,7 +27,8 @@ import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.removeIncompleteWorkoutPref
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import ca.judacribz.gainzassist.util.UI.setSpinnerWithArray
 import ca.judacribz.gainzassist.util.UI.getTextString
 import ca.judacribz.gainzassist.util.UI.getTextInt
@@ -79,8 +80,10 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setInitView(this, R.layout.activity_new_workout_summary, R.string.title_new_workout_summary, true)
-        binding = ActivityNewWorkoutSummaryBinding.bind(findViewById(R.id.clay_parent))
+        setInitTheme(this)
+        binding = ActivityNewWorkoutSummaryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, R.string.title_new_workout_summary, true)
 
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 

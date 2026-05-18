@@ -11,7 +11,8 @@ import android.widget.Toast
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_INT
 import ca.judacribz.gainzassist.databinding.ActivityWorkoutEntryBinding
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import ca.judacribz.gainzassist.util.UI.setVisibleIfDisabled
 import ca.judacribz.gainzassist.util.UI.handleNumChanged
 import ca.judacribz.gainzassist.util.UI.handleFocusLeft
@@ -35,8 +36,10 @@ class WorkoutEntry : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setInitView(this, R.layout.activity_workout_entry, R.string.add_workout, true)
-        binding = ActivityWorkoutEntryBinding.bind(findViewById(R.id.llay_parent))
+        setInitTheme(this)
+        binding = ActivityWorkoutEntryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, R.string.add_workout, true)
 
         numExs = getString(R.string.initial_num_exercises).toInt()
 
