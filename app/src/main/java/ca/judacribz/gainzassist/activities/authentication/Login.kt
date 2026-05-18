@@ -13,14 +13,13 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
-import butterknife.BindView
-import butterknife.OnClick
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.main.Main
 import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_LOGOUT_USER
+import ca.judacribz.gainzassist.databinding.ActivityLoginBinding
 import ca.judacribz.gainzassist.util.Preferences.setUserInfoPref
 import ca.judacribz.gainzassist.util.UI.ProgressHandler
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
 import ca.judacribz.gainzassist.util.UI.setSpring
 import ca.judacribz.gainzassist.util.firebase.Authentication
 import ca.judacribz.gainzassist.util.firebase.Authentication.RC_SIGN_IN
@@ -32,7 +31,6 @@ import ca.judacribz.gainzassist.util.firebase.Database.setUserInfo
 import com.facebook.*
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.facebook.login.widget.LoginButton
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
@@ -40,7 +38,6 @@ import com.facebook.rebound.SpringUtil
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import java.io.IOException
@@ -69,62 +66,31 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     private var loginSpring: Spring? = null
     private var signUpSpring: Spring? = null
 
-    @BindView(R.id.blurLayout)
-    lateinit var blurLayout: View
-
-    @BindView(R.id.tv_sign_up_here)
-    lateinit var tvSignUpHere: TextView
-
-    @BindView(R.id.tv_login_here)
-    lateinit var tvLoginHere: TextView
-
-    @BindView(R.id.tv_sign_up_quest)
-    lateinit var tvLoginQuest: TextView
-
-    @BindView(R.id.tv_login_quest)
-    lateinit var tvSignUpQuest: TextView
-
-    @BindView(R.id.et_email)
-    lateinit var etEmail: EditText
-
-    @BindView(R.id.et_password)
-    lateinit var etPassword: EditText
-
-    @BindView(R.id.iv_login_image)
-    lateinit var ivLoginImg: ImageView
-
-    @BindView(R.id.iv_sign_up_image)
-    lateinit var ivSignUpImg: ImageView
-
-    @BindView(R.id.btn_google_sign_in)
-    lateinit var btnGoogle: SignInButton
-
-    @BindView(R.id.btn_facebook_sign_in)
-    lateinit var btnFacebook: LoginButton
-
-    @BindView(R.id.ibtn_facebook)
-    lateinit var ibtnFacebook: ImageButton
-
-    @BindView(R.id.ibtn_google)
-    lateinit var ibtnGoogle: ImageButton
-
-    @BindView(R.id.btn_login)
-    lateinit var btnLogin: Button
-
-    @BindView(R.id.btn_sign_up)
-    lateinit var btnSignUp: Button
+    private lateinit var binding: ActivityLoginBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setInitView(this, R.layout.activity_login, null, false)
-        progressHandler.setProgress(this, "Authenticating", blurLayout)
+        setInitTheme(this)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        progressHandler.setProgress(this, "Authenticating", binding.blurLayout)
 
         setupSignInMethods()
         setupMainImages()
 
-        ivLoginImg.post { loginSpring = setSpring(ivLoginImg) }
-        ivSignUpImg.post { signUpSpring = setSpring(ivSignUpImg) }
-        tvSignUpHere.post { loginScreen() }
+        binding.ivLoginImage.post { loginSpring = setSpring(binding.ivLoginImage) }
+        binding.ivSignUpImage.post { signUpSpring = setSpring(binding.ivSignUpImage) }
+        binding.tvSignUpHere.post { loginScreen() }
+
+        binding.btnGoogleSignIn.setOnClickListener { googleLogin() }
+        binding.ibtnGoogle.setOnClickListener { googleLogin() }
+        binding.ibtnFacebook.setOnClickListener { facebookLogin() }
+        binding.btnLogin.setOnClickListener { login() }
+        binding.btnSignUp.setOnClickListener { signUp() }
+        binding.tvSignUpHere.setOnClickListener { signUpScreen() }
+        binding.ivLoginImage.setOnClickListener { bounceImg() }
+        binding.ivSignUpImage.setOnClickListener { bounceImg() }
+        binding.tvLoginHere.setOnClickListener { loginScreen() }
     }
 
     private fun setupSignInMethods() {
@@ -141,8 +107,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     private fun setupMainImages() {
         val assetManager = assets
         try {
-            ivLoginImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(LOGIN_IMG)))
-            ivSignUpImg.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(SIGN_UP_IMG)))
+            binding.ivLoginImage.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(LOGIN_IMG)))
+            binding.ivSignUpImage.setImageBitmap(BitmapFactory.decodeStream(assetManager.open(SIGN_UP_IMG)))
         } catch (ioe: IOException) {
             ioe.printStackTrace()
         }
@@ -221,37 +187,34 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         var emailIsValid = false
         var passwordIsValid = false
         if (email.isEmpty()) {
-            etEmail.error = getString(R.string.err_required)
+            binding.etEmail.error = getString(R.string.err_required)
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.error = getString(R.string.err_required_email_format)
+            binding.etEmail.error = getString(R.string.err_required_email_format)
         } else {
             emailIsValid = true
         }
         if (password.isEmpty()) {
-            etPassword.error = getString(R.string.err_required)
+            binding.etPassword.error = getString(R.string.err_required)
         } else if (password.length < MIN_PASSWORD_LEN) {
-            etPassword.error = getString(R.string.err_required_password_min)
+            binding.etPassword.error = getString(R.string.err_required_password_min)
         } else {
             passwordIsValid = true
         }
         return emailIsValid && passwordIsValid
     }
 
-    @OnClick(R.id.btn_google_sign_in, R.id.ibtn_google)
     fun googleLogin() {
         val signInIntent = signInClient!!.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    @OnClick(R.id.ibtn_facebook)
     fun facebookLogin() {
-        btnFacebook.performClick()
+        binding.btnFacebookSignIn.performClick()
     }
 
-    @OnClick(R.id.btn_login)
     fun login() {
-        email = etEmail.text.toString().trim { it <= ' ' }
-        password = etPassword.text.toString().trim { it <= ' ' }
+        email = binding.etEmail.text.toString().trim { it <= ' ' }
+        password = binding.etPassword.text.toString().trim { it <= ' ' }
         if (validateForm(email!!, password!!)) {
             progressHandler.setTitle("Login")
             progressHandler.show()
@@ -261,10 +224,9 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         }
     }
 
-    @OnClick(R.id.btn_sign_up)
     fun signUp() {
-        email = etEmail.text.toString().trim { it <= ' ' }
-        password = etPassword.text.toString().trim { it <= ' ' }
+        email = binding.etEmail.text.toString().trim { it <= ' ' }
+        password = binding.etPassword.text.toString().trim { it <= ' ' }
         if (validateForm(email!!, password!!)) {
             progressHandler.setTitle("Sign Up")
             progressHandler.show()
@@ -274,26 +236,25 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         }
     }
 
-    @OnClick(R.id.tv_sign_up_here)
     fun signUpScreen() {
-        animateView(btnSignUp, btnLogin, null)
-        animateView(ivSignUpImg, ivLoginImg, null)
-        animateView(tvSignUpQuest, tvLoginQuest, tvLoginHere)
-        tvSignUpHere.visibility = View.INVISIBLE
+        animateView(binding.btnSignUp, binding.btnLogin, null)
+        animateView(binding.ivSignUpImage, binding.ivLoginImage, null)
+        // Original: tvSignUpQuest = tv_login_quest, tvLoginQuest = tv_sign_up_quest
+        animateView(binding.tvLoginQuest, binding.tvSignUpQuest, binding.tvLoginHere)
+        binding.tvSignUpHere.visibility = View.INVISIBLE
     }
 
-    @OnClick(R.id.iv_login_image, R.id.iv_sign_up_image)
     fun bounceImg() {
         loginSpring?.endValue = 0.3
         signUpSpring?.endValue = 0.9
     }
 
-    @OnClick(R.id.tv_login_here)
     fun loginScreen() {
-        animateView(btnLogin, btnSignUp, null)
-        animateView(ivLoginImg, ivSignUpImg, null)
-        animateView(tvLoginQuest, tvSignUpQuest, tvSignUpHere)
-        tvLoginHere.visibility = View.INVISIBLE
+        animateView(binding.btnLogin, binding.btnSignUp, null)
+        animateView(binding.ivLoginImage, binding.ivSignUpImage, null)
+        // Original: tvLoginQuest = tv_sign_up_quest, tvSignUpQuest = tv_login_quest
+        animateView(binding.tvSignUpQuest, binding.tvLoginQuest, binding.tvSignUpHere)
+        binding.tvLoginHere.visibility = View.INVISIBLE
     }
 
     fun animateView(inView: View, outView: View, navTextView: View?) {

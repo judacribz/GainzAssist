@@ -13,8 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.add_workout.Summary
 import ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.WORKOUTS_LIST
@@ -22,6 +20,7 @@ import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_C
 import ca.judacribz.gainzassist.activities.main.Main
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter
+import ca.judacribz.gainzassist.databinding.FragmentWorkoutsBinding
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.UI.getTextString
@@ -44,8 +43,8 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
     private var dialog: DialogPlus? = null
     private var workoutName: String? = null
 
-    @BindView(R.id.rv_workout_btns)
-    lateinit var workoutsList: RecyclerView
+    private var _binding: FragmentWorkoutsBinding? = null
+    private val binding get() = _binding!!
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -66,12 +65,11 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_workouts, container, false)
-        ButterKnife.bind(this, view)
+        _binding = FragmentWorkoutsBinding.inflate(inflater, container, false)
         workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel::class.java)
 
-        workoutsList.layoutManager = LinearLayoutManager(act)
-        workoutsList.setHasFixedSize(true)
+        binding.rvWorkoutBtns.layoutManager = LinearLayoutManager(act)
+        binding.rvWorkoutBtns.setHasFixedSize(true)
 
         workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
             allWorkouts = workouts
@@ -85,7 +83,12 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
             updateWorkouts()
         })
 
-        return view
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun updateWorkouts() {
@@ -97,7 +100,7 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
             R.id.btnListItem
         )
         adapter!!.setItemClickObserver(this)
-        workoutsList.adapter = adapter
+        binding.rvWorkoutBtns.adapter = adapter
     }
 
     override fun onItemClick(view: View?) {

@@ -6,9 +6,10 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.*
-import butterknife.*
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter
 import ca.judacribz.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
@@ -17,6 +18,7 @@ import ca.judacribz.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
 import ca.judacribz.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_WEIGHT
 import ca.judacribz.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
+import ca.judacribz.gainzassist.databinding.ActivityNewWorkoutSummaryBinding
 import ca.judacribz.gainzassist.models.Exercise
 import ca.judacribz.gainzassist.models.Exercise.Companion.EQUIPMENT_TYPES
 import ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET
@@ -71,56 +73,14 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     var exercises: ArrayList<Exercise>? = null
     var workoutViewModel: WorkoutViewModel? = null
 
-    @BindView(R.id.et_workout_name)
-    lateinit var etWorkoutName: EditText
-
-    @BindView(R.id.rv_exercise_btns)
-    lateinit var rvSummary: RecyclerView
-
-    @BindView(R.id.et_exercise_name)
-    lateinit var etExerciseName: EditText
-
-    @BindView(R.id.spr_equipment)
-    lateinit var sprEquipment: Spinner
-
-    @BindView(R.id.et_sets)
-    lateinit var etNumSets: EditText
-
-    @BindView(R.id.et_reps)
-    lateinit var etNumReps: EditText
-
-    @BindView(R.id.et_weight)
-    lateinit var etWeight: EditText
-
-    @BindView(R.id.btn_add_exercise)
-    lateinit var btnAddExercise: Button
-
-    @BindView(R.id.btn_update_exercise)
-    lateinit var btnUpdateExercise: Button
-
-    @BindView(R.id.btn_add_workout)
-    lateinit var btnAddWorkout: Button
-
-    @BindView(R.id.btn_discard_workout)
-    lateinit var btnDiscardWorkout: Button
-
-    @BindView(R.id.btn_clear_exercise)
-    lateinit var btnClearExercise: Button
-
-    @BindView(R.id.ibtn_dec_reps)
-    lateinit var ibtnDecReps: ImageButton
-
-    @BindView(R.id.ibtn_dec_weight)
-    lateinit var ibtnDecWeight: ImageButton
-
-    @BindView(R.id.ibtn_dec_sets)
-    lateinit var ibtnDecSets: ImageButton
+    private lateinit var binding: ActivityNewWorkoutSummaryBinding
 
     private lateinit var formEntries: Array<EditText>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitView(this, R.layout.activity_new_workout_summary, R.string.title_new_workout_summary, true)
+        binding = ActivityNewWorkoutSummaryBinding.bind(findViewById(R.id.clay_parent))
 
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
@@ -130,34 +90,112 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
         when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CALLING_ACTIVITY) {
             CALLING_ACTIVITY.WORKOUTS_LIST -> {
-                btnAddWorkout.text = getString(R.string.update_workout)
+                binding.btnAddWorkout.text = getString(R.string.update_workout)
             }
             else -> {
                 // Keep default
             }
         }
 
-        formEntries = arrayOf(etExerciseName, etNumReps, etWeight, etNumSets)
+        formEntries = arrayOf(
+            binding.partEtExercise.etExerciseName,
+            binding.partEtReps.etReps,
+            binding.partEtWeight.etWeight,
+            binding.partEtSets.etSets
+        )
 
         val workoutName = workout!!.name
         if (workoutName != null) {
-            etWorkoutName.setText(workoutName)
+            binding.partEtWorkout.etWorkoutName.setText(workoutName)
         }
 
-        setSpinnerWithArray(this, R.array.exerciseEquipment, sprEquipment)
+        setSpinnerWithArray(this, R.array.exerciseEquipment, binding.sprEquipment)
 
-        rvSummary.layoutManager = LinearLayoutManager(
+        binding.rvExerciseBtns.layoutManager = LinearLayoutManager(
             this,
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        rvSummary.setHasFixedSize(true)
+        binding.rvExerciseBtns.setHasFixedSize(true)
 
         exercises = workout!!.exercises
 
         updateAdapter()
 
-        etWorkoutName.setText(workout!!.name)
+        binding.partEtWorkout.etWorkoutName.setText(workout!!.name)
+
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        binding.sprEquipment.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                equipmentSelected(binding.sprEquipment, position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.partEtExercise.etExerciseName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                onExerciseNameChanged(s ?: "", start, before, count)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partEtWeight.etWeight.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                if (!binding.ibtnDecWeight.isEnabled) {
+                    binding.ibtnDecWeight.isEnabled = true
+                    binding.ibtnDecWeight.visibility = View.VISIBLE
+                }
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                onWeightChanged(s ?: "", start, before, count)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partEtReps.etReps.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                beforeNumChanged(binding.ibtnDecReps)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                num_reps = onNumChanged(binding.partEtReps.etReps, binding.ibtnDecReps, s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partEtSets.etSets.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                beforeNumChanged(binding.ibtnDecSets)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                num_sets = onNumChanged(binding.partEtSets.etSets, binding.ibtnDecSets, s.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.ibtnIncReps.setOnClickListener { incReps() }
+        binding.ibtnDecReps.setOnClickListener { decReps() }
+        binding.ibtnIncSets.setOnClickListener { incSets() }
+        binding.ibtnDecSets.setOnClickListener { decSets() }
+        binding.ibtnIncWeight.setOnClickListener { incWeight() }
+        binding.ibtnDecWeight.setOnClickListener { decWeight() }
+        binding.btnAddExercise.setOnClickListener { addExercise() }
+        binding.btnUpdateExercise.setOnClickListener { updateExercise() }
+        binding.btnAddWorkout.setOnClickListener { addWorkout() }
+        binding.btnDiscardWorkout.setOnClickListener { discardWorkout() }
+        binding.btnClearExercise.setOnClickListener { clearExercise() }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -173,10 +211,9 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             R.id.sqrBtnListItem
         )
         exerciseAdapter!!.setItemClickObserver(this)
-        rvSummary.adapter = exerciseAdapter
+        binding.rvExerciseBtns.adapter = exerciseAdapter
     }
 
-    @OnItemSelected(R.id.spr_equipment)
     fun equipmentSelected(spinner: Spinner, position: Int) {
         when (position) {
             0 -> {
@@ -193,23 +230,22 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             }
         }
 
-        if (!ibtnDecWeight.isEnabled || weight < minWeight) {
-            etWeight.setText(minWeight.toString())
+        if (!binding.ibtnDecWeight.isEnabled || weight < minWeight) {
+            binding.partEtWeight.etWeight.setText(minWeight.toString())
         }
     }
 
-    @OnTextChanged(value = [R.id.et_exercise_name], callback = OnTextChanged.Callback.TEXT_CHANGED)
     fun onExerciseNameChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         val exerciseName = s.toString()
 
         if (exerciseName.isNotEmpty()) {
             if (workout!!.containsExercise(exerciseName)) {
-                switchExerciseBtns(btnAddExercise, btnUpdateExercise)
+                switchExerciseBtns(binding.btnAddExercise, binding.btnUpdateExercise)
             } else {
-                switchExerciseBtns(btnUpdateExercise, btnAddExercise)
+                switchExerciseBtns(binding.btnUpdateExercise, binding.btnAddExercise)
             }
         } else {
-            switchExerciseBtns(btnUpdateExercise, btnAddExercise)
+            switchExerciseBtns(btnDisable = binding.btnUpdateExercise, btnEnable = binding.btnAddExercise)
         }
     }
 
@@ -220,37 +256,18 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         }
     }
 
-    @OnTextChanged(value = [R.id.et_weight], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeWeightChanged() {
-        if (!ibtnDecWeight.isEnabled) {
-            ibtnDecWeight.isEnabled = true
-            ibtnDecWeight.visibility = View.VISIBLE
-        }
-    }
-
-    @OnTextChanged(value = [R.id.et_weight], callback = OnTextChanged.Callback.TEXT_CHANGED)
     fun onWeightChanged(s: CharSequence, start: Int, before: Int, count: Int) {
         val weightStr = s.toString()
         weight = if (weightStr.isEmpty()) minWeight else weightStr.toFloat()
 
         if (weight <= minWeight) {
-            ibtnDecWeight.isEnabled = false
-            ibtnDecWeight.visibility = View.INVISIBLE
+            binding.ibtnDecWeight.isEnabled = false
+            binding.ibtnDecWeight.visibility = View.INVISIBLE
 
             if (weight < minWeight) {
-                etWeight.setText(minWeight.toString())
+                binding.partEtWeight.etWeight.setText(minWeight.toString())
             }
         }
-    }
-
-    @OnTextChanged(value = [R.id.et_reps], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeRepsChanged() {
-        beforeNumChanged(ibtnDecReps)
-    }
-
-    @OnTextChanged(value = [R.id.et_sets], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeSetsChanged() {
-        beforeNumChanged(ibtnDecSets)
     }
 
     fun beforeNumChanged(ibtnDec: ImageButton) {
@@ -258,16 +275,6 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             ibtnDec.isEnabled = true
             ibtnDec.visibility = View.VISIBLE
         }
-    }
-
-    @OnTextChanged(R.id.et_reps)
-    fun onRepsChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        num_reps = onNumChanged(etNumReps, ibtnDecReps, s.toString())
-    }
-
-    @OnTextChanged(R.id.et_sets)
-    fun onSetsChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        num_sets = onNumChanged(etNumSets, ibtnDecSets, s.toString())
     }
 
     fun onNumChanged(etNum: EditText, ibtnDec: ImageButton, str: String): Int {
@@ -285,42 +292,35 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         return value
     }
 
-    @OnClick(R.id.ibtn_inc_reps)
     fun incReps() {
-        etNumReps.setText((getTextInt(etNumReps) + MIN_INT).toString())
+        binding.partEtReps.etReps.setText((getTextInt(binding.partEtReps.etReps) + MIN_INT).toString())
     }
 
-    @OnClick(R.id.ibtn_dec_reps)
     fun decReps() {
-        etNumReps.setText(Math.max(getTextInt(etNumReps) - MIN_INT, MIN_INT).toString())
+        binding.partEtReps.etReps.setText(Math.max(getTextInt(binding.partEtReps.etReps) - MIN_INT, MIN_INT).toString())
     }
 
-    @OnClick(R.id.ibtn_inc_sets)
     fun incSets() {
-        etNumSets.setText((getTextInt(etNumSets) + MIN_INT).toString())
+        binding.partEtSets.etSets.setText((getTextInt(binding.partEtSets.etSets) + MIN_INT).toString())
     }
 
-    @OnClick(R.id.ibtn_dec_sets)
     fun decSets() {
-        etNumSets.setText(Math.max(getTextInt(etNumSets) - MIN_INT, MIN_INT).toString())
+        binding.partEtSets.etSets.setText(Math.max(getTextInt(binding.partEtSets.etSets) - MIN_INT, MIN_INT).toString())
     }
 
-    @OnClick(R.id.ibtn_inc_weight)
     fun incWeight() {
-        etWeight.setText((getTextFloat(etWeight) + MIN_FLOAT).toString())
+        binding.partEtWeight.etWeight.setText((getTextFloat(binding.partEtWeight.etWeight) + MIN_FLOAT).toString())
     }
 
-    @OnClick(R.id.ibtn_dec_weight)
     fun decWeight() {
-        etWeight.setText(Math.max(getTextFloat(etWeight) - MIN_FLOAT, MIN_FLOAT).toString())
+        binding.partEtWeight.etWeight.setText(Math.max(getTextFloat(binding.partEtWeight.etWeight) - MIN_FLOAT, MIN_FLOAT).toString())
     }
 
-    @OnClick(R.id.btn_add_exercise)
     fun addExercise() {
         if (validateForm(this, formEntries)) {
-            val exName = getTextString(etExerciseName)
+            val exName = getTextString(binding.partEtExercise.etExerciseName)
             if (workout!!.containsExercise(exName)) {
-                etExerciseName.error = getString(R.string.err_exercise_exists, exName)
+                binding.partEtExercise.etExerciseName.error = getString(R.string.err_exercise_exists, exName)
             } else {
                 exercises!!.add(updateExerciseData(-1, exName))
                 updateAdapter()
@@ -328,7 +328,6 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         }
     }
 
-    @OnClick(R.id.btn_update_exercise)
     fun updateExercise() {
         if (validateForm(this, formEntries)) {
             val num = ex!!.exerciseNumber
@@ -341,7 +340,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         var newExNumber = exNumber
         var id = -1L
 
-        etExerciseName.setText("")
+        binding.partEtExercise.etExerciseName.setText("")
 
         if (newExNumber == -1) {
             newExNumber = workout!!.numExercises
@@ -354,10 +353,10 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             newExNumber,
             exName,
             "Strength",
-            sprEquipment.selectedItem.toString().toLowerCase(),
-            getTextInt(etNumSets),
-            getTextInt(etNumReps),
-            getTextFloat(etWeight),
+            binding.sprEquipment.selectedItem.toString().lowercase(),
+            getTextInt(binding.partEtSets.etSets),
+            getTextInt(binding.partEtReps.etReps),
+            getTextFloat(binding.partEtWeight.etWeight),
             MAIN_SET
         )
 
@@ -370,15 +369,14 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         return exercise
     }
 
-    @OnClick(R.id.btn_add_workout)
     fun addWorkout() {
-        if (validateForm(this, arrayOf(etWorkoutName))) {
+        if (validateForm(this, arrayOf(binding.partEtWorkout.etWorkoutName))) {
             if (exercises!!.isEmpty()) {
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show()
             } else {
-                val btnText = getTextString(btnAddWorkout).toLowerCase()
+                val btnText = getTextString(binding.btnAddWorkout).lowercase()
 
-                workout!!.name = getTextString(etWorkoutName)
+                workout!!.name = getTextString(binding.partEtWorkout.etWorkoutName)
                 workout!!.exercises = exercises!!
 
                 addWorkoutFirebase(workout!!)
@@ -398,16 +396,14 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         }
     }
 
-    @OnClick(R.id.btn_clear_exercise)
     fun clearExercise() {
-        clearFormEntry(etExerciseName)
-        etNumReps.setText(getString(R.string.starting_reps))
-        etNumSets.setText(getString(R.string.starting_sets))
-        etWeight.setText(getString(R.string.starting_weight))
-        sprEquipment.setSelection(0)
+        clearFormEntry(binding.partEtExercise.etExerciseName)
+        binding.partEtReps.etReps.setText(getString(R.string.starting_reps))
+        binding.partEtSets.etSets.setText(getString(R.string.starting_sets))
+        binding.partEtWeight.etWeight.setText(getString(R.string.starting_weight))
+        binding.sprEquipment.setSelection(0)
     }
 
-    @OnClick(R.id.btn_discard_workout)
     fun discardWorkout() {
         setResult(RESULT_OK)
         finish()
@@ -420,11 +416,11 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     var ex: Exercise? = null
     private fun updateExerciseArea(exName: String) {
         ex = workout!!.getExerciseFromName(exName)
-        etExerciseName.setText(exName)
-        etNumSets.setText(ex!!.sets.toString())
-        etNumReps.setText(ex!!.reps.toString())
-        etWeight.setText(ex!!.weight.toString())
-        sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex!!.equipment))
+        binding.partEtExercise.etExerciseName.setText(exName)
+        binding.partEtSets.etSets.setText(ex!!.sets.toString())
+        binding.partEtReps.etReps.setText(ex!!.reps.toString())
+        binding.partEtWeight.etWeight.setText(ex!!.weight.toString())
+        binding.sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex!!.equipment))
     }
 
     override fun onItemLongClick(view: View?) {

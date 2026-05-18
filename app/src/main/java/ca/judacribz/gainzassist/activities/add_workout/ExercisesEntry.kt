@@ -6,7 +6,6 @@ import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
-import butterknife.BindView
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_NUM_EXERCISES
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_WORKOUT_NAME
@@ -14,6 +13,7 @@ import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_W
 import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_INT
+import ca.judacribz.gainzassist.databinding.ActivityExercisesEntryBinding
 import ca.judacribz.gainzassist.models.Exercise
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.util.Misc.shrinkTo
@@ -43,11 +43,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     private var numExs = 0
     private var addedExs = 0
 
-    @BindView(R.id.tlay_navbar)
-    lateinit var tabLayout: TabLayout
-
-    @BindView(R.id.vp_fmt_container)
-    lateinit var viewPager: ViewPager
+    private lateinit var binding: ActivityExercisesEntryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +54,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
             "Exercises Entry",
             true
         )
+        binding = ActivityExercisesEntryBinding.bind(findViewById(R.id.cl_parent))
 
         val workoutEntryIntent = intent
 
@@ -73,8 +70,8 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
             exercises.add(Exercise())
         }
 
-        tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(tabLayout)
-        viewPagerOnTabSelectedListener = object : TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+        tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar)
+        viewPagerOnTabSelectedListener = object : TabLayout.ViewPagerOnTabSelectedListener(binding.vpFmtContainer) {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 super.onTabSelected(tab)
 
@@ -90,8 +87,8 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
                     tab.icon = null
                     tabs.add(tab)
 
-                    tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_plus))
-                    viewPager.setCurrentItem(numExs - 1, true)
+                    binding.tlayNavbar.addTab(binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus))
+                    binding.vpFmtContainer.setCurrentItem(numExs - 1, true)
                     tab.select()
                 }
             }
@@ -107,20 +104,20 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     private fun setupPager() {
         layInflater = layoutInflater
 
-        viewPager.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        tabLayout.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
+        binding.vpFmtContainer.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
+        binding.tlayNavbar.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
 
         for (i in 0 until numExs) {
-            val tab = tabLayout.newTab().setText(String.format(TAB_LABEL, i + 1))
+            val tab = binding.tlayNavbar.newTab().setText(String.format(TAB_LABEL, i + 1))
             tabs.add(tab)
-            tabLayout.addTab(tab)
+            binding.tlayNavbar.addTab(tab)
         }
 
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_plus))
+        binding.tlayNavbar.addTab(binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus))
 
         workoutPagerAdapter = WorkoutPagerAdapter(supportFragmentManager, numExs)
-        viewPager.adapter = workoutPagerAdapter
-        viewPager.currentItem = 0
+        binding.vpFmtContainer.adapter = workoutPagerAdapter
+        binding.vpFmtContainer.currentItem = 0
     }
 
     override fun onActivityResult(req: Int, res: Int, data: Intent?) {
@@ -156,7 +153,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     fun setFirstEmptyTab() {
         for (i in 0 until numExs) {
             if (exercises[i].name == null) {
-                viewPager.setCurrentItem(i, true)
+                binding.vpFmtContainer.setCurrentItem(i, true)
                 break
             }
         }
@@ -201,7 +198,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         exercises.removeAt(index)
         shrinkTo(exercises, numExs)
 
-        tabLayout.removeTabAt(index)
+        binding.tlayNavbar.removeTabAt(index)
         tabs.removeAt(index)
 
         var selectedIndex = index

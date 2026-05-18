@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.view.View
 import android.widget.*
-import butterknife.ButterKnife
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.util.Preferences.getThemePref
 import com.facebook.rebound.SimpleSpringListener
@@ -32,7 +31,6 @@ object UI {
     fun setInitView(act: Activity, layoutId: Int, title: String?, setBackArrow: Boolean) {
         setInitTheme(act)
         act.setContentView(layoutId)
-        ButterKnife.bind(act)
         if (title != null) {
             setToolbar(act as AppCompatActivity, title, setBackArrow)
         }

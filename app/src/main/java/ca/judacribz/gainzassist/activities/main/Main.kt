@@ -12,7 +12,6 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import butterknife.BindView
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.add_workout.WorkoutEntry
 import ca.judacribz.gainzassist.activities.authentication.Login
@@ -20,6 +19,7 @@ import ca.judacribz.gainzassist.activities.main.fragments.Resume
 import ca.judacribz.gainzassist.activities.main.fragments.Settings
 import ca.judacribz.gainzassist.activities.main.fragments.Workouts
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
+import ca.judacribz.gainzassist.databinding.ActivityMainBinding
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
@@ -55,21 +55,16 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
 
     var pos: Int = 0
 
-    @BindView(R.id.tlay_navbar)
-    lateinit var tabLayout: TabLayout
-
-    @BindView(R.id.vp_fmt_container)
-    lateinit var viewPager: ViewPager
-
-    @BindView(R.id.msvWorkouts)
-    lateinit var searchView: MaterialSearchView
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitView(this, R.layout.activity_main, R.string.app_name, false)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(tabLayout)
-        viewPagerOnTabSelectedListener = ViewPagerOnTabSelectedListener(viewPager)
+        tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar)
+        viewPagerOnTabSelectedListener = ViewPagerOnTabSelectedListener(binding.vpFmtContainer)
     }
 
     private inner class ViewPagerOnTabSelectedListener(viewPager: ViewPager) :
@@ -77,7 +72,7 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
         override fun onTabSelected(tab: TabLayout.Tab) {
             super.onTabSelected(tab)
             pos = tab.position
-            searchView.closeSearch()
+            binding.msvWorkouts.closeSearch()
 
             if (search != null && addWorkout != null) {
                 when (tab.position) {
@@ -104,28 +99,28 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
     override fun onResume() {
         super.onResume()
         setupPager()
-        searchView.setOnQueryTextListener(this)
-        searchView.setVoiceSearch(true)
+        binding.msvWorkouts.setOnQueryTextListener(this)
+        binding.msvWorkouts.setVoiceSearch(true)
     }
 
     private fun setupPager() {
         layInflater = layoutInflater
-        viewPager.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        tabLayout.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
+        binding.vpFmtContainer.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
+        binding.tlayNavbar.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
 
-        viewPager.adapter = WorkoutPagerAdapter(
+        binding.vpFmtContainer.adapter = WorkoutPagerAdapter(
             supportFragmentManager,
             FMTS
         )
-        viewPager.currentItem = 1
+        binding.vpFmtContainer.currentItem = 1
     }
 
     override fun onPause() {
         super.onPause()
-        searchView.setOnQueryTextListener(null)
-        searchView.setVoiceSearch(false)
-        viewPager.removeOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        tabLayout.removeOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
+        binding.msvWorkouts.setOnQueryTextListener(null)
+        binding.msvWorkouts.setVoiceSearch(false)
+        binding.vpFmtContainer.removeOnPageChangeListener(tabLayoutOnPageChangeListener!!)
+        binding.tlayNavbar.removeOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
     }
 
     override fun onBackPressed() {
@@ -135,7 +130,7 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
     override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, mainMenu)
         search = mainMenu.findItem(R.id.act_search)
-        searchView.setMenuItem(search)
+        binding.msvWorkouts.setMenuItem(search)
         addWorkout = mainMenu.findItem(R.id.act_add_workout)
         return super.onCreateOptionsMenu(mainMenu)
     }
@@ -146,7 +141,7 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
             if (matches != null && matches.size > 0) {
                 val searchWrd = matches[0]
                 if (!TextUtils.isEmpty(searchWrd)) {
-                    searchView.setQuery(searchWrd, false)
+                    binding.msvWorkouts.setQuery(searchWrd, false)
                 }
             }
             return

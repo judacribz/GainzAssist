@@ -3,7 +3,7 @@ package ca.judacribz.gainzassist.activities.how_to_videos
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.databinding.PartThumbnailBinding
 import java.util.*
 
 class ThumbnailAdapter(
@@ -22,8 +22,8 @@ class ThumbnailAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThumbnailViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.part_thumbnail, parent, false)
-        val holder = ThumbnailViewHolder(view, videoIds)
+        val binding = PartThumbnailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val holder = ThumbnailViewHolder(binding, videoIds)
         holder.setVideoClickObserver(object : ThumbnailViewHolder.VideoClickObserver {
             override fun onVideoClick(videoId: String) {
                 videoClickObserver?.onVideoClick(videoId)

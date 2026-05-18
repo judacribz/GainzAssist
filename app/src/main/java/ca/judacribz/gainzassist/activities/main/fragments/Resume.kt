@@ -11,11 +11,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter
+import ca.judacribz.gainzassist.databinding.FragmentResumeBinding
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.Preferences.getIncompleteWorkouts
@@ -31,26 +30,30 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
     var allWorkouts: List<Workout>? = null
     var filteredWorkouts = ArrayList<Workout>()
 
-    @BindView(R.id.rv_res_workout_btns)
-    lateinit var workoutsList: RecyclerView
+    private var _binding: FragmentResumeBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_resume, container, false)
-        ButterKnife.bind(this, view)
+        _binding = FragmentResumeBinding.inflate(inflater, container, false)
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
-        workoutsList.layoutManager = LinearLayoutManager(context)
-        workoutsList.setHasFixedSize(true)
+        binding.rvResWorkoutBtns.layoutManager = LinearLayoutManager(context)
+        binding.rvResWorkoutBtns.setHasFixedSize(true)
 
         workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
             allWorkouts = workouts
             updateWorkouts()
         })
 
-        return view
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onResume() {
@@ -80,7 +83,7 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
             R.id.btnListItem
         )
         adapter!!.setItemClickObserver(this)
-        workoutsList.adapter = adapter
+        binding.rvResWorkoutBtns.adapter = adapter
     }
 
     override fun onItemClick(view: View?) {
