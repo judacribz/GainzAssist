@@ -357,7 +357,20 @@ class CurrWorkout private constructor() {
             this.set_i = 0
         }
         this.currExercise = exercise
-        dataListener?.updateProgressSets(exercise.getNumSets())
+
+        val numSets = exercise.getNumSets()
+
+        if (numSets <= 0) {
+            throw IllegalStateException(
+                "Exercise '${exercise.name}' has no sets. Cannot start workout. sets=${exercise.sets}, reps=${exercise.reps}, weight=${exercise.weight}, equipment=${exercise.equipment}"
+            )
+        }
+
+        if (this.set_i >= numSets) {
+            this.set_i = 0
+        }
+
+        dataListener?.updateProgressSets(numSets)
         this.currMinWeight = exercise.minWeight
         this.currWeightChange = exercise.weightChange
         setCurrExerciseSet(this.currExercise!!.getSet(this.set_i))
