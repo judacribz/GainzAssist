@@ -136,7 +136,6 @@ public class WorkoutRepo {
             Workout workout = workoutDao.getFromName(name);
 
             for (Exercise exercise : exerciseDao.getFromWorkout(workout.getId())) {
-                exercise.setSetsList(null);
                 workout.addExercise(exercise);
             }
 
