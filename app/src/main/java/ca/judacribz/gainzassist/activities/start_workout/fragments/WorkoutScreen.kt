@@ -60,8 +60,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     private var updateProgress = true
     private var workoutFinished = false
 
-    private var _binding: FragmentWorkoutScreenBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentWorkoutScreenBinding
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -73,7 +72,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentWorkoutScreenBinding.inflate(inflater, container, false)
+        binding = FragmentWorkoutScreenBinding.inflate(inflater, container, false)
 
         setNum = "%s " + getString(R.string.set_num)
         setProgressLayoutManagers(binding.rvExerciseSet)
@@ -229,11 +228,6 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             saveProgressMap()
         }
         currWorkout.setDataListener(null as CurrWorkout.DataListener?)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     fun saveProgressMap() {

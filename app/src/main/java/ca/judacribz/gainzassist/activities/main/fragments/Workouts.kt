@@ -43,8 +43,7 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
     private var dialog: DialogPlus? = null
     private var workoutName: String? = null
 
-    private var _binding: FragmentWorkoutsBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentWorkoutsBinding
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -65,7 +64,7 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentWorkoutsBinding.inflate(inflater, container, false)
+        binding = FragmentWorkoutsBinding.inflate(inflater, container, false)
         workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel::class.java)
 
         binding.rvWorkoutBtns.layoutManager = LinearLayoutManager(act)
@@ -84,11 +83,6 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
         })
 
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun updateWorkouts() {

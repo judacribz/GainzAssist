@@ -47,8 +47,7 @@ class ExEntry : Fragment() {
 
     var deleteHidden = false
 
-    private var _binding: FragmentExEntryBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentExEntryBinding
 
     lateinit var formEntries: List<@JvmSuppressWildcards EditText>
 
@@ -66,12 +65,12 @@ class ExEntry : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        if (_binding != null) {
+        if (::binding.isInitialized) {
             return binding.root
         }
         retainInstance = true
 
-        _binding = FragmentExEntryBinding.inflate(inflater, container, false)
+        binding = FragmentExEntryBinding.inflate(inflater, container, false)
         val v = binding.root
 
         formEntries = listOf(
@@ -187,11 +186,6 @@ class ExEntry : Fragment() {
         binding.btnDelete.setOnClickListener { deleteExercise() }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     fun setInd(index: Int) {
         this.ex_i = index
     }
@@ -202,7 +196,7 @@ class ExEntry : Fragment() {
 
     fun hideDelete() {
         deleteHidden = true
-        if (_binding != null) {
+        if (::binding.isInitialized) {
             binding.btnDelete.visibility = View.INVISIBLE
         }
     }

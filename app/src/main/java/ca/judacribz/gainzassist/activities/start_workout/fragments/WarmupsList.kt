@@ -17,24 +17,18 @@ class WarmupsList : Fragment() {
 
     private var warmups: ArrayList<Exercise>? = null
 
-    private var _binding: FragmentWarmupsListBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentWarmupsListBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentWarmupsListBinding.inflate(inflater, container, false)
+        binding = FragmentWarmupsListBinding.inflate(inflater, container, false)
         val args = arguments
         if (args != null) {
             warmups = Parcels.unwrap(args.getParcelable(EXTRA_WARMUPS))
         }
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onResume() {

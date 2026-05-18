@@ -30,14 +30,13 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
     var allWorkouts: List<Workout>? = null
     var filteredWorkouts = ArrayList<Workout>()
 
-    private var _binding: FragmentResumeBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentResumeBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentResumeBinding.inflate(inflater, container, false)
+        binding = FragmentResumeBinding.inflate(inflater, container, false)
         workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
         binding.rvResWorkoutBtns.layoutManager = LinearLayoutManager(context)
@@ -49,11 +48,6 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
         })
 
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onResume() {
