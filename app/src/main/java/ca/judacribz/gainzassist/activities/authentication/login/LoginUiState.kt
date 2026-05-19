@@ -1,0 +1,9 @@
+package ca.judacribz.gainzassist.activities.authentication.login
+
+data class LoginUiState(
+    val email: String = "",
+    val emailError: String? = null,
+    val password: String = "",
+    val passwordError: String? = null,
+    val isLoginMode: Boolean = true
+)

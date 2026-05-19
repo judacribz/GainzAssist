@@ -13,7 +13,14 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.activities.authentication.login.LoginActions
+import ca.judacribz.gainzassist.activities.authentication.login.LoginScreen
+import ca.judacribz.gainzassist.activities.authentication.login.LoginUiState
 import ca.judacribz.gainzassist.activities.main.Main
 import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_LOGOUT_USER
 import ca.judacribz.gainzassist.databinding.ActivityLoginBinding
@@ -70,34 +77,57 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
 
     private lateinit var binding: ActivityLoginBinding
 
+    // State for Compose
+    private var uiState by mutableStateOf(LoginUiState())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitTheme(this)
+        // Keep binding initialized if referenced later, but override view with Compose
         binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         progressHandler.setProgress(this, "Authenticating", binding.blurLayout)
 
         setupSignInMethods()
         setupMainImages()
 
-        binding.ivLoginImage.post { loginSpring = setSpring(binding.ivLoginImage) }
-        binding.ivSignUpImage.post { signUpSpring = setSpring(binding.ivSignUpImage) }
-        loginScreenRunnable = Runnable {
-            if (!isFinishing && !isDestroyed && binding.root.isAttachedToWindow) {
-                loginScreen()
-            }
-        }
-        binding.tvSignUpHere.post(loginScreenRunnable!!)
+        setContent {
+            LoginScreen(
+                state = uiState,
+                actions = object : LoginActions {
+                    override fun onEmailChanged(email: String) {
+                        uiState = uiState.copy(email = email, emailError = null)
+                    }
 
-        binding.btnGoogleSignIn.setOnClickListener { googleLogin() }
-        binding.ibtnGoogle.setOnClickListener { googleLogin() }
-        binding.ibtnFacebook.setOnClickListener { facebookLogin() }
-        binding.btnLogin.setOnClickListener { login() }
-        binding.btnSignUp.setOnClickListener { signUp() }
-        binding.tvSignUpHere.setOnClickListener { signUpScreen() }
-        binding.ivLoginImage.setOnClickListener { bounceImg() }
-        binding.ivSignUpImage.setOnClickListener { bounceImg() }
-        binding.tvLoginHere.setOnClickListener { loginScreen() }
+                    override fun onPasswordChanged(password: String) {
+                        uiState = uiState.copy(password = password, passwordError = null)
+                    }
+
+                    override fun onToggleMode() {
+                        uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
+                    }
+
+                    override fun onLoginClick() {
+                        login()
+                    }
+
+                    override fun onSignUpClick() {
+                        signUp()
+                    }
+
+                    override fun onGoogleSignInClick() {
+                        googleLogin()
+                    }
+
+                    override fun onFacebookSignInClick() {
+                        facebookLogin()
+                    }
+
+                    override fun onImageBounceClick() {
+                        bounceImg()
+                    }
+                }
+            )
+        }
     }
 
     private fun setupSignInMethods() {
@@ -193,23 +223,28 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     fun validateForm(email: String, password: String): Boolean {
-        var emailIsValid = false
-        var passwordIsValid = false
+        var emailError: String? = null
+        var passwordError: String? = null
+        var isValid = true
+
         if (email.isEmpty()) {
-            binding.etEmail.error = getString(R.string.err_required)
+            emailError = getString(R.string.err_required)
+            isValid = false
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.etEmail.error = getString(R.string.err_required_email_format)
-        } else {
-            emailIsValid = true
+            emailError = getString(R.string.err_required_email_format)
+            isValid = false
         }
+
         if (password.isEmpty()) {
-            binding.etPassword.error = getString(R.string.err_required)
+            passwordError = getString(R.string.err_required)
+            isValid = false
         } else if (password.length < MIN_PASSWORD_LEN) {
-            binding.etPassword.error = getString(R.string.err_required_password_min)
-        } else {
-            passwordIsValid = true
+            passwordError = getString(R.string.err_required_password_min)
+            isValid = false
         }
-        return emailIsValid && passwordIsValid
+
+        uiState = uiState.copy(emailError = emailError, passwordError = passwordError)
+        return isValid
     }
 
     fun googleLogin() {
@@ -222,26 +257,24 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     fun login() {
-        email = binding.etEmail.text.toString().trim { it <= ' ' }
-        password = binding.etPassword.text.toString().trim { it <= ' ' }
+        email = uiState.email.trim { it <= ' ' }
+        password = uiState.password.trim { it <= ' ' }
         if (validateForm(email!!, password!!)) {
             progressHandler.setTitle("Login")
             progressHandler.show()
             credential = EmailAuthProvider.getCredential(email!!, password!!)
             signIn(this, credential!!, signInClient!!)
-            loginSpring?.endValue = 0.9
         }
     }
 
     fun signUp() {
-        email = binding.etEmail.text.toString().trim { it <= ' ' }
-        password = binding.etPassword.text.toString().trim { it <= ' ' }
+        email = uiState.email.trim { it <= ' ' }
+        password = uiState.password.trim { it <= ' ' }
         if (validateForm(email!!, password!!)) {
             progressHandler.setTitle("Sign Up")
             progressHandler.show()
             credential = EmailAuthProvider.getCredential(email!!, password!!)
             createUser(this, email!!, password!!, signInClient!!)
-            signUpSpring?.endValue = 0.9
         }
     }
 
