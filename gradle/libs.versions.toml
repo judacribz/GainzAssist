@@ -1,0 +1,143 @@
+[versions]
+
+# Android / Kotlin / Google Plugins
+android-gradle-plugin = "9.2.1"
+google-services = "4.4.4"
+kotlin = "2.2.10"
+
+# Android Support
+android-support = "28.0.0"
+constraint-layout = "1.1.3"
+espresso-core = "2.2.2"
+
+# Architecture Components
+arch-lifecycle = "1.1.1"
+room = "1.1.1"
+
+# Facebook
+facebook-android-sdk = "4.38.1"
+facebook-rebound = "0.3.8"
+
+# Firebase
+firebase = "16.0.5"
+
+# Google
+gms-play-services-auth = "16.0.1"
+gson = "2.8.5"
+youtube-api = "v3-rev206-1.25.0"
+
+# Jackson
+jackson-annotations = "2.8.5"
+jackson-core = "2.9.6"
+jackson-databind = "2.8.5"
+
+# Parceler
+parceler = "1.1.11"
+
+# UI / Logging
+autofittextview = "0.2.1"
+dialogplus = "1.11"
+logger = "2.2.0"
+material-search-view = "1.4.2"
+
+# Testing
+junit = "4.12"
+
+
+[libraries]
+
+# Android Support
+android-support-appcompat-v7 = { module = "com.android.support:appcompat-v7", version.ref = "android-support" }
+android-support-design = { module = "com.android.support:design", version.ref = "android-support" }
+android-support-recyclerview-v7 = { module = "com.android.support:recyclerview-v7", version.ref = "android-support" }
+android-support-support-v4 = { module = "com.android.support:support-v4", version.ref = "android-support" }
+constraint-layout = { module = "com.android.support.constraint:constraint-layout", version.ref = "constraint-layout" }
+
+# Architecture Components
+arch-lifecycle-compiler = { module = "android.arch.lifecycle:compiler", version.ref = "arch-lifecycle" }
+arch-lifecycle-extensions = { module = "android.arch.lifecycle:extensions", version.ref = "arch-lifecycle" }
+room-compiler = { module = "android.arch.persistence.room:compiler", version.ref = "room" }
+room-runtime = { module = "android.arch.persistence.room:runtime", version.ref = "room" }
+room-testing = { module = "android.arch.persistence.room:testing", version.ref = "room" }
+
+# Facebook
+facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebook-android-sdk" }
+facebook-rebound = { module = "com.facebook.rebound:rebound", version.ref = "facebook-rebound" }
+
+# Firebase
+firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebase" }
+firebase-core = { module = "com.google.firebase:firebase-core", version.ref = "firebase" }
+firebase-database = { module = "com.google.firebase:firebase-database", version.ref = "firebase" }
+
+# Google
+gms-play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-play-services-auth" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+youtube-api = { module = "com.google.apis:google-api-services-youtube", version.ref = "youtube-api" }
+
+# Jackson
+jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson-annotations" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
+
+# Parceler
+parceler = { module = "org.parceler:parceler", version.ref = "parceler" }
+parceler-api = { module = "org.parceler:parceler-api", version.ref = "parceler" }
+
+# Testing
+espresso-core = { module = "com.android.support.test.espresso:espresso-core", version.ref = "espresso-core" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+# UI / Logging
+autofittextview = { module = "me.grantland:autofittextview", version.ref = "autofittextview" }
+dialogplus = { module = "com.orhanobut:dialogplus", version.ref = "dialogplus" }
+logger = { module = "com.orhanobut:logger", version.ref = "logger" }
+material-search-view = { module = "com.github.ZinoKader:MaterialSearchView", version.ref = "material-search-view" }
+
+
+[bundles]
+
+# Android Support
+android-support = [
+    "android-support-appcompat-v7",
+    "android-support-design",
+    "android-support-recyclerview-v7",
+    "android-support-support-v4",
+    "constraint-layout"
+]
+
+# Firebase
+firebase = [
+    "firebase-auth",
+    "firebase-core",
+    "firebase-database"
+]
+
+# Google
+google = [
+    "gms-play-services-auth",
+    "gson",
+    "youtube-api"
+]
+
+# Jackson
+jackson = [
+    "jackson-annotations",
+    "jackson-core",
+    "jackson-databind"
+]
+
+# UI / Logging
+ui-logging = [
+    "autofittextview",
+    "dialogplus",
+    "logger",
+    "material-search-view"
+]
+
+
+[plugins]
+
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

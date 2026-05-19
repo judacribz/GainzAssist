@@ -10,10 +10,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import butterknife.BindView
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout.Companion.EXTRA_HOW_TO_VID
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.databinding.ActivityHowToVideosBinding
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import com.google.android.youtube.player.YouTubePlayerSupportFragment
@@ -46,24 +47,25 @@ class HowToVideos : AppCompatActivity(),
     var player: YouTubePlayer? = null
     var ytpFmt: YouTubePlayerSupportFragment? = null
     var fmtMgr: FragmentManager? = null
-    var fmtTxn: FragmentTransaction? = null
     var videoId: String? = null
     var exerciseName: String? = null
 
     var isFullScreen = false
     var backPressed = false
 
-    @BindView(R.id.msvHowToVids)
-    lateinit var searchView: MaterialSearchView
+    private lateinit var binding: ActivityHowToVideosBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         exerciseName = intent.getStringExtra(EXTRA_HOW_TO_VID)
-        setInitView(this, R.layout.activity_how_to_videos, "How To $exerciseName", true)
+        setInitTheme(this)
+        binding = ActivityHowToVideosBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, "How To $exerciseName", true)
 
         fmtMgr = supportFragmentManager
 
-        rvVideoList = findViewById(R.id.rv_video_list)
+        rvVideoList = binding.rvVideoList
         ytpFmt = supportFragmentManager.findFragmentById(R.id.fmt_youtube) as YouTubePlayerSupportFragment?
 
         handleFmt(false)
@@ -77,8 +79,8 @@ class HowToVideos : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
-        searchView.setOnQueryTextListener(this)
-        searchView.setVoiceSearch(true)
+        binding.msvHowToVids.setOnQueryTextListener(this)
+        binding.msvHowToVids.setVoiceSearch(true)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -99,11 +101,11 @@ class HowToVideos : AppCompatActivity(),
     }
 
     fun handleFmt(showFmt: Boolean) {
-        fmtTxn = fmtMgr!!.beginTransaction()
+        val fmtTxn = fmtMgr!!.beginTransaction()
 
         if (showFmt) {
             ytpFmt!!.initialize(getString(R.string.google_api_key), this)
-            fmtTxn!!.show(ytpFmt!!)
+            fmtTxn.show(ytpFmt!!)
         } else {
             if (player != null) {
                 if (isFullScreen) {
@@ -113,15 +115,15 @@ class HowToVideos : AppCompatActivity(),
                     player!!.release()
                 }
             }
-            fmtTxn!!.hide(ytpFmt!!)
+            fmtTxn.hide(ytpFmt!!)
         }
 
-        fmtTxn!!.commitNow()
+        fmtTxn.commitNow()
     }
 
     override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_how_to, mainMenu)
-        searchView.setMenuItem(mainMenu.findItem(R.id.act_search))
+        binding.msvHowToVids.setMenuItem(mainMenu.findItem(R.id.act_search))
         return super.onCreateOptionsMenu(mainMenu)
     }
 

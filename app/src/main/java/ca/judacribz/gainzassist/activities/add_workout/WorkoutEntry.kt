@@ -3,14 +3,16 @@ package ca.judacribz.gainzassist.activities.add_workout
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Button
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.Toast
-import butterknife.*
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.constants.ExerciseConst.MIN_INT
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.databinding.ActivityWorkoutEntryBinding
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import ca.judacribz.gainzassist.util.UI.setVisibleIfDisabled
 import ca.judacribz.gainzassist.util.UI.handleNumChanged
 import ca.judacribz.gainzassist.util.UI.handleFocusLeft
@@ -30,26 +32,63 @@ class WorkoutEntry : AppCompatActivity() {
     var isEmpty = true
     var numExs: Int = 0
 
-    @BindView(R.id.et_workout_name)
-    lateinit var etWorkoutName: EditText
-
-    @BindView(R.id.et_num_exercises)
-    lateinit var etNumExercises: EditText
-
-    @BindView(R.id.ibtn_inc_exercises)
-    lateinit var ibtnIncExercises: ImageButton
-
-    @BindView(R.id.ibtn_dec_exercises)
-    lateinit var ibtnDecExercises: ImageButton
-
-    @BindView(R.id.btn_enter)
-    lateinit var btnEnter: Button
+    private lateinit var binding: ActivityWorkoutEntryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setInitView(this, R.layout.activity_workout_entry, R.string.add_workout, true)
+        setInitTheme(this)
+        binding = ActivityWorkoutEntryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, R.string.add_workout, true)
 
         numExs = getString(R.string.initial_num_exercises).toInt()
+
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        binding.partNumExercises.etNumExercises.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                setVisibleIfDisabled(binding.ibtnDecExercises)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                numExs = handleNumChanged(binding.ibtnDecExercises, s.toString(), MIN_INT).toInt()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partWorkoutName.etWorkoutName.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.toString().trim { it <= ' ' }.isEmpty()) {
+                    if (!isEmpty) {
+                        isEmpty = true
+                        binding.btnEnter.setText(R.string.skip)
+                    }
+                } else {
+                    if (isEmpty) {
+                        isEmpty = false
+                        binding.btnEnter.setText(R.string.enter)
+                    }
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partNumExercises.etNumExercises.onFocusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus && v is EditText) {
+                handleFocusLeft(v, MIN_INT, numExs)
+            }
+        }
+
+        binding.ibtnIncExercises.setOnClickListener { incNumExs() }
+        binding.ibtnDecExercises.setOnClickListener { decNumExs() }
+        binding.btnEnter.setOnClickListener { enterWorkoutName() }
+        binding.btnCancel.setOnClickListener { cancelWorkout() }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -63,64 +102,28 @@ class WorkoutEntry : AppCompatActivity() {
         }
     }
 
-    @OnTextChanged(value = [R.id.et_num_exercises], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeNumExercisesChanged() {
-        setVisibleIfDisabled(ibtnDecExercises)
-    }
-
-    @OnTextChanged(value = [R.id.et_num_exercises], callback = OnTextChanged.Callback.TEXT_CHANGED)
-    fun onNumExercisesChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        numExs = handleNumChanged(ibtnDecExercises, s.toString(), MIN_INT).toInt()
-    }
-
-    @OnTextChanged(value = [R.id.et_workout_name], callback = OnTextChanged.Callback.TEXT_CHANGED)
-    fun onWorkoutNameChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        if (s.toString().trim { it <= ' ' }.isEmpty()) {
-            if (!isEmpty) {
-                isEmpty = true
-                btnEnter.setText(R.string.skip)
-            }
-        } else {
-            if (isEmpty) {
-                isEmpty = false
-                btnEnter.setText(R.string.enter)
-            }
-        }
-    }
-
-    @OnFocusChange(R.id.et_num_exercises)
-    fun onFocusLeft(et: EditText, hasFocus: Boolean) {
-        if (!hasFocus) {
-            handleFocusLeft(et, MIN_INT, numExs)
-        }
-    }
-
-    @OnClick(R.id.ibtn_inc_exercises)
     fun incNumExs() {
-        setText(etNumExercises, numExs + 1)
+        setText(binding.partNumExercises.etNumExercises, numExs + 1)
     }
 
-    @OnClick(R.id.ibtn_dec_exercises)
     fun decNumExs() {
-        setText(etNumExercises, numExs - 1)
+        setText(binding.partNumExercises.etNumExercises, numExs - 1)
     }
 
-    @OnClick(R.id.btn_enter)
     fun enterWorkoutName() {
-        if (validateFormEntry(this, etNumExercises)) {
+        if (validateFormEntry(this, binding.partNumExercises.etNumExercises)) {
             val exercisesEntry = Intent(this, ExercisesEntry::class.java)
 
             if (!isEmpty) {
-                Toast.makeText(this, "" + getTextString(etWorkoutName), Toast.LENGTH_SHORT).show()
-                exercisesEntry.putExtra(EXTRA_WORKOUT_NAME, getTextString(etWorkoutName))
+                Toast.makeText(this, "" + getTextString(binding.partWorkoutName.etWorkoutName), Toast.LENGTH_SHORT).show()
+                exercisesEntry.putExtra(EXTRA_WORKOUT_NAME, getTextString(binding.partWorkoutName.etWorkoutName))
             }
 
-            exercisesEntry.putExtra(EXTRA_NUM_EXERCISES, Math.max(MIN_INT, getTextInt(etNumExercises)))
+            exercisesEntry.putExtra(EXTRA_NUM_EXERCISES, Math.max(MIN_INT, getTextInt(binding.partNumExercises.etNumExercises)))
             startActivityForResult(exercisesEntry, REQ_EXERCISES_ENTRY)
         }
     }
 
-    @OnClick(R.id.btn_cancel)
     fun cancelWorkout() {
         finish()
     }

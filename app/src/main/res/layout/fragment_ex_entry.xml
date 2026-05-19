@@ -22,6 +22,7 @@
 		android:translationZ="1dp">
 
 		<include
+			android:id="@+id/part_et_exercise"
 			android:layout_height="match_parent"
 			android:layout_width="match_parent"
 			android:layout_margin="4dp"

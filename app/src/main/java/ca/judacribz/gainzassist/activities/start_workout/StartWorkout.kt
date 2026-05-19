@@ -14,11 +14,10 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.how_to_videos.HowToVideos
 import ca.judacribz.gainzassist.adapters.WorkoutPagerAdapter
+import ca.judacribz.gainzassist.databinding.ActivityStartWorkoutBinding
 import ca.judacribz.gainzassist.models.Exercise
 import ca.judacribz.gainzassist.models.Exercise.SetsType
 import ca.judacribz.gainzassist.models.Workout
@@ -28,7 +27,8 @@ import ca.judacribz.gainzassist.util.Preferences.getIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.addIncompleteSessionPref
 import ca.judacribz.gainzassist.util.Preferences.addIncompleteWorkoutPref
-import ca.judacribz.gainzassist.util.UI.setInitView
+import ca.judacribz.gainzassist.util.UI.setInitTheme
+import ca.judacribz.gainzassist.util.UI.setToolbar
 import com.facebook.rebound.ui.Util.dpToPx
 import org.parceler.Parcels
 import java.util.*
@@ -43,11 +43,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
 
-    @BindView(R.id.tlay_navbar)
-    lateinit var tabLayout: TabLayout
-
-    @BindView(R.id.vp_fmt_container)
-    lateinit var viewPager: ViewPager
+    private lateinit var binding: ActivityStartWorkoutBinding
 
     var layInflater: LayoutInflater? = null
     var setsView: View? = null
@@ -63,7 +59,10 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         val intent = intent
         workout = Parcels.unwrap(intent.getParcelableExtra(ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT))
         exercises = workout!!.exercises
-        setInitView(this, R.layout.activity_start_workout, workout!!.name, true)
+        setInitTheme(this)
+        binding = ActivityStartWorkoutBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setToolbar(this, workout!!.name!!, true)
 
         lp = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,
@@ -75,7 +74,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
     override fun onResume() {
         super.onResume()
-        if (viewPager.adapter == null) {
+        if (binding.vpFmtContainer.adapter == null) {
             setCurrSession()
         }
     }
@@ -169,8 +168,8 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
     private fun setupPager(warmups: ArrayList<Exercise>) {
         layInflater = layoutInflater
-        viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
-        tabLayout.addOnTabSelectedListener(object : TabLayout.ViewPagerOnTabSelectedListener(viewPager) {
+        binding.vpFmtContainer.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar))
+        binding.tlayNavbar.addOnTabSelectedListener(object : TabLayout.ViewPagerOnTabSelectedListener(binding.vpFmtContainer) {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 super.onTabSelected(tab)
             }
@@ -181,15 +180,15 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         })
 
         if (warmups.size == 0) {
-            tabLayout.removeTabAt(0)
+            binding.tlayNavbar.removeTabAt(0)
         }
 
-        viewPager.adapter = WorkoutPagerAdapter(
+        binding.vpFmtContainer.adapter = WorkoutPagerAdapter(
             supportFragmentManager,
             exercises!!,
             warmups
         )
-        viewPager.currentItem = tabLayout.tabCount - 2
+        binding.vpFmtContainer.currentItem = binding.tlayNavbar.tabCount - 2
     }
 
     fun displaySets(

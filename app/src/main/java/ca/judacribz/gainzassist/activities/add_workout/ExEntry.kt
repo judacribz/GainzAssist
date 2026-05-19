@@ -3,12 +3,14 @@ package ca.judacribz.gainzassist.activities.add_workout
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import butterknife.*
 import ca.judacribz.gainzassist.R
+import ca.judacribz.gainzassist.databinding.FragmentExEntryBinding
 import ca.judacribz.gainzassist.models.Exercise
 import ca.judacribz.gainzassist.models.Exercise.SetsType.MAIN_SET
 import ca.judacribz.gainzassist.util.UI.setSpinnerWithArray
@@ -33,7 +35,6 @@ class ExEntry : Fragment() {
 
     private var exEntryDataListener: ExEntryDataListener? = null
 
-    var fragmentView: View? = null
     var exercise: Exercise? = null
     var exerciseName: String? = null
     var num_reps = -1
@@ -46,40 +47,8 @@ class ExEntry : Fragment() {
 
     var deleteHidden = false
 
-    @BindView(R.id.et_exercise_name)
-    lateinit var etExerciseName: EditText
+    private lateinit var binding: FragmentExEntryBinding
 
-    @BindView(R.id.et_weight)
-    lateinit var etWeight: EditText
-
-    @BindView(R.id.et_reps)
-    lateinit var etNumReps: EditText
-
-    @BindView(R.id.et_sets)
-    lateinit var etNumSets: EditText
-
-    @BindView(R.id.ibtn_dec_weight)
-    lateinit var ibtnDecWeight: ImageButton
-
-    @BindView(R.id.ibtn_dec_reps)
-    lateinit var ibtnDecReps: ImageButton
-
-    @BindView(R.id.ibtn_dec_sets)
-    lateinit var ibtnDecSets: ImageButton
-
-    @BindView(R.id.spr_equipment)
-    lateinit var sprEquipment: Spinner
-
-    @BindView(R.id.btn_enter)
-    lateinit var btnEnter: Button
-
-    @BindView(R.id.btn_update)
-    lateinit var btnUpdate: Button
-
-    @BindView(R.id.btn_delete)
-    lateinit var btnDelete: Button
-
-    @BindViews(R.id.et_exercise_name, R.id.et_weight, R.id.et_reps, R.id.et_sets)
     lateinit var formEntries: List<@JvmSuppressWildcards EditText>
 
     override fun onAttach(context: Context?) {
@@ -96,36 +65,125 @@ class ExEntry : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        if (fragmentView != null) {
-            return fragmentView
+        if (::binding.isInitialized) {
+            return binding.root
         }
         retainInstance = true
 
-        val v = inflater.inflate(R.layout.fragment_ex_entry, container, false)
-        fragmentView = v
-        ButterKnife.bind(this, v)
+        binding = FragmentExEntryBinding.inflate(inflater, container, false)
+        val v = binding.root
+
+        formEntries = listOf(
+            binding.partEtExercise.etExerciseName,
+            binding.partEtWeight.etWeight,
+            binding.partEtReps.etReps,
+            binding.partEtSets.etSets
+        )
 
         num_reps = getString(R.string.starting_reps).toInt()
         num_sets = getString(R.string.starting_sets).toInt()
 
-        setSpinnerWithArray(activity, R.array.exerciseEquipment, sprEquipment)
+        setSpinnerWithArray(activity, R.array.exerciseEquipment, binding.sprEquipment)
 
         if (exercise != null) {
-            etExerciseName.setText(exercise!!.name)
-            setText(etWeight, exercise!!.weight)
-            setText(etNumSets, exercise!!.sets)
-            setText(etNumReps, exercise!!.reps)
-            btnEnter.visibility = View.GONE
-            btnUpdate.visibility = View.VISIBLE
+            binding.partEtExercise.etExerciseName.setText(exercise!!.name)
+            setText(binding.partEtWeight.etWeight, exercise!!.weight)
+            setText(binding.partEtSets.etSets, exercise!!.sets)
+            setText(binding.partEtReps.etReps, exercise!!.reps)
+            binding.btnEnter.visibility = View.GONE
+            binding.btnUpdate.visibility = View.VISIBLE
 
             if (deleteHidden) {
-                btnDelete.visibility = View.INVISIBLE
+                binding.btnDelete.visibility = View.INVISIBLE
             } else {
-                btnDelete.visibility = View.VISIBLE
+                binding.btnDelete.visibility = View.VISIBLE
             }
         }
 
+        setupListeners()
+
         return v
+    }
+
+    private fun setupListeners() {
+        binding.sprEquipment.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                equipmentSelected(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.partEtWeight.etWeight.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                setVisibleIfDisabled(binding.ibtnDecWeight)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                weight = handleNumChanged(binding.ibtnDecWeight, s.toString(), minWeight).toFloat()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partEtReps.etReps.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                setVisibleIfDisabled(binding.ibtnDecReps)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                num_reps = handleNumChanged(binding.ibtnDecReps, s.toString(), minInt).toInt()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.partEtSets.etSets.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                setVisibleIfDisabled(binding.ibtnDecSets)
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                num_sets = handleNumChanged(binding.ibtnDecSets, s.toString(), minInt).toInt()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        val focusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
+            if (!hasFocus && v is EditText) {
+                var min = 0f
+                var res = 0f
+                when (v.id) {
+                    R.id.et_weight -> {
+                        res = weight
+                        min = minWeight
+                    }
+                    R.id.et_reps -> {
+                        res = num_reps.toFloat()
+                        min = minInt.toFloat()
+                    }
+                    R.id.et_sets -> {
+                        res = num_sets.toFloat()
+                        min = minInt.toFloat()
+                    }
+                }
+                handleFocusLeft(v, min, res)
+            }
+        }
+        binding.partEtReps.etReps.onFocusChangeListener = focusChangeListener
+        binding.partEtSets.etSets.onFocusChangeListener = focusChangeListener
+        binding.partEtWeight.etWeight.onFocusChangeListener = focusChangeListener
+
+        binding.ibtnIncWeight.setOnClickListener { incNumWeight() }
+        binding.ibtnDecWeight.setOnClickListener { decNumWeight() }
+        binding.ibtnIncReps.setOnClickListener { incNumReps() }
+        binding.ibtnDecReps.setOnClickListener { decNumReps() }
+        binding.ibtnIncSets.setOnClickListener { incNumSets() }
+        binding.ibtnDecSets.setOnClickListener { decNumSets() }
+        binding.btnEnter.setOnClickListener { enterExercise() }
+        binding.btnUpdate.setOnClickListener { updateExercise() }
+        binding.btnDelete.setOnClickListener { deleteExercise() }
     }
 
     override fun onDetach() {
@@ -143,19 +201,18 @@ class ExEntry : Fragment() {
 
     fun hideDelete() {
         deleteHidden = true
-        if (::btnDelete.isInitialized) {
-            btnDelete.visibility = View.INVISIBLE
+        if (::binding.isInitialized) {
+            binding.btnDelete.visibility = View.INVISIBLE
         }
     }
 
     fun setExerciseExists() {
-        etExerciseName.error = String.format(
+        binding.partEtExercise.etExerciseName.error = String.format(
             getString(R.string.err_exercise_exists),
             exerciseName
         )
     }
 
-    @OnItemSelected(R.id.spr_equipment)
     fun equipmentSelected(position: Int) {
         when (position) {
             0 -> {
@@ -173,113 +230,53 @@ class ExEntry : Fragment() {
         }
 
         if (weight > minWeight) {
-            setVisibleIfDisabled(ibtnDecWeight)
+            setVisibleIfDisabled(binding.ibtnDecWeight)
         } else {
-            etWeight.setText(minWeight.toString())
-            setGoneIfEnabled(ibtnDecWeight)
+            binding.partEtWeight.etWeight.setText(minWeight.toString())
+            setGoneIfEnabled(binding.ibtnDecWeight)
         }
     }
 
-    @OnTextChanged(value = [R.id.et_weight], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeWeightChanged() {
-        setVisibleIfDisabled(ibtnDecWeight)
-    }
-
-    @OnTextChanged(value = [R.id.et_weight], callback = OnTextChanged.Callback.TEXT_CHANGED)
-    fun onWeightChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        weight = handleNumChanged(ibtnDecWeight, s.toString(), minWeight).toFloat()
-    }
-
-    @OnTextChanged(value = [R.id.et_reps], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeRepsChanged() {
-        setVisibleIfDisabled(ibtnDecReps)
-    }
-
-    @OnTextChanged(value = [R.id.et_sets], callback = OnTextChanged.Callback.BEFORE_TEXT_CHANGED)
-    fun beforeSetsChanged() {
-        setVisibleIfDisabled(ibtnDecSets)
-    }
-
-    @OnTextChanged(R.id.et_reps)
-    fun onRepsChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        num_reps = handleNumChanged(ibtnDecReps, s.toString(), minInt).toInt()
-    }
-
-    @OnTextChanged(R.id.et_sets)
-    fun onSetsChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        num_sets = handleNumChanged(ibtnDecSets, s.toString(), minInt).toInt()
-    }
-
-    @OnFocusChange(value = [R.id.et_reps, R.id.et_sets, R.id.et_weight])
-    fun onFocusLeft(et: EditText, hasFocus: Boolean) {
-        if (!hasFocus) {
-            var min = 0f
-            var res = 0f
-            when (et.id) {
-                R.id.et_weight -> {
-                    res = weight
-                    min = minWeight
-                }
-                R.id.et_reps -> {
-                    res = num_reps.toFloat()
-                    min = minInt.toFloat()
-                }
-                R.id.et_sets -> {
-                    res = num_sets.toFloat()
-                    min = minInt.toFloat()
-                }
-            }
-            handleFocusLeft(et, min, res)
-        }
-    }
-
-    @OnClick(R.id.ibtn_inc_weight)
     fun incNumWeight() {
-        setText(etWeight, weight + weightChange)
+        setText(binding.partEtWeight.etWeight, weight + weightChange)
     }
 
-    @OnClick(R.id.ibtn_dec_weight)
     fun decNumWeight() {
-        setText(etWeight, Math.max(weight - weightChange, minWeight))
+        setText(binding.partEtWeight.etWeight, Math.max(weight - weightChange, minWeight))
     }
 
-    @OnClick(R.id.ibtn_inc_reps)
     fun incNumReps() {
-        setText(etNumReps, num_reps + 1)
+        setText(binding.partEtReps.etReps, num_reps + 1)
     }
 
-    @OnClick(R.id.ibtn_dec_reps)
     fun decNumReps() {
-        setText(etNumReps, num_reps - 1)
+        setText(binding.partEtReps.etReps, num_reps - 1)
     }
 
-    @OnClick(R.id.ibtn_inc_sets)
     fun incNumSets() {
-        setText(etNumSets, num_sets + 1)
+        setText(binding.partEtSets.etSets, num_sets + 1)
     }
 
-    @OnClick(R.id.ibtn_dec_sets)
     fun decNumSets() {
-        setText(etNumSets, num_sets - 1)
+        setText(binding.partEtSets.etSets, num_sets - 1)
     }
 
-    @OnClick(R.id.btn_enter)
     fun enterExercise() {
         if (validateForm(activity!!, formEntries.toTypedArray())) {
-            exerciseName = getTextString(etExerciseName)
+            exerciseName = getTextString(binding.partEtExercise.etExerciseName)
             if (exEntryDataListener!!.exerciseDoesNotExist(this, exerciseName!!, ex_i)) {
-                btnEnter.visibility = View.GONE
-                btnUpdate.visibility = View.VISIBLE
-                num_reps = getTextInt(etNumReps)
-                num_sets = getTextInt(etNumSets)
+                binding.btnEnter.visibility = View.GONE
+                binding.btnUpdate.visibility = View.VISIBLE
+                num_reps = getTextInt(binding.partEtReps.etReps)
+                num_sets = getTextInt(binding.partEtSets.etSets)
                 exercise = Exercise(
                     ex_i,
                     exerciseName,
                     "Strength",
-                    getTextString(sprEquipment),
-                    getTextInt(etNumSets),
-                    getTextInt(etNumReps),
-                    getTextFloat(etWeight),
+                    getTextString(binding.sprEquipment),
+                    getTextInt(binding.partEtSets.etSets),
+                    getTextInt(binding.partEtReps.etReps),
+                    getTextFloat(binding.partEtWeight.etWeight),
                     MAIN_SET
                 )
                 exEntryDataListener!!.exerciseDataReceived(exercise!!, false)
@@ -287,21 +284,20 @@ class ExEntry : Fragment() {
         }
     }
 
-    @OnClick(R.id.btn_update)
     fun updateExercise() {
         if (validateForm(activity!!, formEntries.toTypedArray())) {
-            exerciseName = getTextString(etExerciseName)
+            exerciseName = getTextString(binding.partEtExercise.etExerciseName)
             if (exEntryDataListener!!.exerciseDoesNotExist(this, exerciseName!!, ex_i)) {
-                num_reps = getTextInt(etNumReps)
-                num_sets = getTextInt(etNumSets)
+                num_reps = getTextInt(binding.partEtReps.etReps)
+                num_sets = getTextInt(binding.partEtSets.etSets)
                 exercise = Exercise(
                     ex_i,
                     exerciseName,
                     "Strength",
-                    getTextString(sprEquipment),
-                    getTextInt(etNumSets),
-                    getTextInt(etNumReps),
-                    getTextFloat(etWeight),
+                    getTextString(binding.sprEquipment),
+                    getTextInt(binding.partEtSets.etSets),
+                    getTextInt(binding.partEtReps.etReps),
+                    getTextFloat(binding.partEtWeight.etWeight),
                     MAIN_SET
                 )
                 exEntryDataListener!!.exerciseDataReceived(exercise!!, true)
@@ -309,9 +305,8 @@ class ExEntry : Fragment() {
         }
     }
 
-    @OnClick(R.id.btn_delete)
     fun deleteExercise() {
-        etExerciseName.setText("")
+        binding.partEtExercise.etExerciseName.setText("")
         exEntryDataListener!!.deleteExercise(exercise, ex_i)
     }
 }

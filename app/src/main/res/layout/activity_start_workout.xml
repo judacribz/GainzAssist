@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rlay_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.start_workout.StartWorkout">
@@ -35,14 +36,12 @@
             app:tabTextColor="@color/colorLightBg">
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tab_warmups"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:icon="@drawable/ic_warmups"
                 android:text="@string/warmups" />
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tab_workout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorBg"
@@ -50,7 +49,6 @@
                 android:text="@string/workout"/>
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tab_exercises"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:icon="@drawable/ic_exercises"
