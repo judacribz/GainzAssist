@@ -365,12 +365,19 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             updateUI()
         } else {
             workoutFinished = true
+
+            countDownTimer?.cancel()
+            countDownTimer = null
+
             val a = act
             if (a != null) {
-                ViewModelProviders.of(a).get(WorkoutViewModel::class.java).insertSession(currWorkout.currSession!!)
+                ViewModelProviders.of(a).get(WorkoutViewModel::class.java)
+                    .insertSession(currWorkout.currSession!!)
+
                 if (Preferences.removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {
                     Preferences.removeIncompleteSessionPref(a, currWorkout.workoutName)
                 }
+
                 Preferences.removeSessionProgressPref(a, currWorkout.workoutName)
                 a.finish()
             }

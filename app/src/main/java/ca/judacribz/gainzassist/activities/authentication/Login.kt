@@ -42,6 +42,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import java.io.IOException
 import java.util.*
+import kotlin.math.hypot
 
 class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
 
@@ -65,6 +66,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     var linkGoogle = false
     private var loginSpring: Spring? = null
     private var signUpSpring: Spring? = null
+    private var loginScreenRunnable: Runnable? = null
 
     private lateinit var binding: ActivityLoginBinding
 
@@ -80,7 +82,12 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
 
         binding.ivLoginImage.post { loginSpring = setSpring(binding.ivLoginImage) }
         binding.ivSignUpImage.post { signUpSpring = setSpring(binding.ivSignUpImage) }
-        binding.tvSignUpHere.post { loginScreen() }
+        loginScreenRunnable = Runnable {
+            if (!isFinishing && !isDestroyed && binding.root.isAttachedToWindow) {
+                loginScreen()
+            }
+        }
+        binding.tvSignUpHere.post(loginScreenRunnable!!)
 
         binding.btnGoogleSignIn.setOnClickListener { googleLogin() }
         binding.ibtnGoogle.setOnClickListener { googleLogin() }
@@ -149,6 +156,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     override fun onStop() {
+        loginScreenRunnable?.let { binding.tvSignUpHere.removeCallbacks(it) }
+
         super.onStop()
         auth!!.removeAuthStateListener(this)
         progressHandler.dismiss()
@@ -260,15 +269,27 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     fun animateView(inView: View, outView: View, navTextView: View?) {
         outView.visibility = View.INVISIBLE
         inView.visibility = View.VISIBLE
-        val animator = ViewAnimationUtils.createCircularReveal(
-            inView,
-            inView.width / 2,
-            inView.height / 2,
-            0.0f,
-            Math.hypot((inView.width / 2).toDouble(), (inView.height / 2).toDouble()).toFloat() * 2
-        )
-        animator.interpolator = AccelerateDecelerateInterpolator()
-        animator.start()
+
+        if (!isFinishing &&
+            !isDestroyed &&
+            inView.isAttachedToWindow &&
+            inView.width > 0 &&
+            inView.height > 0
+        ) {
+            val animator = ViewAnimationUtils.createCircularReveal(
+                inView,
+                inView.width / 2,
+                inView.height / 2,
+                0.0f,
+                hypot(
+                    (inView.width / 2).toDouble(),
+                    (inView.height / 2).toDouble()
+                ).toFloat() * 2
+            )
+            animator.interpolator = AccelerateDecelerateInterpolator()
+            animator.start()
+        }
+
         if (navTextView != null) {
             slide_end!!.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation) {
@@ -279,7 +300,13 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                 override fun onAnimationEnd(animation: Animation) {}
                 override fun onAnimationRepeat(animation: Animation) {}
             })
-            navTextView.startAnimation(slide_end)
+
+            if (navTextView.isAttachedToWindow) {
+                navTextView.startAnimation(slide_end)
+            } else {
+                navTextView.setPadding(100, 0, 0, 0)
+                navTextView.visibility = View.VISIBLE
+            }
         }
     }
 

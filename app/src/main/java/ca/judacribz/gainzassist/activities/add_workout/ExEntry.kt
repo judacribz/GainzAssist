@@ -186,6 +186,11 @@ class ExEntry : Fragment() {
         binding.btnDelete.setOnClickListener { deleteExercise() }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        exEntryDataListener = null
+    }
+
     fun setInd(index: Int) {
         this.ex_i = index
     }
