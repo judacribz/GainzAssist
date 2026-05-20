@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "ca.judacribz.gainzassist"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         buildConfig = true
@@ -18,11 +18,11 @@ android {
 
     defaultConfig {
         applicationId = "ca.judacribz.gainzassist"
-        minSdk = 21
-        targetSdk = 28
+        minSdk = 23
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -45,19 +45,20 @@ android {
                 "META-INF/NOTICE",
                 "META-INF/NOTICE.txt",
                 "META-INF/notice.txt",
-                "META-INF/ASL2.0"
+                "META-INF/ASL2.0",
+                "META-INF/INDEX.LIST"
             )
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 
@@ -86,20 +87,21 @@ dependencies {
     implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
 
     // 2. Testing
-    androidTestImplementation(libs.espresso.core) {
-        exclude(group = "com.android.support", module = "support-annotations")
-    }
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
     testImplementation(libs.junit)
 
-    // 3. Architecture Components
-    implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
-    androidTestImplementation(libs.room.testing)
-    implementation(libs.arch.lifecycle.extensions)
-    kapt(libs.arch.lifecycle.compiler)
+    // 3. Architecture Components (AndroidX)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    androidTestImplementation(libs.androidx.room.testing)
+    
+    implementation(libs.bundles.androidx.lifecycle)
+    kapt(libs.androidx.lifecycle.compiler)
 
-    // 4. Android Support
-    implementation(libs.bundles.android.support)
+    // 4. AndroidX Core
+    implementation(libs.bundles.androidx.core)
 
     // 5. Facebook
     implementation(libs.facebook.android.sdk)
@@ -112,6 +114,7 @@ dependencies {
     implementation(libs.bundles.google)
 
     // 8. Firebase
+    implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
     // 9. Parceler
@@ -119,6 +122,9 @@ dependencies {
     kapt(libs.parceler)
 
     // 10. UI / Logging
-    implementation("com.google.guava:guava:31.0.1-android")
+    implementation("com.google.guava:guava:33.2.1-android")
     implementation(libs.bundles.ui.logging)
+    implementation(libs.android.youtube.player)
+    implementation(libs.glide)
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 }

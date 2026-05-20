@@ -1,6 +1,6 @@
 package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import ca.judacribz.gainzassist.constants.ExerciseConst
 import ca.judacribz.gainzassist.constants.ExerciseConst.BARBELL
 import ca.judacribz.gainzassist.constants.ExerciseConst.DUMBBELL

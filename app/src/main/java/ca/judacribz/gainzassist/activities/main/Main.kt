@@ -1,14 +1,13 @@
 package ca.judacribz.gainzassist.activities.main
 
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import android.content.Intent
 import android.os.Bundle
-import android.speech.RecognizerIntent
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
+import com.google.android.material.tabs.TabLayout
+import androidx.fragment.app.Fragment
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -27,11 +26,10 @@ import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.handleBackButton
 import ca.judacribz.gainzassist.util.UI.setInitTheme
 import ca.judacribz.gainzassist.util.UI.setToolbar
-import com.miguelcatalan.materialsearchview.MaterialSearchView
 import org.parceler.Parcels
 import java.util.*
 
-class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWorkoutReceivedListener {
+class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutReceivedListener {
 
     companion object {
         const val EXTRA_LOGOUT_USER = "ca.judacribz.gainzassist.EXTRA_LOGOUT_USER"
@@ -74,7 +72,12 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
         override fun onTabSelected(tab: TabLayout.Tab) {
             super.onTabSelected(tab)
             pos = tab.position
-            binding.msvWorkouts.closeSearch()
+            
+            search?.let {
+                if (it.isActionViewExpanded) {
+                    it.collapseActionView()
+                }
+            }
 
             if (search != null && addWorkout != null) {
                 when (tab.position) {
@@ -101,8 +104,6 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
     override fun onResume() {
         super.onResume()
         setupPager()
-        binding.msvWorkouts.setOnQueryTextListener(this)
-        binding.msvWorkouts.setVoiceSearch(true)
     }
 
     private fun setupPager() {
@@ -119,8 +120,6 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
 
     override fun onPause() {
         super.onPause()
-        binding.msvWorkouts.setOnQueryTextListener(null)
-        binding.msvWorkouts.setVoiceSearch(false)
         binding.vpFmtContainer.removeOnPageChangeListener(tabLayoutOnPageChangeListener!!)
         binding.tlayNavbar.removeOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
     }
@@ -132,23 +131,11 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
     override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, mainMenu)
         search = mainMenu.findItem(R.id.act_search)
-        binding.msvWorkouts.setMenuItem(search)
+        val searchView = search?.actionView as? SearchView
+        searchView?.setOnQueryTextListener(this)
+        
         addWorkout = mainMenu.findItem(R.id.act_add_workout)
         return super.onCreateOptionsMenu(mainMenu)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == MaterialSearchView.REQUEST_VOICE && resultCode == RESULT_OK) {
-            val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            if (matches != null && matches.size > 0) {
-                val searchWrd = matches[0]
-                if (!TextUtils.isEmpty(searchWrd)) {
-                    binding.msvWorkouts.setQuery(searchWrd, false)
-                }
-            }
-            return
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
@@ -167,7 +154,7 @@ class Main : AppCompatActivity(), MaterialSearchView.OnQueryTextListener, OnWork
                 val logoutIntent = Intent(this, Login::class.java)
                 logoutIntent.putExtra(EXTRA_LOGOUT_USER, true)
                 startActivity(logoutIntent)
-                ViewModelProviders.of(this).get(WorkoutViewModel::class.java).deleteAllWorkouts()
+                ViewModelProvider(this).get(WorkoutViewModel::class.java).deleteAllWorkouts()
                 finish()
             }
         }

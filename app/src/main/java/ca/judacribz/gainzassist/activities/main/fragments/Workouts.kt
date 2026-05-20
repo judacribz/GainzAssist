@@ -1,18 +1,18 @@
 package ca.judacribz.gainzassist.activities.main.fragments
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.SearchView
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.add_workout.Summary
 import ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.WORKOUTS_LIST
@@ -24,12 +24,11 @@ import ca.judacribz.gainzassist.databinding.FragmentWorkoutsBinding
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import ca.judacribz.gainzassist.util.UI.getTextString
-import com.miguelcatalan.materialsearchview.MaterialSearchView
 import com.orhanobut.dialogplus.DialogPlus
 import com.orhanobut.dialogplus.ViewHolder
 import java.util.*
 
-class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearchView.OnQueryTextListener {
+class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, SearchView.OnQueryTextListener {
 
     var intent: Intent? = null
     var extraKey: String? = null
@@ -45,7 +44,7 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
 
     private lateinit var binding: FragmentWorkoutsBinding
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
 
         act = context as Main
@@ -65,12 +64,12 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentWorkoutsBinding.inflate(inflater, container, false)
-        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel::class.java)
+        workoutViewModel = ViewModelProvider(act).get(WorkoutViewModel::class.java)
 
         binding.rvWorkoutBtns.layoutManager = LinearLayoutManager(act)
         binding.rvWorkoutBtns.setHasFixedSize(true)
 
-        workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
+        workoutViewModel!!.allWorkouts.observe(viewLifecycleOwner, Observer { workouts ->
             allWorkouts = workouts
             filteredWorkouts = workouts
             workoutNames = ArrayList()

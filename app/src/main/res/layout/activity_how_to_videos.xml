@@ -15,27 +15,20 @@
         <include
             android:id="@+id/toolbar"
             layout="@layout/part_title_bar"/>
-
-        <com.miguelcatalan.materialsearchview.MaterialSearchView
-            android:id="@+id/msvHowToVids"
-            android:theme="@style/MaterialSearchViewStyle"
-            android:hint="@string/hint_search_exercise_vids"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
     </FrameLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_video_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_container"
         android:background="@android:color/black"/>
 
-    <fragment
-        android:id="@+id/fmt_youtube"
+    <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+        android:id="@+id/ypv_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar_container"
         android:layout_centerInParent="true"
-        android:name="com.google.android.youtube.player.YouTubePlayerSupportFragment"/>
+        android:visibility="gone"/>
 </RelativeLayout>

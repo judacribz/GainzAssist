@@ -1,12 +1,12 @@
 package ca.judacribz.gainzassist.activities.start_workout.fragments
 
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.SparseArray
@@ -62,7 +62,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
     private lateinit var binding: FragmentWorkoutScreenBinding
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         act = context as StartWorkout?
         finExercises = ArrayList()
@@ -371,7 +371,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
             val a = act
             if (a != null) {
-                ViewModelProviders.of(a).get(WorkoutViewModel::class.java)
+                ViewModelProvider(a).get(WorkoutViewModel::class.java)
                     .insertSession(currWorkout.currSession!!)
 
                 if (Preferences.removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {

@@ -1,6 +1,6 @@
 package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import ca.judacribz.gainzassist.util.Misc.exerciseToMap
 import org.parceler.Parcel
 import org.parceler.Parcel.Serialization

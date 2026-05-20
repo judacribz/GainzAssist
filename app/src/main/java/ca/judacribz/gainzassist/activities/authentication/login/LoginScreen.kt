@@ -1,5 +1,6 @@
 package ca.judacribz.gainzassist.activities.authentication.login
 
+import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,8 @@ import ca.judacribz.gainzassist.R
 @Composable
 fun LoginScreen(
     state: LoginUiState,
+    loginImage: Bitmap? = null,
+    signUpImage: Bitmap? = null,
     actions: LoginActions
 ) {
     Box(
@@ -62,7 +66,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.com_facebook_button_login_logo),
+                    painter = painterResource(id = R.drawable.ic_plus),// TODO replace with facebook but
                     contentDescription = "Facebook Login",
                     modifier = Modifier
                         .size(80.dp)
@@ -97,19 +101,23 @@ fun LoginScreen(
             ) {
                 Crossfade(targetState = state.isLoginMode, label = "MainImage") { isLogin ->
                     if (isLogin) {
-                        Image(
-                            painter = painterResource(id = R.drawable.login_img),
-                            contentDescription = stringResource(id = R.string.cd_login_img),
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
-                        )
+                        loginImage?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = stringResource(id = R.string.cd_login_img),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
                     } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.sign_up_img),
-                            contentDescription = stringResource(id = R.string.cd_sign_up_img),
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
-                        )
+                        signUpImage?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = stringResource(id = R.string.cd_sign_up_img),
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
                     }
                 }
             }

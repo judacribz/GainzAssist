@@ -1,9 +1,9 @@
 package ca.judacribz.gainzassist.models.db;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.*;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.room.*;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import ca.judacribz.gainzassist.models.Exercise;
 import ca.judacribz.gainzassist.models.Session;
 import ca.judacribz.gainzassist.models.ExerciseSet;
