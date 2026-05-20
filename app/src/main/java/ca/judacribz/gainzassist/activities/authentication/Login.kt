@@ -115,7 +115,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                     }
 
                     override fun onImageBounceClick() {
-                        // Compose handles its own animations, or we call ViewModel/Logic
+                        uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
                     }
                 }
             )
