@@ -1,4 +1,6 @@
 [versions]
+compose-bom = "2024.04.01"
+activity-compose = "1.9.0"
 
 # Android / Kotlin / Google Plugins
 android-gradle-plugin = "9.2.1"
@@ -45,6 +47,14 @@ junit = "4.12"
 
 
 [libraries]
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+androidx-compose-ui = { module = "androidx.compose.ui:ui" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 
 # Android Support
 android-support-appcompat-v7 = { module = "com.android.support:appcompat-v7", version.ref = "android-support" }
@@ -136,6 +146,7 @@ ui-logging = [
 
 
 [plugins]
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

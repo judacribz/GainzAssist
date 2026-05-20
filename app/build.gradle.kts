@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -12,6 +13,7 @@ android {
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
     }
 
     defaultConfig {
@@ -66,6 +68,20 @@ android {
 }
 
 dependencies {
+    // Compose
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.activity.compose)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
     // 1. Local files
     implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
 
@@ -103,5 +119,6 @@ dependencies {
     kapt(libs.parceler)
 
     // 10. UI / Logging
+    implementation("com.google.guava:guava:31.0.1-android")
     implementation(libs.bundles.ui.logging)
 }
