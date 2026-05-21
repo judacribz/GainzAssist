@@ -17,7 +17,6 @@ import ca.judacribz.gainzassist.activities.authentication.login.LoginScreen
 import ca.judacribz.gainzassist.activities.authentication.login.LoginUiState
 import ca.judacribz.gainzassist.activities.main.Main
 import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_LOGOUT_USER
-import ca.judacribz.gainzassist.databinding.ActivityLoginBinding
 import ca.judacribz.gainzassist.util.Preferences.setUserInfoPref
 import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.setInitTheme
@@ -51,8 +50,6 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         private const val SIGN_UP_IMG = "fatman.png"
     }
 
-    private val progressHandler = ProgressHandler()
-
     private var auth: FirebaseAuth? = null
     private var credential: AuthCredential? = null
     private var googleCred: AuthCredential? = null
@@ -63,17 +60,12 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     private var password: String? = null
     var linkGoogle = false
 
-    private lateinit var binding: ActivityLoginBinding
-
     // State for Compose
     private var uiState by mutableStateOf(LoginUiState())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitTheme(this)
-        // Keep binding initialized if referenced later, but override view with Compose
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        progressHandler.setProgress(this, "Authenticating", binding.blurLayout)
 
         setupSignInMethods()
 
@@ -154,9 +146,9 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
+            uiState = uiState.copy(isLoading = true)
             when (requestCode) {
                 RC_SIGN_IN -> {
-                    progressHandler.setTitle("Google Sign In")
                     val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                     try {
                         val account = task.getResult(ApiException::class.java)
@@ -164,27 +156,25 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                         signIn(this, googleCred!!, signInClient!!)
                     } catch (ex: ApiException) {
                         ex.printStackTrace()
+                        uiState = uiState.copy(isLoading = false)
                     }
                 }
                 else -> {
-                    progressHandler.setTitle("Facebook Login")
                     callbackManager!!.onActivityResult(requestCode, resultCode, data)
                 }
             }
-            progressHandler.show()
         }
     }
 
     override fun onStop() {
         super.onStop()
         auth!!.removeAuthStateListener(this)
-        progressHandler.dismiss()
     }
 
     override fun onAuthStateChanged(firebaseAuth: FirebaseAuth) {
         val firebaseUser = firebaseAuth.currentUser
         if (firebaseUser != null) {
-            progressHandler.show()
+            uiState = uiState.copy(isLoading = true)
             Toast.makeText(
                 this,
                 String.format(getString(R.string.txt_logged_in), firebaseUser.email),
@@ -248,8 +238,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         val email = uiState.email.trim { it <= ' ' }
         val password = uiState.password.trim { it <= ' ' }
         if (validateForm(email, password)) {
-            progressHandler.setTitle("Login")
-            progressHandler.show()
+            uiState = uiState.copy(isLoading = true)
             credential = EmailAuthProvider.getCredential(email, password)
             signIn(this, credential!!, signInClient!!)
         }
@@ -259,14 +248,13 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         val email = uiState.email.trim { it <= ' ' }
         val password = uiState.password.trim { it <= ' ' }
         if (validateForm(email, password)) {
-            progressHandler.setTitle("Sign Up")
-            progressHandler.show()
+            uiState = uiState.copy(isLoading = true)
             credential = EmailAuthProvider.getCredential(email, password)
             createUser(this, email, password, signInClient!!)
         }
     }
 
     fun loginFail() {
-        progressHandler.dismiss()
+        uiState = uiState.copy(isLoading = false)
     }
 }
