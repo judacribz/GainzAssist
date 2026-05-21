@@ -209,9 +209,9 @@ fun LoginScreen(
 
                     val newEmailField = EditText(context).apply {
                         id = R.id.et_email
-                        layoutParams = android.view.ViewGroup.LayoutParams(
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                        layoutParams = android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT
                         )
                         val paddingPx = (20 * context.resources.displayMetrics.density).toInt()
                         setPadding(paddingPx, paddingPx, paddingPx, paddingPx)
@@ -257,9 +257,9 @@ fun LoginScreen(
                     }
                     val newPasswordField = EditText(context).apply {
                         id = R.id.et_password
-                        layoutParams = android.view.ViewGroup.LayoutParams(
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                            android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                        layoutParams = android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT
                         )
                         val paddingPx = (20 * context.resources.displayMetrics.density).toInt()
                         setPadding(paddingPx, paddingPx, paddingPx, paddingPx)
