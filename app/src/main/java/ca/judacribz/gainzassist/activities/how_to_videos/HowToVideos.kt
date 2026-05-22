@@ -6,6 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import ca.judacribz.gainzassist.BuildConfig
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout.Companion.EXTRA_HOW_TO_VID
 import ca.judacribz.gainzassist.databinding.ActivityHowToVideosBinding
@@ -109,7 +110,7 @@ class HowToVideos : AppCompatActivity(),
         task?.execute(
             URL + query.replace("\\s+".toRegex(), SEARCH_SPACE_STR) +
                     "&key=" +
-                    getString(R.string.google_api_key)
+                    BuildConfig.GOOGLE_API_KEY
         )
     }
 

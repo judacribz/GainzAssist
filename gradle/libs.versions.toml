@@ -5,6 +5,7 @@ activity-compose = "1.9.0"
 # Android / Kotlin / Google Plugins
 android-gradle-plugin = "9.2.1"
 google-services = "4.4.4"
+secrets-gradle-plugin = "2.0.1"
 kotlin = "2.2.10"
 
 # AndroidX
@@ -180,5 +181,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets-gradle-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

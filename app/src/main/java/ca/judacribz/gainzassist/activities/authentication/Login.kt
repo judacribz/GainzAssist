@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ca.judacribz.gainzassist.BuildConfig
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.authentication.login.LoginActions
 import ca.judacribz.gainzassist.activities.authentication.login.LoginScreen
@@ -126,7 +127,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     private fun setupSignInMethods() {
         auth = FirebaseAuth.getInstance()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestIdToken(BuildConfig.DEFAULT_WEB_CLIENT_ID)
             .requestEmail()
             .build()
         signInClient = GoogleSignIn.getClient(this, gso)
