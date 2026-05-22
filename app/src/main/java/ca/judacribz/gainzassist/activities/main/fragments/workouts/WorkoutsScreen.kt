@@ -2,6 +2,7 @@ package ca.judacribz.gainzassist.activities.main.fragments.workouts
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -20,15 +20,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -97,23 +95,42 @@ fun WorkoutListItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
+            .padding(vertical = 5.dp),
+        shape = RoundedCornerShape(20.dp),
         shadowElevation = 2.dp,
-        color = colorResource(id = R.color.blue), // Match basic styling from XML button style, though themes alter this
+        color = Color.Transparent, // We use a gradient background in the Box instead
         contentColor = Color.White
     ) {
-        Text(
-            text = workoutName,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(50.dp),
-            fontSize = 18.sp,
-            textAlign = TextAlign.Center
-        )
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            colorResource(id = R.color.blueDark),
+                            colorResource(id = R.color.blue)
+                        )
+                    )
+                )
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(20.dp)
+                )
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                )
+        ) {
+            Text(
+                text = workoutName,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(50.dp),
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
@@ -131,8 +148,14 @@ fun WorkoutOptionsDialog(
         Surface(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .wrapContentHeight(),
-            color = colorResource(id = R.color.colorPrimaryDark), // edit_text_box_blue refers to a blue dark background
+                .wrapContentHeight()
+                .border(
+                    width = 2.5.dp,
+                    color = colorResource(id = R.color.blue),
+                    shape = RoundedCornerShape(20.dp)
+                ),
+            color = colorResource(id = R.color.grey),
+            shape = RoundedCornerShape(20.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -143,7 +166,7 @@ fun WorkoutOptionsDialog(
                 Text(
                     text = workoutName,
                     fontSize = 30.sp,
-                    color = colorResource(id = R.color.colorBg), // From XML tv_workout_name textColor
+                    color = colorResource(id = R.color.colorBg),
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
 

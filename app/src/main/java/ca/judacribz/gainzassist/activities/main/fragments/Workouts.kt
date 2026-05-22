@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -32,6 +33,7 @@ class Workouts : Fragment(), SearchView.OnQueryTextListener {
 
     private var allWorkouts: List<Workout>? = null
     private var filteredWorkouts: List<Workout>? = null
+    private var currentQuery: String = ""
 
     // Compose states
     private var workoutNames by mutableStateOf<List<String>>(emptyList())
@@ -52,18 +54,11 @@ class Workouts : Fragment(), SearchView.OnQueryTextListener {
 
         workoutViewModel!!.allWorkouts.observe(viewLifecycleOwner, Observer { workouts ->
             allWorkouts = workouts
-            filteredWorkouts = workouts
-
-            val names = ArrayList<String>()
-            if (workouts != null) {
-                for (workout in workouts) {
-                    workout.name?.let { names.add(it) }
-                }
-            }
-            workoutNames = names
+            applyFilter()
         })
 
         return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 WorkoutsScreen(
                     workoutNames = workoutNames,
@@ -115,21 +110,25 @@ class Workouts : Fragment(), SearchView.OnQueryTextListener {
         selectedWorkoutName = null
     }
 
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return false
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        if (allWorkouts == null) return false
-        val query = newText?.lowercase() ?: ""
-        filteredWorkouts = allWorkouts!!.filter { it.name!!.lowercase().contains(query) }
+    private fun applyFilter() {
+        if (allWorkouts == null) return
+        val query = currentQuery.lowercase()
+        filteredWorkouts = allWorkouts!!.filter { it.name.orEmpty().lowercase().contains(query) }
 
         val names = ArrayList<String>()
         for (workout in filteredWorkouts!!) {
             workout.name?.let { names.add(it) }
         }
         workoutNames = names
+    }
 
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        currentQuery = newText ?: ""
+        applyFilter()
         return true
     }
 
