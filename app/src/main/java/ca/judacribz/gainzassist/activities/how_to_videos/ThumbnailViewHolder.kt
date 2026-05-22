@@ -21,7 +21,10 @@ class ThumbnailViewHolder(private val binding: PartThumbnailBinding, private val
 
     init {
         binding.btnPlayVideo.setOnClickListener {
-            videoClickObserver?.onVideoClick(videoIds[layoutPosition])
+            val position = bindingAdapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                videoClickObserver?.onVideoClick(videoIds[position])
+            }
         }
     }
 

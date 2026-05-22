@@ -22,7 +22,6 @@ import ca.judacribz.gainzassist.databinding.ActivityMainBinding
 import ca.judacribz.gainzassist.interfaces.OnWorkoutReceivedListener
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
-import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.handleBackButton
 import ca.judacribz.gainzassist.util.UI.setInitTheme
 import ca.judacribz.gainzassist.util.UI.setToolbar
@@ -36,8 +35,6 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
         const val EXTRA_WORKOUT = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT"
         const val EXTRA_CALLING_ACTIVITY = "ca.judacribz.gainzassist.activities.main.Main.EXTRA_CALLING_ACTIVITY"
         const val EXERCISES_ENTRY = "ca.judacribz.gainzassist.activities.main.Main.EXERCISES_ENTRY"
-        
-        private val progressHandler = ProgressHandler()
     }
 
     private val FMTS: ArrayList<Fragment> = arrayListOf(

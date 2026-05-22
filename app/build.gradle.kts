@@ -24,8 +24,8 @@ android {
 
     defaultConfig {
         applicationId = "ca.judacribz.gainzassist"
-        minSdk = 23
-        targetSdk = 35
+        minSdk = 21
+        targetSdk = 28
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

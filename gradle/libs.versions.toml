@@ -28,10 +28,10 @@ facebook-android-sdk = "17.0.0"
 facebook-rebound = "0.3.8"
 
 # Firebase (Modern versions)
-firebase-bom = "33.1.0"
+firebase-bom = "32.8.1"
 
 # Google
-gms-play-services-auth = "21.5.1"
+gms-play-services-auth = "20.7.0"
 gson = "2.11.0"
 youtube-api = "v3-rev20260430-2.0.0"
 android-youtube-player = "13.0.0"

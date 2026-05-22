@@ -104,6 +104,11 @@ class HowToVideos : AppCompatActivity(),
     }
 
     private fun executeSearch(query: String) {
+        if (BuildConfig.GOOGLE_API_KEY.isBlank()) {
+            Snackbar.make(binding.rvVideoList, "Missing Google API Key for video search", Snackbar.LENGTH_LONG).show()
+            return
+        }
+
         task?.setYouTubeSearchObserver(null)
         task = SearchVideosTask()
         task?.setYouTubeSearchObserver(this)
