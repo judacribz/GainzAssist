@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -246,7 +247,7 @@ fun LoginScreen(
                 SocialButton(
                     imageRes = R.drawable.facebook,
                     innerColor = ColorFacebookBlue,
-                    contentDescription = "Facebook Login",
+                    contentDescription = stringResource(R.string.cd_facebook_login),
                     onClick = actions::onFacebookSignInClick
                 )
 
@@ -255,7 +256,7 @@ fun LoginScreen(
                 SocialButton(
                     imageRes = R.drawable.google,
                     innerColor = ColorGoogleWhite,
-                    contentDescription = "Google Login",
+                    contentDescription = stringResource(R.string.cd_google_login),
                     onClick = actions::onGoogleSignInClick
                 )
             }
@@ -382,7 +383,14 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.3f))
-                    .clickable(enabled = false) {},
+                    .pointerInput(Unit) {
+                        // Consume all touch events
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(color = Color.White)

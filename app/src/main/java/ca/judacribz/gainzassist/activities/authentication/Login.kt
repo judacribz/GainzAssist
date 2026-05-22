@@ -19,7 +19,6 @@ import ca.judacribz.gainzassist.activities.authentication.login.LoginUiState
 import ca.judacribz.gainzassist.activities.main.Main
 import ca.judacribz.gainzassist.activities.main.Main.Companion.EXTRA_LOGOUT_USER
 import ca.judacribz.gainzassist.util.Preferences.setUserInfoPref
-import ca.judacribz.gainzassist.util.UI.ProgressHandler
 import ca.judacribz.gainzassist.util.UI.setInitTheme
 import ca.judacribz.gainzassist.util.firebase.Authentication.RC_SIGN_IN
 import ca.judacribz.gainzassist.util.firebase.Authentication.createUser
@@ -164,6 +163,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                     callbackManager!!.onActivityResult(requestCode, resultCode, data)
                 }
             }
+        } else {
+            uiState = uiState.copy(isLoading = false)
         }
     }
 
@@ -196,9 +197,13 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         signIn(this, credential!!, signInClient!!)
     }
 
-    override fun onCancel() {}
+    override fun onCancel() {
+        uiState = uiState.copy(isLoading = false)
+    }
+
     override fun onError(error: FacebookException) {
         error.printStackTrace()
+        uiState = uiState.copy(isLoading = false)
     }
 
     fun validateForm(email: String, password: String): Boolean {
