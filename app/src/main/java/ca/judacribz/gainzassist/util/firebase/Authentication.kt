@@ -11,8 +11,8 @@ import ca.judacribz.gainzassist.models.db.WorkoutViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.*
-import android.arch.lifecycle.ViewModelProviders
-import android.support.v4.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.FragmentActivity
 
 object Authentication {
 
@@ -80,7 +80,7 @@ object Authentication {
         signInClient.signOut().addOnCompleteListener(act) {}
         act.stopService(Intent(act, FirebaseService::class.java))
         if (act is FragmentActivity) {
-            ViewModelProviders.of(act).get(WorkoutViewModel::class.java).deleteAllWorkouts()
+            ViewModelProvider(act).get(WorkoutViewModel::class.java).deleteAllWorkouts()
         }
     }
 

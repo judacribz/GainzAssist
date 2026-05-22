@@ -1,6 +1,6 @@
 package ca.judacribz.gainzassist.activities.how_to_videos
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import ca.judacribz.gainzassist.databinding.PartThumbnailBinding
