@@ -9,6 +9,8 @@
 	<string name="cd_login_img">Main image in the login screen</string>
 	<string name="cd_play_video_btn">Play button for YouTube video</string>
 	<string name="cd_sign_up_img">Main image in the sign up screen</string>
+	<string name="cd_facebook_login">Facebook Login</string>
+	<string name="cd_google_login">Google Login</string>
 	<string name="video_thumbnail">YouTube Video Thumbnail</string>
 
 
