@@ -176,3 +176,56 @@ dependencies {
     implementation(libs.glide)
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 }
+
+val validateReleaseSecrets by tasks.registering {
+    group = "verification"
+    description = "Validates required release secrets before building a release artifact."
+
+    doLast {
+        val secretsFile = rootProject.file("secrets.properties")
+
+        if (!secretsFile.exists()) {
+            throw GradleException(
+                "Missing secrets.properties. Copy secrets.properties.template to secrets.properties " +
+                    "and fill required release values before building release."
+            )
+        }
+
+        val secrets = Properties().apply {
+            secretsFile.inputStream().use { load(it) }
+        }
+
+        val requiredKeys = listOf(
+            "FACEBOOK_APP_ID",
+            "FACEBOOK_CLIENT_TOKEN",
+            "FB_LOGIN_PROTOCOL_SCHEME",
+            "GOOGLE_API_KEY"
+        )
+
+        val missingOrInvalid = requiredKeys.filter { key ->
+            val value = secrets.getProperty(key) ?: return@filter true
+            val trimValue = value.trim()
+            trimValue.isEmpty() ||
+                trimValue.contains("your_", ignoreCase = true) ||
+                trimValue.contains("YOUR_", ignoreCase = true) ||
+                trimValue.contains("template", ignoreCase = true) ||
+                trimValue.contains("placeholder", ignoreCase = true)
+        }
+
+        if (missingOrInvalid.isNotEmpty()) {
+            throw GradleException(
+                "Invalid release secrets in secrets.properties. Missing or placeholder values for: " +
+                    missingOrInvalid.joinToString(", ")
+            )
+        }
+    }
+}
+
+tasks.matching {
+    it.name in listOf(
+        "assembleRelease",
+        "bundleRelease"
+    )
+}.configureEach {
+    dependsOn(validateReleaseSecrets)
+}
