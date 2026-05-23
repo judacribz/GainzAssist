@@ -244,14 +244,16 @@ fun LoginScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                SocialButton(
-                    imageRes = R.drawable.facebook,
-                    innerColor = ColorFacebookBlue,
-                    contentDescription = stringResource(R.string.cd_facebook_login),
-                    onClick = actions::onFacebookSignInClick
-                )
+                if (state.isFacebookEnabled) {
+                    SocialButton(
+                        imageRes = R.drawable.facebook,
+                        innerColor = ColorFacebookBlue,
+                        contentDescription = stringResource(R.string.cd_facebook_login),
+                        onClick = actions::onFacebookSignInClick
+                    )
 
-                Spacer(modifier = Modifier.width(30.dp))
+                    Spacer(modifier = Modifier.width(30.dp))
+                }
 
                 SocialButton(
                     imageRes = R.drawable.google,

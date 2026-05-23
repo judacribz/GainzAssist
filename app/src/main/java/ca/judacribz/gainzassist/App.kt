@@ -11,10 +11,14 @@ class App : Application() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
         
-        if (validateSecrets()) {
+        val isFacebookEnabled = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
+
+        if (validateSecrets(isFacebookEnabled)) {
             // Facebook SDK auto-initializes if App ID and Client Token are in manifest.
             // We only need to activate app events.
-            AppEventsLogger.activateApp(this)
+            if (isFacebookEnabled) {
+                AppEventsLogger.activateApp(this)
+            }
         }
     }
 
@@ -22,10 +26,10 @@ class App : Application() {
      * @return true if secrets are valid, false if invalid but allowed to proceed (debug only)
      * @throws IllegalStateException if secrets are invalid in release
      */
-    private fun validateSecrets(): Boolean {
-        val missingFacebook = BuildConfig.FACEBOOK_APP_ID.isBlank() ||
+    private fun validateSecrets(isFacebookEnabled: Boolean): Boolean {
+        val missingFacebook = isFacebookEnabled && (BuildConfig.FACEBOOK_APP_ID.isBlank() ||
                 BuildConfig.FACEBOOK_CLIENT_TOKEN.isBlank() ||
-                BuildConfig.FB_LOGIN_PROTOCOL_SCHEME.isBlank()
+                BuildConfig.FB_LOGIN_PROTOCOL_SCHEME.isBlank())
         
         val missingGoogle = BuildConfig.GOOGLE_API_KEY.isBlank()
         
