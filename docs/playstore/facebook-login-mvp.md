@@ -5,7 +5,7 @@ Facebook login requires extensive review and configuration (such as data deletio
 
 ## How to Toggle Facebook Login
 
-The feature toggle is controlled by the `ENABLE_FACEBOOK_LOGIN` property inside your `secrets.properties` file.
+The feature toggle is controlled by the `ENABLE_FACEBOOK_LOGIN` property inside your `secrets.properties` file. By default, Facebook login is **disabled** if this property is missing or invalid.
 
 ### Disabling Facebook Login (Recommended for MVP)
 To disable Facebook login, ensure the following line is set in `secrets.properties`:

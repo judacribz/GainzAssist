@@ -64,7 +64,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     private var uiState by mutableStateOf(LoginUiState())
 
     private val isFacebookEnabled: Boolean
-        get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: true
+        get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

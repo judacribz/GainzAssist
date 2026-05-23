@@ -11,7 +11,7 @@ class App : Application() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
         
-        val isFacebookEnabled = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: true
+        val isFacebookEnabled = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
 
         if (validateSecrets(isFacebookEnabled)) {
             // Facebook SDK auto-initializes if App ID and Client Token are in manifest.
