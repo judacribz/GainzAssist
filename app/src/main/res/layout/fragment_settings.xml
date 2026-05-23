@@ -1,83 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	android:layout_width="match_parent"
-	android:layout_height="match_parent"
-	android:padding="15dp"
-	android:orientation="vertical"
-	tools:context=".activities.main.fragments.Settings">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="15dp"
+    tools:context=".activities.main.fragments.Settings">
 
-	<!-- Account Section -->
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_account"
-		android:textStyle="bold"
-		android:textSize="18sp"
-		android:paddingBottom="8dp" />
+    <!-- Account Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:text="@string/settings_account"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-	<TextView
-		android:id="@+id/tvSignedInAs"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingBottom="8dp"
-		tools:text="Signed in as: example@example.com" />
+    <TextView
+        android:id="@+id/tvSignedInAs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        tools:text="Signed in as: example@example.com" />
 
-	<Button
-		android:id="@+id/btnSignOut"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_sign_out"
-		android:layout_marginBottom="24dp" />
+    <Button
+        android:id="@+id/btnSignOut"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/settings_sign_out" />
 
-	<!-- Privacy & Support Section -->
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_privacy_support"
-		android:textStyle="bold"
-		android:textSize="18sp"
-		android:paddingBottom="8dp" />
+    <!-- Privacy & Support Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:text="@string/settings_privacy_support"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-	<Button
-		android:id="@+id/btnPrivacyPolicy"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_privacy_policy" />
+    <Button
+        android:id="@+id/btnPrivacyPolicy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_privacy_policy" />
 
-	<Button
-		android:id="@+id/btnAccountDeletion"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_account_deletion" />
+    <Button
+        android:id="@+id/btnAccountDeletion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/settings_account_deletion" />
 
-	<Button
-		android:id="@+id/btnContactSupport"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_contact_support"
-		android:layout_marginBottom="24dp" />
+    <Button
+        android:id="@+id/btnContactSupport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/settings_contact_support" />
 
-	<!-- About Section -->
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_about"
-		android:textStyle="bold"
-		android:textSize="18sp"
-		android:paddingBottom="8dp" />
+    <!-- About Section -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:text="@string/settings_about"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-	<TextView
-		android:id="@+id/tvAppVersion"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:paddingBottom="4dp"
-		tools:text="Version 1.1.0 (2)" />
+    <TextView
+        android:id="@+id/tvAppVersion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="4dp"
+        tools:text="Version 1.1.0 (2)" />
 
-	<TextView
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:text="@string/settings_app_description" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_app_description" />
 
 </LinearLayout>
