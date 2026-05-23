@@ -26,8 +26,8 @@ android {
         applicationId = "ca.judacribz.gainzassist"
         minSdk = 21
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -102,7 +102,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.testing)
-    
+
     implementation(libs.bundles.androidx.lifecycle)
     kapt(libs.androidx.lifecycle.compiler)
 
