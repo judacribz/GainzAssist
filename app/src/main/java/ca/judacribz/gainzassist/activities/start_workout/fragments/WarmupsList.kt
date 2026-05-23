@@ -36,8 +36,8 @@ class WarmupsList : Fragment() {
         if (binding.llExerciseSetsInsert.childCount > 0) {
             binding.llExerciseSetsInsert.removeAllViews()
         }
-        if (warmups != null) {
-            for (warmup in warmups!!) {
+        warmups?.let {
+            for (warmup in it) {
                 (activity as StartWorkout?)?.displaySets(WARMUP_SET, warmup, binding.llExerciseSetsInsert)
             }
         }

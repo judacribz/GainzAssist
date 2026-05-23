@@ -79,15 +79,15 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
             if (search != null && addWorkout != null) {
                 when (tab.position) {
                     2 -> {
-                        search!!.isVisible = false
-                        addWorkout!!.isVisible = false
+                        search?.isVisible = false
+                        addWorkout?.isVisible = false
                     }
                     0 -> {
-                        addWorkout!!.isVisible = false
+                        addWorkout?.isVisible = false
                     }
                     1 -> {
-                        search!!.isVisible = true
-                        addWorkout!!.isVisible = true
+                        search?.isVisible = true
+                        addWorkout?.isVisible = true
                     }
                 }
             }
@@ -105,8 +105,12 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
 
     private fun setupPager() {
         layInflater = layoutInflater
-        binding.vpFmtContainer.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        binding.tlayNavbar.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
+        tabLayoutOnPageChangeListener?.let {
+            binding.vpFmtContainer.addOnPageChangeListener(it)
+        }
+        viewPagerOnTabSelectedListener?.let {
+            binding.tlayNavbar.addOnTabSelectedListener(it)
+        }
 
         binding.vpFmtContainer.adapter = WorkoutPagerAdapter(
             supportFragmentManager,
@@ -117,8 +121,12 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
 
     override fun onPause() {
         super.onPause()
-        binding.vpFmtContainer.removeOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        binding.tlayNavbar.removeOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
+        tabLayoutOnPageChangeListener?.let {
+            binding.vpFmtContainer.removeOnPageChangeListener(it)
+        }
+        viewPagerOnTabSelectedListener?.let {
+            binding.tlayNavbar.removeOnTabSelectedListener(it)
+        }
     }
 
     override fun onBackPressed() {

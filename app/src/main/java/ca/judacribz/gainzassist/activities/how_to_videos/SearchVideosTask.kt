@@ -77,8 +77,8 @@ class SearchVideosTask : AsyncTask<String, Void, List<ArrayList<String>>>() {
 
     override fun onPostExecute(lists: List<ArrayList<String>>) {
         super.onPostExecute(lists)
-        if (youTubeSearchObserver != null && lists.size == 2) {
-            youTubeSearchObserver!!.videoSearchDataReceived(lists[0], lists[1])
+        if (lists.size == 2) {
+            youTubeSearchObserver?.videoSearchDataReceived(lists[0], lists[1])
         }
     }
 }

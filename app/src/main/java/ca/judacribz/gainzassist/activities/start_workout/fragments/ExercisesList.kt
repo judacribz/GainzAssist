@@ -24,7 +24,9 @@ class ExercisesList : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentExercisesListBinding.inflate(inflater, container, false)
-        exercises = Parcels.unwrap(arguments!!.getParcelable(EXTRA_MAIN_EXERCISES))
+        arguments?.let {
+            exercises = Parcels.unwrap(it.getParcelable(EXTRA_MAIN_EXERCISES))
+        }
         return binding.root
     }
 
@@ -33,8 +35,10 @@ class ExercisesList : Fragment() {
         if (binding.llExerciseSetsInsert.childCount > 0) {
             binding.llExerciseSetsInsert.removeAllViews()
         }
-        for (exercise in exercises!!) {
-            (activity as StartWorkout?)?.displaySets(MAIN_SET, exercise, binding.llExerciseSetsInsert)
+        exercises?.let {
+            for (exercise in it) {
+                (activity as StartWorkout?)?.displaySets(MAIN_SET, exercise, binding.llExerciseSetsInsert)
+            }
         }
     }
 

@@ -42,7 +42,7 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
         binding.rvResWorkoutBtns.layoutManager = LinearLayoutManager(context)
         binding.rvResWorkoutBtns.setHasFixedSize(true)
 
-        workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
+        workoutViewModel?.allWorkouts?.observe(viewLifecycleOwner, Observer { workouts ->
             allWorkouts = workouts
             updateWorkouts()
         })
@@ -56,11 +56,12 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
     }
 
     private fun updateWorkouts() {
-        if (allWorkouts == null) return
-        val incomplete = getIncompleteWorkouts(context!!)
+        val workouts = allWorkouts ?: return
+        val ctx = context ?: return
+        val incomplete = getIncompleteWorkouts(ctx)
         filteredWorkouts = ArrayList()
         if (incomplete != null) {
-            for (workout in allWorkouts!!) {
+            for (workout in workouts) {
                 if (incomplete.contains(workout.name)) {
                     filteredWorkouts.add(workout)
                 }
@@ -68,22 +69,24 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
         }
         val workoutNames = ArrayList<String>()
         for (workout in filteredWorkouts) {
-            workoutNames.add(workout.name!!)
+            workout.name?.let { workoutNames.add(it) }
         }
         adapter = SingleItemAdapter(
-            context,
+            ctx,
             workoutNames,
             R.layout.part_button,
             R.id.btnListItem
         )
-        adapter!!.setItemClickObserver(this)
+        adapter?.setItemClickObserver(this)
         binding.rvResWorkoutBtns.adapter = adapter
     }
 
     override fun onItemClick(view: View?) {
         intent = Intent(context, StartWorkout::class.java)
         extraKey = ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT
-        workoutViewModel!!.getWorkoutFromName(context, getTextString(view as TextView))
+        view?.let {
+            workoutViewModel?.getWorkoutFromName(context, getTextString(it as TextView))
+        }
     }
 
     override fun onItemLongClick(view: View?) {}
