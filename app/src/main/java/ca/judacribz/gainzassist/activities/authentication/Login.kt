@@ -40,6 +40,7 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.orhanobut.logger.Logger
 import java.io.IOException
 
 class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
@@ -162,17 +163,23 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                     val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                     try {
                         val account = task.getResult(ApiException::class.java)
-                        account?.idToken?.let { token ->
+                        val token = account?.idToken
+                        if (token != null) {
                             googleCred = GoogleAuthProvider.getCredential(token, null)
                             val cred = googleCred
                             val client = signInClient
                             if (cred != null && client != null) {
                                 signIn(this, cred, client)
+                            } else {
+                                authError("Google authentication failed: client or credential null")
                             }
+                        } else {
+                            authError("Google authentication failed: account or ID token null")
                         }
                     } catch (ex: ApiException) {
                         ex.printStackTrace()
                         uiState = uiState.copy(isLoading = false)
+                        Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
                     }
                 }
                 else -> {
@@ -214,6 +221,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         val client = signInClient
         if (cred != null && client != null) {
             signIn(this, cred, client)
+        } else {
+            authError("Facebook authentication failed: client or credential null")
         }
     }
 
@@ -224,6 +233,13 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     override fun onError(error: FacebookException) {
         error.printStackTrace()
         uiState = uiState.copy(isLoading = false)
+        Toast.makeText(this, "Facebook Login failed", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun authError(message: String) {
+        Logger.e(message)
+        uiState = uiState.copy(isLoading = false)
+        Toast.makeText(this, "Authentication failed. Please try again.", Toast.LENGTH_SHORT).show()
     }
 
     fun validateForm(email: String, password: String): Boolean {
@@ -252,9 +268,12 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     fun googleLogin() {
-        val signInIntent = signInClient?.signInIntent
-        if (signInIntent != null) {
+        val client = signInClient
+        val signInIntent = client?.signInIntent
+        if (client != null && signInIntent != null) {
             startActivityForResult(signInIntent, RC_SIGN_IN)
+        } else {
+            authError("Google Login unavailable: client uninitialized")
         }
     }
 
@@ -274,6 +293,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
             val client = signInClient
             if (cred != null && client != null) {
                 signIn(this, cred, client)
+            } else {
+                authError("Email Login failed: client or credential null")
             }
         }
     }
@@ -287,6 +308,8 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
             val client = signInClient
             if (client != null) {
                 createUser(this, email, password, client)
+            } else {
+                authError("Sign Up failed: client uninitialized")
             }
         }
     }
