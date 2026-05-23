@@ -3,15 +3,23 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.secrets)
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 android {
     namespace = "ca.judacribz.gainzassist"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
     }
 
     defaultConfig {
@@ -20,7 +28,7 @@ android {
         targetSdk = 28
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -43,19 +51,20 @@ android {
                 "META-INF/NOTICE",
                 "META-INF/NOTICE.txt",
                 "META-INF/notice.txt",
-                "META-INF/ASL2.0"
+                "META-INF/ASL2.0",
+                "META-INF/INDEX.LIST"
             )
         }
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
     }
 
@@ -66,24 +75,39 @@ android {
 }
 
 dependencies {
+    // Compose
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.activity.compose)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
     // 1. Local files
     implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
 
     // 2. Testing
-    androidTestImplementation(libs.espresso.core) {
-        exclude(group = "com.android.support", module = "support-annotations")
-    }
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
     testImplementation(libs.junit)
 
-    // 3. Architecture Components
-    implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
-    androidTestImplementation(libs.room.testing)
-    implementation(libs.arch.lifecycle.extensions)
-    kapt(libs.arch.lifecycle.compiler)
+    // 3. Architecture Components (AndroidX)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+    androidTestImplementation(libs.androidx.room.testing)
+    
+    implementation(libs.bundles.androidx.lifecycle)
+    kapt(libs.androidx.lifecycle.compiler)
 
-    // 4. Android Support
-    implementation(libs.bundles.android.support)
+    // 4. AndroidX Core
+    implementation(libs.bundles.androidx.core)
 
     // 5. Facebook
     implementation(libs.facebook.android.sdk)
@@ -96,6 +120,7 @@ dependencies {
     implementation(libs.bundles.google)
 
     // 8. Firebase
+    implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
 
     // 9. Parceler
@@ -103,5 +128,9 @@ dependencies {
     kapt(libs.parceler)
 
     // 10. UI / Logging
+    implementation("com.google.guava:guava:33.2.1-android")
     implementation(libs.bundles.ui.logging)
+    implementation(libs.android.youtube.player)
+    implementation(libs.glide)
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 }

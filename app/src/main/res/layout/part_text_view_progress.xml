@@ -9,4 +9,5 @@
 	android:fontFamily="@font/staatliches"
 	android:gravity="center"
 	android:textColor="@color/colorBg"
-	android:textSize="25sp"/>
+	android:textSize="25sp"
+	android:textAllCaps="false"/>

@@ -12,7 +12,8 @@
 		android:layout_weight="@integer/ll_lg_weight"
 		android:layout_margin="20dp"
 		android:textColor="@color/colorBg"
-		android:textSize="30sp"/>
+		android:textSize="30sp"
+		android:textAllCaps="false"/>
 
 
 	<RelativeLayout

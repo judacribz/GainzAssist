@@ -52,7 +52,7 @@
 			android:padding="15dp"
 			android:background="@drawable/anim_facebook_ripple"
 			android:scaleType="fitCenter"
-			android:src="@drawable/com_facebook_button_login_logo"/>
+			android:src="@drawable/com_facebook_button_icon"/>
 	</RelativeLayout>
 
 	<!-- Google Sign-In Button-->
@@ -112,7 +112,7 @@
 		android:visibility="invisible"/>
 
 	<!-- Email text field -->
-	<android.support.design.widget.TextInputLayout
+	<com.google.android.material.textfield.TextInputLayout
 		android:id="@+id/tiLay_email"
 		android:layout_width="275dp"
 		android:layout_height="65dp"
@@ -131,10 +131,10 @@
 			android:drawableEnd="@drawable/ic_mail_dark"
 			android:hint="@string/hint_email"
 			android:inputType="textEmailAddress"/>
-	</android.support.design.widget.TextInputLayout>
+	</com.google.android.material.textfield.TextInputLayout>
 
 	<!-- Password text field -->
-	<android.support.design.widget.TextInputLayout
+	<com.google.android.material.textfield.TextInputLayout
 		android:id="@+id/tiLay_password"
 		android:layout_width="275dp"
 		android:layout_height="65dp"
@@ -153,7 +153,7 @@
 			android:drawableEnd="@drawable/ic_pass_dark"
 			android:hint="@string/hint_password"
 			android:inputType="textPassword" />
-	</android.support.design.widget.TextInputLayout>
+	</com.google.android.material.textfield.TextInputLayout>
 
 	<!-- Login button -->
 	<Button

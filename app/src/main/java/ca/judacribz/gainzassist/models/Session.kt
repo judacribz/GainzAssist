@@ -1,6 +1,6 @@
 package ca.judacribz.gainzassist.models
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import android.util.SparseArray
 import ca.judacribz.gainzassist.constants.ExerciseConst
 import java.util.*

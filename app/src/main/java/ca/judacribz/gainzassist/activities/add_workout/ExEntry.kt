@@ -2,7 +2,7 @@ package ca.judacribz.gainzassist.activities.add_workout
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -51,7 +51,7 @@ class ExEntry : Fragment() {
 
     lateinit var formEntries: List<@JvmSuppressWildcards EditText>
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is ExEntryDataListener) {
             exEntryDataListener = context

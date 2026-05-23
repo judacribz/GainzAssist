@@ -15,5 +15,6 @@
 		android:singleLine="true"
 		android:textSize="30sp"
 		android:padding="0dp"
-		android:gravity="center"/>
+		android:gravity="center"
+		android:textAllCaps="false"/>
 </me.grantland.widget.AutofitLayout>

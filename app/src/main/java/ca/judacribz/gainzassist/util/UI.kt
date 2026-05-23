@@ -5,36 +5,25 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
-import android.util.DisplayMetrics
 import android.view.View
-import android.widget.*
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.util.Preferences.getThemePref
 import com.facebook.rebound.SimpleSpringListener
 import com.facebook.rebound.Spring
 import com.facebook.rebound.SpringSystem
 import com.facebook.rebound.SpringUtil
-import java.util.*
+import java.util.Locale
 
 object UI {
 
     private var backPressedTwice = false
-
-    @JvmStatic
-    fun setInitView(act: Activity, layoutId: Int, titleId: Int, setBackArrow: Boolean) {
-        setInitView(act, layoutId, act.resources.getString(titleId), setBackArrow)
-    }
-
-    @JvmStatic
-    fun setInitView(act: Activity, layoutId: Int, title: String?, setBackArrow: Boolean) {
-        setInitTheme(act)
-        act.setContentView(layoutId)
-        if (title != null) {
-            setToolbar(act as AppCompatActivity, title, setBackArrow)
-        }
-    }
 
     @JvmStatic
     fun handleBackButton(context: Context) {
@@ -67,7 +56,9 @@ object UI {
                 actionBar.setDisplayShowHomeEnabled(true)
             }
         }
-        (act.findViewById<View>(R.id.title) as TextView).text = title
+        val titleView = act.findViewById<View>(R.id.title) as TextView
+        titleView.transformationMethod = null
+        titleView.text = title
         return title
     }
 

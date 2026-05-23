@@ -1,122 +1,92 @@
 package ca.judacribz.gainzassist.activities.main.fragments
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.content.Context
-import android.support.v7.widget.RecyclerView
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import ca.judacribz.gainzassist.R
+import androidx.appcompat.widget.SearchView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import ca.judacribz.gainzassist.activities.add_workout.Summary
 import ca.judacribz.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.WORKOUTS_LIST
 import ca.judacribz.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
 import ca.judacribz.gainzassist.activities.main.Main
+import ca.judacribz.gainzassist.activities.main.fragments.workouts.WorkoutsScreen
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout
-import ca.judacribz.gainzassist.adapters.SingleItemAdapter
-import ca.judacribz.gainzassist.databinding.FragmentWorkoutsBinding
 import ca.judacribz.gainzassist.models.Workout
 import ca.judacribz.gainzassist.models.db.WorkoutViewModel
-import ca.judacribz.gainzassist.util.UI.getTextString
-import com.miguelcatalan.materialsearchview.MaterialSearchView
-import com.orhanobut.dialogplus.DialogPlus
-import com.orhanobut.dialogplus.ViewHolder
 import java.util.*
 
-class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearchView.OnQueryTextListener {
+class Workouts : Fragment(), SearchView.OnQueryTextListener {
 
     var intent: Intent? = null
     var extraKey: String? = null
     var workoutViewModel: WorkoutViewModel? = null
-    var adapter: SingleItemAdapter? = null
-    var allWorkouts: List<Workout>? = null
-    var filteredWorkouts: List<Workout>? = null
-    var workoutNames: ArrayList<String>? = null
+
+    private var allWorkouts: List<Workout>? = null
+    private var filteredWorkouts: List<Workout>? = null
+    private var currentQuery: String = ""
+
+    // Compose states
+    private var workoutNames by mutableStateOf<List<String>>(emptyList())
+    private var selectedWorkoutName by mutableStateOf<String?>(null)
 
     private lateinit var act: Main
-    private var dialog: DialogPlus? = null
-    private var workoutName: String? = null
 
-    private lateinit var binding: FragmentWorkoutsBinding
-
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         super.onAttach(context)
-
         act = context as Main
-
-        dialog = DialogPlus.newDialog(act)
-            .setOnItemClickListener { _, _, _, _ -> }
-            .setContentHolder(ViewHolder(R.layout.dialog_workout))
-            .setContentBackgroundResource(R.drawable.edit_text_box_blue)
-            .setExpanded(true)
-            .setGravity(Gravity.CENTER)
-            .setCancelable(true)
-            .create()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentWorkoutsBinding.inflate(inflater, container, false)
-        workoutViewModel = ViewModelProviders.of(act).get(WorkoutViewModel::class.java)
+    ): View {
+        workoutViewModel = ViewModelProvider(act).get(WorkoutViewModel::class.java)
 
-        binding.rvWorkoutBtns.layoutManager = LinearLayoutManager(act)
-        binding.rvWorkoutBtns.setHasFixedSize(true)
-
-        workoutViewModel!!.allWorkouts.observe(this, Observer { workouts ->
+        workoutViewModel!!.allWorkouts.observe(viewLifecycleOwner, Observer { workouts ->
             allWorkouts = workouts
-            filteredWorkouts = workouts
-            workoutNames = ArrayList()
-            if (workouts != null) {
-                for (workout in workouts) {
-                    workoutNames!!.add(workout.name!!)
-                }
-            }
-            updateWorkouts()
+            applyFilter()
         })
 
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                WorkoutsScreen(
+                    workoutNames = workoutNames,
+                    selectedWorkoutName = selectedWorkoutName,
+                    onWorkoutClick = { workoutName ->
+                        onItemClick(workoutName)
+                    },
+                    onWorkoutLongClick = { workoutName ->
+                        selectedWorkoutName = workoutName
+                    },
+                    onDismissDialog = {
+                        selectedWorkoutName = null
+                    },
+                    onEditWorkout = { workoutName ->
+                        editWorkout(workoutName)
+                    },
+                    onDeleteWorkout = { workoutName ->
+                        deleteWorkout(workoutName)
+                    }
+                )
+            }
+        }
     }
 
-    private fun updateWorkouts() {
-        if (workoutNames == null) return
-        adapter = SingleItemAdapter(
-            act,
-            workoutNames,
-            R.layout.part_button,
-            R.id.btnListItem
-        )
-        adapter!!.setItemClickObserver(this)
-        binding.rvWorkoutBtns.adapter = adapter
-    }
-
-    override fun onItemClick(view: View?) {
+    private fun onItemClick(workoutName: String) {
         intent = Intent(act, StartWorkout::class.java)
         extraKey = ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT
-        workoutViewModel!!.getWorkoutFromName(act, getTextString(view as TextView))
-    }
-
-    override fun onItemLongClick(view: View?) {
-        workoutName = getTextString(view as TextView)
-
-        (dialog!!.findViewById(R.id.tv_workout_name) as TextView).text = workoutName
-
-        dialog!!.findViewById(R.id.btn_edit_workout).setOnClickListener {
-            editWorkout(workoutName!!)
-        }
-
-        dialog!!.findViewById(R.id.btn_delete_workout).setOnClickListener {
-            deleteWorkout(workoutName!!)
-        }
-
-        dialog!!.show()
+        workoutViewModel!!.getWorkoutFromName(act, workoutName)
     }
 
     private fun editWorkout(workoutName: String) {
@@ -132,12 +102,24 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
 
         workoutViewModel!!.getWorkoutFromName(act, workoutName)
 
-        dialog!!.dismiss()
+        selectedWorkoutName = null
     }
 
     private fun deleteWorkout(workoutName: String) {
         workoutViewModel!!.deleteWorkout(workoutName)
-        dialog!!.dismiss()
+        selectedWorkoutName = null
+    }
+
+    private fun applyFilter() {
+        if (allWorkouts == null) return
+        val query = currentQuery.lowercase()
+        filteredWorkouts = allWorkouts!!.filter { it.name.orEmpty().lowercase().contains(query) }
+
+        val names = ArrayList<String>()
+        for (workout in filteredWorkouts!!) {
+            workout.name?.let { names.add(it) }
+        }
+        workoutNames = names
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -145,14 +127,8 @@ class Workouts : Fragment(), SingleItemAdapter.ItemClickObserver, MaterialSearch
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        if (allWorkouts == null) return false
-        val query = newText?.lowercase() ?: ""
-        filteredWorkouts = allWorkouts!!.filter { it.name!!.lowercase().contains(query) }
-        workoutNames = ArrayList()
-        for (workout in filteredWorkouts!!) {
-            workoutNames!!.add(workout.name!!)
-        }
-        updateWorkouts()
+        currentQuery = newText ?: ""
+        applyFilter()
         return true
     }
 

@@ -1,9 +1,13 @@
 package ca.judacribz.gainzassist.models.db;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.*;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
+import androidx.room.Update;
 import ca.judacribz.gainzassist.models.ExerciseSet;
-import ca.judacribz.gainzassist.models.Session;
 
 import java.util.List;
 

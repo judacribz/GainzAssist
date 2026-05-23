@@ -1,15 +1,15 @@
 package ca.judacribz.gainzassist.activities.add_workout
 
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.adapters.SingleItemAdapter
 import ca.judacribz.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
@@ -49,7 +49,8 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     companion object {
         const val EXTRA_WORKOUT = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_WORKOUT"
-        const val EXTRA_CALLING_ACTIVITY = "ca.judacribz.gainzassist.activities.add_workout.EXTRA_CALLING_ACTIVITY"
+        const val EXTRA_CALLING_ACTIVITY =
+            "ca.judacribz.gainzassist.activities.add_workout.EXTRA_CALLING_ACTIVITY"
 
         private const val MIN_INT = 1
         private const val MIN_FLOAT = 5.0f
@@ -72,7 +73,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
-    var workoutViewModel: WorkoutViewModel? = null
+    val workoutViewModel by viewModels<WorkoutViewModel>()
 
     private lateinit var binding: ActivityNewWorkoutSummaryBinding
 
@@ -85,7 +86,6 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         setContentView(binding.root)
         setToolbar(this, R.string.title_new_workout_summary, true)
 
-        workoutViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
 
         val sourceIntent = intent
         workout = Parcels.unwrap(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
@@ -95,6 +95,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             CALLING_ACTIVITY.WORKOUTS_LIST -> {
                 binding.btnAddWorkout.text = getString(R.string.update_workout)
             }
+
             else -> {
                 // Keep default
             }
@@ -132,7 +133,12 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     private fun setupListeners() {
         binding.sprEquipment.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 equipmentSelected(binding.sprEquipment, position)
             }
 
@@ -170,7 +176,8 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                num_reps = onNumChanged(binding.partEtReps.etReps, binding.ibtnDecReps, s.toString())
+                num_reps =
+                    onNumChanged(binding.partEtReps.etReps, binding.ibtnDecReps, s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -182,7 +189,8 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                num_sets = onNumChanged(binding.partEtSets.etSets, binding.ibtnDecSets, s.toString())
+                num_sets =
+                    onNumChanged(binding.partEtSets.etSets, binding.ibtnDecSets, s.toString())
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -223,10 +231,12 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
                 minWeight = BB_MIN_WEIGHT
                 weightChange = BB_WEIGHT_CHANGE
             }
+
             1 -> {
                 minWeight = DB_MIN_WEIGHT
                 weightChange = DB_WEIGHT_CHANGE
             }
+
             else -> {
                 minWeight = MIN_WEIGHT
                 weightChange = WEIGHT_CHANGE
@@ -248,7 +258,10 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
                 switchExerciseBtns(binding.btnUpdateExercise, binding.btnAddExercise)
             }
         } else {
-            switchExerciseBtns(btnDisable = binding.btnUpdateExercise, btnEnable = binding.btnAddExercise)
+            switchExerciseBtns(
+                btnDisable = binding.btnUpdateExercise,
+                btnEnable = binding.btnAddExercise
+            )
         }
     }
 
@@ -300,7 +313,12 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     }
 
     fun decReps() {
-        binding.partEtReps.etReps.setText(Math.max(getTextInt(binding.partEtReps.etReps) - MIN_INT, MIN_INT).toString())
+        binding.partEtReps.etReps.setText(
+            Math.max(
+                getTextInt(binding.partEtReps.etReps) - MIN_INT,
+                MIN_INT
+            ).toString()
+        )
     }
 
     fun incSets() {
@@ -308,7 +326,12 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     }
 
     fun decSets() {
-        binding.partEtSets.etSets.setText(Math.max(getTextInt(binding.partEtSets.etSets) - MIN_INT, MIN_INT).toString())
+        binding.partEtSets.etSets.setText(
+            Math.max(
+                getTextInt(binding.partEtSets.etSets) - MIN_INT,
+                MIN_INT
+            ).toString()
+        )
     }
 
     fun incWeight() {
@@ -316,14 +339,20 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     }
 
     fun decWeight() {
-        binding.partEtWeight.etWeight.setText(Math.max(getTextFloat(binding.partEtWeight.etWeight) - MIN_FLOAT, MIN_FLOAT).toString())
+        binding.partEtWeight.etWeight.setText(
+            Math.max(
+                getTextFloat(binding.partEtWeight.etWeight) - MIN_FLOAT,
+                MIN_FLOAT
+            ).toString()
+        )
     }
 
     fun addExercise() {
         if (validateForm(this, formEntries)) {
             val exName = getTextString(binding.partEtExercise.etExerciseName)
             if (workout!!.containsExercise(exName)) {
-                binding.partEtExercise.etExerciseName.error = getString(R.string.err_exercise_exists, exName)
+                binding.partEtExercise.etExerciseName.error =
+                    getString(R.string.err_exercise_exists, exName)
             } else {
                 exercises!!.add(updateExerciseData(-1, exName))
                 updateAdapter()

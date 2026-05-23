@@ -1,32 +1,25 @@
 package ca.judacribz.gainzassist.activities.how_to_videos
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentTransaction
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.LinearLayoutManager
+import ca.judacribz.gainzassist.BuildConfig
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.start_workout.StartWorkout.Companion.EXTRA_HOW_TO_VID
 import ca.judacribz.gainzassist.databinding.ActivityHowToVideosBinding
 import ca.judacribz.gainzassist.util.UI.setInitTheme
 import ca.judacribz.gainzassist.util.UI.setToolbar
-import com.google.android.youtube.player.YouTubeInitializationResult
-import com.google.android.youtube.player.YouTubePlayer
-import com.google.android.youtube.player.YouTubePlayerSupportFragment
-import com.miguelcatalan.materialsearchview.MaterialSearchView
-import java.util.*
+import com.google.android.material.snackbar.Snackbar
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 
 class HowToVideos : AppCompatActivity(),
-    MaterialSearchView.OnQueryTextListener,
+    SearchView.OnQueryTextListener,
     SearchVideosTask.YouTubeSearchObserver,
-    ThumbnailAdapter.VideoClickObserver,
-    YouTubePlayer.OnInitializedListener,
-    YouTubePlayer.PlayerStateChangeListener {
+    ThumbnailAdapter.VideoClickObserver {
 
     companion object {
         const val EXTRA_VIDEO_ID = "ca.judacribz.gainzassist.act_how_to_videos.EXTRA_VIDEO_ID"
@@ -39,19 +32,12 @@ class HowToVideos : AppCompatActivity(),
             "maxResults=10&" + // number of results to show
             "q=") // search text
 
-    var rvVideoList: RecyclerView? = null
-    var thumbnailAdapter: ThumbnailAdapter? = null
-    var rvLayoutManager: LinearLayoutManager? = null
-    var task: SearchVideosTask? = null
+    private var thumbnailAdapter: ThumbnailAdapter? = null
+    private var task: SearchVideosTask? = null
 
-    var player: YouTubePlayer? = null
-    var ytpFmt: YouTubePlayerSupportFragment? = null
-    var fmtMgr: FragmentManager? = null
-    var videoId: String? = null
-    var exerciseName: String? = null
-
-    var isFullScreen = false
-    var backPressed = false
+    private var youTubePlayer: YouTubePlayer? = null
+    private var videoId: String? = null
+    private var exerciseName: String? = null
 
     private lateinit var binding: ActivityHowToVideosBinding
 
@@ -63,75 +49,49 @@ class HowToVideos : AppCompatActivity(),
         setContentView(binding.root)
         setToolbar(this, "How To $exerciseName", true)
 
-        fmtMgr = supportFragmentManager
-
-        rvVideoList = binding.rvVideoList
-        ytpFmt = supportFragmentManager.findFragmentById(R.id.fmt_youtube) as YouTubePlayerSupportFragment?
-
-        handleFmt(false)
+        lifecycle.addObserver(binding.ypvPlayer)
 
         executeSearch("how to $exerciseName")
 
-        rvLayoutManager = LinearLayoutManager(this)
-        rvVideoList!!.layoutManager = rvLayoutManager
-        rvVideoList!!.setHasFixedSize(true)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        binding.msvHowToVids.setOnQueryTextListener(this)
-        binding.msvHowToVids.setVoiceSearch(true)
+        binding.rvVideoList.layoutManager = LinearLayoutManager(this)
+        binding.rvVideoList.setHasFixedSize(true)
+        
+        binding.ypvPlayer.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+            override fun onReady(player: YouTubePlayer) {
+                youTubePlayer = player
+                videoId?.let { player.cueVideo(it, 0f) }
+            }
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        if (ytpFmt!!.isHidden) {
+        if (binding.ypvPlayer.visibility == View.GONE) {
             finish()
         } else {
-            handleFmt(false)
+            closePlayer()
         }
         return true
     }
 
     override fun onBackPressed() {
-        if (!ytpFmt!!.isHidden) {
-            handleFmt(false)
+        if (binding.ypvPlayer.visibility == View.VISIBLE) {
+            closePlayer()
         } else {
             super.onBackPressed()
         }
     }
 
-    fun handleFmt(showFmt: Boolean) {
-        val fmtTxn = fmtMgr!!.beginTransaction()
-
-        if (showFmt) {
-            ytpFmt!!.initialize(getString(R.string.google_api_key), this)
-            fmtTxn.show(ytpFmt!!)
-        } else {
-            if (player != null) {
-                if (isFullScreen) {
-                    backPressed = true
-                    player!!.setFullscreen(false)
-                } else {
-                    player!!.release()
-                }
-            }
-            fmtTxn.hide(ytpFmt!!)
-        }
-
-        fmtTxn.commitNow()
+    private fun closePlayer() {
+        youTubePlayer?.pause()
+        binding.ypvPlayer.visibility = View.GONE
     }
 
     override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_how_to, mainMenu)
-        binding.msvHowToVids.setMenuItem(mainMenu.findItem(R.id.act_search))
+        val searchItem = mainMenu.findItem(R.id.act_search)
+        val searchView = searchItem.actionView as? SearchView
+        searchView?.setOnQueryTextListener(this)
         return super.onCreateOptionsMenu(mainMenu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.act_search -> {}
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onQueryTextChange(query: String): Boolean {
@@ -144,68 +104,34 @@ class HowToVideos : AppCompatActivity(),
     }
 
     private fun executeSearch(query: String) {
-        if (task != null) {
-            task!!.setYouTubeSearchObserver(null)
+        if (BuildConfig.GOOGLE_API_KEY.isBlank()) {
+            Snackbar.make(binding.rvVideoList, "Missing Google API Key for video search", Snackbar.LENGTH_LONG).show()
+            return
         }
+
+        task?.setYouTubeSearchObserver(null)
         task = SearchVideosTask()
-        task!!.setYouTubeSearchObserver(this)
-        task!!.execute(
+        task?.setYouTubeSearchObserver(this)
+        task?.execute(
             URL + query.replace("\\s+".toRegex(), SEARCH_SPACE_STR) +
                     "&key=" +
-                    getString(R.string.google_api_key)
+                    BuildConfig.GOOGLE_API_KEY
         )
     }
 
     override fun videoSearchDataReceived(videoIds: ArrayList<String>, videoTitles: ArrayList<String>) {
         if (videoIds.size > 0) {
             thumbnailAdapter = ThumbnailAdapter(videoIds, videoTitles)
-            rvVideoList!!.adapter = thumbnailAdapter
-            thumbnailAdapter!!.setVideoClickObserver(this)
+            binding.rvVideoList.adapter = thumbnailAdapter
+            thumbnailAdapter?.setVideoClickObserver(this)
         } else {
-            Snackbar.make(rvVideoList!!, "No video results", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.rvVideoList, "No video results", Snackbar.LENGTH_SHORT).show()
         }
     }
 
     override fun onVideoClick(videoId: String) {
         this.videoId = videoId
-        handleFmt(true)
+        binding.ypvPlayer.visibility = View.VISIBLE
+        youTubePlayer?.loadVideo(videoId, 0f)
     }
-
-    override fun onInitializationSuccess(
-        provider: YouTubePlayer.Provider,
-        player: YouTubePlayer,
-        b: Boolean
-    ) {
-        this.player = player
-        player.setPlayerStateChangeListener(this)
-        player.setOnFullscreenListener { isfullScreen ->
-            this@HowToVideos.isFullScreen = isfullScreen
-            if (!isfullScreen) {
-                if (backPressed) {
-                    player.release()
-                }
-            } else {
-                Toast.makeText(this@HowToVideos, "Fullscreen", Toast.LENGTH_SHORT).show()
-                ytpFmt!!.initialize(getString(R.string.google_api_key), this@HowToVideos)
-            }
-        }
-        player.setShowFullscreenButton(true)
-        player.loadVideo(videoId)
-    }
-
-    override fun onInitializationFailure(
-        provider: YouTubePlayer.Provider,
-        initializationResult: YouTubeInitializationResult
-    ) {
-    }
-
-    override fun onLoading() {}
-    override fun onLoaded(s: String) {}
-    override fun onAdStarted() {}
-    override fun onVideoStarted() {}
-    override fun onVideoEnded() {
-        handleFmt(false)
-    }
-
-    override fun onError(errorReason: YouTubePlayer.ErrorReason) {}
 }
