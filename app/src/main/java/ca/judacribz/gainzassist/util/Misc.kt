@@ -137,7 +137,7 @@ object Misc {
             childMap = mapper.readValue(
                 childStr,
                 object : TypeReference<HashMap<String, Any?>?>() {}
-            )!!
+            ).orEmpty()
         } catch (ioe: IOException) {
             ioe.printStackTrace()
         }
@@ -146,9 +146,11 @@ object Misc {
 
     @JvmStatic
     fun shrinkTo(list: MutableList<*>?, newSize: Int) {
-        val size = list!!.size
-        for (i in newSize until size) {
-            list.removeAt(list.size - 1)
+        list?.let {
+            val size = it.size
+            for (i in newSize until size) {
+                it.removeAt(it.size - 1)
+            }
         }
     }
 }
