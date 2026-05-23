@@ -37,6 +37,7 @@
 
         <activity
             android:name="com.facebook.FacebookActivity"
+            android:exported="true"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
         <activity
@@ -54,25 +55,28 @@
 
 
         <!-- Main Activity -->
-        <activity android:name=".activities.main.Main"
+        <activity android:name=".activities.main.Main" android:exported="false"
                   android:windowSoftInputMode="adjustPan|stateHidden"/>
 
         <!-- HowToVideos Activity -->
         <activity
                 android:name=".activities.how_to_videos.HowToVideos"
+                android:exported="false"
                 android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <!-- StartWorkout Activity -->
         <activity
                 android:name=".activities.start_workout.StartWorkout"
+                android:exported="false"
                 android:windowSoftInputMode="adjustPan|stateHidden"/>
 
         <!-- Summary Activity -->
         <activity
                 android:name=".activities.add_workout.Summary"
+                android:exported="false"
                 android:windowSoftInputMode="adjustPan|stateHidden"/>
-        <activity android:name=".activities.add_workout.WorkoutEntry"/>
-        <activity android:name=".activities.add_workout.ExercisesEntry"/>
+        <activity android:name=".activities.add_workout.WorkoutEntry" android:exported="false"/>
+        <activity android:name=".activities.add_workout.ExercisesEntry" android:exported="false"/>
 
         <service
                 android:name=".background.FirebaseService"
