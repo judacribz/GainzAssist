@@ -40,7 +40,7 @@ You have the right to request the deletion of your account and personal data at 
 
 If you wish to delete your account, or if you have any questions, concerns, or requests regarding this Privacy Policy, please contact us at:
 
-**Email:** [YOUR_SUPPORT_EMAIL]
+**Email:** gainzassist.support@gmail.com
 
 ## 7. Changes to This Privacy Policy
 We may update this Privacy Policy from time to time. If we make material changes, we will notify you by updating the "Last Updated" date at the top of this policy and, if necessary, providing a prominent notice within the app.
