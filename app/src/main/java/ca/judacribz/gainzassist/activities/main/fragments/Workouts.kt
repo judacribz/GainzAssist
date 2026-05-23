@@ -52,7 +52,7 @@ class Workouts : Fragment(), SearchView.OnQueryTextListener {
     ): View {
         workoutViewModel = ViewModelProvider(act).get(WorkoutViewModel::class.java)
 
-        workoutViewModel!!.allWorkouts.observe(viewLifecycleOwner, Observer { workouts ->
+        workoutViewModel?.allWorkouts?.observe(viewLifecycleOwner, Observer { workouts ->
             allWorkouts = workouts
             applyFilter()
         })
@@ -86,7 +86,7 @@ class Workouts : Fragment(), SearchView.OnQueryTextListener {
     private fun onItemClick(workoutName: String) {
         intent = Intent(act, StartWorkout::class.java)
         extraKey = ca.judacribz.gainzassist.activities.main.Main.EXTRA_WORKOUT
-        workoutViewModel!!.getWorkoutFromName(act, workoutName)
+        workoutViewModel?.getWorkoutFromName(act, workoutName)
     }
 
     private fun editWorkout(workoutName: String) {
@@ -100,24 +100,26 @@ class Workouts : Fragment(), SearchView.OnQueryTextListener {
         extraKey = Summary.EXTRA_WORKOUT
         intent = newWorkoutSummaryIntent
 
-        workoutViewModel!!.getWorkoutFromName(act, workoutName)
+        workoutViewModel?.getWorkoutFromName(act, workoutName)
 
         selectedWorkoutName = null
     }
 
     private fun deleteWorkout(workoutName: String) {
-        workoutViewModel!!.deleteWorkout(workoutName)
+        workoutViewModel?.deleteWorkout(workoutName)
         selectedWorkoutName = null
     }
 
     private fun applyFilter() {
-        if (allWorkouts == null) return
+        val workouts = allWorkouts ?: return
         val query = currentQuery.lowercase()
-        filteredWorkouts = allWorkouts!!.filter { it.name.orEmpty().lowercase().contains(query) }
+        filteredWorkouts = workouts.filter { it.name.orEmpty().lowercase().contains(query) }
 
         val names = ArrayList<String>()
-        for (workout in filteredWorkouts!!) {
-            workout.name?.let { names.add(it) }
+        filteredWorkouts?.let { filtered ->
+            for (workout in filtered) {
+                workout.name?.let { names.add(it) }
+            }
         }
         workoutNames = names
     }

@@ -145,12 +145,12 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     override fun onStart() {
         super.onStart()
         if (intent.getBooleanExtra(EXTRA_LOGOUT_USER, false)) {
-            signOut(this, signInClient!!)
+            signInClient?.let { signOut(this, it) }
             if (isFacebookEnabled) {
                 LoginManager.getInstance().logOut()
             }
         }
-        auth!!.addAuthStateListener(this)
+        auth?.addAuthStateListener(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -162,8 +162,14 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                     val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                     try {
                         val account = task.getResult(ApiException::class.java)
-                        googleCred = GoogleAuthProvider.getCredential(account!!.idToken, null)
-                        signIn(this, googleCred!!, signInClient!!)
+                        account?.idToken?.let { token ->
+                            googleCred = GoogleAuthProvider.getCredential(token, null)
+                            val cred = googleCred
+                            val client = signInClient
+                            if (cred != null && client != null) {
+                                signIn(this, cred, client)
+                            }
+                        }
                     } catch (ex: ApiException) {
                         ex.printStackTrace()
                         uiState = uiState.copy(isLoading = false)
@@ -180,7 +186,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
 
     override fun onStop() {
         super.onStop()
-        auth!!.removeAuthStateListener(this)
+        auth?.removeAuthStateListener(this)
     }
 
     override fun onAuthStateChanged(firebaseAuth: FirebaseAuth) {
@@ -193,7 +199,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                 Toast.LENGTH_SHORT
             ).show()
             if (linkGoogle) {
-                linkUser(this, credential!!, firebaseUser)
+                credential?.let { linkUser(this, it, firebaseUser) }
             }
             setUserInfoPref(this, firebaseUser.email, firebaseUser.uid)
             setUserInfo(this)
@@ -204,7 +210,11 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
 
     override fun onSuccess(result: LoginResult) {
         credential = FacebookAuthProvider.getCredential(result.accessToken.token)
-        signIn(this, credential!!, signInClient!!)
+        val cred = credential
+        val client = signInClient
+        if (cred != null && client != null) {
+            signIn(this, cred, client)
+        }
     }
 
     override fun onCancel() {
@@ -242,8 +252,10 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     fun googleLogin() {
-        val signInIntent = signInClient!!.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        val signInIntent = signInClient?.signInIntent
+        if (signInIntent != null) {
+            startActivityForResult(signInIntent, RC_SIGN_IN)
+        }
     }
 
     fun facebookLogin() {
@@ -258,7 +270,11 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         if (validateForm(email, password)) {
             uiState = uiState.copy(isLoading = true)
             credential = EmailAuthProvider.getCredential(email, password)
-            signIn(this, credential!!, signInClient!!)
+            val cred = credential
+            val client = signInClient
+            if (cred != null && client != null) {
+                signIn(this, cred, client)
+            }
         }
     }
 
@@ -268,7 +284,10 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
         if (validateForm(email, password)) {
             uiState = uiState.copy(isLoading = true)
             credential = EmailAuthProvider.getCredential(email, password)
-            createUser(this, email, password, signInClient!!)
+            val client = signInClient
+            if (client != null) {
+                createUser(this, email, password, client)
+            }
         }
     }
 

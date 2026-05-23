@@ -89,7 +89,8 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
         val sourceIntent = intent
         workout = Parcels.unwrap(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
-        workoutId = workout!!.id
+        val currentWorkout = workout ?: return
+        workoutId = currentWorkout.id
 
         when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CALLING_ACTIVITY) {
             CALLING_ACTIVITY.WORKOUTS_LIST -> {
@@ -108,7 +109,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
             binding.partEtSets.etSets
         )
 
-        val workoutName = workout!!.name
+        val workoutName = currentWorkout.name
         if (workoutName != null) {
             binding.partEtWorkout.etWorkoutName.setText(workoutName)
         }
@@ -122,11 +123,11 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         )
         binding.rvExerciseBtns.setHasFixedSize(true)
 
-        exercises = workout!!.exercises
+        exercises = currentWorkout.exercises
 
         updateAdapter()
 
-        binding.partEtWorkout.etWorkoutName.setText(workout!!.name)
+        binding.partEtWorkout.etWorkoutName.setText(currentWorkout.name)
 
         setupListeners()
     }
@@ -215,13 +216,14 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     }
 
     private fun updateAdapter() {
+        val currentWorkout = workout ?: return
         exerciseAdapter = SingleItemAdapter(
             this,
-            workout!!.exerciseNames,
+            currentWorkout.exerciseNames,
             R.layout.part_square_button,
             R.id.sqrBtnListItem
         )
-        exerciseAdapter!!.setItemClickObserver(this)
+        exerciseAdapter?.setItemClickObserver(this)
         binding.rvExerciseBtns.adapter = exerciseAdapter
     }
 
@@ -252,7 +254,7 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         val exerciseName = s.toString()
 
         if (exerciseName.isNotEmpty()) {
-            if (workout!!.containsExercise(exerciseName)) {
+            if (workout?.containsExercise(exerciseName) == true) {
                 switchExerciseBtns(binding.btnAddExercise, binding.btnUpdateExercise)
             } else {
                 switchExerciseBtns(binding.btnUpdateExercise, binding.btnAddExercise)
@@ -350,11 +352,11 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
     fun addExercise() {
         if (validateForm(this, formEntries)) {
             val exName = getTextString(binding.partEtExercise.etExerciseName)
-            if (workout!!.containsExercise(exName)) {
+            if (workout?.containsExercise(exName) == true) {
                 binding.partEtExercise.etExerciseName.error =
                     getString(R.string.err_exercise_exists, exName)
             } else {
-                exercises!!.add(updateExerciseData(-1, exName))
+                exercises?.add(updateExerciseData(-1, exName))
                 updateAdapter()
             }
         }
@@ -362,8 +364,15 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     fun updateExercise() {
         if (validateForm(this, formEntries)) {
-            val num = ex!!.exerciseNumber
-            exercises!![num] = updateExerciseData(num, ex!!.name!!)
+            val currentEx = ex ?: return
+            val num = currentEx.exerciseNumber
+            exercises?.let {
+                if (num >= 0 && num < it.size) {
+                    currentEx.name?.let { name ->
+                        it[num] = updateExerciseData(num, name)
+                    }
+                }
+            }
             updateAdapter()
         }
     }
@@ -375,10 +384,10 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         binding.partEtExercise.etExerciseName.setText("")
 
         if (newExNumber == -1) {
-            newExNumber = workout!!.numExercises
+            newExNumber = workout?.numExercises ?: 0
             Logger.d(newExNumber)
         } else {
-            id = ex!!.id
+            ex?.let { id = it.id }
         }
 
         val exercise = Exercise(
@@ -403,23 +412,27 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     fun addWorkout() {
         if (validateForm(this, arrayOf(binding.partEtWorkout.etWorkoutName))) {
-            if (exercises!!.isEmpty()) {
+            val currentExercises = exercises
+            if (currentExercises.isNullOrEmpty()) {
                 Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show()
             } else {
                 val btnText = getTextString(binding.btnAddWorkout).lowercase()
+                val currentWorkout = workout ?: return
 
-                workout!!.name = getTextString(binding.partEtWorkout.etWorkoutName)
-                workout!!.exercises = exercises!!
+                currentWorkout.name = getTextString(binding.partEtWorkout.etWorkoutName)
+                currentWorkout.exercises = currentExercises
 
-                addWorkoutFirebase(workout!!)
+                addWorkoutFirebase(currentWorkout)
 
                 if ("add workout" == btnText) {
-                    workoutViewModel!!.insertWorkout(workout!!)
+                    workoutViewModel.insertWorkout(currentWorkout)
                 } else {
-                    workoutViewModel!!.updateWorkout(workout!!)
+                    workoutViewModel.updateWorkout(currentWorkout)
 
-                    if (removeIncompleteWorkoutPref(this, workout!!.name!!)) {
-                        removeIncompleteSessionPref(this, workout!!.name!!)
+                    currentWorkout.name?.let {
+                        if (removeIncompleteWorkoutPref(this, it)) {
+                            removeIncompleteSessionPref(this, it)
+                        }
                     }
                 }
 
@@ -447,12 +460,14 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
 
     var ex: Exercise? = null
     private fun updateExerciseArea(exName: String) {
-        ex = workout!!.getExerciseFromName(exName)
+        ex = workout?.getExerciseFromName(exName)
         binding.partEtExercise.etExerciseName.setText(exName)
-        binding.partEtSets.etSets.setText(ex!!.sets.toString())
-        binding.partEtReps.etReps.setText(ex!!.reps.toString())
-        binding.partEtWeight.etWeight.setText(ex!!.weight.toString())
-        binding.sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(ex!!.equipment))
+        ex?.let {
+            binding.partEtSets.etSets.setText(it.sets.toString())
+            binding.partEtReps.etReps.setText(it.reps.toString())
+            binding.partEtWeight.etWeight.setText(it.weight.toString())
+            binding.sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(it.equipment))
+        }
     }
 
     override fun onItemLongClick(view: View?) {
