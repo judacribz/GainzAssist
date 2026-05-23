@@ -56,7 +56,9 @@ object UI {
                 actionBar.setDisplayShowHomeEnabled(true)
             }
         }
-        (act.findViewById<View>(R.id.title) as TextView).text = title
+        val titleView = act.findViewById<View>(R.id.title) as TextView
+        titleView.transformationMethod = null
+        titleView.text = title
         return title
     }
 

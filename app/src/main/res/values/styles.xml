@@ -22,6 +22,7 @@
         <item name="android:shadowDy">1</item>
         <item name="android:textColor">@color/colorBg</item>
         <item name="android:textSize">35sp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="BlueTheme" parent="@style/AppTheme">

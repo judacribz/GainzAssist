@@ -37,6 +37,7 @@
             android:layout_height="match_parent"
             android:cursorVisible="false"
             android:inputType="numberDecimal"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
     </me.grantland.widget.AutofitLayout>
 </RelativeLayout>
