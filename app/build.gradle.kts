@@ -195,12 +195,16 @@ val validateReleaseSecrets by tasks.registering {
             secretsFile.inputStream().use { load(it) }
         }
 
-        val requiredKeys = listOf(
-            "FACEBOOK_APP_ID",
-            "FACEBOOK_CLIENT_TOKEN",
-            "FB_LOGIN_PROTOCOL_SCHEME",
-            "GOOGLE_API_KEY"
-        )
+        val isFacebookEnabled = secrets.getProperty("ENABLE_FACEBOOK_LOGIN")?.toBoolean() ?: false
+
+        val requiredKeys = mutableListOf("GOOGLE_API_KEY")
+        if (isFacebookEnabled) {
+            requiredKeys.addAll(listOf(
+                "FACEBOOK_APP_ID",
+                "FACEBOOK_CLIENT_TOKEN",
+                "FB_LOGIN_PROTOCOL_SCHEME"
+            ))
+        }
 
         val missingOrInvalid = requiredKeys.filter { key ->
             val value = secrets.getProperty(key) ?: return@filter true
@@ -215,7 +219,8 @@ val validateReleaseSecrets by tasks.registering {
         if (missingOrInvalid.isNotEmpty()) {
             throw GradleException(
                 "Invalid release secrets in secrets.properties. Missing or placeholder values for: " +
-                    missingOrInvalid.joinToString(", ")
+                    missingOrInvalid.joinToString(", ") +
+                    (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
             )
         }
     }
