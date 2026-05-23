@@ -1,4 +1,4 @@
-import java.io.FileInputStream
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
 plugins {
@@ -18,14 +18,19 @@ secrets {
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    keystorePropertiesFile.inputStream().use(keystoreProperties::load)
 }
 
-val storeFileValue = keystoreProperties.getProperty("storeFile") ?: System.getenv("STORE_FILE")
-val storePasswordValue = keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
-val keyAliasValue = keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
-val keyPasswordValue = keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
-val hasReleaseSigningConfig = storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
+val storeFileValue: String? =
+    keystoreProperties.getProperty("storeFile") ?: System.getenv("STORE_FILE")
+val storePasswordValue: String? =
+    keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
+val keyAliasValue: String? =
+    keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
+val keyPasswordValue: String? =
+    keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
+val hasReleaseSigningConfig =
+    storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
 
 android {
     namespace = "ca.judacribz.gainzassist"
@@ -91,7 +96,7 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
