@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import ca.judacribz.gainzassist.BuildConfig
 import ca.judacribz.gainzassist.R
 import ca.judacribz.gainzassist.activities.authentication.login.LoginActions
 import ca.judacribz.gainzassist.activities.authentication.login.LoginScreen
@@ -62,9 +63,14 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     // State for Compose
     private var uiState by mutableStateOf(LoginUiState())
 
+    private val isFacebookEnabled: Boolean
+        get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitTheme(this)
+
+        uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
 
         setupSignInMethods()
 
@@ -129,15 +135,20 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
             .requestEmail()
             .build()
         signInClient = GoogleSignIn.getClient(this, gso)
-        callbackManager = CallbackManager.Factory.create()
-        LoginManager.getInstance().registerCallback(callbackManager, this)
+
+        if (isFacebookEnabled) {
+            callbackManager = CallbackManager.Factory.create()
+            LoginManager.getInstance().registerCallback(callbackManager, this)
+        }
     }
 
     override fun onStart() {
         super.onStart()
         if (intent.getBooleanExtra(EXTRA_LOGOUT_USER, false)) {
             signOut(this, signInClient!!)
-            LoginManager.getInstance().logOut()
+            if (isFacebookEnabled) {
+                LoginManager.getInstance().logOut()
+            }
         }
         auth!!.addAuthStateListener(this)
     }
@@ -159,7 +170,7 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
                     }
                 }
                 else -> {
-                    callbackManager!!.onActivityResult(requestCode, resultCode, data)
+                    callbackManager?.onActivityResult(requestCode, resultCode, data)
                 }
             }
         } else {
@@ -236,7 +247,9 @@ class Login : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.A
     }
 
     fun facebookLogin() {
-        LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
+        if (isFacebookEnabled) {
+            LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
+        }
     }
 
     fun login() {
