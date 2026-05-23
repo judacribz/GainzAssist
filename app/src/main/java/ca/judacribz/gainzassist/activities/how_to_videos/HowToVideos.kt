@@ -1,5 +1,7 @@
 package ca.judacribz.gainzassist.activities.how_to_videos
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -13,6 +15,7 @@ import ca.judacribz.gainzassist.databinding.ActivityHowToVideosBinding
 import ca.judacribz.gainzassist.util.UI.setInitTheme
 import ca.judacribz.gainzassist.util.UI.setToolbar
 import com.google.android.material.snackbar.Snackbar
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 
@@ -23,19 +26,13 @@ class HowToVideos : AppCompatActivity(),
 
     companion object {
         const val EXTRA_VIDEO_ID = "ca.judacribz.gainzassist.act_how_to_videos.EXTRA_VIDEO_ID"
-        const val SEARCH_SPACE_STR = "%20"
     }
-
-    var URL = ("https://www.googleapis.com/youtube/v3/search?" + // default youtube search url
-            "part=snippet&" + // search resource
-            "fields=items(id/videoId,snippet/title)&" + // needed fields
-            "maxResults=10&" + // number of results to show
-            "q=") // search text
 
     private var thumbnailAdapter: ThumbnailAdapter? = null
     private var task: SearchVideosTask? = null
 
     private var youTubePlayer: YouTubePlayer? = null
+    private var pendingVideoId: String? = null
     private var videoId: String? = null
     private var exerciseName: String? = null
 
@@ -55,17 +52,35 @@ class HowToVideos : AppCompatActivity(),
 
         binding.rvVideoList.layoutManager = LinearLayoutManager(this)
         binding.rvVideoList.setHasFixedSize(true)
-        
+
         binding.ypvPlayer.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
             override fun onReady(player: YouTubePlayer) {
                 youTubePlayer = player
-                videoId?.let { player.cueVideo(it, 0f) }
+                pendingVideoId?.let {
+                    player.loadVideo(it, 0f)
+                    pendingVideoId = null
+                }
+            }
+
+            override fun onError(player: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                super.onError(player, error)
+                val currentVideoId = videoId
+                if (currentVideoId != null) {
+                    Snackbar.make(binding.rvVideoList, "Unable to play this video", Snackbar.LENGTH_LONG)
+                        .setAction("Open in YouTube") {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$currentVideoId"))
+                            startActivity(intent)
+                        }
+                        .show()
+                } else {
+                    Snackbar.make(binding.rvVideoList, "Unable to play this video", Snackbar.LENGTH_SHORT).show()
+                }
             }
         })
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        if (binding.ypvPlayer.visibility == View.GONE) {
+        if (binding.ypvPlayer.visibility == View.INVISIBLE || binding.ypvPlayer.visibility == View.GONE) {
             finish()
         } else {
             closePlayer()
@@ -83,7 +98,7 @@ class HowToVideos : AppCompatActivity(),
 
     private fun closePlayer() {
         youTubePlayer?.pause()
-        binding.ypvPlayer.visibility = View.GONE
+        binding.ypvPlayer.visibility = View.INVISIBLE
     }
 
     override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
@@ -109,14 +124,26 @@ class HowToVideos : AppCompatActivity(),
             return
         }
 
+        val uri = Uri.Builder()
+            .scheme("https")
+            .authority("www.googleapis.com")
+            .appendPath("youtube")
+            .appendPath("v3")
+            .appendPath("search")
+            .appendQueryParameter("part", "snippet")
+            .appendQueryParameter("fields", "items(id/videoId,snippet/title)")
+            .appendQueryParameter("maxResults", "10")
+            .appendQueryParameter("q", query)
+            .appendQueryParameter("type", "video")
+            .appendQueryParameter("videoEmbeddable", "true")
+            .appendQueryParameter("safeSearch", "moderate")
+            .appendQueryParameter("key", BuildConfig.GOOGLE_API_KEY)
+            .build()
+
         task?.setYouTubeSearchObserver(null)
         task = SearchVideosTask()
         task?.setYouTubeSearchObserver(this)
-        task?.execute(
-            URL + query.replace("\\s+".toRegex(), SEARCH_SPACE_STR) +
-                    "&key=" +
-                    BuildConfig.GOOGLE_API_KEY
-        )
+        task?.execute(uri.toString())
     }
 
     override fun videoSearchDataReceived(videoIds: ArrayList<String>, videoTitles: ArrayList<String>) {
@@ -129,9 +156,17 @@ class HowToVideos : AppCompatActivity(),
         }
     }
 
+    override fun videoSearchFailed(message: String) {
+        Snackbar.make(binding.rvVideoList, message, Snackbar.LENGTH_LONG).show()
+    }
+
     override fun onVideoClick(videoId: String) {
         this.videoId = videoId
         binding.ypvPlayer.visibility = View.VISIBLE
-        youTubePlayer?.loadVideo(videoId, 0f)
+        if (youTubePlayer != null) {
+            youTubePlayer?.loadVideo(videoId, 0f)
+        } else {
+            pendingVideoId = videoId
+        }
     }
 }

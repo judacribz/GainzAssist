@@ -64,6 +64,7 @@
         <activity
             android:name=".activities.how_to_videos.HowToVideos"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:hardwareAccelerated="true"
             android:exported="false" />
 
         <!-- StartWorkout Activity -->

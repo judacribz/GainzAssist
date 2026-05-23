@@ -1,6 +1,7 @@
 package ca.judacribz.gainzassist.activities.how_to_videos
 
 import android.os.AsyncTask
+import android.util.Log
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -10,10 +11,17 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-class SearchVideosTask : AsyncTask<String, Void, List<ArrayList<String>>>() {
+class SearchVideosTask : AsyncTask<String, Void, SearchVideosTask.SearchResult>() {
+
+    class SearchResult(
+        val videoIds: ArrayList<String>? = null,
+        val videoTitles: ArrayList<String>? = null,
+        val errorMessage: String? = null
+    )
 
     interface YouTubeSearchObserver {
         fun videoSearchDataReceived(videoIds: ArrayList<String>, videoTitles: ArrayList<String>)
+        fun videoSearchFailed(message: String)
     }
 
     private var youTubeSearchObserver: YouTubeSearchObserver? = null
@@ -22,47 +30,66 @@ class SearchVideosTask : AsyncTask<String, Void, List<ArrayList<String>>>() {
         this.youTubeSearchObserver = youTubeSearchObserver
     }
 
-    override fun doInBackground(vararg strings: String): List<ArrayList<String>>? {
-        val result = ArrayList<ArrayList<String>>()
+    override fun doInBackground(vararg strings: String): SearchResult {
         var connection: HttpURLConnection? = null
         var reader: BufferedReader? = null
 
         try {
-            val url = URL(strings[0])
+            val urlString = strings[0]
+            val url = URL(urlString)
             connection = url.openConnection() as HttpURLConnection
             connection.connect()
 
-            val stream = connection.inputStream
-            reader = BufferedReader(InputStreamReader(stream))
+            val responseCode = connection.responseCode
+            val stream = if (responseCode in 200..299) {
+                connection.inputStream
+            } else {
+                connection.errorStream
+            }
 
+            reader = BufferedReader(InputStreamReader(stream))
             val buffer = StringBuilder()
             var line: String?
             while (reader.readLine().also { line = it } != null) {
                 buffer.append(line).append("\n")
             }
 
+            if (responseCode !in 200..299) {
+                val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
+                Log.e("SearchVideosTask", "Error $responseCode for $sanitizedUrl\nBody: ${buffer.toString()}")
+                return SearchResult(errorMessage = "Unable to load YouTube videos. Check API key or network.")
+            }
+
             val jsonObject = JSONObject(buffer.toString())
-            val items = jsonObject.getJSONArray("items")
+            val items = jsonObject.optJSONArray("items")
 
             val videoIds = ArrayList<String>()
             val videoTitles = ArrayList<String>()
 
-            for (i in 0 until items.length()) {
-                val item = items.getJSONObject(i)
-                val id = item.getJSONObject("id")
-                val snippet = item.getJSONObject("snippet")
+            if (items != null) {
+                for (i in 0 until items.length()) {
+                    val item = items.optJSONObject(i) ?: continue
+                    val id = item.optJSONObject("id") ?: continue
+                    val snippet = item.optJSONObject("snippet") ?: continue
 
-                videoIds.add(id.getString("videoId"))
-                videoTitles.add(snippet.getString("title"))
+                    val videoId = id.optString("videoId")
+                    val title = snippet.optString("title")
+
+                    if (videoId.isNotEmpty()) {
+                        videoIds.add(videoId)
+                        videoTitles.add(title)
+                    }
+                }
             }
 
-            result.add(videoIds)
-            result.add(videoTitles)
+            return SearchResult(videoIds, videoTitles)
 
         } catch (e: IOException) {
             e.printStackTrace()
+            return SearchResult(errorMessage = "Unable to load YouTube videos. Check API key or network.")
         } catch (e: JSONException) {
             e.printStackTrace()
+            return SearchResult(errorMessage = "Error parsing response")
         } finally {
             connection?.disconnect()
             try {
@@ -71,14 +98,14 @@ class SearchVideosTask : AsyncTask<String, Void, List<ArrayList<String>>>() {
                 e.printStackTrace()
             }
         }
-
-        return result
     }
 
-    override fun onPostExecute(lists: List<ArrayList<String>>) {
-        super.onPostExecute(lists)
-        if (lists.size == 2) {
-            youTubeSearchObserver?.videoSearchDataReceived(lists[0], lists[1])
+    override fun onPostExecute(result: SearchResult) {
+        super.onPostExecute(result)
+        if (result.errorMessage != null) {
+            youTubeSearchObserver?.videoSearchFailed(result.errorMessage)
+        } else if (result.videoIds != null && result.videoTitles != null) {
+            youTubeSearchObserver?.videoSearchDataReceived(result.videoIds, result.videoTitles)
         }
     }
 }
