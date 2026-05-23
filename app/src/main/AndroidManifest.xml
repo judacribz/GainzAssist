@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-            android:name=".App"
-            android:allowBackup="true"
-            android:fullBackupContent="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:theme="@style/BlueTheme">
+        android:name=".App"
+        android:allowBackup="true"
+        android:fullBackupContent="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/BlueTheme">
 
         <!-- Login Activity -->
         <activity
             android:name=".activities.authentication.Login"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
 
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
 
@@ -30,22 +30,24 @@
         <!-- ================================================================================== -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="${FACEBOOK_APP_ID}"/>
+            android:value="${FACEBOOK_APP_ID}" />
         <meta-data
             android:name="com.facebook.sdk.ClientToken"
-            android:value="${FACEBOOK_CLIENT_TOKEN}"/>
+            android:value="${FACEBOOK_CLIENT_TOKEN}" />
 
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name" />
+            android:exported="false" />
         <activity
             android:name="com.facebook.CustomTabActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="${FB_LOGIN_PROTOCOL_SCHEME}" />
             </intent-filter>
         </activity>
@@ -54,30 +56,38 @@
 
 
         <!-- Main Activity -->
-        <activity android:name=".activities.main.Main"
-                  android:windowSoftInputMode="adjustPan|stateHidden"/>
+        <activity
+            android:name=".activities.main.Main"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- HowToVideos Activity -->
         <activity
-                android:name=".activities.how_to_videos.HowToVideos"
-                android:configChanges="orientation|keyboardHidden|screenSize"/>
+            android:name=".activities.how_to_videos.HowToVideos"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false" />
 
         <!-- StartWorkout Activity -->
         <activity
-                android:name=".activities.start_workout.StartWorkout"
-                android:windowSoftInputMode="adjustPan|stateHidden"/>
+            android:name=".activities.start_workout.StartWorkout"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- Summary Activity -->
         <activity
-                android:name=".activities.add_workout.Summary"
-                android:windowSoftInputMode="adjustPan|stateHidden"/>
-        <activity android:name=".activities.add_workout.WorkoutEntry"/>
-        <activity android:name=".activities.add_workout.ExercisesEntry"/>
+            android:name=".activities.add_workout.Summary"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity
+            android:name=".activities.add_workout.WorkoutEntry"
+            android:exported="false" />
+        <activity
+            android:name=".activities.add_workout.ExercisesEntry"
+            android:exported="false" />
 
         <service
-                android:name=".background.FirebaseService"
-                android:exported="false">
-        </service>
+            android:name=".background.FirebaseService"
+            android:exported="false" />
     </application>
 
 </manifest>
