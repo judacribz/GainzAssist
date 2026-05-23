@@ -55,3 +55,8 @@ secrets.properties
 freeline.py
 freeline/
 freeline_project_description.json
+
+# Signing properties
+keystore.properties
+*.keystore
+*.jks

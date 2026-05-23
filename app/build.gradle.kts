@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -11,6 +14,23 @@ secrets {
     propertiesFileName = "secrets.properties"
     defaultPropertiesFileName = "local.defaults.properties"
 }
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use(keystoreProperties::load)
+}
+
+val storeFileValue: String? =
+    keystoreProperties.getProperty("storeFile") ?: System.getenv("STORE_FILE")
+val storePasswordValue: String? =
+    keystoreProperties.getProperty("storePassword") ?: System.getenv("STORE_PASSWORD")
+val keyAliasValue: String? =
+    keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
+val keyPasswordValue: String? =
+    keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
+val hasReleaseSigningConfig =
+    storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
 
 android {
     namespace = "ca.judacribz.gainzassist"
@@ -31,6 +51,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            if (hasReleaseSigningConfig) {
+                storeFile = file(storeFileValue!!)
+                storePassword = storePasswordValue
+                keyAlias = keyAliasValue
+                keyPassword = keyPasswordValue
+            }
+        }
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -38,6 +69,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -64,13 +96,23 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
     lint {
         abortOnError = false
         checkReleaseBuilds = false
+    }
+}
+
+tasks.configureEach {
+    if (name == "assembleRelease" || name == "bundleRelease") {
+        doFirst {
+            if (!hasReleaseSigningConfig) {
+                throw GradleException("Release signing properties missing. Please provide storeFile, storePassword, keyAlias, and keyPassword in keystore.properties or via environment variables (STORE_FILE, STORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD).")
+            }
+        }
     }
 }
 
