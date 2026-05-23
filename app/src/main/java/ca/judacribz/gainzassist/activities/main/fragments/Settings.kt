@@ -60,9 +60,19 @@ class Settings : Fragment() {
             }
         }
 
-        binding.btnDataDeletionSupport.setOnClickListener {
+        binding.btnAccountDeletion.setOnClickListener {
+            val url = getString(R.string.account_deletion_url)
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            try {
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(context, "Browser not available", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnContactSupport.setOnClickListener {
             val email = getString(R.string.support_email)
-            val subject = getString(R.string.data_deletion_email_subject)
+            val subject = getString(R.string.support_email_subject)
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayOf(email))

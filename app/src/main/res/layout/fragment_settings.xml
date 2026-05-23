@@ -47,10 +47,16 @@
 		android:text="@string/settings_privacy_policy" />
 
 	<Button
-		android:id="@+id/btnDataDeletionSupport"
+		android:id="@+id/btnAccountDeletion"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/settings_data_deletion_support"
+		android:text="@string/settings_account_deletion" />
+
+	<Button
+		android:id="@+id/btnContactSupport"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/settings_contact_support"
 		android:layout_marginBottom="24dp" />
 
 	<!-- About Section -->
