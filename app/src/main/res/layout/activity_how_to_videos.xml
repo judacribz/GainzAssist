@@ -27,8 +27,7 @@
     <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
         android:id="@+id/ypv_player"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_container"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        android:visibility="invisible"/>
 </RelativeLayout>
