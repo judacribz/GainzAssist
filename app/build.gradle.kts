@@ -33,7 +33,7 @@ val hasReleaseSigningConfig =
     storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
 
 android {
-    namespace = "ca.judacribz.gainzassist"
+    namespace = "ca.gainzassist"
     compileSdk = 35
 
     buildFeatures {
@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "ca.judacribz.gainzassist"
+        applicationId = "ca.gainzassist"
         minSdk = 21
         targetSdk = 35
         versionCode = 2

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ca.judacribz.gainzassist.activity_how_to_videos.PlayVideo">
+    tools:context="ca.gainzassist.activity_how_to_videos.PlayVideo">
 
     <com.google.android.youtube.player.YouTubePlayerView
         android:id="@+id/yt_tv_video"
