@@ -150,16 +150,16 @@ class HowToVideos : AppCompatActivity(),
     }
 
     private fun executeSearch(query: String) {
-        val trimmedQuery = query.trim()
+        val queryKey = query.trim()
 
-        if (trimmedQuery == activeQuery) {
+        if (queryKey == activeQuery) {
             return
         }
 
-        if (queryCache.containsKey(trimmedQuery)) {
-            val cached = queryCache[trimmedQuery]
+        if (queryCache.containsKey(queryKey)) {
+            val cached = queryCache[queryKey]
             if (cached != null) {
-                videoSearchDataReceived(cached.first, cached.second)
+                displaySearchResults(cached.first, cached.second)
             }
             return
         }
@@ -169,7 +169,7 @@ class HowToVideos : AppCompatActivity(),
             return
         }
 
-        activeQuery = trimmedQuery
+        activeQuery = queryKey
 
         val uri = Uri.Builder()
             .scheme("https")
@@ -180,14 +180,14 @@ class HowToVideos : AppCompatActivity(),
             .appendQueryParameter("part", "snippet")
             .appendQueryParameter("fields", "items(id/videoId,snippet/title)")
             .appendQueryParameter("maxResults", "10")
-            .appendQueryParameter("q", trimmedQuery)
+            .appendQueryParameter("q", queryKey)
             .appendQueryParameter("type", "video")
             .appendQueryParameter("videoEmbeddable", "true")
             .appendQueryParameter("safeSearch", "moderate")
             .appendQueryParameter("key", BuildConfig.GOOGLE_API_KEY)
             .build()
 
-        searchYouTube(uri.toString())
+        searchYouTube(queryKey, uri.toString())
     }
 
     private fun getAppSha1(): String {
@@ -212,7 +212,7 @@ class HowToVideos : AppCompatActivity(),
         return ""
     }
 
-    private fun searchYouTube(urlString: String) {
+    private fun searchYouTube(queryKey: String, urlString: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             var connection: HttpURLConnection? = null
             var reader: BufferedReader? = null
@@ -295,21 +295,31 @@ class HowToVideos : AppCompatActivity(),
 
             withContext(Dispatchers.Main) {
                 if (errorMessage != null) {
-                    videoSearchFailed(errorMessage)
+                    videoSearchFailed(queryKey, errorMessage)
                 } else if (videoIds != null && videoTitles != null) {
-                    videoSearchDataReceived(videoIds, videoTitles)
+                    videoSearchDataReceived(queryKey, videoIds, videoTitles)
                 }
             }
         }
     }
 
-    private fun videoSearchDataReceived(videoIds: ArrayList<String>, videoTitles: ArrayList<String>) {
-        val currentQuery = activeQuery
-        if (currentQuery != null) {
-            queryCache[currentQuery] = Pair(videoIds, videoTitles)
-        }
-        activeQuery = null
+    private fun videoSearchDataReceived(
+        queryKey: String,
+        videoIds: ArrayList<String>,
+        videoTitles: ArrayList<String>
+    ) {
+        queryCache[queryKey] = Pair(videoIds, videoTitles)
+        if (activeQuery == queryKey) activeQuery = null
 
+        displaySearchResults(videoIds, videoTitles)
+    }
+
+    private fun videoSearchFailed(queryKey: String, message: String) {
+        if (activeQuery == queryKey) activeQuery = null
+        Snackbar.make(binding.rvVideoList, message, Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun displaySearchResults(videoIds: ArrayList<String>, videoTitles: ArrayList<String>) {
         if (videoIds.size > 0) {
             thumbnailAdapter = ThumbnailAdapter(videoIds, videoTitles)
             binding.rvVideoList.adapter = thumbnailAdapter
@@ -317,10 +327,5 @@ class HowToVideos : AppCompatActivity(),
         } else {
             Snackbar.make(binding.rvVideoList, "No video results", Snackbar.LENGTH_SHORT).show()
         }
-    }
-
-    private fun videoSearchFailed(message: String) {
-        activeQuery = null
-        Snackbar.make(binding.rvVideoList, message, Snackbar.LENGTH_LONG).show()
     }
 }
