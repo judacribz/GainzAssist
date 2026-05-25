@@ -67,7 +67,7 @@ fun GainzOutlinedTextField(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val isFloating = isFocused || value.isNotEmpty()
-    
+
     val innerBorderColor = if (isError) Color.Red else blue
 
     val alignment = when (textAlign) {
@@ -119,7 +119,7 @@ fun GainzOutlinedTextField(
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp)
                                 )
                             }
-                            
+
                             // Input Area
                             Box(
                                 modifier = Modifier
