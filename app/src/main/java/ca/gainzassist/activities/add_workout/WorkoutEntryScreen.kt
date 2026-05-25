@@ -206,7 +206,7 @@ fun WorkoutNameSection(
             label = if (LocalInspectionMode.current) "Workout Name" else stringResource(
                 id = R.string.hint_workout_name
             ).trim(),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp)
@@ -264,16 +264,19 @@ fun NumExercisesSection(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Minus Button
-                GainzButton(
-                    text = "-",
-                    onClick = onDecrementExercises,
-                    enabled = numExercises > ExerciseConst.MIN_INT,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(80.dp)
-                        .padding(vertical = 10.dp)
-                )
+                // Minus Button - Hidden when disabled to match legacy View.GONE behavior
+                if (numExercises > ExerciseConst.MIN_INT) {
+                    GainzButton(
+                        text = "-",
+                        onClick = onDecrementExercises,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(80.dp)
+                            .padding(vertical = 10.dp)
+                    )
+                } else {
+                    Spacer(modifier = Modifier.width(80.dp))
+                }
 
                 // Number Display
                 Box(
@@ -287,11 +290,13 @@ fun NumExercisesSection(
                     BasicTextField(
                         value = numExercises.toString(),
                         onValueChange = {
-                            val newValue = it.filter { char -> char.isDigit() }.take(3)
-                            if (newValue.isNotEmpty()) {
-                                onNumExercisesChanged(newValue.toInt())
+                            val newValueStr = it.filter { char -> char.isDigit() }.take(3)
+                            if (newValueStr.isEmpty()) {
+                                // Restore MIN_INT if field is cleared
+                                onNumExercisesChanged(ExerciseConst.MIN_INT)
                             } else {
-                                onNumExercisesChanged(0)
+                                val newValue = newValueStr.toInt()
+                                onNumExercisesChanged(Math.max(ExerciseConst.MIN_INT, newValue))
                             }
                         },
                         textStyle = TextStyle(

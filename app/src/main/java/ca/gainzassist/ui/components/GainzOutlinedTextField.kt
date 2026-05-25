@@ -49,10 +49,14 @@ fun GainzOutlinedTextField(
     isError: Boolean = false,
     errorText: String? = null,
 ) {
-    val safeFontFamily = try {
-        StaatlichesFont
-    } catch (_: Exception) {
+    val safeFontFamily = if (androidx.compose.ui.platform.LocalInspectionMode.current) {
         FontFamily.Default
+    } else {
+        try {
+            StaatlichesFont
+        } catch (_: Exception) {
+            FontFamily.Default
+        }
     }
 
     val blue = colorResource(id = R.color.blue)
@@ -65,6 +69,12 @@ fun GainzOutlinedTextField(
     val isFloating = isFocused || value.isNotEmpty()
     
     val innerBorderColor = if (isError) Color.Red else blue
+
+    val alignment = when (textAlign) {
+        TextAlign.Start -> Alignment.CenterStart
+        TextAlign.End -> Alignment.CenterEnd
+        else -> Alignment.Center
+    }
 
     Column(modifier = modifier) {
         Surface(
@@ -110,12 +120,12 @@ fun GainzOutlinedTextField(
                                 )
                             }
                             
-                            // Input Area - centered
+                            // Input Area
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = alignment
                             ) {
                                 if (!isFloating) {
                                     Text(
@@ -156,6 +166,7 @@ fun GainzOutlinedTextFieldPreview() {
         value = "Bench Press",
         onValueChange = {},
         label = "Exercise Name",
+        textAlign = TextAlign.Start,
         modifier = Modifier.height(150.dp).padding(16.dp)
     )
 }
