@@ -2,23 +2,23 @@ package ca.gainzassist.activities.add_workout
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
-import android.widget.*
+import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import ca.gainzassist.R
-import ca.gainzassist.adapters.SingleItemAdapter
 import ca.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
 import ca.gainzassist.constants.ExerciseConst.BB_WEIGHT_CHANGE
 import ca.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
 import ca.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
 import ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
 import ca.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
-import ca.gainzassist.databinding.ActivityNewWorkoutSummaryBinding
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Exercise.Companion.EQUIPMENT_TYPES
 import ca.gainzassist.models.Exercise.SetsType.MAIN_SET
@@ -28,19 +28,12 @@ import ca.gainzassist.models.db.WorkoutViewModel
 import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.UI.setToolbar
-import ca.gainzassist.util.UI.setSpinnerWithArray
-import ca.gainzassist.util.UI.getTextString
-import ca.gainzassist.util.UI.getTextInt
-import ca.gainzassist.util.UI.getTextFloat
-import ca.gainzassist.util.UI.validateForm
-import ca.gainzassist.util.UI.clearFormEntry
 import ca.gainzassist.util.firebase.Database.addWorkoutFirebase
 import com.orhanobut.logger.Logger
 import org.parceler.Parcels
-import java.util.*
+import java.util.ArrayList
 
-class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
+class Summary : AppCompatActivity() {
 
     enum class CALLING_ACTIVITY {
         WORKOUTS_LIST,
@@ -60,417 +53,267 @@ class Summary : AppCompatActivity(), SingleItemAdapter.ItemClickObserver {
         private const val POS_NA = 2
     }
 
-    private var exerciseAdapter: SingleItemAdapter? = null
-    private var exSets: ArrayList<ExerciseSet>? = null
     private var workoutId: Long = -1
-
-    private var num_reps = 0
-    private var num_sets = 0
-    private var minInt = 1
-    private var weight = 0f
-    private var minWeight = MIN_WEIGHT
-    private var weightChange = WEIGHT_CHANGE
 
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
     val workoutViewModel by viewModels<WorkoutViewModel>()
-
-    private lateinit var binding: ActivityNewWorkoutSummaryBinding
-
-    private lateinit var formEntries: Array<EditText>
+    var ex: Exercise? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitTheme(this)
-        binding = ActivityNewWorkoutSummaryBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setToolbar(this, R.string.title_new_workout_summary, true)
-
 
         val sourceIntent = intent
         workout = Parcels.unwrap(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
         val currentWorkout = workout ?: return
         workoutId = currentWorkout.id
 
+        var initialMainButtonText = getString(R.string.add_workout)
         when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CALLING_ACTIVITY) {
             CALLING_ACTIVITY.WORKOUTS_LIST -> {
-                binding.btnAddWorkout.text = getString(R.string.update_workout)
+                initialMainButtonText = getString(R.string.update_workout)
             }
-
             else -> {
                 // Keep default
             }
         }
 
-        formEntries = arrayOf(
-            binding.partEtExercise.etExerciseName,
-            binding.partEtReps.etReps,
-            binding.partEtWeight.etWeight,
-            binding.partEtSets.etSets
-        )
-
-        val workoutName = currentWorkout.name
-        if (workoutName != null) {
-            binding.partEtWorkout.etWorkoutName.setText(workoutName)
-        }
-
-        setSpinnerWithArray(this, R.array.exerciseEquipment, binding.sprEquipment)
-
-        binding.rvExerciseBtns.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
-        binding.rvExerciseBtns.setHasFixedSize(true)
-
+        val initialWorkoutName = currentWorkout.name ?: ""
         exercises = currentWorkout.exercises
 
-        updateAdapter()
+        setContent {
+            val exercisesState = remember { mutableStateListOf<Exercise>().apply { exercises?.let { addAll(it) } } }
+            var workoutName by rememberSaveable { mutableStateOf(initialWorkoutName) }
+            var exerciseName by rememberSaveable { mutableStateOf("") }
+            var weight by rememberSaveable { mutableStateOf(getString(R.string.starting_weight)) }
+            var reps by rememberSaveable { mutableStateOf(getString(R.string.starting_reps)) }
+            var sets by rememberSaveable { mutableStateOf(getString(R.string.starting_sets)) }
+            var selectedEquipment by rememberSaveable { mutableStateOf("Barbell") }
+            var selectedExerciseName by rememberSaveable { mutableStateOf<String?>(null) }
 
-        binding.partEtWorkout.etWorkoutName.setText(currentWorkout.name)
+            var workoutNameError by rememberSaveable { mutableStateOf<String?>(null) }
+            var exerciseNameError by rememberSaveable { mutableStateOf<String?>(null) }
+            var weightError by rememberSaveable { mutableStateOf<String?>(null) }
+            var repsError by rememberSaveable { mutableStateOf<String?>(null) }
+            var setsError by rememberSaveable { mutableStateOf<String?>(null) }
 
-        setupListeners()
-    }
-
-    private fun setupListeners() {
-        binding.sprEquipment.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                equipmentSelected(binding.sprEquipment, position)
+            val minWeight = when (selectedEquipment) {
+                "Barbell" -> BB_MIN_WEIGHT
+                "Dumbbell" -> DB_MIN_WEIGHT
+                else -> MIN_WEIGHT
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-
-        binding.partEtExercise.etExerciseName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                onExerciseNameChanged(s ?: "", start, before, count)
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.partEtWeight.etWeight.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (!binding.ibtnDecWeight.isEnabled) {
-                    binding.ibtnDecWeight.isEnabled = true
-                    binding.ibtnDecWeight.visibility = View.VISIBLE
-                }
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                onWeightChanged(s ?: "", start, before, count)
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.partEtReps.etReps.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                beforeNumChanged(binding.ibtnDecReps)
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                num_reps =
-                    onNumChanged(binding.partEtReps.etReps, binding.ibtnDecReps, s.toString())
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.partEtSets.etSets.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                beforeNumChanged(binding.ibtnDecSets)
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                num_sets =
-                    onNumChanged(binding.partEtSets.etSets, binding.ibtnDecSets, s.toString())
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.ibtnIncReps.setOnClickListener { incReps() }
-        binding.ibtnDecReps.setOnClickListener { decReps() }
-        binding.ibtnIncSets.setOnClickListener { incSets() }
-        binding.ibtnDecSets.setOnClickListener { decSets() }
-        binding.ibtnIncWeight.setOnClickListener { incWeight() }
-        binding.ibtnDecWeight.setOnClickListener { decWeight() }
-        binding.btnAddExercise.setOnClickListener { addExercise() }
-        binding.btnUpdateExercise.setOnClickListener { updateExercise() }
-        binding.btnAddWorkout.setOnClickListener { addWorkout() }
-        binding.btnDiscardWorkout.setOnClickListener { discardWorkout() }
-        binding.btnClearExercise.setOnClickListener { clearExercise() }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return super.onSupportNavigateUp()
-    }
-
-    private fun updateAdapter() {
-        val currentWorkout = workout ?: return
-        exerciseAdapter = SingleItemAdapter(
-            this,
-            currentWorkout.exerciseNames,
-            R.layout.part_square_button,
-            R.id.sqrBtnListItem
-        )
-        exerciseAdapter?.setItemClickObserver(this)
-        binding.rvExerciseBtns.adapter = exerciseAdapter
-    }
-
-    fun equipmentSelected(spinner: Spinner, position: Int) {
-        when (position) {
-            0 -> {
-                minWeight = BB_MIN_WEIGHT
-                weightChange = BB_WEIGHT_CHANGE
-            }
-
-            1 -> {
-                minWeight = DB_MIN_WEIGHT
-                weightChange = DB_WEIGHT_CHANGE
-            }
-
-            else -> {
-                minWeight = MIN_WEIGHT
-                weightChange = WEIGHT_CHANGE
-            }
-        }
-
-        if (!binding.ibtnDecWeight.isEnabled || weight < minWeight) {
-            binding.partEtWeight.etWeight.setText(minWeight.toString())
-        }
-    }
-
-    fun onExerciseNameChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        val exerciseName = s.toString()
-
-        if (exerciseName.isNotEmpty()) {
-            if (workout?.containsExercise(exerciseName) == true) {
-                switchExerciseBtns(binding.btnAddExercise, binding.btnUpdateExercise)
-            } else {
-                switchExerciseBtns(binding.btnUpdateExercise, binding.btnAddExercise)
-            }
-        } else {
-            switchExerciseBtns(
-                btnDisable = binding.btnUpdateExercise,
-                btnEnable = binding.btnAddExercise
+            val uiState = SummaryUiState(
+                workoutName = workoutName,
+                exerciseName = exerciseName,
+                selectedEquipment = selectedEquipment,
+                equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList(),
+                weight = weight,
+                reps = reps,
+                sets = sets,
+                exerciseNames = exercisesState.mapNotNull { it.name },
+                selectedExerciseName = selectedExerciseName,
+                showAddExerciseButton = selectedExerciseName == null,
+                showUpdateExerciseButton = selectedExerciseName != null,
+                mainWorkoutButtonText = initialMainButtonText,
+                workoutNameError = workoutNameError,
+                exerciseNameError = exerciseNameError,
+                weightError = weightError,
+                repsError = repsError,
+                setsError = setsError,
+                canDecrementWeight = (weight.toFloatOrNull() ?: 0f) > minWeight,
+                canDecrementReps = (reps.toIntOrNull() ?: 0) > MIN_INT,
+                canDecrementSets = (sets.toIntOrNull() ?: 0) > MIN_INT
             )
-        }
-    }
 
-    private fun switchExerciseBtns(btnDisable: Button, btnEnable: Button) {
-        if (btnDisable.visibility == View.VISIBLE) {
-            btnEnable.visibility = View.VISIBLE
-            btnDisable.visibility = View.INVISIBLE
-        }
-    }
-
-    fun onWeightChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-        val weightStr = s.toString()
-        weight = if (weightStr.isEmpty()) minWeight else weightStr.toFloat()
-
-        if (weight <= minWeight) {
-            binding.ibtnDecWeight.isEnabled = false
-            binding.ibtnDecWeight.visibility = View.INVISIBLE
-
-            if (weight < minWeight) {
-                binding.partEtWeight.etWeight.setText(minWeight.toString())
-            }
-        }
-    }
-
-    fun beforeNumChanged(ibtnDec: ImageButton) {
-        if (!ibtnDec.isEnabled) {
-            ibtnDec.isEnabled = true
-            ibtnDec.visibility = View.VISIBLE
-        }
-    }
-
-    fun onNumChanged(etNum: EditText, ibtnDec: ImageButton, str: String): Int {
-        val value = if (str.isEmpty()) minInt else str.toInt()
-
-        if (value <= minInt) {
-            ibtnDec.isEnabled = false
-            ibtnDec.visibility = View.INVISIBLE
-
-            if (value < minInt) {
-                etNum.setText(minInt.toString())
-            }
-        }
-
-        return value
-    }
-
-    fun incReps() {
-        binding.partEtReps.etReps.setText((getTextInt(binding.partEtReps.etReps) + MIN_INT).toString())
-    }
-
-    fun decReps() {
-        binding.partEtReps.etReps.setText(
-            Math.max(
-                getTextInt(binding.partEtReps.etReps) - MIN_INT,
-                MIN_INT
-            ).toString()
-        )
-    }
-
-    fun incSets() {
-        binding.partEtSets.etSets.setText((getTextInt(binding.partEtSets.etSets) + MIN_INT).toString())
-    }
-
-    fun decSets() {
-        binding.partEtSets.etSets.setText(
-            Math.max(
-                getTextInt(binding.partEtSets.etSets) - MIN_INT,
-                MIN_INT
-            ).toString()
-        )
-    }
-
-    fun incWeight() {
-        binding.partEtWeight.etWeight.setText((getTextFloat(binding.partEtWeight.etWeight) + MIN_FLOAT).toString())
-    }
-
-    fun decWeight() {
-        binding.partEtWeight.etWeight.setText(
-            Math.max(
-                getTextFloat(binding.partEtWeight.etWeight) - MIN_FLOAT,
-                MIN_FLOAT
-            ).toString()
-        )
-    }
-
-    fun addExercise() {
-        if (validateForm(this, formEntries)) {
-            val exName = getTextString(binding.partEtExercise.etExerciseName)
-            if (workout?.containsExercise(exName) == true) {
-                binding.partEtExercise.etExerciseName.error =
-                    getString(R.string.err_exercise_exists, exName)
-            } else {
-                exercises?.add(updateExerciseData(-1, exName))
-                updateAdapter()
-            }
-        }
-    }
-
-    fun updateExercise() {
-        if (validateForm(this, formEntries)) {
-            val currentEx = ex ?: return
-            val num = currentEx.exerciseNumber
-            exercises?.let {
-                if (num >= 0 && num < it.size) {
-                    currentEx.name?.let { name ->
-                        it[num] = updateExerciseData(num, name)
+            SummaryScreenContent(
+                uiState = uiState,
+                onBack = { finish() },
+                onWorkoutNameChanged = {
+                    workoutName = it
+                    workoutNameError = null
+                },
+                onExerciseNameChanged = {
+                    exerciseName = it
+                    exerciseNameError = null
+                    if (it.isNotEmpty() && workout?.containsExercise(it) == true) {
+                        selectedExerciseName = it
+                    } else {
+                        selectedExerciseName = null
                     }
-                }
-            }
-            updateAdapter()
-        }
-    }
+                },
+                onEquipmentSelected = { eq ->
+                    selectedEquipment = eq
+                    val newMinWeight = when (eq) {
+                        "Barbell" -> BB_MIN_WEIGHT
+                        "Dumbbell" -> DB_MIN_WEIGHT
+                        else -> MIN_WEIGHT
+                    }
+                    val currentWeight = weight.toFloatOrNull() ?: newMinWeight
+                    if (currentWeight < newMinWeight) {
+                        weight = newMinWeight.toString()
+                    }
+                },
+                onWeightChanged = {
+                    weight = it
+                    weightError = null
+                    val newWeight = it.toFloatOrNull() ?: minWeight
+                    if (newWeight < minWeight) {
+                        weight = minWeight.toString()
+                    }
+                },
+                onRepsChanged = { reps = it; repsError = null },
+                onSetsChanged = { sets = it; setsError = null },
+                onIncrementWeight = {
+                    val current = weight.toFloatOrNull() ?: minWeight
+                    weight = (current + MIN_FLOAT).toString()
+                },
+                onDecrementWeight = {
+                    val current = weight.toFloatOrNull() ?: minWeight
+                    weight = Math.max(current - MIN_FLOAT, minWeight).toString()
+                },
+                onIncrementReps = {
+                    val current = reps.toIntOrNull() ?: MIN_INT
+                    reps = (current + MIN_INT).toString()
+                },
+                onDecrementReps = {
+                    val current = reps.toIntOrNull() ?: MIN_INT
+                    reps = Math.max(current - MIN_INT, MIN_INT).toString()
+                },
+                onIncrementSets = {
+                    val current = sets.toIntOrNull() ?: MIN_INT
+                    sets = (current + MIN_INT).toString()
+                },
+                onDecrementSets = {
+                    val current = sets.toIntOrNull() ?: MIN_INT
+                    sets = Math.max(current - MIN_INT, MIN_INT).toString()
+                },
+                onClearExercise = {
+                    exerciseName = ""
+                    exerciseNameError = null
+                    reps = getString(R.string.starting_reps)
+                    sets = getString(R.string.starting_sets)
+                    weight = getString(R.string.starting_weight)
+                    selectedEquipment = "Barbell"
+                    selectedExerciseName = null
+                },
+                onAddExercise = {
+                    var isValid = true
+                    if (exerciseName.isBlank()) { exerciseNameError = getString(R.string.err_required); isValid = false }
+                    if (weight.isBlank()) { weightError = getString(R.string.err_required); isValid = false }
+                    if (reps.isBlank()) { repsError = getString(R.string.err_required); isValid = false }
+                    if (sets.isBlank()) { setsError = getString(R.string.err_required); isValid = false }
 
-    private fun updateExerciseData(exNumber: Int, exName: String): Exercise {
-        var newExNumber = exNumber
-        var id = -1L
+                    if (isValid) {
+                        if (workout?.containsExercise(exerciseName) == true) {
+                            exerciseNameError = getString(R.string.err_exercise_exists, exerciseName)
+                        } else {
+                            val newExNumber = workout?.numExercises ?: 0
+                            val exercise = Exercise(
+                                newExNumber, exerciseName, "Strength", selectedEquipment.lowercase(),
+                                sets.toIntOrNull() ?: MIN_INT, reps.toIntOrNull() ?: MIN_INT, weight.toFloatOrNull() ?: minWeight, MAIN_SET
+                            ).apply { this.workoutId = this@Summary.workoutId }
 
-        binding.partEtExercise.etExerciseName.setText("")
+                            exercises?.add(exercise)
+                            exercisesState.add(exercise)
 
-        if (newExNumber == -1) {
-            newExNumber = workout?.numExercises ?: 0
-            Logger.d(newExNumber)
-        } else {
-            ex?.let { id = it.id }
-        }
+                            exerciseName = ""
+                            exerciseNameError = null
+                            reps = getString(R.string.starting_reps)
+                            sets = getString(R.string.starting_sets)
+                            weight = getString(R.string.starting_weight)
+                            selectedEquipment = "Barbell"
+                            selectedExerciseName = null
+                        }
+                    }
+                },
+                onUpdateExercise = {
+                    var isValid = true
+                    if (exerciseName.isBlank()) { exerciseNameError = getString(R.string.err_required); isValid = false }
+                    if (weight.isBlank()) { weightError = getString(R.string.err_required); isValid = false }
+                    if (reps.isBlank()) { repsError = getString(R.string.err_required); isValid = false }
+                    if (sets.isBlank()) { setsError = getString(R.string.err_required); isValid = false }
 
-        val exercise = Exercise(
-            newExNumber,
-            exName,
-            "Strength",
-            binding.sprEquipment.selectedItem.toString().lowercase(),
-            getTextInt(binding.partEtSets.etSets),
-            getTextInt(binding.partEtReps.etReps),
-            getTextFloat(binding.partEtWeight.etWeight),
-            MAIN_SET
-        )
+                    if (isValid) {
+                        val currentEx = ex
+                        if (currentEx != null) {
+                            val num = currentEx.exerciseNumber
+                            exercises?.let { exList ->
+                                if (num >= 0 && num < exList.size) {
+                                    val exercise = Exercise(
+                                        num, exerciseName, "Strength", selectedEquipment.lowercase(),
+                                        sets.toIntOrNull() ?: MIN_INT, reps.toIntOrNull() ?: MIN_INT, weight.toFloatOrNull() ?: minWeight, MAIN_SET
+                                    ).apply {
+                                        this.workoutId = this@Summary.workoutId
+                                        this.id = currentEx.id
+                                    }
+                                    exList[num] = exercise
+                                    exercisesState[num] = exercise
+                                }
+                            }
+                        }
 
-        exercise.workoutId = workoutId
+                        exerciseName = ""
+                        exerciseNameError = null
+                        reps = getString(R.string.starting_reps)
+                        sets = getString(R.string.starting_sets)
+                        weight = getString(R.string.starting_weight)
+                        selectedEquipment = "Barbell"
+                        selectedExerciseName = null
+                    }
+                },
+                onExerciseClicked = { exName ->
+                    ex = workout?.getExerciseFromName(exName)
+                    exerciseName = exName
+                    selectedExerciseName = exName
+                    ex?.let {
+                        sets = it.sets.toString()
+                        reps = it.reps.toString()
+                        weight = it.weight.toString()
+                        val equipmentIndex = EQUIPMENT_TYPES.indexOf(it.equipment)
+                        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment)
+                        if (equipmentIndex >= 0 && equipmentIndex < equipmentOptions.size) {
+                            selectedEquipment = equipmentOptions[equipmentIndex]
+                        }
+                    }
+                },
+                onDiscardWorkout = {
+                    setResult(RESULT_OK)
+                    finish()
+                },
+                onAddOrUpdateWorkout = {
+                    if (workoutName.isBlank()) {
+                        workoutNameError = getString(R.string.err_required)
+                    } else {
+                        val currentExercises = exercises
+                        if (currentExercises.isNullOrEmpty()) {
+                            Toast.makeText(this@Summary, "Error: No exercises added.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val currentWorkout = workout
+                            if (currentWorkout != null) {
+                                currentWorkout.name = workoutName
+                                currentWorkout.exercises = currentExercises
 
-        if (id != -1L) {
-            exercise.id = id
-        }
+                                addWorkoutFirebase(currentWorkout)
 
-        return exercise
-    }
-
-    fun addWorkout() {
-        if (validateForm(this, arrayOf(binding.partEtWorkout.etWorkoutName))) {
-            val currentExercises = exercises
-            if (currentExercises.isNullOrEmpty()) {
-                Toast.makeText(this, "Error: No exercises added.", Toast.LENGTH_SHORT).show()
-            } else {
-                val btnText = getTextString(binding.btnAddWorkout).lowercase()
-                val currentWorkout = workout ?: return
-
-                currentWorkout.name = getTextString(binding.partEtWorkout.etWorkoutName)
-                currentWorkout.exercises = currentExercises
-
-                addWorkoutFirebase(currentWorkout)
-
-                if ("add workout" == btnText) {
-                    workoutViewModel.insertWorkout(currentWorkout)
-                } else {
-                    workoutViewModel.updateWorkout(currentWorkout)
-
-                    currentWorkout.name?.let {
-                        if (removeIncompleteWorkoutPref(this, it)) {
-                            removeIncompleteSessionPref(this, it)
+                                if ("add workout" == initialMainButtonText.lowercase()) {
+                                    workoutViewModel.insertWorkout(currentWorkout)
+                                } else {
+                                    workoutViewModel.updateWorkout(currentWorkout)
+                                    currentWorkout.name?.let {
+                                        if (removeIncompleteWorkoutPref(this@Summary, it)) {
+                                            removeIncompleteSessionPref(this@Summary, it)
+                                        }
+                                    }
+                                }
+                                setResult(RESULT_OK)
+                                finish()
+                            }
                         }
                     }
                 }
-
-                discardWorkout()
-            }
+            )
         }
-    }
-
-    fun clearExercise() {
-        clearFormEntry(binding.partEtExercise.etExerciseName)
-        binding.partEtReps.etReps.setText(getString(R.string.starting_reps))
-        binding.partEtSets.etSets.setText(getString(R.string.starting_sets))
-        binding.partEtWeight.etWeight.setText(getString(R.string.starting_weight))
-        binding.sprEquipment.setSelection(0)
-    }
-
-    fun discardWorkout() {
-        setResult(RESULT_OK)
-        finish()
-    }
-
-    override fun onItemClick(view: View?) {
-        updateExerciseArea(getTextString(view as TextView))
-    }
-
-    var ex: Exercise? = null
-    private fun updateExerciseArea(exName: String) {
-        ex = workout?.getExerciseFromName(exName)
-        binding.partEtExercise.etExerciseName.setText(exName)
-        ex?.let {
-            binding.partEtSets.etSets.setText(it.sets.toString())
-            binding.partEtReps.etReps.setText(it.reps.toString())
-            binding.partEtWeight.etWeight.setText(it.weight.toString())
-            binding.sprEquipment.setSelection(EQUIPMENT_TYPES.indexOf(it.equipment))
-        }
-    }
-
-    override fun onItemLongClick(view: View?) {
-        // Keep Java behavior: no-op.
     }
 }
