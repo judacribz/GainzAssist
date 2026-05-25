@@ -2,15 +2,11 @@ package ca.gainzassist.activities.add_workout
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
-import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import ca.gainzassist.R
-import ca.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_NUM_EXERCISES
-import ca.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_WORKOUT_NAME
-import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
+import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
 import ca.gainzassist.adapters.WorkoutPagerAdapter
 import ca.gainzassist.constants.ExerciseConst.MIN_INT
 import ca.gainzassist.databinding.ActivityExercisesEntryBinding
@@ -19,9 +15,8 @@ import ca.gainzassist.models.Workout
 import ca.gainzassist.util.Misc.shrinkTo
 import ca.gainzassist.util.UI.setInitTheme
 import ca.gainzassist.util.UI.setToolbar
-import com.orhanobut.logger.Logger
+import com.google.android.material.tabs.TabLayout
 import org.parceler.Parcels
-import java.util.*
 
 class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
@@ -118,6 +113,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     }
 
     override fun onActivityResult(req: Int, res: Int, data: Intent?) {
+        super.onActivityResult(req, res, data)
         when (res) {
             RESULT_OK -> {
                 setResult(RESULT_OK)
