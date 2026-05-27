@@ -16,14 +16,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import ca.gainzassist.activities.add_workout.Summary
-import ca.gainzassist.activities.add_workout.Summary.CALLING_ACTIVITY.WORKOUTS_LIST
+import ca.gainzassist.activities.add_workout.Summary.CallingActivity.WORKOUTS_LIST
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.activities.main.Main
 import ca.gainzassist.activities.main.fragments.workouts.WorkoutsScreen
 import ca.gainzassist.activities.start_workout.StartWorkout
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutViewModel
-import java.util.*
 
 class Workouts : Fragment(), SearchView.OnQueryTextListener {
 
