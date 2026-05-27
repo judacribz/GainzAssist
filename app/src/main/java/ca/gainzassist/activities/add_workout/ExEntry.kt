@@ -38,7 +38,7 @@ class ExEntry : Fragment() {
 
     var deleteHidden = false
 
-    private var composeView: ComposeView? = null
+    private var isStateInitialized = false
 
     // Compose State
     private var uiState by mutableStateOf(ExEntryUiState(
@@ -70,14 +70,8 @@ class ExEntry : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        if (composeView != null) {
-            return composeView!!
-        }
+    private fun initializeStateIfNeeded() {
+        if (isStateInitialized) return
 
         num_reps = getString(R.string.starting_reps).toInt()
         num_sets = getString(R.string.starting_sets).toInt()
@@ -111,7 +105,7 @@ class ExEntry : Fragment() {
             exerciseName = initExerciseName,
             selectedEquipment = initEquipment,
             equipmentOptions = equipmentOptions,
-            weight = if (weight == weight.toInt().toFloat()) weight.toInt().toString() else weight.toString(),
+            weight = formatWeight(weight),
             reps = num_reps.toString(),
             sets = num_sets.toString(),
             showEnter = initShowEnter,
@@ -122,7 +116,44 @@ class ExEntry : Fragment() {
             canDecrementSets = num_sets > minInt
         )
 
-        composeView = ComposeView(requireContext()).apply {
+        isStateInitialized = true
+    }
+
+    private fun formatWeight(value: Float): String {
+        return if (value == value.toInt().toFloat()) value.toInt().toString() else value.toString()
+    }
+
+    private fun applyExerciseToState(exercise: Exercise) {
+        val newExerciseName = exercise.name ?: ""
+        weight = exercise.weight
+        num_sets = exercise.sets
+        num_reps = exercise.reps
+        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
+        val newEquipment = exercise.equipment ?: equipmentOptions[0]
+        equipmentSelected(equipmentOptions.indexOf(newEquipment).takeIf { it >= 0 } ?: 0)
+
+        uiState = uiState.copy(
+            exerciseName = newExerciseName,
+            selectedEquipment = newEquipment,
+            weight = formatWeight(weight),
+            reps = num_reps.toString(),
+            sets = num_sets.toString(),
+            showEnter = false,
+            showUpdate = true,
+            canDecrementWeight = weight > minWeight,
+            canDecrementReps = num_reps > minInt,
+            canDecrementSets = num_sets > minInt
+        )
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        initializeStateIfNeeded()
+
+        return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 ExEntryScreen(
@@ -139,7 +170,7 @@ class ExEntry : Fragment() {
 
                         override fun onEquipmentSelected(equipment: String) {
                             uiState = uiState.copy(selectedEquipment = equipment)
-                            equipmentSelected(equipmentOptions.indexOf(equipment))
+                            equipmentSelected(uiState.equipmentOptions.indexOf(equipment))
                         }
 
                         override fun onWeightChanged(newWeight: String) {
@@ -208,8 +239,6 @@ class ExEntry : Fragment() {
                 )
             }
         }
-
-        return composeView!!
     }
 
     override fun onDetach() {
@@ -223,27 +252,9 @@ class ExEntry : Fragment() {
 
     fun updateExFields(exercise: Exercise) {
         this.exercise = exercise
-
-        val newExerciseName = exercise.name ?: ""
-        weight = exercise.weight
-        num_sets = exercise.sets
-        num_reps = exercise.reps
-        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
-        val newEquipment = exercise.equipment ?: equipmentOptions[0]
-        equipmentSelected(equipmentOptions.indexOf(newEquipment).takeIf { it >= 0 } ?: 0)
-
-        uiState = uiState.copy(
-            exerciseName = newExerciseName,
-            selectedEquipment = newEquipment,
-            weight = if (weight == weight.toInt().toFloat()) weight.toInt().toString() else weight.toString(),
-            reps = num_reps.toString(),
-            sets = num_sets.toString(),
-            showEnter = false,
-            showUpdate = true,
-            canDecrementWeight = weight > minWeight,
-            canDecrementReps = num_reps > minInt,
-            canDecrementSets = num_sets > minInt
-        )
+        if (isAdded && isStateInitialized) {
+            applyExerciseToState(exercise)
+        }
     }
 
     fun hideDelete() {
@@ -280,7 +291,7 @@ class ExEntry : Fragment() {
             weight = minWeight
         }
         uiState = uiState.copy(
-            weight = if (weight == weight.toInt().toFloat()) weight.toInt().toString() else weight.toString(),
+            weight = formatWeight(weight),
             canDecrementWeight = weight > minWeight
         )
     }
@@ -288,7 +299,7 @@ class ExEntry : Fragment() {
     fun incNumWeight() {
         weight += weightChange
         uiState = uiState.copy(
-            weight = if (weight == weight.toInt().toFloat()) weight.toInt().toString() else weight.toString(),
+            weight = formatWeight(weight),
             canDecrementWeight = weight > minWeight
         )
     }
@@ -296,7 +307,7 @@ class ExEntry : Fragment() {
     fun decNumWeight() {
         weight = Math.max(weight - weightChange, minWeight)
         uiState = uiState.copy(
-            weight = if (weight == weight.toInt().toFloat()) weight.toInt().toString() else weight.toString(),
+            weight = formatWeight(weight),
             canDecrementWeight = weight > minWeight
         )
     }
