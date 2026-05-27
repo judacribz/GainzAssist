@@ -12,8 +12,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import ca.gainzassist.R
+import ca.gainzassist.constants.ExerciseConst
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Exercise.SetsType.MAIN_SET
+import java.util.Locale
+import kotlin.math.max
 
 class ExEntry : Fragment() {
 
@@ -40,25 +43,27 @@ class ExEntry : Fragment() {
     private var isStateInitialized = false
 
     // Compose State
-    private var uiState by mutableStateOf(ExEntryUiState(
-        exerciseName = "",
-        selectedEquipment = "Barbell",
-        equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-        weight = "45.0",
-        reps = "10",
-        sets = "3",
-        showEnter = true,
-        showUpdate = false,
-        showDelete = true,
-        duplicateExerciseError = null,
-        canDecrementWeight = false,
-        canDecrementReps = true,
-        canDecrementSets = true,
-        exerciseNameError = null,
-        weightError = null,
-        repsError = null,
-        setsError = null
-    ))
+    private var uiState by mutableStateOf(
+        ExEntryUiState(
+            exerciseName = "",
+            selectedEquipment = "Barbell",
+            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
+            weight = "45.0",
+            reps = "10",
+            sets = "3",
+            showEnter = true,
+            showUpdate = false,
+            showDelete = true,
+            duplicateExerciseError = null,
+            canDecrementWeight = false,
+            canDecrementReps = true,
+            canDecrementSets = true,
+            exerciseNameError = null,
+            weightError = null,
+            repsError = null,
+            setsError = null
+        )
+    )
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -118,7 +123,7 @@ class ExEntry : Fragment() {
     }
 
     private fun formatWeight(value: Float): String {
-        return if (value == value.toInt().toFloat()) value.toInt().toString() else value.toString()
+        return String.format(Locale.getDefault(), "%.1f", value)
     }
 
     private fun applyExerciseToState(exercise: Exercise) {
@@ -126,13 +131,21 @@ class ExEntry : Fragment() {
         weight = exercise.weight
         numSets = exercise.sets
         numReps = exercise.reps
-        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
-        val newEquipment = exercise.equipment ?: equipmentOptions[0]
+
+        val equipmentOptions = context
+            ?.resources
+            ?.getStringArray(R.array.exerciseEquipment)
+            ?.toList()
+            ?: uiState.equipmentOptions
+
+        val fallbackEquipment = equipmentOptions.firstOrNull() ?: "Barbell"
+        val newEquipment = exercise.equipment ?: fallbackEquipment
         equipmentSelected(equipmentOptions.indexOf(newEquipment).takeIf { it >= 0 } ?: 0)
 
         uiState = uiState.copy(
             exerciseName = newExerciseName,
             selectedEquipment = newEquipment,
+            equipmentOptions = equipmentOptions,
             weight = formatWeight(weight),
             reps = numReps.toString(),
             sets = numSets.toString(),
@@ -176,7 +189,8 @@ class ExEntry : Fragment() {
                             val parsedWeight = weight.toFloatOrNull()
                             if (parsedWeight != null) {
                                 this@ExEntry.weight = parsedWeight
-                                uiState = uiState.copy(canDecrementWeight = this@ExEntry.weight > minWeight)
+                                uiState =
+                                    uiState.copy(canDecrementWeight = this@ExEntry.weight > minWeight)
                             }
                         }
 
@@ -272,16 +286,18 @@ class ExEntry : Fragment() {
     fun equipmentSelected(position: Int) {
         when (position) {
             0 -> {
-                minWeight = ca.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
-                weightChange = ca.gainzassist.constants.ExerciseConst.BB_WEIGHT_CHANGE
+                minWeight = ExerciseConst.BB_MIN_WEIGHT
+                weightChange = ExerciseConst.BB_WEIGHT_CHANGE
             }
+
             1 -> {
-                minWeight = ca.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
-                weightChange = ca.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
+                minWeight = ExerciseConst.DB_MIN_WEIGHT
+                weightChange = ExerciseConst.DB_WEIGHT_CHANGE
             }
+
             else -> {
-                minWeight = ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
-                weightChange = ca.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
+                minWeight = ExerciseConst.MIN_WEIGHT
+                weightChange = ExerciseConst.WEIGHT_CHANGE
             }
         }
 
@@ -303,7 +319,7 @@ class ExEntry : Fragment() {
     }
 
     fun decNumWeight() {
-        weight = Math.max(weight - weightChange, minWeight)
+        weight = max(weight - weightChange, minWeight)
         uiState = uiState.copy(
             weight = formatWeight(weight),
             canDecrementWeight = weight > minWeight
@@ -319,7 +335,7 @@ class ExEntry : Fragment() {
     }
 
     fun decNumReps() {
-        numReps = Math.max(numReps - 1, minInt)
+        numReps = max(numReps - 1, minInt)
         uiState = uiState.copy(
             reps = numReps.toString(),
             canDecrementReps = numReps > minInt
@@ -335,7 +351,7 @@ class ExEntry : Fragment() {
     }
 
     fun decNumSets() {
-        numSets = Math.max(numSets - 1, minInt)
+        numSets = max(numSets - 1, minInt)
         uiState = uiState.copy(
             sets = numSets.toString(),
             canDecrementSets = numSets > minInt
@@ -359,7 +375,7 @@ class ExEntry : Fragment() {
             weightErr = getString(R.string.err_required)
             isValid = false
         } else {
-            weight = parsedWeight
+            weight = max(parsedWeight, minWeight)
         }
 
         val parsedReps = uiState.reps.toIntOrNull()
@@ -367,7 +383,7 @@ class ExEntry : Fragment() {
             repsErr = getString(R.string.err_required)
             isValid = false
         } else {
-            numReps = parsedReps
+            numReps = max(parsedReps, minInt)
         }
 
         val parsedSets = uiState.sets.toIntOrNull()
@@ -375,56 +391,77 @@ class ExEntry : Fragment() {
             setsErr = getString(R.string.err_required)
             isValid = false
         } else {
-            numSets = parsedSets
+            numSets = max(parsedSets, minInt)
         }
 
         uiState = uiState.copy(
             exerciseNameError = nameErr,
             weightError = weightErr,
             repsError = repsErr,
-            setsError = setsErr
+            setsError = setsErr,
+            weight = formatWeight(weight),
+            reps = numReps.toString(),
+            sets = numSets.toString()
         )
 
         return isValid
     }
 
     fun enterExercise() {
-        if (validateComposeForm()) {
-            exerciseName = uiState.exerciseName
-            if (exEntryDataListener?.exerciseDoesNotExist(this, exerciseName, exIndex) ?: false) {
-                uiState = uiState.copy(showEnter = false, showUpdate = true)
-                exercise = Exercise(
-                    exIndex,
-                    exerciseName,
-                    "Strength",
-                    uiState.selectedEquipment,
-                    numSets,
-                    numReps,
-                    weight,
-                    MAIN_SET
-                )
-                exEntryDataListener?.exerciseDataReceived(exercise, false)
-            }
+        if (!validateComposeForm()) return
+
+        val listener = exEntryDataListener ?: return
+        val name = uiState.exerciseName.trim().takeIf { it.isNotEmpty() } ?: run {
+            uiState = uiState.copy(exerciseNameError = getString(R.string.err_required))
+            return
         }
+
+        if (!listener.exerciseDoesNotExist(this, name, exIndex)) return
+
+        val newExercise = Exercise(
+            exIndex,
+            name,
+            "Strength",
+            uiState.selectedEquipment,
+            numSets,
+            numReps,
+            weight,
+            MAIN_SET
+        )
+
+        exerciseName = name
+        exercise = newExercise
+        uiState = uiState.copy(showEnter = false, showUpdate = true)
+
+        listener.exerciseDataReceived(newExercise, false)
     }
 
     fun updateExercise() {
-        if (validateComposeForm()) {
-            exerciseName = uiState.exerciseName
-            if (exEntryDataListener?.exerciseDoesNotExist(this, exerciseName, exIndex) ?: false) {
-                exercise = Exercise(
-                    exIndex,
-                    exerciseName,
-                    "Strength",
-                    uiState.selectedEquipment,
-                    numSets,
-                    numReps,
-                    weight,
-                    MAIN_SET
-                )
-                exEntryDataListener?.exerciseDataReceived(exercise, true)
-            }
+        if (!validateComposeForm()) return
+
+        val listener = exEntryDataListener ?: return
+        val name = uiState.exerciseName.trim().takeIf { it.isNotEmpty() } ?: run {
+            uiState = uiState.copy(exerciseNameError = getString(R.string.err_required))
+            return
         }
+
+        if (!listener.exerciseDoesNotExist(this, name, exIndex)) return
+
+        val updatedExercise = Exercise(
+            exIndex,
+            name,
+            "Strength",
+            uiState.selectedEquipment,
+            numSets,
+            numReps,
+            weight,
+            MAIN_SET
+        )
+
+        exerciseName = name
+        exercise = updatedExercise
+
+        listener.exerciseDataReceived(updatedExercise, true)
     }
 
     fun deleteExercise() {

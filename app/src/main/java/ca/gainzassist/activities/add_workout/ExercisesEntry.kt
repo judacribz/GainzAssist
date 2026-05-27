@@ -154,21 +154,15 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         exerciseName: String?,
         skipIndex: Int
     ): Boolean {
-        if (exerciseName.isNullOrEmpty()) {
-            return false
-        }
+        val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
 
         for (ex in exercises) {
-            if (skipIndex == exercises.indexOf(ex)) {
-                continue
-            }
+            if (skipIndex == exercises.indexOf(ex)) continue
 
             val name = ex.name
-            if (name != null) {
-                if (name == exerciseName) {
-                    fmt.setExerciseExists()
-                    return false
-                }
+            if (name == targetName) {
+                fmt.setExerciseExists()
+                return false
             }
         }
 

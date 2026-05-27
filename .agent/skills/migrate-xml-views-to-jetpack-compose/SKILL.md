@@ -8,6 +8,7 @@ This skill defines the canonical workflow for migrating an existing Android scre
 2. **Preserve Visual/Functional Parity**: The new Compose UI must look and act identically to the legacy XML UI unless otherwise directed.
 3. **Delete Only When Unused**: Do not delete the XML layout until the Compose equivalent is complete, validated, and all references to the XML file are removed from the project.
 4. **Mandatory Previews**: Every top-level (screen) composable must have a `@Preview` function to visualize its state.
+5. **No Kotlin Not-Null Assertions**: Do not use `!!` in migrated Compose screens, Activity/Fragment lifecycle code, callbacks, or UI state mapping. Use safe calls (`?.`), Elvis defaults (`?:`), `takeIf`, explicit validation, or early returns. If a required value is missing, fail safely by showing validation state, returning from the action, or preserving the previous valid value.
 
 ## Step-by-Step Workflow
 
@@ -35,10 +36,13 @@ This skill defines the canonical workflow for migrating an existing Android scre
 * In the target Activity/Fragment, locate `setContentView` or ViewBinding setup.
 * Replace the root layout inflation with a `ComposeView` block (or `setContent` for Activities).
 * Invoke the new top-level Composable and map state variables to its inputs, and existing action handlers to its lambda parameters.
+* When mapping Fragment/Activity state into Compose, avoid `!!`. Fragment views can be recreated and callbacks can be detached, so use nullable-safe access and lifecycle-aware guards.
 
 ### 6. Validate Parity
 * Run the app and visually inspect the migrated screen against the baseline.
 * Verify all interactions, animations, and inputs trigger the original logic correctly.
+* Search the migrated files for `!!` and remove any usage before opening the PR:
+  `grep -R "!!" app/src/main/java`
 * Run existing tests.
 
 ### 7. Clean Up
