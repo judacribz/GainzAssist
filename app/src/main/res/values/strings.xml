@@ -4,6 +4,7 @@
     <string name="title_create_account">Create Account</string>
     <string name="title_exercises_entry">Exercise %d</string>
     <string name="title_new_workout_summary">New Workout Summary</string>
+    <string name="no_workouts_to_resume">No workouts to resume</string>
 
     <!-- Content Descriptions -->
     <string name="cd_login_img">Main image in the login screen</string>
