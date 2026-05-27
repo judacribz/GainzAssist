@@ -3,24 +3,26 @@ package ca.gainzassist.activities.add_workout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzButton
+import ca.gainzassist.ui.components.GainzDropdown
 import ca.gainzassist.ui.components.GainzOutlinedTextField
 
 data class ExEntryUiState(
@@ -76,12 +79,9 @@ fun ExEntryScreen(
     val staatliches = FontFamily(Font(R.font.staatliches))
     val colorBg = colorResource(id = R.color.colorBg) // black
     val colorLightBg = colorResource(id = R.color.colorLightBg) // white
-    val colorAccent = colorResource(id = R.color.colorAccent) // #6b6b6b
     val colorText = colorResource(id = R.color.colorText) // white
     val colorDarkText = colorResource(id = R.color.colorDarkText) // #333333
-    val colorGrey = colorResource(id = R.color.grey) // #e3d4d4d4
     val colorBlue = colorResource(id = R.color.blue)
-    val colorBlueDark = colorResource(id = R.color.blueDark)
 
     Column(
         modifier = modifier
@@ -136,53 +136,14 @@ fun ExEntryScreen(
                     textAlign = TextAlign.Center
                 )
 
-                var expanded by remember { mutableStateOf(false) }
-
-                Box(
+                GainzDropdown(
+                    selectedValue = uiState.selectedEquipment,
+                    options = uiState.equipmentOptions,
+                    onOptionSelected = actions::onEquipmentSelected,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(2.dp)
-                        .background(colorResource(id = R.color.colorLightAccent), RoundedCornerShape(5.dp))
-                        .border(2.dp, colorAccent, RoundedCornerShape(5.dp))
-                        .clickable { expanded = true }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(start = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = uiState.selectedEquipment,
-                            color = colorText,
-                            fontSize = 22.sp,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_drop_dark),
-                            contentDescription = "Dropdown",
-                            modifier = Modifier.padding(end = 5.dp)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(colorLightBg)
-                    ) {
-                        uiState.equipmentOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(text = option, color = colorDarkText, fontSize = 22.sp) },
-                                onClick = {
-                                    actions.onEquipmentSelected(option)
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
+                )
             }
         }
 

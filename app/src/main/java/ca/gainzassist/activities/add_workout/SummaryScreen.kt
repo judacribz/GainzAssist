@@ -20,8 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,10 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -50,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzButton
+import ca.gainzassist.ui.components.GainzDropdown
 import ca.gainzassist.ui.components.GainzOutlinedTextField
 import androidx.appcompat.R as appCompatR
 
@@ -211,52 +206,6 @@ fun NumericStepperField(
 }
 
 @Composable
-fun EquipmentDropdown(
-    selectedEquipment: String,
-    equipmentOptions: List<String>,
-    onEquipmentSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Box(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .clickable { expanded = true }
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = selectedEquipment,
-                fontSize = 22.sp,
-                color = colorResource(id = R.color.colorText),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.ic_drop_dark),
-                contentDescription = "Dropdown",
-                tint = Color.Unspecified
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            equipmentOptions.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onEquipmentSelected(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun ExerciseChipButton(
     text: String,
     onClick: () -> Unit,
@@ -364,10 +313,10 @@ fun SummaryScreenContent(
                             .weight(1f)
                             .padding(end = 4.dp)
                     )
-                    EquipmentDropdown(
-                        selectedEquipment = uiState.selectedEquipment,
-                        equipmentOptions = uiState.equipmentOptions,
-                        onEquipmentSelected = onEquipmentSelected,
+                    GainzDropdown(
+                        selectedValue = uiState.selectedEquipment,
+                        options = uiState.equipmentOptions,
+                        onOptionSelected = onEquipmentSelected,
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = 4.dp)
@@ -546,31 +495,36 @@ fun SummaryScreen(
 }
 
 // -- Previews --
+val summaryPreviewState = SummaryUiState(
+    workoutName = "Push Day",
+    exerciseName = "",
+    selectedEquipment = "Barbell",
+    equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
+    weight = "45.0",
+    reps = "10",
+    sets = "3",
+    exerciseNames = listOf("Bench Press", "Overhead Press"),
+    selectedExerciseName = null,
+    showAddExerciseButton = true,
+    showUpdateExerciseButton = false,
+    mainWorkoutButtonText = "ADD WORKOUT",
+    workoutNameError = null,
+    exerciseNameError = null,
+    weightError = null,
+    repsError = null,
+    setsError = null,
+    canDecrementWeight = true,
+    canDecrementReps = true,
+    canDecrementSets = true
+)
+
 @Preview(showBackground = true)
 @Composable
 fun SummaryScreenPreview_EmptyInitial() {
     SummaryScreen(
-        uiState = SummaryUiState(
+        uiState = summaryPreviewState.copy(
             workoutName = "",
-            exerciseName = "",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "45.0",
-            reps = "10",
-            sets = "3",
-            exerciseNames = emptyList(),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+            exerciseNames = emptyList()
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -598,27 +552,9 @@ fun SummaryScreenPreview_EmptyInitial() {
 @Composable
 fun SummaryScreenPreview_WithWorkoutAndExerciseText() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0",
-            reps = "8",
-            sets = "4",
-            exerciseNames = emptyList(),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+        uiState = summaryPreviewState.copy(
+            exerciseName = "Squat",
+            weight = "225.0"
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -646,27 +582,8 @@ fun SummaryScreenPreview_WithWorkoutAndExerciseText() {
 @Composable
 fun SummaryScreenPreview_WithOneExercise() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "45.0",
-            reps = "10",
-            sets = "3",
-            exerciseNames = listOf("Bench Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+        uiState = summaryPreviewState.copy(
+            exerciseNames = listOf("Bench Press")
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -694,27 +611,8 @@ fun SummaryScreenPreview_WithOneExercise() {
 @Composable
 fun SummaryScreenPreview_UpdateWorkoutMode() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "45.0",
-            reps = "10",
-            sets = "3",
-            exerciseNames = listOf("Bench Press", "Overhead Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "UPDATE WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+        uiState = summaryPreviewState.copy(
+            mainWorkoutButtonText = "UPDATE WORKOUT"
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -742,27 +640,12 @@ fun SummaryScreenPreview_UpdateWorkoutMode() {
 @Composable
 fun SummaryScreenPreview_UpdateExerciseMode() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
+        uiState = summaryPreviewState.copy(
             exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0",
-            reps = "8",
-            sets = "3",
-            exerciseNames = listOf("Bench Press", "Overhead Press"),
             selectedExerciseName = "Bench Press",
             showAddExerciseButton = false,
             showUpdateExerciseButton = true,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+            weight = "135.0"
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -790,27 +673,9 @@ fun SummaryScreenPreview_UpdateExerciseMode() {
 @Composable
 fun SummaryScreenPreview_DuplicateExerciseError() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
+        uiState = summaryPreviewState.copy(
             exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0",
-            reps = "8",
-            sets = "3",
-            exerciseNames = listOf("Bench Press", "Overhead Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = "Bench Press exists",
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+            exerciseNameError = "Bench Press exists"
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -838,27 +703,9 @@ fun SummaryScreenPreview_DuplicateExerciseError() {
 @Composable
 fun SummaryScreenPreview_MinWeight() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
+        uiState = summaryPreviewState.copy(
             weight = "45.0",
-            reps = "10",
-            sets = "3",
-            exerciseNames = listOf("Bench Press"),
-            selectedExerciseName = "Bench Press",
-            showAddExerciseButton = false,
-            showUpdateExerciseButton = true,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = false,
-            canDecrementReps = true,
-            canDecrementSets = true
+            canDecrementWeight = false
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -886,27 +733,10 @@ fun SummaryScreenPreview_MinWeight() {
 @Composable
 fun SummaryScreenPreview_DumbbellSelected() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
+        uiState = summaryPreviewState.copy(
             exerciseName = "Lateral Raise",
             selectedEquipment = "Dumbbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "15.0",
-            reps = "12",
-            sets = "3",
-            exerciseNames = listOf("Bench Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
+            weight = "15.0"
         ),
         onBack = {},
         onWorkoutNameChanged = {},
@@ -934,28 +764,7 @@ fun SummaryScreenPreview_DumbbellSelected() {
 @Composable
 fun SummaryScreenPreview_SmallPhone_360x800() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0",
-            reps = "8",
-            sets = "3",
-            exerciseNames = listOf("Bench Press", "Overhead Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
-        ),
+        uiState = summaryPreviewState,
         onBack = {},
         onWorkoutNameChanged = {},
         onExerciseNameChanged = {},
@@ -982,28 +791,7 @@ fun SummaryScreenPreview_SmallPhone_360x800() {
 @Composable
 fun SummaryScreenPreview_LargePhone_412x915() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0",
-            reps = "8",
-            sets = "3",
-            exerciseNames = listOf("Bench Press", "Overhead Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
-        ),
+        uiState = summaryPreviewState,
         onBack = {},
         onWorkoutNameChanged = {},
         onExerciseNameChanged = {},
@@ -1030,28 +818,7 @@ fun SummaryScreenPreview_LargePhone_412x915() {
 @Composable
 fun SummaryScreenPreview_FontScaleLarge() {
     SummaryScreen(
-        uiState = SummaryUiState(
-            workoutName = "Push Day",
-            exerciseName = "Bench Press",
-            selectedEquipment = "Barbell",
-            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0",
-            reps = "8",
-            sets = "3",
-            exerciseNames = listOf("Bench Press", "Overhead Press"),
-            selectedExerciseName = null,
-            showAddExerciseButton = true,
-            showUpdateExerciseButton = false,
-            mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null,
-            exerciseNameError = null,
-            weightError = null,
-            repsError = null,
-            setsError = null,
-            canDecrementWeight = true,
-            canDecrementReps = true,
-            canDecrementSets = true
-        ),
+        uiState = summaryPreviewState,
         onBack = {},
         onWorkoutNameChanged = {},
         onExerciseNameChanged = {},
