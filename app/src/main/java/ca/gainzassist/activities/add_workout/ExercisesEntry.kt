@@ -107,7 +107,9 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         layInflater = layoutInflater
 
         tabLayoutOnPageChangeListener?.let(binding.vpFmtContainer::addOnPageChangeListener)
-        binding.tlayNavbar.addOnTabSelectedListener(viewPagerOnTabSelectedListener)
+        viewPagerOnTabSelectedListener?.let {
+            binding.tlayNavbar.addOnTabSelectedListener(it)
+        }
 
         val newTabs = List(numExs) { i ->
             binding.tlayNavbar.newTab().setText(String.format(TAB_LABEL, i + 1))
