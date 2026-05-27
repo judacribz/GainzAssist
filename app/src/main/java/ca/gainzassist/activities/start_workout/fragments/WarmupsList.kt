@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import ca.gainzassist.adapters.WorkoutPagerAdapter.Companion.EXTRA_WARMUPS
 import ca.gainzassist.models.Exercise
-import ca.gainzassist.ui.theme.GainzAssistTheme
 import org.parceler.Parcels
 import java.util.*
 
@@ -29,9 +28,7 @@ class WarmupsList : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                GainzAssistTheme {
-                    WarmupsListScreen(warmups = warmups)
-                }
+                WarmupsListScreen(warmups = warmups)
             }
         }
     }

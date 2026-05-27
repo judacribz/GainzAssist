@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.ui.theme.GainzAssistTheme
 
 @Composable
 fun ExerciseSetsListScreen(exercises: List<Exercise>) {
