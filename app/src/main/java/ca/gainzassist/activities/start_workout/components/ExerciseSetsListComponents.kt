@@ -1,13 +1,11 @@
-package ca.gainzassist.activities.start_workout.fragments.exercises
+package ca.gainzassist.activities.start_workout.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,15 +34,10 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.ui.theme.GainzAssistTheme
-
-data class ExerciseSetsListUiState(
-    val exercises: List<Exercise>
-)
 
 @Composable
 fun ExerciseSetsListScreen(
-    uiState: ExerciseSetsListUiState,
+    exercises: List<Exercise>,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -55,7 +46,7 @@ fun ExerciseSetsListScreen(
             .padding(5.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(uiState.exercises) { exercise ->
+        items(exercises) { exercise ->
             ExerciseSetsCard(exercise = exercise)
         }
     }
@@ -208,10 +199,8 @@ fun ExerciseSetChip(
 @Preview(showBackground = true)
 @Composable
 fun ExercisesListScreenPreview_Empty() {
-    GainzAssistTheme {
-        Surface {
-            ExerciseSetsListScreen(uiState = ExerciseSetsListUiState(exercises = emptyList()))
-        }
+    Surface {
+        ExerciseSetsListScreen(exercises = emptyList())
     }
 }
 
@@ -224,10 +213,8 @@ fun ExercisesListScreenPreview_OneExercise() {
         setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 155f })
         setsList.add(ExerciseSet().apply { setNumber = 2; reps = 6; weight = 185f })
     }
-    GainzAssistTheme {
-        Surface {
-            ExerciseSetsListScreen(uiState = ExerciseSetsListUiState(exercises = listOf(exercise)))
-        }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
     }
 }
 
@@ -243,10 +230,8 @@ fun ExercisesListScreenPreview_MultipleExercises() {
         name = "Deadlift"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 5; weight = 315f })
     }
-    GainzAssistTheme {
-        Surface {
-            ExerciseSetsListScreen(uiState = ExerciseSetsListUiState(exercises = listOf(exercise1, exercise2)))
-        }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise1, exercise2))
     }
 }
 
@@ -257,10 +242,8 @@ fun ExercisesListScreenPreview_LongExerciseName() {
         name = "Standing Overhead Barbell Shoulder Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 95f })
     }
-    GainzAssistTheme {
-        Surface {
-            ExerciseSetsListScreen(uiState = ExerciseSetsListUiState(exercises = listOf(exercise)))
-        }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
     }
 }
 
@@ -273,10 +256,8 @@ fun ExercisesListScreenPreview_SmallPhone_360x800() {
         setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 155f })
         setsList.add(ExerciseSet().apply { setNumber = 2; reps = 6; weight = 185f })
     }
-    GainzAssistTheme {
-        Surface {
-            ExerciseSetsListScreen(uiState = ExerciseSetsListUiState(exercises = listOf(exercise)))
-        }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
     }
 }
 
@@ -287,9 +268,7 @@ fun ExercisesListScreenPreview_FontScaleLarge() {
         name = "Bench Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
     }
-    GainzAssistTheme {
-        Surface {
-            ExerciseSetsListScreen(uiState = ExerciseSetsListUiState(exercises = listOf(exercise)))
-        }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
     }
 }

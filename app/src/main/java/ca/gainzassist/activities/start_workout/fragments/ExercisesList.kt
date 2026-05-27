@@ -7,11 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import ca.gainzassist.activities.start_workout.fragments.exercises.ExerciseSetsListScreen
-import ca.gainzassist.activities.start_workout.fragments.exercises.ExerciseSetsListUiState
+import ca.gainzassist.activities.start_workout.components.ExerciseSetsListScreen
 import ca.gainzassist.adapters.WorkoutPagerAdapter.Companion.EXTRA_MAIN_EXERCISES
 import ca.gainzassist.models.Exercise
-import ca.gainzassist.ui.theme.GainzAssistTheme
 import org.parceler.Parcels
 import java.util.*
 
@@ -30,13 +28,9 @@ class ExercisesList : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                GainzAssistTheme {
-                    ExerciseSetsListScreen(
-                        uiState = ExerciseSetsListUiState(
-                            exercises = exercises ?: emptyList()
-                        )
-                    )
-                }
+                ExerciseSetsListScreen(
+                    exercises = exercises ?: emptyList()
+                )
             }
         }
     }
