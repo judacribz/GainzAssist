@@ -123,16 +123,6 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         binding.vpFmtContainer.currentItem = 0
     }
 
-    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
-        super.onActivityResult(req, res, data)
-        when (res) {
-            RESULT_OK -> {
-                setResult(RESULT_OK)
-                finish()
-            }
-        }
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return super.onSupportNavigateUp()
