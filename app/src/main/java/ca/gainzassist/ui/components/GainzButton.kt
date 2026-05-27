@@ -31,7 +31,7 @@ fun GainzButton(
 ) {
     val blueDark = colorResource(id = R.color.blueDark)
     val blue = colorResource(id = R.color.blue)
-    
+
     val colors = if (enabled) {
         listOf(blueDark, blue)
     } else {

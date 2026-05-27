@@ -3,6 +3,7 @@ package ca.gainzassist.activities.add_workout
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import ca.gainzassist.R
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
@@ -21,7 +22,6 @@ import org.parceler.Parcels
 class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     companion object {
-        const val REQ_NEW_WORKOUT_SUMMARY = 1002
         const val TAB_LABEL = "Exercise %s"
     }
 
@@ -41,6 +41,15 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     private lateinit var binding: ActivityExercisesEntryBinding
 
+    private val summaryLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitTheme(this)
@@ -51,19 +60,18 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         val workoutEntryIntent = intent
 
         workout = Workout()
-        workout!!.id = -1
-        workoutId = workout!!.id
+        workout?.id = -1
+        workoutId = workout?.id ?: -1
 
-        workout!!.name = workoutEntryIntent.getStringExtra(WorkoutEntry.EXTRA_WORKOUT_NAME)
+        workout?.name = workoutEntryIntent.getStringExtra(WorkoutEntry.EXTRA_WORKOUT_NAME)
         numExs = workoutEntryIntent.getIntExtra(WorkoutEntry.EXTRA_NUM_EXERCISES, MIN_INT)
 
-        exercises = ArrayList()
-        for (i in 0 until numExs) {
-            exercises.add(Exercise())
-        }
+        exercises = ArrayList(List(numExs) { Exercise() })
 
         tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar)
-        viewPagerOnTabSelectedListener = object : TabLayout.ViewPagerOnTabSelectedListener(binding.vpFmtContainer) {
+        viewPagerOnTabSelectedListener = object : TabLayout.ViewPagerOnTabSelectedListener(
+            binding.vpFmtContainer
+        ) {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 super.onTabSelected(tab)
 
@@ -71,15 +79,17 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
                     numExs++
                     exercises.add(Exercise())
 
-                    workoutPagerAdapter!!.addTab()
-                    workoutPagerAdapter!!.notifyDataSetChanged()
+                    workoutPagerAdapter?.addTab()
+                    workoutPagerAdapter?.notifyDataSetChanged()
 
                     pos = tab.position
                     tab.text = String.format(TAB_LABEL, pos + 1)
                     tab.icon = null
                     tabs.add(tab)
 
-                    binding.tlayNavbar.addTab(binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus))
+                    binding.tlayNavbar.addTab(
+                        binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus)
+                    )
                     binding.vpFmtContainer.setCurrentItem(numExs - 1, true)
                     tab.select()
                 }
@@ -96,30 +106,21 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     private fun setupPager() {
         layInflater = layoutInflater
 
-        binding.vpFmtContainer.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        binding.tlayNavbar.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
-
-        for (i in 0 until numExs) {
-            val tab = binding.tlayNavbar.newTab().setText(String.format(TAB_LABEL, i + 1))
-            tabs.add(tab)
-            binding.tlayNavbar.addTab(tab)
+        tabLayoutOnPageChangeListener?.let(binding.vpFmtContainer::addOnPageChangeListener)
+        viewPagerOnTabSelectedListener?.let {
+            binding.tlayNavbar.addOnTabSelectedListener(it)
         }
+
+        val newTabs = List(numExs) { i ->
+            binding.tlayNavbar.newTab().setText(String.format(TAB_LABEL, i + 1))
+        }.also { tabs.addAll(it) }
+        newTabs.forEach { binding.tlayNavbar.addTab(it) }
 
         binding.tlayNavbar.addTab(binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus))
 
         workoutPagerAdapter = WorkoutPagerAdapter(supportFragmentManager, numExs)
         binding.vpFmtContainer.adapter = workoutPagerAdapter
         binding.vpFmtContainer.currentItem = 0
-    }
-
-    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
-        super.onActivityResult(req, res, data)
-        when (res) {
-            RESULT_OK -> {
-                setResult(RESULT_OK)
-                finish()
-            }
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -129,7 +130,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     private fun checkAndGoToSummary() {
         if (addedExs >= numExs) {
-            workout!!.exercises = exercises
+            workout?.exercises = exercises
 
             val newWorkoutSummaryIntent = Intent(this, Summary::class.java)
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
@@ -137,40 +138,41 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
                 EXTRA_CALLING_ACTIVITY,
                 Summary.CALLING_ACTIVITY.EXERCISES_ENTRY
             )
-            startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY)
+            summaryLauncher.launch(newWorkoutSummaryIntent)
         } else {
             setFirstEmptyTab()
         }
     }
 
     fun setFirstEmptyTab() {
-        for (i in 0 until numExs) {
-            if (exercises[i].name == null) {
-                binding.vpFmtContainer.setCurrentItem(i, true)
-                break
-            }
+        val firstEmptyIndex = exercises.indexOfFirst { it.name == null }
+        if (firstEmptyIndex != -1) {
+            binding.vpFmtContainer.setCurrentItem(firstEmptyIndex, true)
         }
     }
 
-    override fun exerciseDoesNotExist(fmt: ExEntry, exerciseName: String, skipIndex: Int): Boolean {
+    override fun exerciseDoesNotExist(
+        fmt: ExEntry,
+        exerciseName: String?,
+        skipIndex: Int
+    ): Boolean {
+        val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
+
         for (ex in exercises) {
-            if (skipIndex == exercises.indexOf(ex)) {
-                continue
-            }
+            if (skipIndex == exercises.indexOf(ex)) continue
 
             val name = ex.name
-            if (name != null) {
-                if (name == exerciseName) {
-                    fmt.setExerciseExists()
-                    return false
-                }
+            if (name == targetName) {
+                fmt.setExerciseExists()
+                return false
             }
         }
 
         return true
     }
 
-    override fun exerciseDataReceived(exercise: Exercise, update: Boolean) {
+    override fun exerciseDataReceived(exercise: Exercise?, update: Boolean) {
+        exercise ?: return
         exercise.workoutId = workoutId
         exercises[exercise.exerciseNumber] = exercise
 
@@ -205,13 +207,13 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
             tabs[i].text = String.format(TAB_LABEL, i + 1)
         }
 
-        workoutPagerAdapter!!.removeFragment(selectedIndex, exercises)
-        workoutPagerAdapter!!.notifyDataSetChanged()
+        workoutPagerAdapter?.removeFragment(selectedIndex, exercises)
+        workoutPagerAdapter?.notifyDataSetChanged()
 
         checkAndGoToSummary()
 
         if (numExs <= 1) {
-            workoutPagerAdapter!!.hideDelete()
+            workoutPagerAdapter?.hideDelete()
         }
     }
 }

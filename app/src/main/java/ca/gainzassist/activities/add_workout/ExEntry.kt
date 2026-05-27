@@ -2,34 +2,27 @@ package ca.gainzassist.activities.add_workout
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
 import ca.gainzassist.R
-import ca.gainzassist.databinding.FragmentExEntryBinding
+import ca.gainzassist.constants.ExerciseConst
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Exercise.SetsType.MAIN_SET
-import ca.gainzassist.util.UI.setSpinnerWithArray
-import ca.gainzassist.util.UI.setText
-import ca.gainzassist.util.UI.setVisibleIfDisabled
-import ca.gainzassist.util.UI.setGoneIfEnabled
-import ca.gainzassist.util.UI.handleNumChanged
-import ca.gainzassist.util.UI.handleFocusLeft
-import ca.gainzassist.util.UI.validateForm
-import ca.gainzassist.util.UI.getTextString
-import ca.gainzassist.util.UI.getTextInt
-import ca.gainzassist.util.UI.getTextFloat
-import java.util.*
+import java.util.Locale
+import kotlin.math.max
 
 class ExEntry : Fragment() {
 
     interface ExEntryDataListener {
-        fun exerciseDoesNotExist(fmt: ExEntry, exerciseName: String, skipIndex: Int): Boolean
-        fun exerciseDataReceived(exercise: Exercise, update: Boolean)
+        fun exerciseDoesNotExist(fmt: ExEntry, exerciseName: String?, skipIndex: Int): Boolean
+        fun exerciseDataReceived(exercise: Exercise?, update: Boolean)
         fun deleteExercise(exercise: Exercise?, index: Int)
     }
 
@@ -37,9 +30,9 @@ class ExEntry : Fragment() {
 
     var exercise: Exercise? = null
     var exerciseName: String? = null
-    var num_reps = -1
-    var num_sets = -1
-    var ex_i = 0
+    var numReps = -1
+    var numSets = -1
+    var exIndex = 0
     var minInt = 1
     var weight = -1f
     var minWeight = 0f
@@ -47,143 +40,217 @@ class ExEntry : Fragment() {
 
     var deleteHidden = false
 
-    private lateinit var binding: FragmentExEntryBinding
+    private var isStateInitialized = false
 
-    lateinit var formEntries: List<@JvmSuppressWildcards EditText>
+    // Compose State
+    private var uiState by mutableStateOf(
+        ExEntryUiState(
+            exerciseName = "",
+            selectedEquipment = "Barbell",
+            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
+            weight = "45.0",
+            reps = "10",
+            sets = "3",
+            showEnter = true,
+            showUpdate = false,
+            showDelete = true,
+            duplicateExerciseError = null,
+            canDecrementWeight = false,
+            canDecrementReps = true,
+            canDecrementSets = true,
+            exerciseNameError = null,
+            weightError = null,
+            repsError = null,
+            setsError = null
+        )
+    )
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is ExEntryDataListener) {
             exEntryDataListener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement ExEntryDataListener")
+            throw RuntimeException("$context must implement ExEntryDataListener")
         }
+    }
+
+    private fun initializeStateIfNeeded() {
+        if (isStateInitialized) return
+
+        numReps = getString(R.string.starting_reps).toInt()
+        numSets = getString(R.string.starting_sets).toInt()
+
+        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
+
+        // Initial setup for default equipment
+        equipmentSelected(0)
+
+        var initExerciseName = ""
+        var initEquipment = equipmentOptions[0]
+        var initShowEnter = true
+        var initShowUpdate = false
+
+        if (exercise != null) {
+            initExerciseName = exercise?.name.orEmpty()
+            weight = exercise?.weight ?: 0f
+            numSets = exercise?.sets ?: 0
+            numReps = exercise?.reps ?: 0
+            initEquipment = exercise?.equipment ?: equipmentOptions[0]
+            equipmentSelected(equipmentOptions.indexOf(initEquipment).takeIf { it >= 0 } ?: 0)
+
+            initShowEnter = false
+            initShowUpdate = true
+        } else {
+            weight = getString(R.string.starting_weight).toFloat()
+        }
+
+        uiState = uiState.copy(
+            exerciseName = initExerciseName,
+            selectedEquipment = initEquipment,
+            equipmentOptions = equipmentOptions,
+            weight = formatWeight(weight),
+            reps = numReps.toString(),
+            sets = numSets.toString(),
+            showEnter = initShowEnter,
+            showUpdate = initShowUpdate,
+            showDelete = !deleteHidden,
+            canDecrementWeight = weight > minWeight,
+            canDecrementReps = numReps > minInt,
+            canDecrementSets = numSets > minInt
+        )
+
+        isStateInitialized = true
+    }
+
+    private fun formatWeight(value: Float): String {
+        return String.format(Locale.getDefault(), "%.1f", value)
+    }
+
+    private fun applyExerciseToState(exercise: Exercise) {
+        val newExerciseName = exercise.name ?: ""
+        weight = exercise.weight
+        numSets = exercise.sets
+        numReps = exercise.reps
+
+        val equipmentOptions = context
+            ?.resources
+            ?.getStringArray(R.array.exerciseEquipment)
+            ?.toList()
+            ?: uiState.equipmentOptions
+
+        val fallbackEquipment = equipmentOptions.firstOrNull() ?: "Barbell"
+        val newEquipment = exercise.equipment ?: fallbackEquipment
+        equipmentSelected(equipmentOptions.indexOf(newEquipment).takeIf { it >= 0 } ?: 0)
+
+        uiState = uiState.copy(
+            exerciseName = newExerciseName,
+            selectedEquipment = newEquipment,
+            equipmentOptions = equipmentOptions,
+            weight = formatWeight(weight),
+            reps = numReps.toString(),
+            sets = numSets.toString(),
+            showEnter = false,
+            showUpdate = true,
+            canDecrementWeight = weight > minWeight,
+            canDecrementReps = numReps > minInt,
+            canDecrementSets = numSets > minInt
+        )
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        if (::binding.isInitialized) {
-            return binding.root
-        }
-        retainInstance = true
+    ): View {
+        initializeStateIfNeeded()
 
-        binding = FragmentExEntryBinding.inflate(inflater, container, false)
-        val v = binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ExEntryScreen(
+                    uiState = uiState,
+                    actions = object : ExEntryActions {
+                        override fun onExerciseNameChanged(name: String) {
+                            exerciseName = name
+                            uiState = uiState.copy(
+                                exerciseName = name,
+                                duplicateExerciseError = null,
+                                exerciseNameError = null
+                            )
+                        }
 
-        formEntries = listOf(
-            binding.partEtExercise.etExerciseName,
-            binding.partEtWeight.etWeight,
-            binding.partEtReps.etReps,
-            binding.partEtSets.etSets
-        )
+                        override fun onEquipmentSelected(equipment: String) {
+                            uiState = uiState.copy(selectedEquipment = equipment)
+                            equipmentSelected(uiState.equipmentOptions.indexOf(equipment))
+                        }
 
-        num_reps = getString(R.string.starting_reps).toInt()
-        num_sets = getString(R.string.starting_sets).toInt()
+                        override fun onWeightChanged(weight: String) {
+                            uiState = uiState.copy(weight = weight, weightError = null)
+                            val parsedWeight = weight.toFloatOrNull()
+                            if (parsedWeight != null) {
+                                this@ExEntry.weight = parsedWeight
+                                uiState =
+                                    uiState.copy(canDecrementWeight = this@ExEntry.weight > minWeight)
+                            }
+                        }
 
-        setSpinnerWithArray(activity, R.array.exerciseEquipment, binding.sprEquipment)
+                        override fun onRepsChanged(reps: String) {
+                            uiState = uiState.copy(reps = reps, repsError = null)
+                            val parsedReps = reps.toIntOrNull()
+                            if (parsedReps != null) {
+                                numReps = parsedReps
+                                uiState = uiState.copy(canDecrementReps = numReps > minInt)
+                            }
+                        }
 
-        if (exercise != null) {
-            binding.partEtExercise.etExerciseName.setText(exercise!!.name)
-            setText(binding.partEtWeight.etWeight, exercise!!.weight)
-            setText(binding.partEtSets.etSets, exercise!!.sets)
-            setText(binding.partEtReps.etReps, exercise!!.reps)
-            binding.btnEnter.visibility = View.GONE
-            binding.btnUpdate.visibility = View.VISIBLE
+                        override fun onSetsChanged(sets: String) {
+                            uiState = uiState.copy(sets = sets, setsError = null)
+                            val parsedSets = sets.toIntOrNull()
+                            if (parsedSets != null) {
+                                numSets = parsedSets
+                                uiState = uiState.copy(canDecrementSets = numSets > minInt)
+                            }
+                        }
 
-            if (deleteHidden) {
-                binding.btnDelete.visibility = View.INVISIBLE
-            } else {
-                binding.btnDelete.visibility = View.VISIBLE
-            }
-        }
+                        override fun onIncrementWeight() {
+                            incNumWeight()
+                        }
 
-        setupListeners()
+                        override fun onDecrementWeight() {
+                            decNumWeight()
+                        }
 
-        return v
-    }
+                        override fun onIncrementReps() {
+                            incNumReps()
+                        }
 
-    private fun setupListeners() {
-        binding.sprEquipment.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                equipmentSelected(position)
-            }
+                        override fun onDecrementReps() {
+                            decNumReps()
+                        }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+                        override fun onIncrementSets() {
+                            incNumSets()
+                        }
 
-        binding.partEtWeight.etWeight.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                setVisibleIfDisabled(binding.ibtnDecWeight)
-            }
+                        override fun onDecrementSets() {
+                            decNumSets()
+                        }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                weight = handleNumChanged(binding.ibtnDecWeight, s.toString(), minWeight).toFloat()
-            }
+                        override fun onEnter() {
+                            enterExercise()
+                        }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+                        override fun onUpdate() {
+                            updateExercise()
+                        }
 
-        binding.partEtReps.etReps.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                setVisibleIfDisabled(binding.ibtnDecReps)
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                num_reps = handleNumChanged(binding.ibtnDecReps, s.toString(), minInt).toInt()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        binding.partEtSets.etSets.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                setVisibleIfDisabled(binding.ibtnDecSets)
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                num_sets = handleNumChanged(binding.ibtnDecSets, s.toString(), minInt).toInt()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        val focusChangeListener = View.OnFocusChangeListener { v, hasFocus ->
-            if (!hasFocus && v is EditText) {
-                var min = 0f
-                var res = 0f
-                when (v.id) {
-                    R.id.et_weight -> {
-                        res = weight
-                        min = minWeight
+                        override fun onDelete() {
+                            deleteExercise()
+                        }
                     }
-                    R.id.et_reps -> {
-                        res = num_reps.toFloat()
-                        min = minInt.toFloat()
-                    }
-                    R.id.et_sets -> {
-                        res = num_sets.toFloat()
-                        min = minInt.toFloat()
-                    }
-                }
-                handleFocusLeft(v, min, res)
+                )
             }
         }
-        binding.partEtReps.etReps.onFocusChangeListener = focusChangeListener
-        binding.partEtSets.etSets.onFocusChangeListener = focusChangeListener
-        binding.partEtWeight.etWeight.onFocusChangeListener = focusChangeListener
-
-        binding.ibtnIncWeight.setOnClickListener { incNumWeight() }
-        binding.ibtnDecWeight.setOnClickListener { decNumWeight() }
-        binding.ibtnIncReps.setOnClickListener { incNumReps() }
-        binding.ibtnDecReps.setOnClickListener { decNumReps() }
-        binding.ibtnIncSets.setOnClickListener { incNumSets() }
-        binding.ibtnDecSets.setOnClickListener { decNumSets() }
-        binding.btnEnter.setOnClickListener { enterExercise() }
-        binding.btnUpdate.setOnClickListener { updateExercise() }
-        binding.btnDelete.setOnClickListener { deleteExercise() }
     }
 
     override fun onDetach() {
@@ -192,121 +259,213 @@ class ExEntry : Fragment() {
     }
 
     fun setInd(index: Int) {
-        this.ex_i = index
+        this.exIndex = index
     }
 
     fun updateExFields(exercise: Exercise) {
         this.exercise = exercise
+        if (isAdded && isStateInitialized) {
+            applyExerciseToState(exercise)
+        }
     }
 
     fun hideDelete() {
         deleteHidden = true
-        if (::binding.isInitialized) {
-            binding.btnDelete.visibility = View.INVISIBLE
-        }
+        uiState = uiState.copy(showDelete = false)
     }
 
     fun setExerciseExists() {
-        binding.partEtExercise.etExerciseName.error = String.format(
-            getString(R.string.err_exercise_exists),
-            exerciseName
+        uiState = uiState.copy(
+            duplicateExerciseError = String.format(
+                getString(R.string.err_exercise_exists),
+                exerciseName
+            )
         )
     }
 
     fun equipmentSelected(position: Int) {
         when (position) {
             0 -> {
-                minWeight = ca.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
-                weightChange = ca.gainzassist.constants.ExerciseConst.BB_WEIGHT_CHANGE
+                minWeight = ExerciseConst.BB_MIN_WEIGHT
+                weightChange = ExerciseConst.BB_WEIGHT_CHANGE
             }
+
             1 -> {
-                minWeight = ca.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
-                weightChange = ca.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
+                minWeight = ExerciseConst.DB_MIN_WEIGHT
+                weightChange = ExerciseConst.DB_WEIGHT_CHANGE
             }
+
             else -> {
-                minWeight = ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
-                weightChange = ca.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
+                minWeight = ExerciseConst.MIN_WEIGHT
+                weightChange = ExerciseConst.WEIGHT_CHANGE
             }
         }
 
-        if (weight > minWeight) {
-            setVisibleIfDisabled(binding.ibtnDecWeight)
-        } else {
-            binding.partEtWeight.etWeight.setText(minWeight.toString())
-            setGoneIfEnabled(binding.ibtnDecWeight)
+        if (weight <= minWeight) {
+            weight = minWeight
         }
+        uiState = uiState.copy(
+            weight = formatWeight(weight),
+            canDecrementWeight = weight > minWeight
+        )
     }
 
     fun incNumWeight() {
-        setText(binding.partEtWeight.etWeight, weight + weightChange)
+        weight += weightChange
+        uiState = uiState.copy(
+            weight = formatWeight(weight),
+            canDecrementWeight = weight > minWeight
+        )
     }
 
     fun decNumWeight() {
-        setText(binding.partEtWeight.etWeight, Math.max(weight - weightChange, minWeight))
+        weight = max(weight - weightChange, minWeight)
+        uiState = uiState.copy(
+            weight = formatWeight(weight),
+            canDecrementWeight = weight > minWeight
+        )
     }
 
     fun incNumReps() {
-        setText(binding.partEtReps.etReps, num_reps + 1)
+        numReps += 1
+        uiState = uiState.copy(
+            reps = numReps.toString(),
+            canDecrementReps = numReps > minInt
+        )
     }
 
     fun decNumReps() {
-        setText(binding.partEtReps.etReps, num_reps - 1)
+        numReps = max(numReps - 1, minInt)
+        uiState = uiState.copy(
+            reps = numReps.toString(),
+            canDecrementReps = numReps > minInt
+        )
     }
 
     fun incNumSets() {
-        setText(binding.partEtSets.etSets, num_sets + 1)
+        numSets += 1
+        uiState = uiState.copy(
+            sets = numSets.toString(),
+            canDecrementSets = numSets > minInt
+        )
     }
 
     fun decNumSets() {
-        setText(binding.partEtSets.etSets, num_sets - 1)
+        numSets = max(numSets - 1, minInt)
+        uiState = uiState.copy(
+            sets = numSets.toString(),
+            canDecrementSets = numSets > minInt
+        )
+    }
+
+    private fun validateComposeForm(): Boolean {
+        var isValid = true
+        var nameErr: String? = null
+        var weightErr: String? = null
+        var repsErr: String? = null
+        var setsErr: String? = null
+
+        if (uiState.exerciseName.trim().isEmpty()) {
+            nameErr = getString(R.string.err_required)
+            isValid = false
+        }
+
+        val parsedWeight = uiState.weight.toFloatOrNull()
+        if (parsedWeight == null || uiState.weight.trim().isEmpty()) {
+            weightErr = getString(R.string.err_required)
+            isValid = false
+        } else {
+            weight = max(parsedWeight, minWeight)
+        }
+
+        val parsedReps = uiState.reps.toIntOrNull()
+        if (parsedReps == null || uiState.reps.trim().isEmpty()) {
+            repsErr = getString(R.string.err_required)
+            isValid = false
+        } else {
+            numReps = max(parsedReps, minInt)
+        }
+
+        val parsedSets = uiState.sets.toIntOrNull()
+        if (parsedSets == null || uiState.sets.trim().isEmpty()) {
+            setsErr = getString(R.string.err_required)
+            isValid = false
+        } else {
+            numSets = max(parsedSets, minInt)
+        }
+
+        uiState = uiState.copy(
+            exerciseNameError = nameErr,
+            weightError = weightErr,
+            repsError = repsErr,
+            setsError = setsErr,
+            weight = formatWeight(weight),
+            reps = numReps.toString(),
+            sets = numSets.toString()
+        )
+
+        return isValid
     }
 
     fun enterExercise() {
-        if (validateForm(activity!!, formEntries.toTypedArray())) {
-            exerciseName = getTextString(binding.partEtExercise.etExerciseName)
-            if (exEntryDataListener!!.exerciseDoesNotExist(this, exerciseName!!, ex_i)) {
-                binding.btnEnter.visibility = View.GONE
-                binding.btnUpdate.visibility = View.VISIBLE
-                num_reps = getTextInt(binding.partEtReps.etReps)
-                num_sets = getTextInt(binding.partEtSets.etSets)
-                exercise = Exercise(
-                    ex_i,
-                    exerciseName,
-                    "Strength",
-                    getTextString(binding.sprEquipment),
-                    getTextInt(binding.partEtSets.etSets),
-                    getTextInt(binding.partEtReps.etReps),
-                    getTextFloat(binding.partEtWeight.etWeight),
-                    MAIN_SET
-                )
-                exEntryDataListener!!.exerciseDataReceived(exercise!!, false)
-            }
+        if (!validateComposeForm()) return
+
+        val listener = exEntryDataListener ?: return
+        val name = uiState.exerciseName.trim().takeIf { it.isNotEmpty() } ?: run {
+            uiState = uiState.copy(exerciseNameError = getString(R.string.err_required))
+            return
         }
+
+        if (!listener.exerciseDoesNotExist(this, name, exIndex)) return
+
+        val newExercise = Exercise(
+            exIndex,
+            name,
+            "Strength",
+            uiState.selectedEquipment,
+            numSets,
+            numReps,
+            weight,
+            MAIN_SET
+        )
+
+        exerciseName = name
+        exercise = newExercise
+        uiState = uiState.copy(showEnter = false, showUpdate = true)
+
+        listener.exerciseDataReceived(newExercise, false)
     }
 
     fun updateExercise() {
-        if (validateForm(activity!!, formEntries.toTypedArray())) {
-            exerciseName = getTextString(binding.partEtExercise.etExerciseName)
-            if (exEntryDataListener!!.exerciseDoesNotExist(this, exerciseName!!, ex_i)) {
-                num_reps = getTextInt(binding.partEtReps.etReps)
-                num_sets = getTextInt(binding.partEtSets.etSets)
-                exercise = Exercise(
-                    ex_i,
-                    exerciseName,
-                    "Strength",
-                    getTextString(binding.sprEquipment),
-                    getTextInt(binding.partEtSets.etSets),
-                    getTextInt(binding.partEtReps.etReps),
-                    getTextFloat(binding.partEtWeight.etWeight),
-                    MAIN_SET
-                )
-                exEntryDataListener!!.exerciseDataReceived(exercise!!, true)
-            }
+        if (!validateComposeForm()) return
+
+        val listener = exEntryDataListener ?: return
+        val name = uiState.exerciseName.trim().takeIf { it.isNotEmpty() } ?: run {
+            uiState = uiState.copy(exerciseNameError = getString(R.string.err_required))
+            return
         }
+
+        if (!listener.exerciseDoesNotExist(this, name, exIndex)) return
+
+        val updatedExercise = Exercise(
+            exIndex,
+            name,
+            "Strength",
+            uiState.selectedEquipment,
+            numSets,
+            numReps,
+            weight,
+            MAIN_SET
+        )
+
+        exerciseName = name
+        exercise = updatedExercise
+
+        listener.exerciseDataReceived(updatedExercise, true)
     }
 
     fun deleteExercise() {
-        binding.partEtExercise.etExerciseName.setText("")
-        exEntryDataListener!!.deleteExercise(exercise, ex_i)
+        uiState = uiState.copy(exerciseName = "")
+        exEntryDataListener?.deleteExercise(exercise, exIndex)
     }
 }
