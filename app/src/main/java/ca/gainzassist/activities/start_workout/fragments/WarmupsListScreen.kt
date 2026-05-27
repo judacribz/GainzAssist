@@ -17,7 +17,7 @@ import ca.gainzassist.models.ExerciseSet
 fun WarmupsListScreen(warmups: List<Exercise>?) {
     if (warmups.isNullOrEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No warmups.")
+            Text(androidx.compose.ui.res.stringResource(ca.gainzassist.R.string.no_warmups))
         }
     } else {
         ExerciseSetsListScreen(exercises = warmups)
