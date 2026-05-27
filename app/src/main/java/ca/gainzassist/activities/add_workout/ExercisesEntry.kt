@@ -146,7 +146,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
             newWorkoutSummaryIntent.putExtra(
                 EXTRA_CALLING_ACTIVITY,
-                Summary.CALLING_ACTIVITY.EXERCISES_ENTRY
+                Summary.CallingActivity.EXERCISES_ENTRY
             )
             summaryLauncher.launch(newWorkoutSummaryIntent)
         } else {

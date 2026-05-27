@@ -3,7 +3,16 @@ package ca.gainzassist.activities.add_workout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -11,8 +20,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -23,15 +43,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
-import ca.gainzassist.ui.components.GainzOutlinedTextField
 import ca.gainzassist.ui.components.GainzButton
+import ca.gainzassist.ui.components.GainzOutlinedTextField
+import androidx.appcompat.R as appCompatR
 
 val StaatlichesFont = FontFamily(Font(R.font.staatliches))
 
@@ -80,7 +100,7 @@ fun SummaryToolbar(onBack: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
-                    painter = painterResource(id = androidx.appcompat.R.drawable.abc_ic_ab_back_material),
+                    painter = painterResource(id = appCompatR.drawable.abc_ic_ab_back_material),
                     contentDescription = "Back",
                     tint = colorResource(id = R.color.colorBg)
                 )
@@ -102,8 +122,15 @@ fun SummaryCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) 
         modifier = modifier
             .padding(4.dp)
             .shadow(elevation = 3.dp, shape = RoundedCornerShape(5.dp))
-            .background(color = colorResource(id = R.color.colorLightBg), shape = RoundedCornerShape(5.dp))
-            .border(width = 0.5.dp, color = colorResource(id = R.color.colorBg), shape = RoundedCornerShape(5.dp))
+            .background(
+                color = colorResource(id = R.color.colorLightBg),
+                shape = RoundedCornerShape(5.dp)
+            )
+            .border(
+                width = 0.5.dp,
+                color = colorResource(id = R.color.colorBg),
+                shape = RoundedCornerShape(5.dp)
+            )
             .padding(4.dp)
     ) {
         content()
@@ -158,7 +185,13 @@ fun NumericStepperField(
                 textAlign = TextAlign.Center
             ),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = if (isFloat) KeyboardType.Decimal else KeyboardType.Number),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = if (isFloat) {
+                    KeyboardType.Decimal
+                } else {
+                    KeyboardType.Number
+                }
+            ),
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 4.dp)
@@ -278,18 +311,28 @@ fun SummaryScreenContent(
     ) {
         SummaryToolbar(onBack = onBack)
 
-        SummaryCard(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        SummaryCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        ) {
             GainzOutlinedTextField(
                 value = uiState.workoutName,
                 onValueChange = onWorkoutNameChanged,
                 label = stringResource(id = R.string.hint_workout_name),
                 isError = uiState.workoutNameError != null,
                 errorText = uiState.workoutNameError,
-                modifier = Modifier.padding(4.dp).height(80.dp)
+                modifier = Modifier
+                    .padding(4.dp)
+                    .height(80.dp)
             )
         }
 
-        SummaryCard(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        SummaryCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        ) {
             Column(modifier = Modifier.padding(4.dp)) {
                 GainzOutlinedTextField(
                     value = uiState.exerciseName,
@@ -298,11 +341,16 @@ fun SummaryScreenContent(
                     isError = uiState.exerciseNameError != null,
                     errorText = uiState.exerciseNameError,
                     singleLine = false,
-                    modifier = Modifier.fillMaxWidth().height(150.dp).padding(bottom = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp)
+                        .padding(bottom = 8.dp)
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     NumericStepperField(
@@ -312,18 +360,24 @@ fun SummaryScreenContent(
                         onDecrement = onDecrementWeight,
                         canDecrement = uiState.canDecrementWeight,
                         isFloat = true,
-                        modifier = Modifier.weight(1f).padding(end = 4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)
                     )
                     EquipmentDropdown(
                         selectedEquipment = uiState.selectedEquipment,
                         equipmentOptions = uiState.equipmentOptions,
                         onEquipmentSelected = onEquipmentSelected,
-                        modifier = Modifier.weight(1f).padding(start = 4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp)
                     )
                 }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     NumericStepperField(
@@ -332,7 +386,9 @@ fun SummaryScreenContent(
                         onIncrement = onIncrementSets,
                         onDecrement = onDecrementSets,
                         canDecrement = uiState.canDecrementSets,
-                        modifier = Modifier.weight(1f).padding(end = 4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)
                     )
                     NumericStepperField(
                         value = uiState.reps,
@@ -340,19 +396,26 @@ fun SummaryScreenContent(
                         onIncrement = onIncrementReps,
                         onDecrement = onDecrementReps,
                         canDecrement = uiState.canDecrementReps,
-                        modifier = Modifier.weight(1f).padding(start = 4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp)
                     )
                 }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     GainzButton(
                         text = stringResource(id = R.string.clear),
                         onClick = onClearExercise,
                         fontFamily = StaatlichesFont,
-                        modifier = Modifier.weight(1f).padding(end = 4.dp).height(55.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)
+                            .height(55.dp)
                     )
 
                     if (uiState.showUpdateExerciseButton) {
@@ -360,21 +423,31 @@ fun SummaryScreenContent(
                             text = stringResource(id = R.string.update_exercise),
                             onClick = onUpdateExercise,
                             fontFamily = StaatlichesFont,
-                            modifier = Modifier.weight(1f).padding(start = 4.dp).height(55.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 4.dp)
+                                .height(55.dp)
                         )
                     } else if (uiState.showAddExerciseButton) {
                         GainzButton(
                             text = stringResource(id = R.string.add_exercise),
                             onClick = onAddExercise,
                             fontFamily = StaatlichesFont,
-                            modifier = Modifier.weight(1f).padding(start = 4.dp).height(55.dp)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = 4.dp)
+                                .height(55.dp)
                         )
                     }
                 }
             }
         }
 
-        SummaryCard(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        SummaryCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        ) {
             Column(modifier = Modifier.padding(4.dp)) {
                 Text(
                     text = stringResource(id = R.string.exercises).uppercase(),
@@ -398,20 +471,28 @@ fun SummaryScreenContent(
         Spacer(modifier = Modifier.weight(1f))
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             GainzButton(
                 text = stringResource(id = R.string.discard),
                 onClick = onDiscardWorkout,
                 fontFamily = StaatlichesFont,
-                modifier = Modifier.weight(1f).padding(end = 4.dp).height(60.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 4.dp)
+                    .height(60.dp)
             )
             GainzButton(
                 text = uiState.mainWorkoutButtonText,
                 onClick = onAddOrUpdateWorkout,
                 fontFamily = StaatlichesFont,
-                modifier = Modifier.weight(1f).padding(start = 4.dp).height(60.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 4.dp)
+                    .height(60.dp)
             )
         }
     }
@@ -470,16 +551,46 @@ fun SummaryScreen(
 fun SummaryScreenPreview_EmptyInitial() {
     SummaryScreen(
         uiState = SummaryUiState(
-            workoutName = "", exerciseName = "", selectedEquipment = "Barbell", equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "45.0", reps = "10", sets = "3", exerciseNames = emptyList(), selectedExerciseName = null,
-            showAddExerciseButton = true, showUpdateExerciseButton = false, mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null, exerciseNameError = null, weightError = null, repsError = null, setsError = null,
-            canDecrementWeight = true, canDecrementReps = true, canDecrementSets = true
+            workoutName = "",
+            exerciseName = "",
+            selectedEquipment = "Barbell",
+            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
+            weight = "45.0",
+            reps = "10",
+            sets = "3",
+            exerciseNames = emptyList(),
+            selectedExerciseName = null,
+            showAddExerciseButton = true,
+            showUpdateExerciseButton = false,
+            mainWorkoutButtonText = "ADD WORKOUT",
+            workoutNameError = null,
+            exerciseNameError = null,
+            weightError = null,
+            repsError = null,
+            setsError = null,
+            canDecrementWeight = true,
+            canDecrementReps = true,
+            canDecrementSets = true
         ),
-        onBack = {}, onWorkoutNameChanged = {}, onExerciseNameChanged = {}, onEquipmentSelected = {}, onWeightChanged = {},
-        onRepsChanged = {}, onSetsChanged = {}, onIncrementWeight = {}, onDecrementWeight = {}, onIncrementReps = {},
-        onDecrementReps = {}, onIncrementSets = {}, onDecrementSets = {}, onClearExercise = {}, onAddExercise = {},
-        onUpdateExercise = {}, onExerciseClicked = {}, onDiscardWorkout = {}, onAddOrUpdateWorkout = {}
+        onBack = {},
+        onWorkoutNameChanged = {},
+        onExerciseNameChanged = {},
+        onEquipmentSelected = {},
+        onWeightChanged = {},
+        onRepsChanged = {},
+        onSetsChanged = {},
+        onIncrementWeight = {},
+        onDecrementWeight = {},
+        onIncrementReps = {},
+        onDecrementReps = {},
+        onIncrementSets = {},
+        onDecrementSets = {},
+        onClearExercise = {},
+        onAddExercise = {},
+        onUpdateExercise = {},
+        onExerciseClicked = {},
+        onDiscardWorkout = {},
+        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -488,15 +599,45 @@ fun SummaryScreenPreview_EmptyInitial() {
 fun SummaryScreenPreview_WithWorkoutAndExerciseText() {
     SummaryScreen(
         uiState = SummaryUiState(
-            workoutName = "Push Day", exerciseName = "Bench Press", selectedEquipment = "Barbell", equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
-            weight = "135.0", reps = "8", sets = "4", exerciseNames = emptyList(), selectedExerciseName = null,
-            showAddExerciseButton = true, showUpdateExerciseButton = false, mainWorkoutButtonText = "ADD WORKOUT",
-            workoutNameError = null, exerciseNameError = null, weightError = null, repsError = null, setsError = null,
-            canDecrementWeight = true, canDecrementReps = true, canDecrementSets = true
+            workoutName = "Push Day",
+            exerciseName = "Bench Press",
+            selectedEquipment = "Barbell",
+            equipmentOptions = listOf("Barbell", "Dumbbell", "N/A"),
+            weight = "135.0",
+            reps = "8",
+            sets = "4",
+            exerciseNames = emptyList(),
+            selectedExerciseName = null,
+            showAddExerciseButton = true,
+            showUpdateExerciseButton = false,
+            mainWorkoutButtonText = "ADD WORKOUT",
+            workoutNameError = null,
+            exerciseNameError = null,
+            weightError = null,
+            repsError = null,
+            setsError = null,
+            canDecrementWeight = true,
+            canDecrementReps = true,
+            canDecrementSets = true
         ),
-        onBack = {}, onWorkoutNameChanged = {}, onExerciseNameChanged = {}, onEquipmentSelected = {}, onWeightChanged = {},
-        onRepsChanged = {}, onSetsChanged = {}, onIncrementWeight = {}, onDecrementWeight = {}, onIncrementReps = {},
-        onDecrementReps = {}, onIncrementSets = {}, onDecrementSets = {}, onClearExercise = {}, onAddExercise = {},
-        onUpdateExercise = {}, onExerciseClicked = {}, onDiscardWorkout = {}, onAddOrUpdateWorkout = {}
+        onBack = {},
+        onWorkoutNameChanged = {},
+        onExerciseNameChanged = {},
+        onEquipmentSelected = {},
+        onWeightChanged = {},
+        onRepsChanged = {},
+        onSetsChanged = {},
+        onIncrementWeight = {},
+        onDecrementWeight = {},
+        onIncrementReps = {},
+        onDecrementReps = {},
+        onIncrementSets = {},
+        onDecrementSets = {},
+        onClearExercise = {},
+        onAddExercise = {},
+        onUpdateExercise = {},
+        onExerciseClicked = {},
+        onDiscardWorkout = {},
+        onAddOrUpdateWorkout = {}
     )
 }

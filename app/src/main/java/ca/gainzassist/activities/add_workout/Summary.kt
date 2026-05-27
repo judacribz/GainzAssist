@@ -1,41 +1,36 @@
 package ca.gainzassist.activities.add_workout
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import ca.gainzassist.R
+import ca.gainzassist.constants.ExerciseConst
 import ca.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
-import ca.gainzassist.constants.ExerciseConst.BB_WEIGHT_CHANGE
 import ca.gainzassist.constants.ExerciseConst.DB_MIN_WEIGHT
-import ca.gainzassist.constants.ExerciseConst.DB_WEIGHT_CHANGE
 import ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
-import ca.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
 import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Exercise.Companion.EQUIPMENT_TYPES
 import ca.gainzassist.models.Exercise.SetsType.MAIN_SET
-import ca.gainzassist.models.ExerciseSet
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutViewModel
 import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.gainzassist.util.UI.setInitTheme
 import ca.gainzassist.util.firebase.Database.addWorkoutFirebase
-import com.orhanobut.logger.Logger
 import org.parceler.Parcels
-import java.util.ArrayList
+import java.util.Locale
+import kotlin.math.max
 
 class Summary : AppCompatActivity() {
 
-    enum class CALLING_ACTIVITY {
+    enum class CallingActivity {
         WORKOUTS_LIST,
         EXERCISES_ENTRY
     }
@@ -47,10 +42,6 @@ class Summary : AppCompatActivity() {
 
         private const val MIN_INT = 1
         private const val MIN_FLOAT = 5.0f
-
-        private const val POS_STREN = 0
-        private const val POS_CARDIO = 1
-        private const val POS_NA = 2
     }
 
     private var workoutId: Long = -1
@@ -59,6 +50,49 @@ class Summary : AppCompatActivity() {
     var exercises: ArrayList<Exercise>? = null
     val workoutViewModel by viewModels<WorkoutViewModel>()
     var ex: Exercise? = null
+
+    private fun sanitizeReps(value: String): Int =
+        max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
+
+    private fun sanitizeSets(value: String): Int =
+        max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
+
+    private fun sanitizeWeight(value: String, minWeight: Float): Float =
+        max(value.toFloatOrNull() ?: minWeight, minWeight)
+
+    private fun formatWeight(value: Float): String {
+        return String.format(Locale.US, "%.1f", value)
+    }
+
+    private fun equipmentDisplayToModel(display: String): String {
+        return when (display.trim().lowercase()) {
+            "barbell" -> ExerciseConst.BARBELL
+            "dumbbell" -> ExerciseConst.DUMBBELL
+            "n/a", "na", "other" -> ExerciseConst.NA
+            else -> ExerciseConst.NA
+        }
+    }
+
+    private fun equipmentModelToDisplay(model: String?, options: List<String>): String {
+        val fallback = options.firstOrNull() ?: "Barbell"
+        return when (model?.trim()?.lowercase()) {
+            ExerciseConst.BARBELL -> options.firstOrNull { it.equals("Barbell", ignoreCase = true) } ?: fallback
+            ExerciseConst.DUMBBELL -> options.firstOrNull { it.equals("Dumbbell", ignoreCase = true) } ?: fallback
+            "n/a", "na" -> options.firstOrNull { it.equals("N/A", ignoreCase = true) } ?: fallback
+            else -> fallback
+        }
+    }
+
+    private fun exerciseNameExistsForOtherExercise(
+        exercises: List<Exercise>,
+        name: String,
+        selectedExerciseNumber: Int?
+    ): Boolean {
+        return exercises.any { exercise ->
+            exercise.exerciseNumber != selectedExerciseNumber &&
+                exercise.name.equals(name, ignoreCase = true)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,27 +104,29 @@ class Summary : AppCompatActivity() {
         workoutId = currentWorkout.id
 
         var initialMainButtonText = getString(R.string.add_workout)
-        when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CALLING_ACTIVITY) {
-            CALLING_ACTIVITY.WORKOUTS_LIST -> {
+        when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CallingActivity) {
+            CallingActivity.WORKOUTS_LIST -> {
                 initialMainButtonText = getString(R.string.update_workout)
             }
+
             else -> {
                 // Keep default
             }
         }
 
-        val initialWorkoutName = currentWorkout.name ?: ""
+        val initialWorkoutName = currentWorkout.name.orEmpty()
         exercises = currentWorkout.exercises
 
         setContent {
-            val exercisesState = remember { mutableStateListOf<Exercise>().apply { exercises?.let { addAll(it) } } }
+            val exercisesState =
+                remember { mutableStateListOf<Exercise>().apply { exercises?.let { addAll(it) } } }
             var workoutName by rememberSaveable { mutableStateOf(initialWorkoutName) }
             var exerciseName by rememberSaveable { mutableStateOf("") }
             var weight by rememberSaveable { mutableStateOf(getString(R.string.starting_weight)) }
             var reps by rememberSaveable { mutableStateOf(getString(R.string.starting_reps)) }
             var sets by rememberSaveable { mutableStateOf(getString(R.string.starting_sets)) }
             var selectedEquipment by rememberSaveable { mutableStateOf("Barbell") }
-            var selectedExerciseName by rememberSaveable { mutableStateOf<String?>(null) }
+            var selectedExerciseNumber by rememberSaveable { mutableStateOf<Int?>(null) }
 
             var workoutNameError by rememberSaveable { mutableStateOf<String?>(null) }
             var exerciseNameError by rememberSaveable { mutableStateOf<String?>(null) }
@@ -113,9 +149,9 @@ class Summary : AppCompatActivity() {
                 reps = reps,
                 sets = sets,
                 exerciseNames = exercisesState.mapNotNull { it.name },
-                selectedExerciseName = selectedExerciseName,
-                showAddExerciseButton = selectedExerciseName == null,
-                showUpdateExerciseButton = selectedExerciseName != null,
+                selectedExerciseName = exercisesState.find { it.exerciseNumber == selectedExerciseNumber }?.name,
+                showAddExerciseButton = selectedExerciseNumber == null,
+                showUpdateExerciseButton = selectedExerciseNumber != null,
                 mainWorkoutButtonText = initialMainButtonText,
                 workoutNameError = workoutNameError,
                 exerciseNameError = exerciseNameError,
@@ -137,11 +173,6 @@ class Summary : AppCompatActivity() {
                 onExerciseNameChanged = {
                     exerciseName = it
                     exerciseNameError = null
-                    if (it.isNotEmpty() && workout?.containsExercise(it) == true) {
-                        selectedExerciseName = it
-                    } else {
-                        selectedExerciseName = null
-                    }
                 },
                 onEquipmentSelected = { eq ->
                     selectedEquipment = eq
@@ -196,23 +227,46 @@ class Summary : AppCompatActivity() {
                     sets = getString(R.string.starting_sets)
                     weight = getString(R.string.starting_weight)
                     selectedEquipment = "Barbell"
-                    selectedExerciseName = null
+                    selectedExerciseNumber = null
                 },
                 onAddExercise = {
                     var isValid = true
-                    if (exerciseName.isBlank()) { exerciseNameError = getString(R.string.err_required); isValid = false }
-                    if (weight.isBlank()) { weightError = getString(R.string.err_required); isValid = false }
-                    if (reps.isBlank()) { repsError = getString(R.string.err_required); isValid = false }
-                    if (sets.isBlank()) { setsError = getString(R.string.err_required); isValid = false }
+                    if (exerciseName.isBlank()) {
+                        exerciseNameError = getString(R.string.err_required); isValid = false
+                    }
+                    if (weight.isBlank()) {
+                        weightError = getString(R.string.err_required); isValid = false
+                    }
+                    if (reps.isBlank()) {
+                        repsError = getString(R.string.err_required); isValid = false
+                    }
+                    if (sets.isBlank()) {
+                        setsError = getString(R.string.err_required); isValid = false
+                    }
 
                     if (isValid) {
-                        if (workout?.containsExercise(exerciseName) == true) {
-                            exerciseNameError = getString(R.string.err_exercise_exists, exerciseName)
+                        if (exerciseNameExistsForOtherExercise(exercisesState, exerciseName, null)) {
+                            exerciseNameError =
+                                getString(R.string.err_exercise_exists, exerciseName)
                         } else {
-                            val newExNumber = workout?.numExercises ?: 0
+                            val finalReps = sanitizeReps(reps)
+                            val finalSets = sanitizeSets(sets)
+                            val finalWeight = sanitizeWeight(weight, minWeight)
+
+                            reps = finalReps.toString()
+                            sets = finalSets.toString()
+                            weight = formatWeight(finalWeight)
+
+                            val newExNumber = exercisesState.size
                             val exercise = Exercise(
-                                newExNumber, exerciseName, "Strength", selectedEquipment.lowercase(),
-                                sets.toIntOrNull() ?: MIN_INT, reps.toIntOrNull() ?: MIN_INT, weight.toFloatOrNull() ?: minWeight, MAIN_SET
+                                newExNumber,
+                                exerciseName,
+                                "Strength",
+                                equipmentDisplayToModel(selectedEquipment),
+                                finalSets,
+                                finalReps,
+                                finalWeight,
+                                MAIN_SET
                             ).apply { this.workoutId = this@Summary.workoutId }
 
                             exercises?.add(exercise)
@@ -224,58 +278,85 @@ class Summary : AppCompatActivity() {
                             sets = getString(R.string.starting_sets)
                             weight = getString(R.string.starting_weight)
                             selectedEquipment = "Barbell"
-                            selectedExerciseName = null
+                            selectedExerciseNumber = null
                         }
                     }
                 },
                 onUpdateExercise = {
                     var isValid = true
-                    if (exerciseName.isBlank()) { exerciseNameError = getString(R.string.err_required); isValid = false }
-                    if (weight.isBlank()) { weightError = getString(R.string.err_required); isValid = false }
-                    if (reps.isBlank()) { repsError = getString(R.string.err_required); isValid = false }
-                    if (sets.isBlank()) { setsError = getString(R.string.err_required); isValid = false }
+                    if (exerciseName.isBlank()) {
+                        exerciseNameError = getString(R.string.err_required); isValid = false
+                    }
+                    if (weight.isBlank()) {
+                        weightError = getString(R.string.err_required); isValid = false
+                    }
+                    if (reps.isBlank()) {
+                        repsError = getString(R.string.err_required); isValid = false
+                    }
+                    if (sets.isBlank()) {
+                        setsError = getString(R.string.err_required); isValid = false
+                    }
 
                     if (isValid) {
-                        val currentEx = ex
-                        if (currentEx != null) {
-                            val num = currentEx.exerciseNumber
-                            exercises?.let { exList ->
-                                if (num >= 0 && num < exList.size) {
-                                    val exercise = Exercise(
-                                        num, exerciseName, "Strength", selectedEquipment.lowercase(),
-                                        sets.toIntOrNull() ?: MIN_INT, reps.toIntOrNull() ?: MIN_INT, weight.toFloatOrNull() ?: minWeight, MAIN_SET
-                                    ).apply {
-                                        this.workoutId = this@Summary.workoutId
-                                        this.id = currentEx.id
-                                    }
-                                    exList[num] = exercise
-                                    exercisesState[num] = exercise
+                        if (exerciseNameExistsForOtherExercise(exercisesState, exerciseName, selectedExerciseNumber)) {
+                            exerciseNameError = getString(R.string.err_exercise_exists, exerciseName)
+                        } else {
+                            val finalReps = sanitizeReps(reps)
+                            val finalSets = sanitizeSets(sets)
+                            val finalWeight = sanitizeWeight(weight, minWeight)
+
+                            reps = finalReps.toString()
+                            sets = finalSets.toString()
+                            weight = formatWeight(finalWeight)
+
+                            val num = selectedExerciseNumber
+                            if (num != null) {
+                                val currentEx = exercisesState.find { it.exerciseNumber == num }
+                                val exercise = Exercise(
+                                    num,
+                                    exerciseName,
+                                    "Strength",
+                                    equipmentDisplayToModel(selectedEquipment),
+                                    finalSets,
+                                    finalReps,
+                                    finalWeight,
+                                    MAIN_SET
+                                ).apply {
+                                    this.workoutId = this@Summary.workoutId
+                                    this.id = currentEx?.id ?: -1
                                 }
+
+                                exercises?.let { exList ->
+                                    val indexInOriginal = exList.indexOfFirst { it.exerciseNumber == num }
+                                    if (indexInOriginal != -1) exList[indexInOriginal] = exercise
+                                }
+                                val indexInState = exercisesState.indexOfFirst { it.exerciseNumber == num }
+                                if (indexInState != -1) exercisesState[indexInState] = exercise
+
+                                exerciseName = ""
+                                exerciseNameError = null
+                                reps = getString(R.string.starting_reps)
+                                sets = getString(R.string.starting_sets)
+                                weight = getString(R.string.starting_weight)
+                                selectedEquipment = "Barbell"
+                                selectedExerciseNumber = null
                             }
                         }
-
-                        exerciseName = ""
-                        exerciseNameError = null
-                        reps = getString(R.string.starting_reps)
-                        sets = getString(R.string.starting_sets)
-                        weight = getString(R.string.starting_weight)
-                        selectedEquipment = "Barbell"
-                        selectedExerciseName = null
                     }
                 },
                 onExerciseClicked = { exName ->
-                    ex = workout?.getExerciseFromName(exName)
-                    exerciseName = exName
-                    selectedExerciseName = exName
-                    ex?.let {
-                        sets = it.sets.toString()
-                        reps = it.reps.toString()
-                        weight = it.weight.toString()
-                        val equipmentIndex = EQUIPMENT_TYPES.indexOf(it.equipment)
-                        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment)
-                        if (equipmentIndex >= 0 && equipmentIndex < equipmentOptions.size) {
-                            selectedEquipment = equipmentOptions[equipmentIndex]
-                        }
+                    val clickedEx = exercisesState.find { it.name == exName }
+                    if (clickedEx != null) {
+                        ex = clickedEx
+                        exerciseName = clickedEx.name ?: ""
+                        selectedExerciseNumber = clickedEx.exerciseNumber
+                        sets = clickedEx.sets.toString()
+                        reps = clickedEx.reps.toString()
+                        weight = formatWeight(clickedEx.weight)
+                        selectedEquipment = equipmentModelToDisplay(
+                            clickedEx.equipment,
+                            resources.getStringArray(R.array.exerciseEquipment).toList()
+                        )
                     }
                 },
                 onDiscardWorkout = {
@@ -288,7 +369,11 @@ class Summary : AppCompatActivity() {
                     } else {
                         val currentExercises = exercises
                         if (currentExercises.isNullOrEmpty()) {
-                            Toast.makeText(this@Summary, "Error: No exercises added.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@Summary,
+                                "Error: No exercises added.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         } else {
                             val currentWorkout = workout
                             if (currentWorkout != null) {
