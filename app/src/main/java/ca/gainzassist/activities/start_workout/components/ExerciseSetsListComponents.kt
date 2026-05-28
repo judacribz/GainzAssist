@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
+import java.util.Locale
 
 @Composable
 fun ExerciseSetsListScreen(
@@ -68,7 +69,10 @@ fun ExerciseSetsCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(1.dp, colorResource(id = R.color.colorDarkText)) // @drawable/border approximation
+                .border(
+                    1.dp,
+                    colorResource(id = R.color.colorDarkText)
+                ) // @drawable/border approximation
         ) {
             // Title
             Text(
@@ -183,7 +187,7 @@ fun ExerciseSetChip(
 
         // Weight
         Text(
-            text = String.format(java.util.Locale.CANADA, "%.0f", exerciseSet.weight),
+            text = String.format(Locale.getDefault(), "%.0f", exerciseSet.weight),
             modifier = Modifier
                 .size(60.dp)
                 .padding(18.dp),
