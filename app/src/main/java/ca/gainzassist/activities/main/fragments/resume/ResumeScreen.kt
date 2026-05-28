@@ -2,10 +2,8 @@ package ca.gainzassist.activities.main.fragments.resume
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,7 +48,7 @@ fun ResumeScreen(
                 .padding(15.dp)
         ) {
             Text(
-                text = stringResource(id = R.string.incomplete_workouts),
+                text = stringResource(R.string.incomplete_workouts),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 10.dp),
@@ -63,7 +61,7 @@ fun ResumeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stringResource(id = R.string.no_workouts_to_resume),
+                        text = stringResource(R.string.no_workouts_to_resume),
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp
                     )
@@ -77,8 +75,7 @@ fun ResumeScreen(
                             text = workoutName,
                             onClick = { onWorkoutClick(workoutName) },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 5.dp),
+                                .fillMaxWidth(),
                             fontFamily = staatliches
                         )
                     }
