@@ -6,9 +6,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.PreviewFontScale
+import ca.gainzassist.R
 import ca.gainzassist.activities.start_workout.components.ExerciseSetsListScreen
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
@@ -17,7 +19,7 @@ import ca.gainzassist.models.ExerciseSet
 fun WarmupsListScreen(warmups: List<Exercise>?) {
     if (warmups.isNullOrEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(androidx.compose.ui.res.stringResource(ca.gainzassist.R.string.no_warmups))
+            Text(stringResource(R.string.no_warmups))
         }
     } else {
         ExerciseSetsListScreen(exercises = warmups)
