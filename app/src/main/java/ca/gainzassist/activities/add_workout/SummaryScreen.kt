@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,7 +49,17 @@ import ca.gainzassist.ui.components.GainzDropdown
 import ca.gainzassist.ui.components.GainzOutlinedTextField
 import androidx.appcompat.R as appCompatR
 
-val StaatlichesFont = FontFamily(Font(R.font.staatliches))
+val StaatlichesFont: FontFamily
+    @Composable
+    get() = if (LocalInspectionMode.current) {
+        FontFamily.Default
+    } else {
+        try {
+            FontFamily(Font(R.font.staatliches))
+        } catch (_: Exception) {
+            FontFamily.Default
+        }
+    }
 
 data class SummaryUiState(
     val workoutName: String,
