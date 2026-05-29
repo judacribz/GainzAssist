@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -29,12 +29,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
 import java.util.Locale
+
+private fun numberColumnWidthDp(vararg values: String): Dp {
+    val maxChars = values.maxOfOrNull { it.length } ?: 1
+    return maxOf(72.dp, (maxChars * 14).dp + 28.dp)
+}
 
 @Composable
 fun ExerciseSetsListScreen(
@@ -129,7 +135,7 @@ fun ExerciseSetSubtitles(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .background(colorResource(id = R.color.colorLightBg))
                 .height(60.dp) // from part_sets_input.xml where fields are 60dp
-                .padding(vertical = 18.dp), // approximate gravity center_vertical
+                .wrapContentHeight(Alignment.CenterVertically), // approximate gravity center_vertical
             color = colorResource(id = R.color.colorBg),
             fontSize = 15.sp,
         )
@@ -137,7 +143,7 @@ fun ExerciseSetSubtitles(modifier: Modifier = Modifier) {
             text = stringResource(id = R.string.reps),
             modifier = Modifier
                 .height(60.dp)
-                .padding(vertical = 18.dp),
+                .wrapContentHeight(Alignment.CenterVertically),
             color = colorResource(id = R.color.colorBg),
             fontSize = 15.sp,
         )
@@ -145,7 +151,7 @@ fun ExerciseSetSubtitles(modifier: Modifier = Modifier) {
             text = stringResource(id = R.string.weight_lbs),
             modifier = Modifier
                 .height(60.dp)
-                .padding(vertical = 18.dp),
+                .wrapContentHeight(Alignment.CenterVertically),
             color = colorResource(id = R.color.colorBg),
             fontSize = 15.sp,
         )
@@ -153,48 +159,46 @@ fun ExerciseSetSubtitles(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun ExerciseSetNumberCell(
+    text: String,
+    width: Dp,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier
+            .width(width)
+            .height(60.dp)
+            .wrapContentHeight(Alignment.CenterVertically),
+        color = Color.Black,
+        fontSize = 20.sp,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        softWrap = false
+    )
+}
+
+@Composable
 fun ExerciseSetChip(
     exerciseSet: ExerciseSet,
     modifier: Modifier = Modifier
 ) {
+    val setText = (exerciseSet.setNumber + 1).toString()
+    val repsText = exerciseSet.reps.toString()
+    val weightText = String.format(Locale.getDefault(), "%.0f", exerciseSet.weight)
+
+    val columnWidth = numberColumnWidthDp(setText, repsText, weightText)
+
     Column(
         modifier = modifier
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .width(columnWidth)
+            .padding(horizontal = 6.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Set number
-        Text(
-            text = (exerciseSet.setNumber + 1).toString(),
-            modifier = Modifier
-                .size(60.dp)
-                .padding(18.dp), // approx gravity center
-            color = colorResource(id = R.color.colorBg),
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
-
-        // Reps
-        Text(
-            text = exerciseSet.reps.toString(),
-            modifier = Modifier
-                .size(60.dp)
-                .padding(18.dp),
-            color = Color.Black, // Input text color
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
-
-        // Weight
-        Text(
-            text = String.format(Locale.getDefault(), "%.0f", exerciseSet.weight),
-            modifier = Modifier
-                .size(60.dp)
-                .padding(18.dp),
-            color = Color.Black, // Input text color
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        )
+        ExerciseSetNumberCell(text = setText, width = columnWidth)
+        ExerciseSetNumberCell(text = repsText, width = columnWidth)
+        ExerciseSetNumberCell(text = weightText, width = columnWidth)
     }
 }
 
@@ -271,6 +275,42 @@ fun ExercisesListScreenPreview_FontScaleLarge() {
     val exercise = Exercise().apply {
         name = "Bench Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
+    }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExercisesListScreenPreview_ThreeDigitWeights() {
+    val exercise = Exercise().apply {
+        name = "Bench Press"
+        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 130f })
+    }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExercisesListScreenPreview_LargeWeights() {
+    val exercise = Exercise().apply {
+        name = "Leg Press"
+        setsList.add(ExerciseSet().apply { setNumber = 12; reps = 100; weight = 315f })
+    }
+    Surface {
+        ExerciseSetsListScreen(exercises = listOf(exercise))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ExercisesListScreenPreview_MixedDigitWidths() {
+    val exercise = Exercise().apply {
+        name = "Heavy Lifting"
+        setsList.add(ExerciseSet().apply { setNumber = 123; reps = 1000; weight = 10000f })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
