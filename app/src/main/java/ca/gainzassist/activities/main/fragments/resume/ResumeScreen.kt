@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -37,15 +36,8 @@ fun ResumeScreen(
     uiState: ResumeUiState,
     onWorkoutClick: (String) -> Unit
 ) {
-    val staatliches = if (LocalInspectionMode.current) {
-        FontFamily.Default
-    } else {
-        try {
-            FontFamily(Font(R.font.staatliches))
-        } catch (_: Exception) {
-            FontFamily.Default
-        }
-    }
+    val staatliches = FontFamily(Font(R.font.staatliches))
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
@@ -62,6 +54,7 @@ fun ResumeScreen(
                     .padding(bottom = 10.dp),
                 fontSize = 16.sp
             )
+
             if (uiState.isEmpty) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
