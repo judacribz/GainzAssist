@@ -27,25 +27,32 @@ This skill defines the canonical workflow for migrating an existing Android scre
 * Create a new file (e.g., `[ScreenName]Screen.kt`) and an empty top-level Composable function.
 * Add a minimal `@Preview` block.
 
-### 4. Migrate the Layout
-* Translate the XML view hierarchy into Compose equivalents (e.g., `LinearLayout` to `Column`/`Row`, `FrameLayout` to `Box`, `TextView` to `Text`).
-* Translate layout parameters, margins, and padding into Compose `Modifier` equivalents.
-* Bind the Composable parameters to the UI component properties.
+### 4. Phase 1: Hybrid Migration (AndroidView)
+* Create a new Composable function for the screen (e.g., `[ScreenName]Screen.kt`).
+* Use `AndroidView` to wrap the existing XML layout via ViewBinding.
+* This allows you to integrate the screen into the Compose hierarchy immediately without rewriting the entire UI.
+* Bind the existing ViewBinding logic to the `AndroidView` lifecycle.
 
-### 5. Replace Usage via Interoperability
+### 5. Phase 2: Full Compose Migration
+* Incrementally replace components within the `AndroidView` with pure Compose equivalents.
+* Start with simpler components (Buttons, TextViews) and move to complex ones (RecyclerViews, Custom Views).
+* Translate the XML view hierarchy into Compose equivalents (e.g., `LinearLayout` to `Column`/`Row`, `FrameLayout` to `Box`).
+* Ensure state and event handling are migrated to the Composable parameters.
+
+### 6. Replace Usage via Interoperability
 * In the target Activity/Fragment, locate `setContentView` or ViewBinding setup.
 * Replace the root layout inflation with a `ComposeView` block (or `setContent` for Activities).
-* Invoke the new top-level Composable and map state variables to its inputs, and existing action handlers to its lambda parameters.
+* Invoke the new top-level Composable.
 * When mapping Fragment/Activity state into Compose, avoid `!!`. Fragment views can be recreated and callbacks can be detached, so use nullable-safe access and lifecycle-aware guards.
 
-### 6. Validate Parity
+### 7. Validate Parity
 * Run the app and visually inspect the migrated screen against the baseline.
 * Verify all interactions, animations, and inputs trigger the original logic correctly.
 * Search the migrated files for `!!` and remove any usage before opening the PR:
   `grep -R "!!" app/src/main/java`
 * Run existing tests.
 
-### 7. Clean Up
+### 8. Clean Up
 * Remove the old ViewBinding initialization if no longer needed.
 * Delete the target XML layout *only if* it has zero remaining usages in the codebase.
 * Remove references to unused view IDs.
