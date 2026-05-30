@@ -1,4 +1,4 @@
-package ca.gainzassist.activities.start_workout
+package ca.gainzassist.activities.start_workout.components
 
 import android.content.Context
 import android.graphics.Canvas
@@ -8,7 +8,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import ca.gainzassist.R
-import java.util.*
+import java.util.Locale
 
 class EquipmentView @JvmOverloads constructor(
     context: Context,
@@ -57,7 +57,7 @@ class EquipmentView @JvmOverloads constructor(
 
             for (j in numWeights.indices) {
                 if (numWeights[j] > 0) {
-                    text = String.format(Locale.getDefault(), "%dx%.1flbs", numWeights[j], WEIGHTS[j].toFloat() / 10f)
+                    text = String.Companion.format(Locale.getDefault(), "%dx%.1flbs", numWeights[j], WEIGHTS[j].toFloat() / 10f)
                     canvas.drawText(text!!, width.toFloat() - text!!.length * 20f, i.toFloat(), paint)
                     i += textSpacing
                 }
@@ -87,13 +87,27 @@ class EquipmentView @JvmOverloads constructor(
                     }
                     val r = (WEIGHTS[j] / 10) * diam45 / 45 + (45 - (WEIGHTS[j] / 10))
                     startY = 20 + (diam45 - r) / 2
-                    plates!!.add(RectF(startX.toFloat(), startY.toFloat(), (startX + PLATE_WIDTH).toFloat(), (startY + r).toFloat()))
+                    plates!!.add(
+                        RectF(
+                            startX.toFloat(),
+                            startY.toFloat(),
+                            (startX + PLATE_WIDTH).toFloat(),
+                            (startY + r).toFloat()
+                        )
+                    )
                     startX += PLATE_WIDTH + 5
                 }
                 newWeight -= WEIGHTS[j] * numWeights[j]
             }
             val center = this.viewHeight / 2 - PLATE_WIDTH / 2
-            plates!!.add(RectF(0f, center.toFloat(), (startX + 30).toFloat(), (center + PLATE_WIDTH).toFloat()))
+            plates!!.add(
+                RectF(
+                    0f,
+                    center.toFloat(),
+                    (startX + 30).toFloat(),
+                    (center + PLATE_WIDTH).toFloat()
+                )
+            )
         } else {
             this.weight = weight
         }

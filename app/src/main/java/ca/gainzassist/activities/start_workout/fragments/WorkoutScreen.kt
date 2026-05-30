@@ -1,26 +1,32 @@
 package ca.gainzassist.activities.start_workout.fragments
 
-import androidx.lifecycle.ViewModelProvider
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.core.util.size
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import ca.gainzassist.R
 import ca.gainzassist.activities.start_workout.CurrWorkout
-import ca.gainzassist.activities.start_workout.EquipmentView
 import ca.gainzassist.activities.start_workout.StartWorkout
 import ca.gainzassist.adapters.SingleItemAdapter
 import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.*
+import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL
+import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SELECTED
+import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS
+import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.UNSELECTED
 import ca.gainzassist.constants.ExerciseConst.MIN_REPS
 import ca.gainzassist.constants.UIConst.PROGRESS_CODE_MAP
 import ca.gainzassist.constants.UIConst.PROGRESS_STATUS_MAP
@@ -35,7 +41,7 @@ import ca.gainzassist.util.Preferences
 import ca.gainzassist.util.UI.getTextInt
 import ca.gainzassist.util.UI.handleFocusLeft
 import com.orhanobut.logger.Logger
-import java.util.*
+import java.util.Locale
 
 class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.ItemClickObserver {
 
@@ -71,7 +77,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentWorkoutScreenBinding.inflate(inflater, container, false)
 
         setNum = "%s " + getString(R.string.set_num)
@@ -240,13 +246,13 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         val setMap = HashMap<String, Int?>()
 
         exProgress?.let {
-            for (i in 0 until it.size()) {
+            for (i in 0 until it.size) {
                 exMap[i.toString()] = PROGRESS_CODE_MAP[it.get(i)]
             }
         }
 
         setProgress?.let {
-            for (i in 0 until it.size()) {
+            for (i in 0 until it.size) {
                 setMap[i.toString()] = PROGRESS_CODE_MAP[it.get(i)]
             }
         }
@@ -273,7 +279,8 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                 val seconds = currTime / 1000
                 val minutes = seconds / 60
                 val remainingSeconds = seconds % 60
-                val time = "$minutes:" + String.format(Locale.getDefault(), "%02d", remainingSeconds)
+                val time =
+                    "$minutes:" + String.format(Locale.getDefault(), "%02d", remainingSeconds)
                 binding.tvTimer.text = time
             }
 
@@ -303,7 +310,13 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         progressStatus: SparseArray<PROGRESS_STATUS>,
         setClickListener: Boolean
     ): SingleItemAdapter {
-        val adapter = SingleItemAdapter(act, numItems, R.layout.part_text_view_progress, R.id.tv_progress, progressStatus)
+        val adapter = SingleItemAdapter(
+            act,
+            numItems,
+            R.layout.part_text_view_progress,
+            R.id.tv_progress,
+            progressStatus
+        )
         rv.adapter = adapter
         if (setClickListener) {
             adapter.setItemClickObserver(this)
@@ -311,7 +324,11 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         return adapter
     }
 
-    private fun setupProgress(numItems: Int, itemInd: Int, setType: SetsType?): SparseArray<PROGRESS_STATUS> {
+    private fun setupProgress(
+        numItems: Int,
+        itemInd: Int,
+        setType: SetsType?
+    ): SparseArray<PROGRESS_STATUS> {
         val progressStatus = SparseArray<PROGRESS_STATUS>()
         for (i in 0 until numItems) {
             progressStatus.put(i, UNSELECTED)
@@ -357,7 +374,8 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         binding.btnResumeWorkout.visibility = View.INVISIBLE
 
         setProgress?.let {
-            setAdapter = setupProgressAdapter(binding.rvExerciseSet, currWorkout.currNumSets, it, true)
+            setAdapter =
+                setupProgressAdapter(binding.rvExerciseSet, currWorkout.currNumSets, it, true)
         }
         exerciseAdapter?.setSelected(currWorkout.currExNum)
         binding.tvExerciseTitle.text = currWorkout.currExName
@@ -383,7 +401,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             if (a != null) {
                 val session = currWorkout.currSession
                 if (session != null) {
-                    ViewModelProvider(a).get(WorkoutViewModel::class.java)
+                    ViewModelProvider(a)[WorkoutViewModel::class.java]
                         .insertSession(session)
                 }
 
@@ -419,8 +437,22 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         }
 
         if (updateProgress) {
-            exerciseAdapter?.let { selectProgressAdapterPos(it, binding.rvExerciseNum, currWorkout.currExNum, currWorkout.exSuccess) }
-            setAdapter?.let { selectProgressAdapterPos(it, binding.rvExerciseSet, currWorkout.currSetNum, currWorkout.setSuccess) }
+            exerciseAdapter?.let {
+                selectProgressAdapterPos(
+                    it,
+                    binding.rvExerciseNum,
+                    currWorkout.currExNum,
+                    currWorkout.exSuccess
+                )
+            }
+            setAdapter?.let {
+                selectProgressAdapterPos(
+                    it,
+                    binding.rvExerciseSet,
+                    currWorkout.currSetNum,
+                    currWorkout.setSuccess
+                )
+            }
         } else {
             updateProgress = true
         }
@@ -437,7 +469,12 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         binding.equipView.post { binding.equipView.setup(weightVal, currWorkout.currEquip) }
     }
 
-    private fun selectProgressAdapterPos(adapter: SingleItemAdapter, rv: RecyclerView, pos: Int, success: Boolean) {
+    private fun selectProgressAdapterPos(
+        adapter: SingleItemAdapter,
+        rv: RecyclerView,
+        pos: Int,
+        success: Boolean
+    ) {
         adapter.setCurrItem(pos, success)
         rv.scrollToPosition(pos - 1)
     }
@@ -450,13 +487,18 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         if (ex != null) {
             val setStatus = SparseArray<PROGRESS_STATUS>()
             updateSetMode = true
-            if (binding.btnFinishSet.visibility == View.VISIBLE) {
+            if (binding.btnFinishSet.isVisible) {
                 binding.btnFinishSet.visibility = View.INVISIBLE
                 binding.btnUpdateSet.visibility = View.VISIBLE
                 binding.btnResumeWorkout.visibility = View.VISIBLE
             }
             if (currSet == null) {
-                currSet = ExerciseSet(ex, currWorkout.currSetNum, currWorkout.currReps, currWorkout.currWeight)
+                currSet = ExerciseSet(
+                    ex,
+                    currWorkout.currSetNum,
+                    currWorkout.currReps,
+                    currWorkout.currWeight
+                )
             }
             exerciseAdapter?.setSelected(ind)
             val setsToUpdate = ex.getFinishedSetsList()
@@ -467,7 +509,8 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                     setStatus.put(set.setNumber, FAIL)
                 }
             }
-            setAdapter = setupProgressAdapter(binding.rvExerciseSet, ex.getNumSets(), setStatus, true)
+            setAdapter =
+                setupProgressAdapter(binding.rvExerciseSet, ex.getNumSets(), setStatus, true)
             setAdapter?.setSelected(1)
             updateUI(ex, 0)
         }
