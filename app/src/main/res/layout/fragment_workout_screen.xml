@@ -94,7 +94,7 @@
 			android:layout_height="wrap_content"
 			android:layout_centerHorizontal="true"/>
 
-		<ca.gainzassist.activities.start_workout.EquipmentView
+		<ca.gainzassist.activities.start_workout.components.EquipmentView
 			android:id="@+id/equip_view"
 			android:layout_width="wrap_content"
 			android:layout_height="match_parent"
