@@ -33,7 +33,6 @@ import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.UNSELECTED
 import ca.gainzassist.constants.ExerciseConst.MIN_REPS
 import ca.gainzassist.constants.UIConst.PROGRESS_CODE_MAP
 import ca.gainzassist.constants.UIConst.PROGRESS_STATUS_MAP
-import ca.gainzassist.databinding.FragmentWorkoutScreenBinding
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Exercise.SetsType
 import ca.gainzassist.models.ExerciseSet
@@ -69,7 +68,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     private var updateProgress = true
     private var workoutFinished = false
 
-    private var binding: FragmentWorkoutScreenBinding? = null
+    private var bindings: WorkoutScreenSectionBindings? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -85,39 +84,43 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                WorkoutScreenScreen(
-                    onBindingReady = { inflatedBinding ->
-                        initializeLegacyBinding(inflatedBinding)
+                WorkoutScreenSectionedAndroidViewScreen(
+                    onBindingsReady = { inflatedBindings ->
+                        initializeLegacyBindings(inflatedBindings)
                     }
                 )
             }
         }
     }
 
-    private fun initializeLegacyBinding(inflatedBinding: FragmentWorkoutScreenBinding) {
-        binding = inflatedBinding
+    private fun initializeLegacyBindings(inflatedBindings: WorkoutScreenSectionBindings) {
+        bindings = inflatedBindings
 
         setNum = "%s " + getString(R.string.set_num)
 
-        setProgressLayoutManagers(inflatedBinding.rvExerciseSet)
-        setProgressLayoutManagers(inflatedBinding.rvExerciseNum)
+        setProgressLayoutManagers(inflatedBindings.progressHeader.rvExerciseSet)
+        setProgressLayoutManagers(inflatedBindings.progressHeader.rvExerciseNum)
 
-        inflatedBinding.rvExerciseSet.setHasFixedSize(true)
-        inflatedBinding.rvExerciseNum.setHasFixedSize(true)
+        inflatedBindings.progressHeader.rvExerciseSet.setHasFixedSize(true)
+        inflatedBindings.progressHeader.rvExerciseNum.setHasFixedSize(true)
 
-        setupListeners(inflatedBinding)
+        setupListeners(inflatedBindings)
 
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             refreshFromResume()
         }
     }
 
-    private fun setupListeners(binding: FragmentWorkoutScreenBinding) {
-        binding.partEtReps.etReps.addTextChangedListener(object : TextWatcher {
+    private fun setupListeners(bindings: WorkoutScreenSectionBindings) {
+        val repsBinding = bindings.repsWeightControls
+        val equipBinding = bindings.equipmentTimer
+        val footerBinding = bindings.footerControls
+
+        repsBinding.partEtReps.etReps.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (!binding.ibtnDecReps.isEnabled) {
-                    binding.ibtnDecReps.isEnabled = true
-                    binding.ibtnDecReps.visibility = View.VISIBLE
+                if (!repsBinding.ibtnDecReps.isEnabled) {
+                    repsBinding.ibtnDecReps.isEnabled = true
+                    repsBinding.ibtnDecReps.visibility = View.VISIBLE
                 }
             }
 
@@ -126,19 +129,19 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                 val reps = if (repStr.isNotEmpty()) repStr.toInt() else MIN_REPS
                 currWorkout.setCurrReps(reps, false)
                 if (currWorkout.isMinReps()) {
-                    binding.ibtnDecReps.isEnabled = false
-                    binding.ibtnDecReps.visibility = View.INVISIBLE
+                    repsBinding.ibtnDecReps.isEnabled = false
+                    repsBinding.ibtnDecReps.visibility = View.INVISIBLE
                 }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        binding.partEtWeight.etWeight.addTextChangedListener(object : TextWatcher {
+        repsBinding.partEtWeight.etWeight.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                if (!binding.ibtnDecWeight.isEnabled) {
-                    binding.ibtnDecWeight.isEnabled = true
-                    binding.ibtnDecWeight.visibility = View.VISIBLE
+                if (!repsBinding.ibtnDecWeight.isEnabled) {
+                    repsBinding.ibtnDecWeight.isEnabled = true
+                    repsBinding.ibtnDecWeight.visibility = View.VISIBLE
                 }
             }
 
@@ -146,14 +149,14 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                 val weightVal: Float
                 if (s.toString().isNotEmpty()) {
                     weightVal = s.toString().toFloat()
-                    binding.equipView.setup(weightVal, currWorkout.currEquip)
+                    equipBinding.equipView.setup(weightVal, currWorkout.currEquip)
                 } else {
                     weightVal = currWorkout.currMinWeight
                 }
                 currWorkout.setWeight(weightVal)
                 if (currWorkout.isMinWeight() || weightVal <= currWorkout.currMinWeight) {
-                    binding.ibtnDecWeight.isEnabled = false
-                    binding.ibtnDecWeight.visibility = View.INVISIBLE
+                    repsBinding.ibtnDecWeight.isEnabled = false
+                    repsBinding.ibtnDecWeight.visibility = View.INVISIBLE
                 }
             }
 
@@ -174,16 +177,16 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                 handleFocusLeft(v, min, res)
             }
         }
-        binding.partEtReps.etReps.onFocusChangeListener = focusChangeListener
-        binding.partEtWeight.etWeight.onFocusChangeListener = focusChangeListener
+        repsBinding.partEtReps.etReps.onFocusChangeListener = focusChangeListener
+        repsBinding.partEtWeight.etWeight.onFocusChangeListener = focusChangeListener
 
-        binding.tvTimer.setOnClickListener { changeTimerState() }
-        binding.ibtnIncReps.setOnClickListener { changeReps(it as ImageButton) }
-        binding.ibtnDecReps.setOnClickListener { changeReps(it as ImageButton) }
-        binding.ibtnIncWeight.setOnClickListener { changeWeight(it as ImageButton) }
-        binding.ibtnDecWeight.setOnClickListener { changeWeight(it as ImageButton) }
-        binding.btnResumeWorkout.setOnClickListener { resumeWorkout() }
-        binding.btnFinishSet.setOnClickListener { finishSet() }
+        equipBinding.tvTimer.setOnClickListener { changeTimerState() }
+        repsBinding.ibtnIncReps.setOnClickListener { changeReps(it as ImageButton) }
+        repsBinding.ibtnDecReps.setOnClickListener { changeReps(it as ImageButton) }
+        repsBinding.ibtnIncWeight.setOnClickListener { changeWeight(it as ImageButton) }
+        repsBinding.ibtnDecWeight.setOnClickListener { changeWeight(it as ImageButton) }
+        footerBinding.btnResumeWorkout.setOnClickListener { resumeWorkout() }
+        footerBinding.btnFinishSet.setOnClickListener { finishSet() }
     }
 
     private fun setProgressLayoutManagers(rv: RecyclerView): LinearLayoutManager {
@@ -195,7 +198,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
     override fun onResume() {
         super.onResume()
-        if (binding == null) return
+        if (bindings == null) return
         refreshFromResume()
     }
 
@@ -230,12 +233,12 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     fun updateProgressExs(numExs: Int) {
-        val binding = binding ?: return
+        val header = bindings?.progressHeader ?: return
         if (exProgress == null) {
             exProgress = setupProgress(numExs, currWorkout.currExNum, null)
         }
         exProgress?.let {
-            exerciseAdapter = setupProgressAdapter(binding.rvExerciseNum, numExs, it, false)
+            exerciseAdapter = setupProgressAdapter(header.rvExerciseNum, numExs, it, false)
             exerciseAdapter?.setItemClickObserver(object : SingleItemAdapter.ItemClickObserver {
                 override fun onItemClick(view: View?) {
                     view?.let { v -> exerciseItemClick(v) }
@@ -247,7 +250,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     fun updateProgSets(numSets: Int) {
-        val binding = binding ?: return
+        val header = bindings?.progressHeader ?: return
         if (setProgress == null) {
             setProgress = setupProgress(numSets, currWorkout.currSetNum, null)
             updateProgress = true
@@ -255,7 +258,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             updateProgress = false
         }
         setProgress?.let {
-            setAdapter = setupProgressAdapter(binding.rvExerciseSet, numSets, it, true)
+            setAdapter = setupProgressAdapter(header.rvExerciseSet, numSets, it, true)
         }
     }
 
@@ -268,7 +271,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     override fun onDestroyView() {
-        binding = null
+        bindings = null
         super.onDestroyView()
     }
 
@@ -307,28 +310,28 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     private fun getCountDownTimer(milliseconds: Long): CountDownTimer {
         return object : CountDownTimer(milliseconds, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                val binding = binding ?: return
+                val timerBinding = bindings?.equipmentTimer ?: return
                 currTime = millisUntilFinished
                 val seconds = currTime / 1000
                 val minutes = seconds / 60
                 val remainingSeconds = seconds % 60
                 val time =
                     "$minutes:" + String.format(Locale.getDefault(), "%02d", remainingSeconds)
-                binding.tvTimer.text = time
+                timerBinding.tvTimer.text = time
             }
 
             override fun onFinish() {
-                val binding = binding ?: return
-                binding.tvTimer.setText(R.string.start_next_set)
+                val timerBinding = bindings?.equipmentTimer ?: return
+                timerBinding.tvTimer.setText(R.string.start_next_set)
                 cancel()
             }
         }
     }
 
     override fun updateProgressSets(numSets: Int) {
-        val binding = binding ?: return
+        val header = bindings?.progressHeader ?: return
         setAdapter = setupProgressAdapter(
-            binding.rvExerciseSet,
+            header.rvExerciseSet,
             numSets,
             setupProgress(
                 numSets,
@@ -403,22 +406,27 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     fun resumeWorkout() {
-        val binding = binding ?: return
+        val currentBindings = bindings ?: return
+        val footer = currentBindings.footerControls
+        val header = currentBindings.progressHeader
+        val reps = currentBindings.repsWeightControls
+        val equip = currentBindings.equipmentTimer
+
         updateSetMode = false
-        binding.btnFinishSet.visibility = View.VISIBLE
-        binding.btnUpdateSet.visibility = View.INVISIBLE
-        binding.btnResumeWorkout.visibility = View.INVISIBLE
+        footer.btnFinishSet.visibility = View.VISIBLE
+        footer.btnUpdateSet.visibility = View.INVISIBLE
+        footer.btnResumeWorkout.visibility = View.INVISIBLE
 
         setProgress?.let {
             setAdapter =
-                setupProgressAdapter(binding.rvExerciseSet, currWorkout.currNumSets, it, true)
+                setupProgressAdapter(header.rvExerciseSet, currWorkout.currNumSets, it, true)
         }
         exerciseAdapter?.setSelected(currWorkout.currExNum)
-        binding.tvExerciseTitle.text = currWorkout.currExName
+        header.tvExerciseTitle.text = currWorkout.currExName
         currSet?.let {
-            binding.equipView.setup(it.weight, currWorkout.currEquip)
-            binding.partEtReps.etReps.setText(it.reps.toString())
-            binding.partEtWeight.etWeight.setText(it.weight.toString())
+            equip.equipView.setup(it.weight, currWorkout.currEquip)
+            reps.partEtReps.etReps.setText(it.reps.toString())
+            reps.partEtWeight.etWeight.setText(it.weight.toString())
         }
         updateUI()
         currSet = null
@@ -452,7 +460,9 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     fun updateUI() {
-        val binding = binding ?: return
+        val currentBindings = bindings ?: return
+        val header = currentBindings.progressHeader
+
         val setType = if (currWorkout.getIsWarmup()) {
             countDownTimer?.onFinish()
             countDownTimer = null
@@ -468,16 +478,16 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             setWeight()
         }
 
-        binding.tvExerciseTitle.text = currWorkout.currExName
+        header.tvExerciseTitle.text = currWorkout.currExName
         setNum?.let {
-            binding.tvSetNum.text = String.format(it, setType)
+            header.tvSetNum.text = String.format(it, setType)
         }
 
         if (updateProgress) {
             exerciseAdapter?.let {
                 selectProgressAdapterPos(
                     it,
-                    binding.rvExerciseNum,
+                    header.rvExerciseNum,
                     currWorkout.currExNum,
                     currWorkout.exSuccess
                 )
@@ -485,7 +495,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             setAdapter?.let {
                 selectProgressAdapterPos(
                     it,
-                    binding.rvExerciseSet,
+                    header.rvExerciseSet,
                     currWorkout.currSetNum,
                     currWorkout.setSuccess
                 )
@@ -497,15 +507,16 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     private fun setReps() {
-        val binding = binding ?: return
-        binding.partEtReps.etReps.setText(currWorkout.currReps.toString())
+        val reps = bindings?.repsWeightControls ?: return
+        reps.partEtReps.etReps.setText(currWorkout.currReps.toString())
     }
 
     fun setWeight() {
-        val binding = binding ?: return
+        val reps = bindings?.repsWeightControls ?: return
+        val equip = bindings?.equipmentTimer ?: return
         weightVal = currWorkout.currWeight
-        binding.partEtWeight.etWeight.setText(weightVal.toString())
-        binding.equipView.post { binding.equipView.setup(weightVal, currWorkout.currEquip) }
+        reps.partEtWeight.etWeight.setText(weightVal.toString())
+        equip.equipView.post { equip.equipView.setup(weightVal, currWorkout.currEquip) }
     }
 
     private fun selectProgressAdapterPos(
@@ -519,7 +530,10 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     private fun exerciseItemClick(view: View) {
-        val binding = binding ?: return
+        val currentBindings = bindings ?: return
+        val footer = currentBindings.footerControls
+        val header = currentBindings.progressHeader
+
         val ind = getTextInt(view as TextView)
         updateEx = currWorkout.getSessionExercise(ind)
         val ex = updateEx
@@ -527,10 +541,10 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
         if (ex != null) {
             val setStatus = SparseArray<PROGRESS_STATUS>()
             updateSetMode = true
-            if (binding.btnFinishSet.isVisible) {
-                binding.btnFinishSet.visibility = View.INVISIBLE
-                binding.btnUpdateSet.visibility = View.VISIBLE
-                binding.btnResumeWorkout.visibility = View.VISIBLE
+            if (footer.btnFinishSet.isVisible) {
+                footer.btnFinishSet.visibility = View.INVISIBLE
+                footer.btnUpdateSet.visibility = View.VISIBLE
+                footer.btnResumeWorkout.visibility = View.VISIBLE
             }
             if (currSet == null) {
                 currSet = ExerciseSet(
@@ -550,14 +564,14 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
                 }
             }
             setAdapter =
-                setupProgressAdapter(binding.rvExerciseSet, ex.getNumSets(), setStatus, true)
+                setupProgressAdapter(header.rvExerciseSet, ex.getNumSets(), setStatus, true)
             setAdapter?.setSelected(1)
             updateUI(ex, 0)
         }
     }
 
     override fun onItemClick(view: View?) {
-        binding ?: return
+        if (bindings == null) return
         val ind = getTextInt(view as TextView)
         if (updateSetMode || (!currWorkout.getIsWarmup() && ind < currWorkout.currSetNum)) {
             saveProgressMap()
@@ -567,20 +581,24 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     private fun updateUI(updateEx: Exercise, setInd: Int) {
-        val binding = binding ?: return
+        val currentBindings = bindings ?: return
+        val header = currentBindings.progressHeader
+        val equip = currentBindings.equipmentTimer
+        val reps = currentBindings.repsWeightControls
+
         val setList = updateEx.getFinishedSetsList()
         if (setInd >= 0 && setInd < setList.size) {
             val set = setList[setInd]
-            binding.tvExerciseTitle.text = updateEx.name
+            header.tvExerciseTitle.text = updateEx.name
             setNum?.let {
-                binding.tvSetNum.text = String.format(it, "Main")
+                header.tvSetNum.text = String.format(it, "Main")
             }
             updateEx.equipment?.let {
-                binding.equipView.setup(set.weight, it)
+                equip.equipView.setup(set.weight, it)
             }
-            binding.tvTimer.setText(R.string.update_set)
-            binding.partEtReps.etReps.setText(set.reps.toString())
-            binding.partEtWeight.etWeight.setText(set.weight.toString())
+            equip.tvTimer.setText(R.string.update_set)
+            reps.partEtReps.etReps.setText(set.reps.toString())
+            reps.partEtWeight.etWeight.setText(set.weight.toString())
         }
     }
 
