@@ -1,8 +1,19 @@
 package ca.gainzassist.activities.start_workout
 
-import android.util.SparseArray
+import ca.gainzassist.constants.ExerciseConst.BARBELL
+import ca.gainzassist.constants.ExerciseConst.EXERCISES
+import ca.gainzassist.constants.ExerciseConst.EXERCISE_INDEX
+import ca.gainzassist.constants.ExerciseConst.HEAVY_REST_TIME
+import ca.gainzassist.constants.ExerciseConst.LIGHT_REST_TIME
+import ca.gainzassist.constants.ExerciseConst.MIN_REPS
+import ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
+import ca.gainzassist.constants.ExerciseConst.REPS
+import ca.gainzassist.constants.ExerciseConst.SESSION
+import ca.gainzassist.constants.ExerciseConst.SET_INDEX
+import ca.gainzassist.constants.ExerciseConst.SET_LIST
+import ca.gainzassist.constants.ExerciseConst.WEIGHT
+import ca.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
 import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Exercise.SetsType
 import ca.gainzassist.models.Exercise.SetsType.MAIN_SET
 import ca.gainzassist.models.Exercise.SetsType.WARMUP_SET
 import ca.gainzassist.models.ExerciseSet
@@ -11,21 +22,9 @@ import ca.gainzassist.models.Workout
 import ca.gainzassist.util.Misc.enablePrettyMapper
 import ca.gainzassist.util.Misc.readValue
 import ca.gainzassist.util.Misc.writeValueAsString
-import ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
-import ca.gainzassist.constants.ExerciseConst.WEIGHT_CHANGE
-import ca.gainzassist.constants.ExerciseConst.EXERCISE_INDEX
-import ca.gainzassist.constants.ExerciseConst.SET_INDEX
-import ca.gainzassist.constants.ExerciseConst.SESSION
-import ca.gainzassist.constants.ExerciseConst.EXERCISES
-import ca.gainzassist.constants.ExerciseConst.SET_LIST
-import ca.gainzassist.constants.ExerciseConst.REPS
-import ca.gainzassist.constants.ExerciseConst.WEIGHT
-import ca.gainzassist.constants.ExerciseConst.BARBELL
-import ca.gainzassist.constants.ExerciseConst.MIN_REPS
-import ca.gainzassist.constants.ExerciseConst.HEAVY_REST_TIME
-import ca.gainzassist.constants.ExerciseConst.LIGHT_REST_TIME
 import com.orhanobut.logger.Logger
-import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 class CurrWorkout private constructor() {
 
@@ -39,8 +38,8 @@ class CurrWorkout private constructor() {
         private set
     private var currWeightChange = WEIGHT_CHANGE
 
-    private var set_i = -1
-    private var ex_i = -1
+    private var setIndex = -1
+    private var exIndex = -1
     
     var currReps = 0
         private set
@@ -94,8 +93,8 @@ class CurrWorkout private constructor() {
         this.currWorkout = workout
         this.currSession = Session(workout)
 
-        this.ex_i = map[EXERCISE_INDEX]?.toString()?.toInt() ?: 0
-        this.set_i = map[SET_INDEX]?.toString()?.toInt() ?: 0
+        this.exIndex = map[EXERCISE_INDEX]?.toString()?.toInt() ?: 0
+        this.setIndex = map[SET_INDEX]?.toString()?.toInt() ?: 0
 
         val sessionRestored = readValue(map[SESSION])
         val exsMap = readValue(sessionRestored[EXERCISES])
@@ -121,7 +120,7 @@ class CurrWorkout private constructor() {
         }
         genWarmups(workout.exercises)
         enablePrettyMapper()
-        Logger.d(writeValueAsString(this.currSession!!.sessionStateMap(ex_i, set_i)))
+        Logger.d(writeValueAsString(this.currSession!!.sessionStateMap(exIndex, setIndex)))
     }
 
     fun setCurrWorkout(workout: Workout) {
@@ -169,7 +168,7 @@ class CurrWorkout private constructor() {
         }
         setCurrWarmupExercises(warmups)
         setAllCurrExercises(allExs)
-        currMainInd = allExs[ex_i].exerciseNumber
+        currMainInd = allExs[exIndex].exerciseNumber
     }
 
     private fun genBBWarmups(ex: Exercise): ArrayList<ExerciseSet> {
@@ -219,7 +218,7 @@ class CurrWorkout private constructor() {
                 newWeight -= newWeight % weightChange
                 exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
                 newWeight += weightInc
-                reps = Math.max(reps / 2, 1)
+                reps = max(reps / 2, 1)
             } else {
                 newWeight -= weightInc
                 weightInc /= 2f
@@ -235,19 +234,19 @@ class CurrWorkout private constructor() {
         val minWeight = ex.minWeight
         val weightChange = ex.weightChange
         val weight = ex.getAvgWeight()
-        var newWeight = minWeight
+        var newWeight: Float
         val diff = weight - minWeight
 
         if (diff == 0f) {
             return exerciseSets
         }
 
-        var setsCount = Math.min(5, (diff / (weightChange * 2)).toInt())
+        var setsCount = min(5, (diff / (weightChange * 2)).toInt())
         setsCount += (weight / 100).toInt()
         val percInc = 0.91f / setsCount.toFloat()
         var perc = percInc
 
-        for (i in 0 until setsCount) {
+        repeat(setsCount) {
             newWeight = perc * weight
             newWeight -= newWeight % (weightChange * 2)
             if (newWeight >= 0.65f * weight) {
@@ -272,10 +271,10 @@ class CurrWorkout private constructor() {
 
     private fun setAllCurrExercises(allExercises: ArrayList<Exercise>) {
         this.currWorkout!!.exercises = allExercises
-        if (this.ex_i == -1) {
-            this.ex_i = 0
+        if (this.exIndex == -1) {
+            this.exIndex = 0
         }
-        setCurrExercise(this.currWorkout!!.getExerciseFromIndex(this.ex_i))
+        setCurrExercise(this.currWorkout!!.getExerciseFromIndex(this.exIndex))
     }
 
     var setSuccess = true
@@ -283,14 +282,21 @@ class CurrWorkout private constructor() {
     var lastExSuccess = true
 
     fun finishCurrSet(): Boolean {
-        this.set_i++
+        if (this.currReps >= this.currExercise!!.reps && this.currWeight >= this.currExercise!!.weight) {
+            setSuccess = true
+        } else {
+            setSuccess = false
+            exSuccess = false
+        }
+
+        this.setIndex++
         if (!isWarmup) {
             addCurrSet()
         }
         if (atEndOfSets()) {
             resetLocks()
-            this.set_i = 0
-            this.ex_i++
+            this.setIndex = 0
+            this.exIndex++
             if (!isWarmup) {
                 this.currSession!!.addExercise(this.currExercise!!)
             }
@@ -302,7 +308,7 @@ class CurrWorkout private constructor() {
                 if (isWarmup) {
                     exSuccess = true
                 }
-                setCurrExercise(this.currWorkout!!.getExerciseFromIndex(this.ex_i))
+                setCurrExercise(this.currWorkout!!.getExerciseFromIndex(this.exIndex))
             }
         } else {
             if (!isWarmup) {
@@ -313,19 +319,10 @@ class CurrWorkout private constructor() {
                     lockWeight = true
                 }
             }
-            if (this.currReps >= this.currExercise!!.reps && this.currWeight >= this.currExercise!!.weight) {
-                setSuccess = true
-            } else {
-                setSuccess = false
-                exSuccess = false
-            }
-            setCurrExerciseSet(this.currExercise!!.getSet(this.set_i))
+            setCurrExerciseSet(this.currExercise!!.getSet(this.setIndex))
         }
         return true
     }
-
-    val exerciseSuccess: Boolean
-        get() = lastExSuccess
 
     fun resetLocks() {
         lockReps = false
@@ -339,24 +336,19 @@ class CurrWorkout private constructor() {
     }
 
     fun atEndOfSets(): Boolean {
-        return this.set_i >= this.currExercise!!.getNumSets()
+        return this.setIndex >= this.currExercise!!.getNumSets()
     }
 
     private fun atEndOfExercises(): Boolean {
-        return this.ex_i >= this.currWorkout!!.numExercises
+        return this.exIndex >= this.currWorkout!!.numExercises
     }
 
-    var exInd: Int
-        get() = ex_i
-        set(ex_i) {
-            this.ex_i = ex_i
-        }
-
     private fun setCurrExercise(exercise: Exercise) {
-        if (this.set_i == -1) {
-            this.set_i = 0
+        if (this.setIndex == -1) {
+            this.setIndex = 0
         }
         this.currExercise = exercise
+        this.currMainInd = exercise.exerciseNumber
 
         val numSets = exercise.getNumSets()
 
@@ -366,14 +358,14 @@ class CurrWorkout private constructor() {
             )
         }
 
-        if (this.set_i >= numSets) {
-            this.set_i = 0
+        if (this.setIndex >= numSets) {
+            this.setIndex = 0
         }
 
         dataListener?.updateProgressSets(numSets)
         this.currMinWeight = exercise.minWeight
         this.currWeightChange = exercise.weightChange
-        setCurrExerciseSet(this.currExercise!!.getSet(this.set_i))
+        setCurrExerciseSet(this.currExercise!!.getSet(this.setIndex))
     }
 
     private fun setCurrExerciseSet(exerciseSet: ExerciseSet) {
@@ -383,9 +375,6 @@ class CurrWorkout private constructor() {
     }
 
     fun getIsWarmup(): Boolean = isWarmup
-
-    val warmups: ArrayList<Exercise>?
-        get() = currWarmups
 
     val workoutName: String
         get() = currWorkout!!.name!!
@@ -413,7 +402,7 @@ class CurrWorkout private constructor() {
         get() = currExercise!!.getNumSets()
 
     val currSetNum: Int
-        get() = set_i + 1
+        get() = setIndex + 1
 
     fun incReps() {
         setCurrReps(++this.currReps, false)
@@ -455,7 +444,7 @@ class CurrWorkout private constructor() {
     }
 
     fun decWeight() {
-        setWeight(Math.max(this.currMinWeight, this.currWeight - this.currWeightChange))
+        setWeight(max(this.currMinWeight, this.currWeight - this.currWeightChange))
     }
 
     fun setWeight(weight: Float) {
@@ -470,8 +459,8 @@ class CurrWorkout private constructor() {
         get() = WARMUP_SET == currExercise!!.setsType
 
     fun resetIndices() {
-        this.ex_i = -1
-        this.set_i = -1
+        this.exIndex = -1
+        this.setIndex = -1
         this.currMainInd = 0
         this.retrievedWorkout = null
     }
@@ -484,24 +473,21 @@ class CurrWorkout private constructor() {
         enablePrettyMapper()
         val jsonStr = writeValueAsString(
             this.currSession!!.sessionStateMap(
-                ex_i,
-                set_i
+                exIndex,
+                setIndex
             )
         )
         Logger.d("leave$jsonStr")
         return jsonStr
     }
 
-    fun getSessionExercise(ex_i: Int): Exercise? {
+    fun getSessionExercise(exIndex: Int): Exercise? {
         var exercise: Exercise? = null
-        if (ex_i < currExNum) {
-            exercise = this.currSession!!.sessionExs[ex_i - 1]
+        if (exIndex < currExNum) {
+            exercise = this.currSession!!.sessionExs[exIndex - 1]
         }
         return exercise
     }
-
-    val currExType: SetsType
-        get() = currExercise!!.setsType
 
     fun unsetTimer() {
         timerSet = false

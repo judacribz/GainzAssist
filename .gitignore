@@ -60,3 +60,6 @@ freeline_project_description.json
 keystore.properties
 *.keystore
 *.jks
+
+# Kotlin compiler files
+.kotlin
