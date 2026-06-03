@@ -489,6 +489,9 @@ class CurrWorkout private constructor() {
         return exercise
     }
 
+    val currExType: Exercise.SetsType?
+        get() = currExercise?.setsType
+
     fun unsetTimer() {
         timerSet = false
     }

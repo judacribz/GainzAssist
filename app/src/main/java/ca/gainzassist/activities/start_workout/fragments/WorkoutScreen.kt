@@ -118,7 +118,6 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
     }
 
     private fun setupSectionListeners(bindings: WorkoutScreenSectionBindings) {
-        val progress = bindings.progressHeader
         val equipmentTimer = bindings.equipmentTimer
         val repsWeight = bindings.repsWeightControls
         val footer = bindings.footerControls
@@ -444,7 +443,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
             setupProgress(
                 numSets,
                 currWorkout.currSetNum,
-                null
+                currWorkout.currExType
             ).also { setProgress = it },
             true
         )
@@ -631,7 +630,8 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
     private fun exerciseItemClick(view: View) {
         val bindings = sectionBindings ?: return
-        val ind = getTextInt(view as TextView)
+        val textView = view as? TextView ?: return
+        val ind = getTextInt(textView)
         updateEx = currWorkout.getSessionExercise(ind)
         val ex = updateEx
         Logger.d("OHH $ind")
@@ -669,7 +669,8 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener, SingleItemAdapter.It
 
     override fun onItemClick(view: View?) {
         sectionBindings ?: return
-        val ind = getTextInt(view as TextView)
+        val textView = view as? TextView ?: return
+        val ind = getTextInt(textView)
         if (updateSetMode || (!currWorkout.getIsWarmup() && ind < currWorkout.currSetNum)) {
             saveProgressMap()
             setAdapter?.setSelected(ind)
