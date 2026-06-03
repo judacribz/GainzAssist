@@ -282,7 +282,9 @@ class CurrWorkout private constructor() {
     var lastExSuccess = true
 
     fun finishCurrSet(): Boolean {
-        if (this.currReps >= this.currExercise!!.reps && this.currWeight >= this.currExercise!!.weight) {
+        if (isWarmup) {
+            setSuccess = true
+        } else if (this.currReps >= this.currExercise!!.reps && this.currWeight >= this.currExercise!!.weight) {
             setSuccess = true
         } else {
             setSuccess = false
@@ -488,9 +490,6 @@ class CurrWorkout private constructor() {
         }
         return exercise
     }
-
-    val currExType: Exercise.SetsType?
-        get() = currExercise?.setsType
 
     fun unsetTimer() {
         timerSet = false

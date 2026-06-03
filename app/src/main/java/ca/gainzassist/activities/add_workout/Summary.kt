@@ -202,7 +202,7 @@ class Summary : AppCompatActivity() {
                 },
                 onDecrementWeight = {
                     val current = weight.toFloatOrNull() ?: minWeight
-                    weight = Math.max(current - MIN_FLOAT, minWeight).toString()
+                    weight =max(current - MIN_FLOAT, minWeight).toString()
                 },
                 onIncrementReps = {
                     val current = reps.toIntOrNull() ?: MIN_INT
@@ -210,7 +210,7 @@ class Summary : AppCompatActivity() {
                 },
                 onDecrementReps = {
                     val current = reps.toIntOrNull() ?: MIN_INT
-                    reps = Math.max(current - MIN_INT, MIN_INT).toString()
+                    reps =max(current - MIN_INT, MIN_INT).toString()
                 },
                 onIncrementSets = {
                     val current = sets.toIntOrNull() ?: MIN_INT
@@ -218,7 +218,7 @@ class Summary : AppCompatActivity() {
                 },
                 onDecrementSets = {
                     val current = sets.toIntOrNull() ?: MIN_INT
-                    sets = Math.max(current - MIN_INT, MIN_INT).toString()
+                    sets =max(current - MIN_INT, MIN_INT).toString()
                 },
                 onClearExercise = {
                     exerciseName = ""

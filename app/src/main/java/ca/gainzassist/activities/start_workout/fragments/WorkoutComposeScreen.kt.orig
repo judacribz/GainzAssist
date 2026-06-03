@@ -1,0 +1,664 @@
+package ca.gainzassist.activities.start_workout.fragments
+
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import ca.gainzassist.R
+import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS
+import java.util.Locale
+import kotlin.math.max
+
+data class WorkoutUiState(
+    val exerciseTitle: String = "",
+    val setNumText: String = "",
+    val exerciseProgress: List<WorkoutProgressUiItem> = emptyList(),
+    val setProgress: List<WorkoutProgressUiItem> = emptyList(),
+    val timerText: String = "",
+    val repsText: String = "",
+    val weightText: String = "",
+    val currentWeight: Float = 0f,
+    val currentEquipment: String = "",
+    val isMinReps: Boolean = false,
+    val isMinWeight: Boolean = false,
+    val isFinishSetVisible: Boolean = true,
+    val isUpdateSetVisible: Boolean = false,
+    val isResumeWorkoutVisible: Boolean = false
+)
+
+data class WorkoutProgressUiItem(
+    val number: Int,
+    val status: PROGRESS_STATUS
+)
+
+data class WorkoutUiActions(
+    val onTimerClick: () -> Unit = {},
+    val onRepsChanged: (String) -> Unit = {},
+    val onWeightChanged: (String) -> Unit = {},
+    val onRepsFocusLost: () -> Unit = {},
+    val onWeightFocusLost: () -> Unit = {},
+    val onIncreaseReps: () -> Unit = {},
+    val onDecreaseReps: () -> Unit = {},
+    val onIncreaseWeight: () -> Unit = {},
+    val onDecreaseWeight: () -> Unit = {},
+    val onFinishSet: () -> Unit = {},
+    val onResumeWorkout: () -> Unit = {},
+    val onUpdateSet: () -> Unit = {},
+    val onExerciseProgressClick: (Int) -> Unit = {},
+    val onSetProgressClick: (Int) -> Unit = {}
+)
+
+@Composable
+fun WorkoutComposeScreen(
+    uiState: WorkoutUiState,
+    actions: WorkoutUiActions,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(3.dp)
+            .background(Color.White)
+    ) {
+        WorkoutProgressHeader(
+            title = uiState.exerciseTitle,
+            setNumText = uiState.setNumText,
+            exerciseProgress = uiState.exerciseProgress,
+            setProgress = uiState.setProgress,
+            onExerciseClick = actions.onExerciseProgressClick,
+            onSetClick = actions.onSetProgressClick,
+            modifier = Modifier.weight(5f)
+        )
+        WorkoutEquipmentTimer(
+            weight = uiState.currentWeight,
+            equipment = uiState.currentEquipment,
+            timerText = uiState.timerText,
+            onTimerClick = actions.onTimerClick,
+            modifier = Modifier.weight(4f)
+        )
+        WorkoutRepsWeightControls(
+            repsText = uiState.repsText,
+            weightText = uiState.weightText,
+            isMinReps = uiState.isMinReps,
+            isMinWeight = uiState.isMinWeight,
+            onRepsChanged = actions.onRepsChanged,
+            onWeightChanged = actions.onWeightChanged,
+            onRepsFocusLost = actions.onRepsFocusLost,
+            onWeightFocusLost = actions.onWeightFocusLost,
+            onIncreaseReps = actions.onIncreaseReps,
+            onDecreaseReps = actions.onDecreaseReps,
+            onIncreaseWeight = actions.onIncreaseWeight,
+            onDecreaseWeight = actions.onDecreaseWeight,
+            modifier = Modifier.weight(3f)
+        )
+        WorkoutFooterControls(
+            isFinishSetVisible = uiState.isFinishSetVisible,
+            isUpdateSetVisible = uiState.isUpdateSetVisible,
+            isResumeWorkoutVisible = uiState.isResumeWorkoutVisible,
+            onFinishSet = actions.onFinishSet,
+            onUpdateSet = actions.onUpdateSet,
+            onResumeWorkout = actions.onResumeWorkout,
+            modifier = Modifier.weight(2f)
+        )
+    }
+}
+
+@Composable
+fun WorkoutProgressHeader(
+    title: String,
+    setNumText: String,
+    exerciseProgress: List<WorkoutProgressUiItem>,
+    setProgress: List<WorkoutProgressUiItem>,
+    onExerciseClick: (Int) -> Unit,
+    onSetClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val staatliches = FontFamily(Font(R.font.staatliches))
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "${stringResource(id = R.string.exercise)}: $title",
+            color = colorResource(id = R.color.colorAccent),
+            fontSize = 32.sp,
+            fontFamily = staatliches,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 10.dp)
+        )
+        WorkoutProgressRow(
+            items = exerciseProgress,
+            onClick = onExerciseClick,
+            modifier = Modifier.padding(vertical = 5.dp)
+        )
+        Text(
+            text = setNumText,
+            color = colorResource(id = R.color.colorAccent),
+            fontSize = 32.sp,
+            fontFamily = staatliches,
+            textAlign = TextAlign.Center
+        )
+        WorkoutProgressRow(
+            items = setProgress,
+            onClick = onSetClick,
+            modifier = Modifier.padding(vertical = 5.dp)
+        )
+    }
+}
+
+@Composable
+fun WorkoutProgressRow(
+    items: List<WorkoutProgressUiItem>,
+    onClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        itemsIndexed(items) { index, item ->
+            WorkoutProgressItem(
+                item = item,
+                onClick = { onClick(index) }
+            )
+        }
+    }
+}
+
+@Composable
+fun WorkoutProgressItem(
+    item: WorkoutProgressUiItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val bgColor = when (item.status) {
+        PROGRESS_STATUS.SUCCESS, PROGRESS_STATUS.SUCCESS_SELECTED -> colorResource(id = R.color.green)
+        PROGRESS_STATUS.FAIL, PROGRESS_STATUS.FAIL_SELECTED -> colorResource(id = R.color.red)
+        PROGRESS_STATUS.SELECTED -> colorResource(id = R.color.colorLightAccent)
+        else -> Color.Transparent
+    }
+    
+    val strokeColor = when (item.status) {
+        PROGRESS_STATUS.SELECTED, PROGRESS_STATUS.SUCCESS_SELECTED, PROGRESS_STATUS.FAIL_SELECTED -> Color.Black
+        else -> Color.Transparent
+    }
+
+    val unselectedBg = if (item.status == PROGRESS_STATUS.UNSELECTED) {
+        Modifier.background(
+            brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                colors = listOf(colorResource(id = R.color.colorLightAccent), colorResource(id = R.color.colorBg)),
+                radius = 60f
+            ),
+            shape = androidx.compose.foundation.shape.CircleShape
+        )
+    } else {
+        Modifier.background(
+            brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                colors = listOf(bgColor, bgColor.copy(alpha = 0f)),
+                radius = 60f
+            ),
+            shape = androidx.compose.foundation.shape.CircleShape
+        )
+    }
+    
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .padding(5.dp)
+            .size(35.dp)
+            .clickable(onClick = onClick)
+            .then(unselectedBg)
+            .border(
+                width = if (strokeColor != Color.Transparent) 1.dp else 0.dp,
+                color = strokeColor,
+                shape = androidx.compose.foundation.shape.CircleShape
+            )
+    ) {
+        Text(
+            text = item.number.toString(),
+            color = colorResource(id = R.color.colorBg),
+            fontSize = 18.sp,
+            fontFamily = FontFamily(Font(R.font.staatliches))
+        )
+    }
+}
+
+@Composable
+fun WorkoutEquipmentTimer(
+    weight: Float,
+    equipment: String,
+    timerText: String,
+    onTimerClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(5.dp)
+        ) {
+            WorkoutEquipmentCanvas(
+                weight = weight,
+                equipment = equipment,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(5.dp)
+                .border(width = 0.5.dp, color = Color.Black)
+                .clickable(onClick = onTimerClick),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = timerText,
+                color = colorResource(id = R.color.colorAccent),
+                fontSize = 50.sp,
+                fontFamily = FontFamily(Font(R.font.staatliches)),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun WorkoutEquipmentCanvas(
+    weight: Float,
+    equipment: String,
+    modifier: Modifier = Modifier
+) {
+    val barbellName = stringResource(id = R.string.barbell).lowercase(Locale.getDefault())
+    val eqLower = equipment.lowercase(Locale.getDefault())
+    
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+        
+        // Draw black border
+        drawRect(
+            color = Color.Black,
+            style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1f)
+        )
+        
+        if (eqLower == barbellName) {
+            var barbellWeight = (weight - 45f) / 2f
+            barbellWeight *= 10f
+            var startX = 10f
+            var newWeight = barbellWeight.toInt()
+            val diam45 = height - 40f
+            
+            val weights = intArrayOf(450, 250, 100, 50, 25)
+            val numWeights = IntArray(5)
+            val plateWidth = 40f
+            val textSpacing = height / 5f
+            var textY = textSpacing + 25f // TEXT_SIZE / 2
+            
+            for (j in weights.indices) {
+                numWeights[j] = newWeight / weights[j]
+                for (i in 0 until numWeights[j]) {
+                    if (j == 0 && i > 4) continue // Max 5 x 45 plates
+                    
+                    val r = (weights[j] / 10f) * diam45 / 45f + (45f - (weights[j] / 10f))
+                    val startY = 20f + (diam45 - r) / 2f
+                    
+                    drawRect(
+                        color = Color.Black,
+                        topLeft = androidx.compose.ui.geometry.Offset(startX, startY),
+                        size = androidx.compose.ui.geometry.Size(plateWidth, r)
+                    )
+                    startX += plateWidth + 5f
+                }
+                newWeight -= weights[j] * numWeights[j]
+            }
+            
+            val center = height / 2f - plateWidth / 2f
+            drawRect(
+                color = Color.Black,
+                topLeft = androidx.compose.ui.geometry.Offset(0f, center),
+                size = androidx.compose.ui.geometry.Size(startX + 30f, plateWidth)
+            )
+            
+            // Draw Text
+            val textPaint = android.graphics.Paint().apply {
+                color = android.graphics.Color.BLACK
+                textSize = 50f
+            }
+            
+            for (j in numWeights.indices) {
+                if (numWeights[j] > 0) {
+                    val label = String.format(Locale.getDefault(), "%dx%.1flbs", numWeights[j], weights[j].toFloat() / 10f)
+                    drawIntoCanvas { canvas ->
+                        canvas.nativeCanvas.drawText(
+                            label,
+                            width - label.length * 20f,
+                            textY,
+                            textPaint
+                        )
+                    }
+                    textY += textSpacing
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkoutRepsWeightControls(
+    repsText: String,
+    weightText: String,
+    isMinReps: Boolean,
+    isMinWeight: Boolean,
+    onRepsChanged: (String) -> Unit,
+    onWeightChanged: (String) -> Unit,
+    onRepsFocusLost: () -> Unit,
+    onWeightFocusLost: () -> Unit,
+    onIncreaseReps: () -> Unit,
+    onDecreaseReps: () -> Unit,
+    onIncreaseWeight: () -> Unit,
+    onDecreaseWeight: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        WorkoutNumberControl(
+            value = repsText,
+            onValueChanged = onRepsChanged,
+            onFocusLost = onRepsFocusLost,
+            onIncrease = onIncreaseReps,
+            onDecrease = onDecreaseReps,
+            isMin = isMinReps,
+            label = "Reps",
+            modifier = Modifier.weight(1f)
+        )
+        WorkoutNumberControl(
+            value = weightText,
+            onValueChanged = onWeightChanged,
+            onFocusLost = onWeightFocusLost,
+            onIncrease = onIncreaseWeight,
+            onDecrease = onDecreaseWeight,
+            isMin = isMinWeight,
+            label = "Lbs",
+            isDecimal = true,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+fun WorkoutNumberControl(
+    value: String,
+    onValueChanged: (String) -> Unit,
+    onFocusLost: () -> Unit,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    isMin: Boolean,
+    label: String,
+    isDecimal: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxHeight()
+            .padding(vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+            if (!isMin) {
+                IconButton(onClick = onDecrease) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_minus),
+                        contentDescription = "Decrease",
+                        tint = colorResource(id = R.color.colorAccent),
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+        }
+        
+        Box(
+            modifier = Modifier
+                .weight(2f)
+                .fillMaxHeight()
+                .padding(horizontal = 5.dp)
+                .background(Color.White)
+                .border(width = 1.dp, color = colorResource(id = R.color.colorAccent)),
+            contentAlignment = Alignment.Center
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = { newText ->
+                    if (isDecimal) {
+                        if (newText.length <= 7 && newText.count { it == '.' } <= 1) {
+                            onValueChanged(newText)
+                        }
+                    } else {
+                        if (newText.length <= 4 && newText.all { it.isDigit() }) {
+                            onValueChanged(newText)
+                        }
+                    }
+                },
+                textStyle = TextStyle(
+                    color = colorResource(id = R.color.colorAccent),
+                    fontSize = 35.sp,
+                    fontFamily = FontFamily(Font(R.font.staatliches)),
+                    textAlign = TextAlign.Center
+                ),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { state ->
+                        if (!state.isFocused) {
+                            onFocusLost()
+                        }
+                    }
+            )
+        }
+        
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+            IconButton(onClick = onIncrease) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_plus),
+                    contentDescription = "Increase",
+                    tint = colorResource(id = R.color.colorAccent),
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun WorkoutFooterControls(
+    isFinishSetVisible: Boolean,
+    isUpdateSetVisible: Boolean,
+    isResumeWorkoutVisible: Boolean,
+    onFinishSet: () -> Unit,
+    onUpdateSet: () -> Unit,
+    onResumeWorkout: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val staatliches = FontFamily(Font(R.font.staatliches))
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (isFinishSetVisible) {
+            ca.gainzassist.ui.components.GainzButton(
+                text = stringResource(id = R.string.finish_set),
+                onClick = onFinishSet,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(3.dp),
+                fontFamily = staatliches
+            )
+        } else {
+            if (isResumeWorkoutVisible) {
+                Button(
+                    onClick = onResumeWorkout,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.colorAccent)),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(5.dp)
+                ) {
+                    Text(
+                        text = "Resume Workout",
+                        color = colorResource(id = R.color.colorBg),
+                        fontSize = 32.sp,
+                        fontFamily = staatliches,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+            if (isUpdateSetVisible) {
+                Button(
+                    onClick = onUpdateSet,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.colorAccent)),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(5.dp)
+                ) {
+                    Text(
+                        text = "Update Set",
+                        color = colorResource(id = R.color.colorBg),
+                        fontSize = 32.sp,
+                        fontFamily = staatliches,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+}
+
+// Previews
+@Preview(showBackground = true)
+@Composable
+fun WorkoutComposeScreenPreview_Default() {
+    WorkoutComposeScreen(
+        uiState = WorkoutUiState(
+            exerciseTitle = "Bench Press",
+            setNumText = "Set 1 / 5",
+            exerciseProgress = listOf(
+                WorkoutProgressUiItem(1, PROGRESS_STATUS.SUCCESS),
+                WorkoutProgressUiItem(2, PROGRESS_STATUS.SELECTED),
+                WorkoutProgressUiItem(3, PROGRESS_STATUS.UNSELECTED)
+            ),
+            setProgress = listOf(
+                WorkoutProgressUiItem(1, PROGRESS_STATUS.SELECTED),
+                WorkoutProgressUiItem(2, PROGRESS_STATUS.UNSELECTED)
+            ),
+            timerText = "01:30",
+            repsText = "5",
+            weightText = "135.0",
+            currentWeight = 135f,
+            currentEquipment = "barbell",
+            isMinReps = false,
+            isMinWeight = false,
+            isFinishSetVisible = true
+        ),
+        actions = WorkoutUiActions()
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WorkoutComposeScreenPreview_UpdateMode() {
+    WorkoutComposeScreen(
+        uiState = WorkoutUiState(
+            exerciseTitle = "Squat",
+            setNumText = "Set 3 / 3",
+            exerciseProgress = listOf(
+                WorkoutProgressUiItem(1, PROGRESS_STATUS.SUCCESS)
+            ),
+            setProgress = listOf(
+                WorkoutProgressUiItem(1, PROGRESS_STATUS.SUCCESS),
+                WorkoutProgressUiItem(2, PROGRESS_STATUS.SUCCESS),
+                WorkoutProgressUiItem(3, PROGRESS_STATUS.SUCCESS_SELECTED)
+            ),
+            timerText = "00:00",
+            repsText = "5",
+            weightText = "225.0",
+            currentWeight = 225f,
+            currentEquipment = "barbell",
+            isMinReps = false,
+            isMinWeight = false,
+            isFinishSetVisible = false,
+            isUpdateSetVisible = true,
+            isResumeWorkoutVisible = true
+        ),
+        actions = WorkoutUiActions()
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WorkoutComposeScreenPreview_LargeWeight() {
+    WorkoutComposeScreen(
+        uiState = WorkoutUiState(
+            exerciseTitle = "Deadlift",
+            setNumText = "Set 1 / 1",
+            exerciseProgress = emptyList(),
+            setProgress = emptyList(),
+            timerText = "05:00",
+            repsText = "1",
+            weightText = "495.0",
+            currentWeight = 495f,
+            currentEquipment = "barbell",
+            isMinReps = false,
+            isMinWeight = false,
+            isFinishSetVisible = true
+        ),
+        actions = WorkoutUiActions()
+    )
+}
