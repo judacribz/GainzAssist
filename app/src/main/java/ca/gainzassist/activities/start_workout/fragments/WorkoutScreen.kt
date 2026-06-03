@@ -174,13 +174,13 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
 
         exProgress?.let {
             for (i in 0 until it.size) {
-                exMap[it.keyAt(i).toString()] = PROGRESS_CODE_MAP[it.valueAt(i)]
+                exMap[i.toString()] = PROGRESS_CODE_MAP[it.get(i)]
             }
         }
 
         setProgress?.let {
-        for (i in 0 until it.size) {
-                setMap[it.keyAt(i).toString()] = PROGRESS_CODE_MAP[it.valueAt(i)]
+            for (i in 0 until it.size) {
+                setMap[i.toString()] = PROGRESS_CODE_MAP[it.get(i)]
             }
         }
 
@@ -266,7 +266,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
     }
 
     private fun onRepsTextChanged(repStr: String) {
-        val reps = if (repStr.isNotEmpty()) repStr.toInt() else MIN_REPS
+        val reps = repStr.toIntOrNull() ?: MIN_REPS
         currWorkout.setCurrReps(reps, false)
         uiState = uiState.copy(
             repsText = repStr,
@@ -275,11 +275,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
     }
 
     private fun onWeightTextChanged(weightStr: String) {
-        val w: Float = if (weightStr.isNotEmpty()) {
-            weightStr.toFloat()
-        } else {
-            currWorkout.currMinWeight
-        }
+        val w = weightStr.toFloatOrNull() ?: currWorkout.currMinWeight
         currWorkout.setWeight(w)
         uiState = uiState.copy(
             weightText = weightStr,
