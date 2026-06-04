@@ -726,7 +726,6 @@ fun WorkoutComposeScreenPreview_UpdateMode() {
             isMinReps = false,
             isMinWeight = false,
             isFinishSetVisible = false,
-            isUpdateSetVisible = true,
             isResumeWorkoutVisible = true
         ),
         actions = WorkoutUiActions()

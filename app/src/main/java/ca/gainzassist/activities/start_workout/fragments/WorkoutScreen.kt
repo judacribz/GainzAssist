@@ -88,7 +88,6 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
                         onDecreaseWeight = ::decreaseWeight,
                         onFinishSet = ::finishSet,
                         onResumeWorkout = ::resumeWorkout,
-                        onUpdateSet = ::updateCurrentSet,
                         onExerciseProgressClick = ::exerciseItemClick,
                         onSetProgressClick = ::setProgressItemClick
                     )
@@ -299,10 +298,6 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
         }
     }
 
-    private fun updateCurrentSet() {
-        // Preserved empty logic from original XML view implementations
-    }
-
     fun resumeWorkout() {
         updateSetMode = false
         uiState = uiState.copy(
@@ -314,7 +309,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
         setProgress?.let {
             uiState = uiState.copy(setProgress = it.toProgressUiItems(currWorkout.currNumSets))
         }
-        
+
         exProgress?.selectOneBased(currWorkout.currExNum)
         uiState = uiState.copy(
             exerciseProgress = exProgress?.toProgressUiItems(currWorkout.currNumExs) ?: emptyList(),
