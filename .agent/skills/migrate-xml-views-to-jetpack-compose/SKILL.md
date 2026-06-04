@@ -56,3 +56,10 @@ This skill defines the canonical workflow for migrating an existing Android scre
 * Remove the old ViewBinding initialization if no longer needed.
 * Delete the target XML layout *only if* it has zero remaining usages in the codebase.
 * Remove references to unused view IDs.
+
+Kotlin style rules:
+- Use lowerCamelCase for Kotlin variables, properties, and functions.
+- Do not introduce underscore variable names like ex_i or set_i.
+- Preserve intentional Kotlin naming cleanup already present in the branch.
+- Prefer Kotlin stdlib helpers such as max, min, coerceAtLeast, coerceAtMost, and coerceIn instead of java.lang.Math.max/Math.min.
+- Do not revert existing Kotlin cleanup while fixing Compose migration issues.
