@@ -296,7 +296,7 @@ fun NumExercisesSection(
                                 onNumExercisesChanged(ExerciseConst.MIN_INT)
                             } else {
                                 val newValue = newValueStr.toInt()
-                                onNumExercisesChanged(Math.max(ExerciseConst.MIN_INT, newValue))
+                                onNumExercisesChanged(kotlin.math.max(ExerciseConst.MIN_INT, newValue))
                             }
                         },
                         textStyle = TextStyle(
