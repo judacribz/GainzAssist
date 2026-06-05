@@ -1,56 +1,21 @@
 package ca.gainzassist.adapters
 
-import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import ca.gainzassist.activities.add_workout.ExEntry
-import ca.gainzassist.activities.start_workout.fragments.ExercisesList
-import ca.gainzassist.activities.start_workout.fragments.WarmupsList
-import ca.gainzassist.activities.start_workout.fragments.WorkoutScreen
 import ca.gainzassist.models.Exercise
-import org.parceler.Parcels
-import java.util.*
 
 class WorkoutPagerAdapter : FragmentPagerAdapter {
 
-    private val FMTS = arrayListOf(
-        WarmupsList.getInstance(),
-        WorkoutScreen.getInstance(),
-        ExercisesList.getInstance()
-    )
-
-    private val FMTS_NO_WARMUPS = arrayListOf(
-        WorkoutScreen.getInstance(),
-        ExercisesList.getInstance()
-    )
-
-    private var fmts: ArrayList<Fragment> = FMTS
+    private var fmts: ArrayList<Fragment> = ArrayList()
     private var numExs = 0
     private var baseId = 0
-
-    constructor(fragmentManager: FragmentManager, vararg exercises: ArrayList<Exercise>) : super(fragmentManager) {
-        val bundle = Bundle()
-        bundle.putParcelable(EXTRA_MAIN_EXERCISES, Parcels.wrap(exercises[0]))
-        val warmups = exercises[1]
-        if (warmups.size > 0) {
-            bundle.putParcelable(EXTRA_WARMUPS, Parcels.wrap(warmups))
-        } else {
-            fmts = FMTS_NO_WARMUPS
-        }
-        for (fmt in fmts) {
-            fmt.arguments = bundle
-        }
-    }
 
     constructor(fragmentManager: FragmentManager, numExs: Int) : super(fragmentManager) {
         this.numExs = numExs
         fmts = ArrayList()
         newEntries()
-    }
-
-    constructor(fragmentManager: FragmentManager, fmts: List<Fragment>) : super(fragmentManager) {
-        this.fmts = fmts as ArrayList<Fragment>
     }
 
     override fun getCount(): Int {
@@ -110,11 +75,5 @@ class WorkoutPagerAdapter : FragmentPagerAdapter {
 
     fun hideDelete() {
         (fmts[0] as ExEntry).hideDelete()
-    }
-
-    companion object {
-        const val EXTRA_WARMUPS = "ca.gainzassist.activities.start_workout.EXTRA_WARMUPS"
-        const val EXTRA_MAIN_EXERCISES = "ca.gainzassist.activities.start_workout.EXTRA_MAIN_EXERCISES"
-        const val EXTRA_EX_INDEX = "ca.gainzassist.activities.start_workout.EXTRA_EX_INDEX"
     }
 }
