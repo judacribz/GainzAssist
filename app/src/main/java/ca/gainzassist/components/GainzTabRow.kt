@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ScrollableTabRow
@@ -79,7 +80,13 @@ fun GainzTabRow(
                 androidx.compose.material3.HorizontalDivider(color = Color.Black)
             }
         ) {
-            GainzTabItems(tabs, pagerState, coroutineScope, onTabClick)
+            GainzTabItems(
+                tabs = tabs,
+                pagerState = pagerState,
+                coroutineScope = coroutineScope,
+                onTabClick = onTabClick,
+                scrollable = true
+            )
         }
     } else {
         TabRow(
@@ -104,7 +111,13 @@ fun GainzTabRow(
                 androidx.compose.material3.HorizontalDivider(color = Color.Black)
             }
         ) {
-            GainzTabItems(tabs, pagerState, coroutineScope, onTabClick)
+            GainzTabItems(
+                tabs = tabs,
+                pagerState = pagerState,
+                coroutineScope = coroutineScope,
+                onTabClick = onTabClick,
+                scrollable = false
+            )
         }
     }
 }
@@ -149,7 +162,8 @@ private fun GainzTabItems(
     tabs: List<GainzTabItem>,
     pagerState: PagerState,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
-    onTabClick: ((Int) -> Unit)?
+    onTabClick: ((Int) -> Unit)?,
+    scrollable: Boolean
 ) {
     tabs.forEachIndexed { index, tab ->
         val pageOffset = ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction)
@@ -160,9 +174,19 @@ private fun GainzTabItems(
             distance
         )
 
+        val isPlusTab = tab.iconResId != null && tab.title.isBlank()
+        val tabWidthModifier = if (scrollable) {
+            if (isPlusTab) {
+                Modifier.wrapContentWidth(Alignment.Start).padding(start = 16.dp)
+            } else {
+                Modifier.wrapContentWidth()
+            }
+        } else {
+            Modifier.fillMaxWidth()
+        }
+
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = tabWidthModifier
                 .instantClickable {
                     if (onTabClick != null) {
                         onTabClick(index)
@@ -172,10 +196,10 @@ private fun GainzTabItems(
                         }
                     }
                 }
-                .padding(vertical = if (tab.iconResId != null) 8.dp else 14.dp),
+                .padding(vertical = if (tab.iconResId != null && tab.title.isNotBlank()) 8.dp else 14.dp),
             contentAlignment = Alignment.Center
         ) {
-            if (tab.iconResId != null) {
+            if (tab.iconResId != null && tab.title.isNotBlank()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         painter = painterResource(id = tab.iconResId),
@@ -192,6 +216,13 @@ private fun GainzTabItems(
                         fontWeight = if (distance < 0.5f) FontWeight.Bold else FontWeight.Normal
                     )
                 }
+            } else if (tab.iconResId != null && tab.title.isBlank()) {
+                Icon(
+                    painter = painterResource(id = tab.iconResId),
+                    contentDescription = "Add",
+                    tint = color,
+                    modifier = Modifier.size(16.dp)
+                )
             } else {
                 Text(
                     text = tab.title,

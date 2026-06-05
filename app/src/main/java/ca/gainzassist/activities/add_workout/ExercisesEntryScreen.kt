@@ -40,9 +40,12 @@ fun ExercisesEntryScreen(
     onTabSelected: (Int) -> Unit,
     pageContent: @Composable (Int) -> Unit
 ) {
+    val safeInitialPage = uiState.selectedIndex
+        .coerceIn(0, (uiState.numExercises - 1).coerceAtLeast(0))
+
     val pagerState = rememberPagerState(
-        initialPage = uiState.selectedIndex.takeIf { it >= 0 } ?: 0,
-        pageCount = { uiState.tabs.size } // Note: we sync page count to total tabs, including the Add Tab
+        initialPage = safeInitialPage,
+        pageCount = { uiState.numExercises }
     )
 
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
@@ -53,10 +56,11 @@ fun ExercisesEntryScreen(
         }
     }
 
-    LaunchedEffect(uiState.selectedIndex, uiState.tabs.size) {
-        if (uiState.selectedIndex >= 0 && uiState.selectedIndex < uiState.tabs.size) {
-            if (pagerState.currentPage != uiState.selectedIndex) {
-                pagerState.animateScrollToPage(uiState.selectedIndex)
+    LaunchedEffect(uiState.selectedIndex, uiState.numExercises) {
+        if (uiState.numExercises > 0) {
+            val targetPage = uiState.selectedIndex.coerceIn(0, uiState.numExercises - 1)
+            if (pagerState.currentPage != targetPage) {
+                pagerState.animateScrollToPage(targetPage)
             }
         }
     }
