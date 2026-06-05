@@ -131,10 +131,14 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     }
 
     private fun updateUiState(selectedIndex: Int) {
-        val tabs = mutableListOf<ExerciseEntryTab>()
-        for (i in 0 until numExs) {
-            tabs.add(ExerciseEntryTab(index = i, title = String.format(TAB_LABEL, i + 1), id = System.identityHashCode(exercises[i]).toLong()))
-        }
+        val tabs = exercises.take(numExs).mapIndexed { i, ex ->
+            ExerciseEntryTab(
+                index = i,
+                title = String.format(TAB_LABEL, i + 1),
+                id = System.identityHashCode(ex).toLong()
+            )
+        }.toMutableList()
+
         // Plus Tab
         tabs.add(ExerciseEntryTab(index = numExs, title = "", id = Long.MAX_VALUE, isAddTab = true))
 
@@ -235,21 +239,17 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         exercises.removeAt(index)
         shrinkTo(exercises, numExs)
 
-        // Adjust remaining exercises numbering
-        for (i in 0 until numExs) {
-            exercises[i].exerciseNumber = i
+        // Re-index remaining exercises
+        exercises.forEachIndexed { i, ex ->
+            ex.exerciseNumber = i
         }
 
         // Shift fragments down to match new indices
         val newFragments = mutableMapOf<Int, ExEntry>()
-
-        for (i in 0 until numExs) {
-            val oldIndex = if (i >= index) i + 1 else i
-            val frag = fragments[oldIndex]
-            if (frag != null) {
-                frag.setInd(i) // Update fragment index
-                newFragments[i] = frag
-            }
+        fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
+            val newIdx = if (oldIdx > index) oldIdx - 1 else oldIdx
+            frag.setInd(newIdx)
+            newFragments[newIdx] = frag
         }
 
         // Optional: Remove the deleted fragment from FragmentManager to fully clean up
