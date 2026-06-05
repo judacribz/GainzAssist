@@ -3,32 +3,30 @@ package ca.gainzassist.activities.add_workout
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
-import ca.gainzassist.R
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
 import ca.gainzassist.constants.ExerciseConst.MIN_INT
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Workout
+import ca.gainzassist.ui.components.GainzTopBar
 import ca.gainzassist.util.Misc.shrinkTo
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.UI.setToolbar
 import org.parceler.Parcels
 
 class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
@@ -80,34 +78,28 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
         updateUiState(0)
 
-        val rootView = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            val toolbarView = layoutInflater.inflate(R.layout.part_title_bar, this, false)
-            toolbarView.id = R.id.toolbar
-            addView(toolbarView)
-
-            val composeView = ComposeView(this@ExercisesEntry).apply {
-                setContent {
-                    ExercisesEntryScreen(
-                        uiState = uiState,
-                        onTabSelected = { index ->
-                            handleTabSelected(index)
-                        },
-                        pageContent = { pageIndex ->
-                            ExEntryFragmentContainer(
-                                pageIndex = pageIndex,
-                                fragmentManager = supportFragmentManager,
-                                getFragment = { idx -> getOrCreateFragment(idx) }
-                            )
-                        }
-                    )
-                }
+        setContent {
+            Column(Modifier.fillMaxSize()) {
+                GainzTopBar(
+                    title = "Exercises Entry",
+                    showBack = true,
+                    onBackClick = { finish() }
+                )
+                ExercisesEntryScreen(
+                    uiState = uiState,
+                    onTabSelected = { index ->
+                        handleTabSelected(index)
+                    },
+                    pageContent = { pageIndex ->
+                        ExEntryFragmentContainer(
+                            pageIndex = pageIndex,
+                            fragmentManager = supportFragmentManager,
+                            getFragment = { idx -> getOrCreateFragment(idx) }
+                        )
+                    }
+                )
             }
-            addView(composeView, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
-
-        setContentView(rootView)
-        setToolbar(this, "Exercises Entry", true)
     }
 
     private fun handleTabSelected(index: Int) {
