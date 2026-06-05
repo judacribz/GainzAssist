@@ -3,6 +3,8 @@ package ca.gainzassist.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,13 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GainzButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    fontFamily: FontFamily = FontFamily.Default
+    fontFamily: FontFamily = FontFamily.Default,
+    onLongClick: (() -> Unit)? = null
 ) {
     val blueDark = colorResource(id = R.color.blueDark)
     val blue = colorResource(id = R.color.blue)
@@ -54,7 +58,16 @@ fun GainzButton(
                     color = Color.Black,
                     shape = RoundedCornerShape(20.dp)
                 )
-                .clickable(enabled = enabled) { onClick() }
+                .run {
+                    if (enabled) {
+                        combinedClickable(
+                            onClick = onClick,
+                            onLongClick = onLongClick
+                        )
+                    } else {
+                        this
+                    }
+                }
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {

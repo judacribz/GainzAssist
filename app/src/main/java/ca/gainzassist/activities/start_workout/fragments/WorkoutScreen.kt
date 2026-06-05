@@ -166,6 +166,12 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
         currWorkout.setDataListener(null as CurrWorkout.DataListener?)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        countDownTimer?.cancel()
+        countDownTimer = null
+    }
+
     fun saveProgressMap() {
         val progressMap = HashMap<String, Any>()
         val exMap = HashMap<String, Int?>()
@@ -210,7 +216,9 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
             }
 
             override fun onFinish() {
-                uiState = uiState.copy(timerText = getString(R.string.start_next_set))
+                if (isAdded) {
+                    uiState = uiState.copy(timerText = getString(R.string.start_next_set))
+                }
                 cancel()
             }
         }
