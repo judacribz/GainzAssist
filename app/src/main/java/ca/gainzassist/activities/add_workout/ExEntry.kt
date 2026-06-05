@@ -274,6 +274,11 @@ class ExEntry : Fragment() {
         uiState = uiState.copy(showDelete = false)
     }
 
+    fun showDelete() {
+        deleteHidden = false
+        uiState = uiState.copy(showDelete = true)
+    }
+
     fun setExerciseExists() {
         uiState = uiState.copy(
             duplicateExerciseError = String.format(

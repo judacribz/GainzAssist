@@ -1,7 +1,6 @@
-@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
-
 package ca.gainzassist.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
@@ -44,98 +44,159 @@ data class GainzTabItem(
     val iconResId: Int? = null
 )
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GainzTabRow(
     pagerState: PagerState,
     tabs: List<GainzTabItem>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scrollable: Boolean = false,
+    onTabClick: ((Int) -> Unit)? = null
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    TabRow(
-        selectedTabIndex = pagerState.currentPage,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        colorResource(id = R.color.blue),
-                        colorResource(id = R.color.colorBg),
-                        colorResource(id = R.color.colorBg)
+    if (scrollable) {
+        ScrollableTabRow(
+            selectedTabIndex = pagerState.currentPage,
+            edgePadding = 0.dp,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            colorResource(id = R.color.blue),
+                            colorResource(id = R.color.colorBg),
+                            colorResource(id = R.color.colorBg)
+                        )
                     )
-                )
-            ),
-        containerColor = Color.Transparent,
-        contentColor = Color.White,
-        indicator = { tabPositions ->
-            val page = pagerState.currentPage
-            val fraction = pagerState.currentPageOffsetFraction
-            val targetPage = if (fraction > 0) page + 1 else page - 1
-
-            val currentTab = tabPositions.getOrNull(page)
-            val targetTab = tabPositions.getOrNull(targetPage)
-
-            if (currentTab != null) {
-                val indicatorWidth = if (targetTab != null) {
-                    lerp(currentTab.width, targetTab.width, abs(fraction))
-                } else currentTab.width
-
-                val indicatorOffset = if (targetTab != null) {
-                    lerp(currentTab.left, targetTab.left, abs(fraction))
-                } else currentTab.left
-
-                TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentSize(Alignment.BottomStart)
-                        .offset(x = indicatorOffset)
-                        .width(indicatorWidth),
-                    color = colorResource(id = R.color.blue),
-                    height = 2.dp
-                )
+                ),
+            containerColor = Color.Transparent,
+            contentColor = Color.White,
+            indicator = { tabPositions ->
+                GainzTabIndicator(pagerState, tabPositions)
+            },
+            divider = {
+                androidx.compose.material3.HorizontalDivider(color = Color.Black)
             }
-        },
-        divider = {
-            androidx.compose.material3.HorizontalDivider(color = Color.Black)
+        ) {
+            GainzTabItems(tabs, pagerState, coroutineScope, onTabClick)
         }
-    ) {
-        tabs.forEachIndexed { index, tab ->
-            val pageOffset = ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction)
-            val distance = abs(pageOffset).coerceIn(0f, 1f)
-            val color = androidx.compose.ui.graphics.lerp(colorResource(id = R.color.blue), Color.White, distance)
-            
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .instantClickable { 
+    } else {
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            modifier = modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            colorResource(id = R.color.blue),
+                            colorResource(id = R.color.colorBg),
+                            colorResource(id = R.color.colorBg)
+                        )
+                    )
+                ),
+            containerColor = Color.Transparent,
+            contentColor = Color.White,
+            indicator = { tabPositions ->
+                GainzTabIndicator(pagerState, tabPositions)
+            },
+            divider = {
+                androidx.compose.material3.HorizontalDivider(color = Color.Black)
+            }
+        ) {
+            GainzTabItems(tabs, pagerState, coroutineScope, onTabClick)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun GainzTabIndicator(
+    pagerState: PagerState,
+    tabPositions: List<androidx.compose.material3.TabPosition>
+) {
+    val page = pagerState.currentPage
+    val fraction = pagerState.currentPageOffsetFraction
+    val targetPage = if (fraction > 0) page + 1 else page - 1
+
+    val currentTab = tabPositions.getOrNull(page)
+    val targetTab = tabPositions.getOrNull(targetPage)
+
+    if (currentTab != null) {
+        val indicatorWidth = if (targetTab != null) {
+            lerp(currentTab.width, targetTab.width, abs(fraction))
+        } else currentTab.width
+
+        val indicatorOffset = if (targetTab != null) {
+            lerp(currentTab.left, targetTab.left, abs(fraction))
+        } else currentTab.left
+
+        TabRowDefaults.SecondaryIndicator(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.BottomStart)
+                .offset(x = indicatorOffset)
+                .width(indicatorWidth),
+            color = colorResource(id = R.color.blue),
+            height = 2.dp
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun GainzTabItems(
+    tabs: List<GainzTabItem>,
+    pagerState: PagerState,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    onTabClick: ((Int) -> Unit)?
+) {
+    tabs.forEachIndexed { index, tab ->
+        val pageOffset = ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction)
+        val distance = abs(pageOffset).coerceIn(0f, 1f)
+        val color = androidx.compose.ui.graphics.lerp(
+            colorResource(id = R.color.blue),
+            Color.White,
+            distance
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .instantClickable {
+                    if (onTabClick != null) {
+                        onTabClick(index)
+                    } else {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
                     }
-                    .padding(vertical = if (tab.iconResId != null) 8.dp else 14.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                if (tab.iconResId != null) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            painter = painterResource(id = tab.iconResId),
-                            contentDescription = tab.title,
-                            tint = color,
-                            modifier = Modifier.padding(bottom = 4.dp).size(24.dp)
-                        )
-                        Text(
-                            text = tab.title.uppercase(),
-                            color = color,
-                            fontSize = 10.sp,
-                            fontWeight = if (distance < 0.5f) FontWeight.Bold else FontWeight.Normal
-                        )
-                    }
-                } else {
+                }
+                .padding(vertical = if (tab.iconResId != null) 8.dp else 14.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (tab.iconResId != null) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        painter = painterResource(id = tab.iconResId),
+                        contentDescription = tab.title,
+                        tint = color,
+                        modifier = Modifier
+                            .padding(bottom = 4.dp)
+                            .size(24.dp)
+                    )
                     Text(
-                        text = tab.title,
-                        color = color
+                        text = tab.title.uppercase(),
+                        color = color,
+                        fontSize = 10.sp,
+                        fontWeight = if (distance < 0.5f) FontWeight.Bold else FontWeight.Normal
                     )
                 }
+            } else {
+                Text(
+                    text = tab.title,
+                    color = color
+                )
             }
         }
     }
@@ -146,7 +207,7 @@ fun Modifier.instantClickable(onClick: () -> Unit): Modifier {
     val interactionSource = remember { MutableInteractionSource() }
     val indication = LocalIndication.current
     val coroutineScope = rememberCoroutineScope()
-    
+
     return this
         .indication(interactionSource, indication)
         .pointerInput(Unit) {
@@ -157,17 +218,17 @@ fun Modifier.instantClickable(onClick: () -> Unit): Modifier {
                         interactionSource.emit(press)
                         kotlinx.coroutines.delay(100) // Minimum ripple visibility duration
                     }
-                    
+
                     val released = tryAwaitRelease()
                     if (released) {
-                        coroutineScope.launch { 
+                        coroutineScope.launch {
                             rippleJob.join()
-                            interactionSource.emit(PressInteraction.Release(press)) 
+                            interactionSource.emit(PressInteraction.Release(press))
                         }
                     } else {
-                        coroutineScope.launch { 
+                        coroutineScope.launch {
                             rippleJob.join()
-                            interactionSource.emit(PressInteraction.Cancel(press)) 
+                            interactionSource.emit(PressInteraction.Cancel(press))
                         }
                     }
                 },
