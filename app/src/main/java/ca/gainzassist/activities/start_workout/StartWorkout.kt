@@ -63,7 +63,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
                 GainzTopBar(
                     title = currentWorkout.name.orEmpty(),
                     showBack = true,
-                    onBackClick = { onBackPressedDispatcher.onBackPressed() },
+                    onBackClick = { onBackPressed() },
                     actions = {
                         IconButton(
                             onClick = {
@@ -73,7 +73,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.mipmap.ic_youtube_btn),
+                                painter = painterResource(R.mipmap.ic_youtube_btn_fg),
                                 contentDescription = "How To Videos",
                                 tint = Color.Unspecified
                             )
