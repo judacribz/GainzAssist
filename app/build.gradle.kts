@@ -147,6 +147,11 @@ dependencies {
     implementation(libs.bundles.androidx.lifecycle)
     kapt(libs.androidx.lifecycle.compiler)
 
+    // DI (Koin)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    testImplementation(libs.koin.test)
+
     // 4. AndroidX Core
     implementation(libs.bundles.androidx.core)
 
