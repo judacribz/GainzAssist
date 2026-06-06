@@ -2,36 +2,31 @@ package ca.gainzassist.activities.start_workout
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import ca.gainzassist.R
 import ca.gainzassist.activities.how_to_videos.HowToVideos
-import ca.gainzassist.adapters.WorkoutPagerAdapter
-import ca.gainzassist.databinding.ActivityStartWorkoutBinding
 import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Exercise.SetsType
 import ca.gainzassist.models.Workout
+import ca.gainzassist.ui.components.GainzTopBar
 import ca.gainzassist.util.Misc.readValue
-import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
-import ca.gainzassist.util.Preferences.getIncompleteSessionPref
-import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.gainzassist.util.Preferences.addIncompleteSessionPref
 import ca.gainzassist.util.Preferences.addIncompleteWorkoutPref
+import ca.gainzassist.util.Preferences.getIncompleteSessionPref
+import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
+import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.UI.setToolbar
-import com.facebook.rebound.ui.Util.dpToPx
 import org.parceler.Parcels
-import java.util.*
 
 class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
@@ -43,41 +38,70 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
 
-    private lateinit var binding: ActivityStartWorkoutBinding
-
-    var layInflater: LayoutInflater? = null
-    var setsView: View? = null
-    var setList: RecyclerView? = null
-    var tvExerciseName: TextView? = null
-    var lp: RelativeLayout.LayoutParams? = null
-    var adapter: SetsAdapter? = null
-    var warmupAdapter = ArrayList<SetsAdapter>()
-    var mainAdapters = ArrayList<SetsAdapter>()
+    private var uiState by mutableStateOf(
+        StartWorkoutUiState(
+            selectedTab = StartWorkoutTab.WORKOUT,
+            availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+            exercises = arrayListOf(),
+            warmups = arrayListOf()
+        )
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = intent
         workout = Parcels.unwrap(intent.getParcelableExtra(ca.gainzassist.activities.main.Main.EXTRA_WORKOUT))
-        exercises = workout!!.exercises
-        setInitTheme(this)
-        binding = ActivityStartWorkoutBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setToolbar(this, workout!!.name!!, true)
+        val currentWorkout = workout ?: return
+        exercises = currentWorkout.exercises
+        
+        uiState = uiState.copy(exercises = exercises ?: arrayListOf())
 
-        lp = RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT
-        )
-        val dpval = dpToPx(5f, resources)
-        lp!!.setMargins(dpval, dpval, dpval, dpval)
+        setInitTheme(this)
+
+        setContent {
+            Column(Modifier.fillMaxSize()) {
+                GainzTopBar(
+                    title = currentWorkout.name.orEmpty(),
+                    showBack = true,
+                    onBackClick = { onBackPressed() },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                val intent = Intent(this@StartWorkout, HowToVideos::class.java)
+                                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
+                                startActivity(intent)
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.mipmap.ic_youtube_btn_fg),
+                                contentDescription = "How To Videos",
+                                tint = Color.Unspecified
+                            )
+                        }
+                    }
+                )
+
+                StartWorkoutScreen(
+                    uiState = uiState,
+                    onTabSelected = { tab ->
+                        uiState = uiState.copy(selectedTab = tab)
+                    }
+                )
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (binding.vpFmtContainer.adapter == null) {
+        // Initialize session if not already set. We check if uiState's tabs match a fresh load.
+        // But since we removed the pager adapter check, we can use a boolean flag.
+        if (uiState.warmups.isEmpty() && uiState.availableTabs.size == 2 && !sessionSet) {
             setCurrSession()
+            sessionSet = true
         }
     }
+    
+    private var sessionSet = false
 
     fun setCurrSession() {
         currWorkout.setDataListener(this)
@@ -134,90 +158,36 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
     }
 
     fun handleLeavingScreen() {
+        val currentWorkout = workout ?: return
+        val workoutName = currentWorkout.name ?: return
+
         val jsonStr = currWorkout.saveSessionState()
         if (jsonStr.isNotEmpty()) {
             addIncompleteSessionPref(
                 this,
-                workout!!.name!!,
+                workoutName,
                 jsonStr
             )
         }
-        addIncompleteWorkoutPref(this, workout!!.name!!)
+        addIncompleteWorkoutPref(this, workoutName)
         currWorkout.resetLocks()
     }
 
-    override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_start_workout, mainMenu)
-        return super.onCreateOptionsMenu(mainMenu)
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.act_how_to -> {
-                val intent = Intent(this, HowToVideos::class.java)
-                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
-                startActivity(intent)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     override fun warmupsGenerated(warmups: ArrayList<Exercise>) {
-        setupPager(warmups)
-    }
-
-    private fun setupPager(warmups: ArrayList<Exercise>) {
-        layInflater = layoutInflater
-        binding.vpFmtContainer.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar))
-        binding.tlayNavbar.addOnTabSelectedListener(object : TabLayout.ViewPagerOnTabSelectedListener(binding.vpFmtContainer) {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                super.onTabSelected(tab)
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                super.onTabUnselected(tab)
-            }
-        })
-
-        if (warmups.size == 0) {
-            binding.tlayNavbar.removeTabAt(0)
-        }
-
-        binding.vpFmtContainer.adapter = WorkoutPagerAdapter(
-            supportFragmentManager,
-            exercises!!,
-            warmups
-        )
-        binding.vpFmtContainer.currentItem = binding.tlayNavbar.tabCount - 2
-    }
-
-    fun displaySets(
-        setsType: SetsType,
-        exercise: Exercise,
-        llSets: LinearLayout
-    ) {
-        layInflater = layoutInflater
-        setsView = layInflater!!.inflate(R.layout.part_horizontal_rv, llSets, false)
-        setsView!!.layoutParams = lp
-        llSets.addView(setsView, 0)
-
-        tvExerciseName = setsView!!.findViewById(R.id.tv_exercise_name)
-        tvExerciseName!!.text = exercise.name
-
-        setList = setsView!!.findViewById(R.id.rv_exercise_sets)
-        setList!!.setHasFixedSize(true)
-        setList!!.setLayoutManager(LinearLayoutManager(
-            this,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        ))
-
-        adapter = SetsAdapter(exercise.setsList)
-        setList!!.adapter = adapter
-
-        when (setsType) {
-            SetsType.MAIN_SET -> mainAdapters.add(adapter!!)
-            SetsType.WARMUP_SET -> warmupAdapter.add(adapter!!)
+        uiState = if (warmups.isEmpty()) {
+            uiState.copy(
+                availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+                selectedTab = StartWorkoutTab.WORKOUT,
+                warmups = warmups
+            )
+        } else {
+            uiState.copy(
+                availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+                selectedTab = StartWorkoutTab.WORKOUT,
+                warmups = warmups
+            )
         }
     }
 }

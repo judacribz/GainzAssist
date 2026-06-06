@@ -5,49 +5,55 @@ import androidx.lifecycle.ViewModelProvider
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import ca.gainzassist.R
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import ca.gainzassist.activities.start_workout.StartWorkout
-import ca.gainzassist.adapters.SingleItemAdapter
-import ca.gainzassist.databinding.FragmentResumeBinding
+import ca.gainzassist.activities.main.fragments.resume.ResumeScreen
+import ca.gainzassist.activities.main.fragments.resume.ResumeUiState
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutViewModel
 import ca.gainzassist.util.Preferences.getIncompleteWorkouts
-import ca.gainzassist.util.UI.getTextString
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.*
 
-class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
+class Resume : Fragment() {
 
     var intent: Intent? = null
     var extraKey: String? = null
     var workoutViewModel: WorkoutViewModel? = null
-    var adapter: SingleItemAdapter? = null
     var allWorkouts: List<Workout>? = null
     var filteredWorkouts = ArrayList<Workout>()
 
-    private lateinit var binding: FragmentResumeBinding
+    private val uiStateFlow = MutableStateFlow(ResumeUiState(workoutNames = emptyList()))
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentResumeBinding.inflate(inflater, container, false)
+    ): View {
         workoutViewModel = ViewModelProvider(this).get(WorkoutViewModel::class.java)
-
-        binding.rvResWorkoutBtns.layoutManager = LinearLayoutManager(context)
-        binding.rvResWorkoutBtns.setHasFixedSize(true)
 
         workoutViewModel?.allWorkouts?.observe(viewLifecycleOwner, Observer { workouts ->
             allWorkouts = workouts
             updateWorkouts()
         })
 
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by uiStateFlow.collectAsState()
+                ResumeScreen(
+                    uiState = uiState,
+                    onWorkoutClick = { workoutName ->
+                        onWorkoutClicked(workoutName)
+                    }
+                )
+            }
+        }
     }
 
     override fun onResume() {
@@ -71,25 +77,15 @@ class Resume : Fragment(), SingleItemAdapter.ItemClickObserver {
         for (workout in filteredWorkouts) {
             workout.name?.let { workoutNames.add(it) }
         }
-        adapter = SingleItemAdapter(
-            ctx,
-            workoutNames,
-            R.layout.part_button,
-            R.id.btnListItem
-        )
-        adapter?.setItemClickObserver(this)
-        binding.rvResWorkoutBtns.adapter = adapter
+
+        uiStateFlow.value = ResumeUiState(workoutNames = workoutNames)
     }
 
-    override fun onItemClick(view: View?) {
+    private fun onWorkoutClicked(workoutName: String) {
         intent = Intent(context, StartWorkout::class.java)
         extraKey = ca.gainzassist.activities.main.Main.EXTRA_WORKOUT
-        view?.let {
-            workoutViewModel?.getWorkoutFromName(context, getTextString(it as TextView))
-        }
+        workoutViewModel?.getWorkoutFromName(context, workoutName)
     }
-
-    override fun onItemLongClick(view: View?) {}
 
     companion object {
         @JvmStatic

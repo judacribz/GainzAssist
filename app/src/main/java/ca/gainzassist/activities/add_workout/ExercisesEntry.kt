@@ -2,128 +2,163 @@ package ca.gainzassist.activities.add_workout
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
+import android.view.View
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import android.view.LayoutInflater
-import ca.gainzassist.R
-import ca.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_NUM_EXERCISES
-import ca.gainzassist.activities.add_workout.WorkoutEntry.Companion.EXTRA_WORKOUT_NAME
-import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.commit
+import androidx.fragment.app.commitNow
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
-import ca.gainzassist.adapters.WorkoutPagerAdapter
+import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
 import ca.gainzassist.constants.ExerciseConst.MIN_INT
-import ca.gainzassist.databinding.ActivityExercisesEntryBinding
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Workout
+import ca.gainzassist.ui.components.GainzTopBar
 import ca.gainzassist.util.Misc.shrinkTo
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.UI.setToolbar
-import com.orhanobut.logger.Logger
 import org.parceler.Parcels
-import java.util.*
 
 class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     companion object {
-        const val REQ_NEW_WORKOUT_SUMMARY = 1002
         const val TAB_LABEL = "Exercise %s"
     }
-
-    private var workoutPagerAdapter: WorkoutPagerAdapter? = null
-    private var tabLayoutOnPageChangeListener: TabLayout.TabLayoutOnPageChangeListener? = null
-    private var viewPagerOnTabSelectedListener: TabLayout.ViewPagerOnTabSelectedListener? = null
-    private val tabs = ArrayList<TabLayout.Tab>()
-
-    var layInflater: LayoutInflater? = null
 
     private var workout: Workout? = null
     private var workoutId: Long = -1
     private var exercises = ArrayList<Exercise>()
-    private var pos = 0
     private var numExs = 0
     private var addedExs = 0
 
-    private lateinit var binding: ActivityExercisesEntryBinding
+    // Caching fragments to preserve state during recompositions/paging
+    private val fragments = mutableMapOf<Int, ExEntry>()
+
+    private var uiState by mutableStateOf(
+        ExercisesEntryUiState(
+            selectedIndex = 0,
+            tabs = emptyList(),
+            numExercises = 0
+        )
+    )
+
+    private val summaryLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setInitTheme(this)
-        binding = ActivityExercisesEntryBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setToolbar(this, "Exercises Entry", true)
 
         val workoutEntryIntent = intent
 
         workout = Workout()
-        workout!!.id = -1
-        workoutId = workout!!.id
+        workout?.id = -1
+        workoutId = workout?.id ?: -1
 
-        workout!!.name = workoutEntryIntent.getStringExtra(WorkoutEntry.EXTRA_WORKOUT_NAME)
+        workout?.name = workoutEntryIntent.getStringExtra(WorkoutEntry.EXTRA_WORKOUT_NAME)
         numExs = workoutEntryIntent.getIntExtra(WorkoutEntry.EXTRA_NUM_EXERCISES, MIN_INT)
 
-        exercises = ArrayList()
-        for (i in 0 until numExs) {
-            exercises.add(Exercise())
+        exercises = ArrayList(List(numExs) { Exercise() })
+
+        updateUiState(0)
+
+        setContent {
+            Column(Modifier.fillMaxSize()) {
+                GainzTopBar(
+                    title = "Exercises Entry",
+                    showBack = true,
+                    onBackClick = { finish() }
+                )
+                ExercisesEntryScreen(
+                    uiState = uiState,
+                    onTabSelected = { index ->
+                        handleTabSelected(index)
+                    },
+                    pageContent = { pageIndex ->
+                        ExEntryFragmentContainer(
+                            pageIndex = pageIndex,
+                            fragmentManager = supportFragmentManager,
+                            getFragment = { idx -> getOrCreateFragment(idx) }
+                        )
+                    }
+                )
+            }
         }
+    }
 
-        tabLayoutOnPageChangeListener = TabLayout.TabLayoutOnPageChangeListener(binding.tlayNavbar)
-        viewPagerOnTabSelectedListener = object : TabLayout.ViewPagerOnTabSelectedListener(binding.vpFmtContainer) {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                super.onTabSelected(tab)
+    private fun handleTabSelected(index: Int) {
+        val tab = uiState.tabs.getOrNull(index)
+        if (tab?.isAddTab == true) {
+            addNewExercise()
+        } else {
+            updateUiState(index)
+        }
+    }
 
-                if (tab.text == null) {
-                    numExs++
-                    exercises.add(Exercise())
+    private fun addNewExercise() {
+        numExs++
+        exercises.add(Exercise())
+        updateUiState(numExs - 1)
+        
+        // Show delete on all fragments since we have more than 1 exercise
+        if (numExs > 1) {
+            fragments.values.forEach { it.showDelete() }
+        }
+    }
 
-                    workoutPagerAdapter!!.addTab()
-                    workoutPagerAdapter!!.notifyDataSetChanged()
+    private fun updateUiState(selectedIndex: Int) {
+        val tabs = exercises.take(numExs).mapIndexed { i, ex ->
+            ExerciseEntryTab(
+                index = i,
+                title = String.format(TAB_LABEL, i + 1),
+                id = System.identityHashCode(ex).toLong()
+            )
+        }.toMutableList()
 
-                    pos = tab.position
-                    tab.text = String.format(TAB_LABEL, pos + 1)
-                    tab.icon = null
-                    tabs.add(tab)
+        // Plus Tab
+        tabs.add(ExerciseEntryTab(index = numExs, title = "", id = Long.MAX_VALUE, isAddTab = true))
 
-                    binding.tlayNavbar.addTab(binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus))
-                    binding.vpFmtContainer.setCurrentItem(numExs - 1, true)
-                    tab.select()
+        uiState = uiState.copy(
+            selectedIndex = selectedIndex,
+            tabs = tabs,
+            numExercises = numExs
+        )
+    }
+
+
+
+    private fun getOrCreateFragment(index: Int): ExEntry {
+        var fragment = fragments[index]
+        if (fragment == null) {
+            fragment = ExEntry().apply {
+                setInd(index)
+                if (numExs <= 1) {
+                    hideDelete()
+                }
+                val ex = exercises.getOrNull(index)
+                if (ex != null && ex.name != null) {
+                    updateExFields(ex)
                 }
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                super.onTabUnselected(tab)
-            }
+            fragments[index] = fragment
         }
-
-        setupPager()
-    }
-
-    private fun setupPager() {
-        layInflater = layoutInflater
-
-        binding.vpFmtContainer.addOnPageChangeListener(tabLayoutOnPageChangeListener!!)
-        binding.tlayNavbar.addOnTabSelectedListener(viewPagerOnTabSelectedListener!!)
-
-        for (i in 0 until numExs) {
-            val tab = binding.tlayNavbar.newTab().setText(String.format(TAB_LABEL, i + 1))
-            tabs.add(tab)
-            binding.tlayNavbar.addTab(tab)
-        }
-
-        binding.tlayNavbar.addTab(binding.tlayNavbar.newTab().setIcon(R.drawable.ic_plus))
-
-        workoutPagerAdapter = WorkoutPagerAdapter(supportFragmentManager, numExs)
-        binding.vpFmtContainer.adapter = workoutPagerAdapter
-        binding.vpFmtContainer.currentItem = 0
-    }
-
-    override fun onActivityResult(req: Int, res: Int, data: Intent?) {
-        when (res) {
-            RESULT_OK -> {
-                setResult(RESULT_OK)
-                finish()
-            }
-        }
+        return fragment
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -133,48 +168,49 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     private fun checkAndGoToSummary() {
         if (addedExs >= numExs) {
-            workout!!.exercises = exercises
+            workout?.exercises = exercises
 
             val newWorkoutSummaryIntent = Intent(this, Summary::class.java)
             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
             newWorkoutSummaryIntent.putExtra(
                 EXTRA_CALLING_ACTIVITY,
-                Summary.CALLING_ACTIVITY.EXERCISES_ENTRY
+                Summary.CallingActivity.EXERCISES_ENTRY
             )
-            startActivityForResult(newWorkoutSummaryIntent, REQ_NEW_WORKOUT_SUMMARY)
+            summaryLauncher.launch(newWorkoutSummaryIntent)
         } else {
             setFirstEmptyTab()
         }
     }
 
     fun setFirstEmptyTab() {
-        for (i in 0 until numExs) {
-            if (exercises[i].name == null) {
-                binding.vpFmtContainer.setCurrentItem(i, true)
-                break
-            }
+        val firstEmptyIndex = exercises.indexOfFirst { it.name == null }
+        if (firstEmptyIndex != -1) {
+            updateUiState(firstEmptyIndex)
         }
     }
 
-    override fun exerciseDoesNotExist(fmt: ExEntry, exerciseName: String, skipIndex: Int): Boolean {
+    override fun exerciseDoesNotExist(
+        fmt: ExEntry,
+        exerciseName: String?,
+        skipIndex: Int
+    ): Boolean {
+        val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
+
         for (ex in exercises) {
-            if (skipIndex == exercises.indexOf(ex)) {
-                continue
-            }
+            if (skipIndex == exercises.indexOf(ex)) continue
 
             val name = ex.name
-            if (name != null) {
-                if (name == exerciseName) {
-                    fmt.setExerciseExists()
-                    return false
-                }
+            if (name == targetName) {
+                fmt.setExerciseExists()
+                return false
             }
         }
 
         return true
     }
 
-    override fun exerciseDataReceived(exercise: Exercise, update: Boolean) {
+    override fun exerciseDataReceived(exercise: Exercise?, update: Boolean) {
+        exercise ?: return
         exercise.workoutId = workoutId
         exercises[exercise.exerciseNumber] = exercise
 
@@ -186,7 +222,7 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
     }
 
     override fun deleteExercise(exercise: Exercise?, index: Int) {
-        if (exercise != null) {
+        if (exercise != null && exercise.name != null) {
             addedExs--
         }
 
@@ -195,27 +231,76 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         exercises.removeAt(index)
         shrinkTo(exercises, numExs)
 
-        binding.tlayNavbar.removeTabAt(index)
-        tabs.removeAt(index)
+        // Re-index remaining exercises
+        exercises.forEachIndexed { i, ex ->
+            ex.exerciseNumber = i
+        }
+
+        // Shift fragments down to match new indices
+        val newFragments = mutableMapOf<Int, ExEntry>()
+        fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
+            val newIdx = if (oldIdx > index) oldIdx - 1 else oldIdx
+            frag.setInd(newIdx)
+            newFragments[newIdx] = frag
+        }
+
+        // Optional: Remove the deleted fragment from FragmentManager to fully clean up
+        val deletedFrag = fragments[index]
+        if (deletedFrag != null) {
+            supportFragmentManager.commit {
+                remove(deletedFrag)
+            }
+        }
+
+        fragments.clear()
+        fragments.putAll(newFragments)
 
         var selectedIndex = index
-        if (selectedIndex != 0) {
-            selectedIndex--
+        if (selectedIndex >= numExs) {
+            selectedIndex = numExs - 1
         }
-
-        tabs[selectedIndex].select()
-
-        for (i in selectedIndex until tabs.size) {
-            tabs[i].text = String.format(TAB_LABEL, i + 1)
+        if (selectedIndex < 0) {
+            selectedIndex = 0
         }
-
-        workoutPagerAdapter!!.removeFragment(selectedIndex, exercises)
-        workoutPagerAdapter!!.notifyDataSetChanged()
-
-        checkAndGoToSummary()
 
         if (numExs <= 1) {
-            workoutPagerAdapter!!.hideDelete()
+            fragments[0]?.hideDelete()
         }
+
+        updateUiState(selectedIndex)
+        checkAndGoToSummary()
     }
+}
+
+@Composable
+fun ExEntryFragmentContainer(
+    pageIndex: Int,
+    fragmentManager: FragmentManager,
+    getFragment: (Int) -> Fragment
+) {
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { ctx ->
+            FragmentContainerView(ctx).apply {
+                id = View.generateViewId()
+            }
+        },
+        update = { view ->
+            val fragment = getFragment(pageIndex)
+            val existing = fragmentManager.findFragmentById(view.id)
+            if (existing != fragment) {
+                if (fragment.isAdded) {
+                    fragmentManager.commitNow { remove(fragment) }
+                }
+                fragmentManager.commitNow {
+                    replace(view.id, fragment)
+                }
+            } else {
+                if (fragment.view != null && fragment.view?.parent != view) {
+                    fragmentManager.commitNow { remove(fragment) }
+                    fragmentManager.commitNow { replace(view.id, fragment) }
+                }
+            }
+        }
+    )
 }

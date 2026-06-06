@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import ca.gainzassist.ui.components.GainzButton
 import ca.gainzassist.R
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -85,53 +87,21 @@ fun WorkoutsScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WorkoutListItem(
     workoutName: String,
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    Surface(
+    GainzButton(
+        text = workoutName,
+        onClick = onClick,
+        onLongClick = onLongClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        shape = RoundedCornerShape(20.dp),
-        shadowElevation = 2.dp,
-        color = Color.Transparent, // We use a gradient background in the Box instead
-        contentColor = Color.White
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            colorResource(id = R.color.blueDark),
-                            colorResource(id = R.color.blue)
-                        )
-                    )
-                )
-                .border(
-                    width = 1.dp,
-                    color = Color.Black,
-                    shape = RoundedCornerShape(20.dp)
-                )
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
-        ) {
-            Text(
-                text = workoutName,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(50.dp),
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+            .padding(vertical = 5.dp)
+            .height(120.dp)
+    )
 }
 
 @Composable
