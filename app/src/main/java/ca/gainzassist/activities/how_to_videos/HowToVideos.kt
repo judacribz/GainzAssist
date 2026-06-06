@@ -1,24 +1,21 @@
 package ca.gainzassist.activities.how_to_videos
 
 import android.content.Intent
-import android.net.Uri
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.BuildConfig
-import ca.gainzassist.R
 import ca.gainzassist.activities.start_workout.StartWorkout.Companion.EXTRA_HOW_TO_VID
 import ca.gainzassist.ui.components.HowToVideosTopBar
 import ca.gainzassist.util.UI.setInitTheme
@@ -38,8 +35,6 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
-import java.util.ArrayList
-import java.util.HashMap
 
 class HowToVideos : AppCompatActivity() {
 

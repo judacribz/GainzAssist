@@ -48,8 +48,8 @@ fun HowToVideosTopBar(
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
+                        focusedTextColor = colorResource(id = R.color.colorBg),
+                        unfocusedTextColor = colorResource(id = R.color.colorBg),
                         cursorColor = colorResource(id = R.color.colorLightAccent),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
@@ -61,7 +61,7 @@ fun HowToVideosTopBar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Close search",
-                        tint = Color.White
+                        tint = colorResource(id = R.color.colorBg)
                     )
                 }
             },
@@ -71,7 +71,7 @@ fun HowToVideosTopBar(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Clear search",
-                            tint = Color.White
+                            tint = colorResource(id = R.color.colorBg)
                         )
                     }
                 }
@@ -90,7 +90,7 @@ fun HowToVideosTopBar(
                     Icon(
                         imageVector = Icons.Filled.Search,
                         contentDescription = "Search",
-                        tint = Color.White
+                        tint = colorResource(id = R.color.colorBg)
                     )
                 }
             }
