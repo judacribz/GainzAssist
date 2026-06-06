@@ -76,7 +76,7 @@ fun StartWorkoutScreen(
     ) {
         HorizontalPager(
             state = pagerState,
-            beyondBoundsPageCount = 2,
+            beyondViewportPageCount = uiState.availableTabs.size,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -119,13 +119,13 @@ fun WorkoutFragmentContainer() {
             }
         },
         update = { view ->
-            val activity = context as? AppCompatActivity
-            if (activity != null) {
-                val fragmentManager = activity.supportFragmentManager
-                if (fragmentManager.findFragmentById(view.id) == null) {
-                    fragmentManager.commit {
-                        replace(view.id, WorkoutScreen.getInstance())
-                    }
+            val activity = context as? AppCompatActivity ?: return@AndroidView
+            val fragmentManager = activity.supportFragmentManager
+            val currentFragment = fragmentManager.findFragmentById(view.id)
+
+            if (currentFragment == null || currentFragment.view == null || currentFragment.view?.parent == null) {
+                fragmentManager.commit {
+                    replace(view.id, WorkoutScreen.getInstance())
                 }
             }
         }

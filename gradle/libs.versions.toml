@@ -1,5 +1,5 @@
 [versions]
-compose-bom = "2024.04.01"
+compose-bom = "2024.10.01"
 activity-compose = "1.9.0"
 
 # Android / Kotlin / Google Plugins
