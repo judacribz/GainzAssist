@@ -2,19 +2,23 @@ package ca.gainzassist.activities.start_workout
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.LinearLayout
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import ca.gainzassist.R
 import ca.gainzassist.activities.how_to_videos.HowToVideos
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Workout
+import ca.gainzassist.ui.components.GainzTopBar
 import ca.gainzassist.util.Misc.readValue
 import ca.gainzassist.util.Preferences.addIncompleteSessionPref
 import ca.gainzassist.util.Preferences.addIncompleteWorkoutPref
@@ -22,7 +26,6 @@ import ca.gainzassist.util.Preferences.getIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.UI.setToolbar
 import org.parceler.Parcels
 
 class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
@@ -44,8 +47,6 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         )
     )
 
-    private var composeView: ComposeView? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = intent
@@ -57,27 +58,37 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
         setInitTheme(this)
 
-        val rootView = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            val toolbarView = layoutInflater.inflate(R.layout.part_title_bar, this, false)
-            toolbarView.id = R.id.toolbar
-            addView(toolbarView)
-
-            composeView = ComposeView(this@StartWorkout).apply {
-                setContent {
-                    StartWorkoutScreen(
-                        uiState = uiState,
-                        onTabSelected = { tab ->
-                            uiState = uiState.copy(selectedTab = tab)
+        setContent {
+            Column(Modifier.fillMaxSize()) {
+                GainzTopBar(
+                    title = currentWorkout.name.orEmpty(),
+                    showBack = true,
+                    onBackClick = { onBackPressed() },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                val intent = Intent(this@StartWorkout, HowToVideos::class.java)
+                                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
+                                startActivity(intent)
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.mipmap.ic_youtube_btn_fg),
+                                contentDescription = "How To Videos",
+                                tint = Color.Unspecified
+                            )
                         }
-                    )
-                }
-            }
-            addView(composeView, LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
-        }
+                    }
+                )
 
-        setContentView(rootView)
-        setToolbar(this, currentWorkout.name!!, true)
+                StartWorkoutScreen(
+                    uiState = uiState,
+                    onTabSelected = { tab ->
+                        uiState = uiState.copy(selectedTab = tab)
+                    }
+                )
+            }
+        }
     }
 
     override fun onResume() {
@@ -162,21 +173,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         currWorkout.resetLocks()
     }
 
-    override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_start_workout, mainMenu)
-        return super.onCreateOptionsMenu(mainMenu)
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.act_how_to -> {
-                val intent = Intent(this, HowToVideos::class.java)
-                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
-                startActivity(intent)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     override fun warmupsGenerated(warmups: ArrayList<Exercise>) {
         uiState = if (warmups.isEmpty()) {
