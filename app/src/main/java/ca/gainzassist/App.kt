@@ -10,6 +10,8 @@ import ca.gainzassist.core.di.coreModule
 import ca.gainzassist.core.di.dataModule
 import ca.gainzassist.core.di.preferencesDataModule
 import ca.gainzassist.core.di.domainModule
+import ca.gainzassist.core.di.workoutUseCaseModule
+import ca.gainzassist.core.di.sessionSettingsUseCaseModule
 import ca.gainzassist.core.di.presentationModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -26,6 +28,8 @@ class App : Application() {
                 dataModule,
                 preferencesDataModule,
                 domainModule,
+                workoutUseCaseModule,
+                sessionSettingsUseCaseModule,
                 presentationModule
             )
         }
