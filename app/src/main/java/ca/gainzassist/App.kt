@@ -8,6 +8,7 @@ import com.orhanobut.logger.Logger
 
 import ca.gainzassist.core.di.coreModule
 import ca.gainzassist.core.di.dataModule
+import ca.gainzassist.core.di.preferencesDataModule
 import ca.gainzassist.core.di.domainModule
 import ca.gainzassist.core.di.presentationModule
 import org.koin.android.ext.koin.androidContext
@@ -23,6 +24,7 @@ class App : Application() {
             modules(
                 coreModule,
                 dataModule,
+                preferencesDataModule,
                 domainModule,
                 presentationModule
             )
