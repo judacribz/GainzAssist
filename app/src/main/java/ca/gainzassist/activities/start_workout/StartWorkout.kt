@@ -73,7 +73,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
                             }
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.selector_youtube_btn),
+                                painter = painterResource(id = R.mipmap.ic_youtube_btn),
                                 contentDescription = "How To Videos",
                                 tint = Color.Unspecified
                             )
