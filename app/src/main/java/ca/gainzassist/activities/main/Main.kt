@@ -3,18 +3,15 @@ package ca.gainzassist.activities.main
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,15 +25,15 @@ import ca.gainzassist.activities.start_workout.StartWorkout
 import ca.gainzassist.interfaces.OnWorkoutReceivedListener
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutViewModel
+import ca.gainzassist.ui.components.MainTopBar
 import ca.gainzassist.util.Preferences
 import ca.gainzassist.util.UI.handleBackButton
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.UI.setToolbar
 import com.google.firebase.auth.FirebaseAuth
 import org.parceler.Parcels
 import java.util.ArrayList
 
-class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutReceivedListener {
+class Main : AppCompatActivity(), OnWorkoutReceivedListener {
 
     companion object {
         const val EXTRA_LOGOUT_USER = "ca.gainzassist.EXTRA_LOGOUT_USER"
@@ -46,13 +43,12 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
         private const val MAIL_TO = "mailto:"
     }
 
-    private var search: MenuItem? = null
-    private var addWorkout: MenuItem? = null
-
     // Compose states
     private var selectedTab by mutableStateOf(MainTab.WORKOUTS)
     private var allWorkouts by mutableStateOf<List<Workout>>(emptyList())
     private var currentQuery by mutableStateOf("")
+    private var isSearchExpanded by mutableStateOf(false)
+    private var searchQuery by mutableStateOf("")
     private var selectedWorkoutName by mutableStateOf<String?>(null)
 
     // Pending intent routing
@@ -60,7 +56,6 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
     private var pendingExtraKey: String? = null
 
     private lateinit var workoutViewModel: WorkoutViewModel
-    private var composeView: ComposeView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,38 +66,50 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
             allWorkouts = workouts
         })
 
-        val rootView = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            val toolbarView = layoutInflater.inflate(R.layout.part_title_bar, this, false)
-            toolbarView.id = R.id.toolbar
-            addView(toolbarView)
+        setContent {
+            Column(Modifier.fillMaxSize()) {
+                MainTopBar(
+                    selectedTab = selectedTab,
+                    isSearchExpanded = isSearchExpanded,
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = {
+                        searchQuery = it
+                        currentQuery = it
+                    },
+                    onSearchClick = { isSearchExpanded = true },
+                    onCloseSearchClick = {
+                        isSearchExpanded = false
+                        searchQuery = ""
+                        currentQuery = ""
+                    },
+                    onAddWorkoutClick = { openWorkoutEntry() },
+                    onLogoutClick = { logout() }
+                )
 
-            composeView = ComposeView(this@Main).apply {
-                setContent {
-                    val filteredWorkouts = allWorkouts.filter { 
-                        it.name.orEmpty().lowercase().contains(currentQuery.lowercase()) 
-                    }
-                    val workoutNames = filteredWorkouts.mapNotNull { it.name }
+                val filteredWorkouts = allWorkouts.filter { 
+                    it.name.orEmpty().lowercase().contains(currentQuery.lowercase()) 
+                }
+                val workoutNames = filteredWorkouts.mapNotNull { it.name }
 
-                    val incomplete = Preferences.getIncompleteWorkouts(this@Main)
-                    val resumeWorkoutNames = if (incomplete != null) {
-                        allWorkouts.filter { incomplete.contains(it.name) }.mapNotNull { it.name }
-                    } else {
-                        emptyList()
-                    }
+                val incomplete = Preferences.getIncompleteWorkouts(this@Main)
+                val resumeWorkoutNames = if (incomplete != null) {
+                    allWorkouts.filter { incomplete.contains(it.name) }.mapNotNull { it.name }
+                } else {
+                    emptyList()
+                }
 
-                    MainScreen(
-                        uiState = MainUiState(
-                            selectedTab = selectedTab,
-                            resumeWorkoutNames = resumeWorkoutNames,
-                            workoutNames = workoutNames,
-                            selectedWorkoutName = selectedWorkoutName,
-                            settingsUiState = getSettingsUiState()
-                        ),
-                        onTabSelected = { tab ->
-                            selectedTab = tab
-                            updateMenuVisibility()
-                        },
+                MainScreen(
+                    uiState = MainUiState(
+                        selectedTab = selectedTab,
+                        resumeWorkoutNames = resumeWorkoutNames,
+                        workoutNames = workoutNames,
+                        selectedWorkoutName = selectedWorkoutName,
+                        settingsUiState = getSettingsUiState()
+                    ),
+                    onTabSelected = { tab ->
+                        selectedTab = tab
+                        isSearchExpanded = false
+                    },
                         onResumeWorkoutClick = { workoutName ->
                             pendingIntent = Intent(this@Main, StartWorkout::class.java)
                             pendingExtraKey = EXTRA_WORKOUT
@@ -138,67 +145,14 @@ class Main : AppCompatActivity(), SearchView.OnQueryTextListener, OnWorkoutRecei
                     )
                 }
             }
-            addView(composeView, LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
-        }
+    }
 
-        setContentView(rootView)
-        setToolbar(this, R.string.app_name, false)
+    private fun openWorkoutEntry() {
+        startActivity(Intent(this, WorkoutEntry::class.java))
     }
 
     override fun onBackPressed() {
         handleBackButton(this)
-    }
-
-    override fun onCreateOptionsMenu(mainMenu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, mainMenu)
-        search = mainMenu.findItem(R.id.act_search)
-        val searchView = search?.actionView as? SearchView
-        searchView?.setOnQueryTextListener(this)
-        
-        addWorkout = mainMenu.findItem(R.id.act_add_workout)
-        
-        updateMenuVisibility()
-        return super.onCreateOptionsMenu(mainMenu)
-    }
-
-    private fun updateMenuVisibility() {
-        search?.let {
-            if (it.isActionViewExpanded) {
-                it.collapseActionView()
-            }
-        }
-
-        when (selectedTab) {
-            MainTab.SETTINGS -> {
-                search?.isVisible = false
-                addWorkout?.isVisible = false
-            }
-            MainTab.RESUME -> {
-                search?.isVisible = true
-                addWorkout?.isVisible = false
-            }
-            MainTab.WORKOUTS -> {
-                search?.isVisible = true
-                addWorkout?.isVisible = true
-            }
-        }
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        currentQuery = newText ?: ""
-        return true
-    }
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.act_add_workout -> startActivity(Intent(this, WorkoutEntry::class.java))
-            R.id.act_logout -> logout()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onWorkoutsReceived(workout: Workout) {
