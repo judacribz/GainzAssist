@@ -76,7 +76,6 @@ fun StartWorkoutScreen(
     ) {
         HorizontalPager(
             state = pagerState,
-            userScrollEnabled = false,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
