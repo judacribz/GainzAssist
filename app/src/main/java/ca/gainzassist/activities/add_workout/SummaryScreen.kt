@@ -70,7 +70,8 @@ data class SummaryUiState(
     val setsError: String?,
     val canDecrementWeight: Boolean,
     val canDecrementReps: Boolean,
-    val canDecrementSets: Boolean
+    val canDecrementSets: Boolean,
+    val isSaving: Boolean
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -436,6 +437,7 @@ fun SummaryScreenContent(
             )
             GainzButton(
                 text = uiState.mainWorkoutButtonText,
+                enabled = !uiState.isSaving,
                 onClick = onAddOrUpdateWorkout,
                 fontFamily = StaatlichesFont,
                 modifier = Modifier
@@ -515,7 +517,8 @@ val summaryPreviewState = SummaryUiState(
     setsError = null,
     canDecrementWeight = true,
     canDecrementReps = true,
-    canDecrementSets = true
+    canDecrementSets = true,
+    isSaving = false
 )
 
 @Preview(showBackground = true)
