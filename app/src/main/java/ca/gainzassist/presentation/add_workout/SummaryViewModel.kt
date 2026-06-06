@@ -2,9 +2,7 @@ package ca.gainzassist.presentation.add_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ca.gainzassist.domain.usecase.workout.AddWorkoutUseCase
 import ca.gainzassist.domain.usecase.workout.SaveWorkoutUseCase
-import ca.gainzassist.domain.usecase.workout.UpdateWorkoutUseCase
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Workout
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,9 +27,7 @@ sealed interface SummaryViewModelEvent {
 }
 
 class SummaryViewModel(
-    private val saveWorkoutUseCase: SaveWorkoutUseCase,
-    private val addWorkoutUseCase: AddWorkoutUseCase,
-    private val updateWorkoutUseCase: UpdateWorkoutUseCase
+    private val saveWorkoutUseCase: SaveWorkoutUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SummaryViewModelState())
@@ -77,6 +73,7 @@ class SummaryViewModel(
 
         viewModelScope.launch {
             try {
+                saveWorkoutUseCase(currentWorkout, isUpdate)
                 _events.emit(SummaryViewModelEvent.Saved)
             } catch (e: Exception) {
                 _events.emit(SummaryViewModelEvent.Error(e.message ?: "Unknown error occurred"))

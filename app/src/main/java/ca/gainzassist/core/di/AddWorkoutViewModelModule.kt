@@ -11,9 +11,7 @@ val addWorkoutViewModelModule = module {
     viewModel { ExercisesEntryViewModel(exerciseExistsUseCase = get()) }
     viewModel {
         SummaryViewModel(
-            saveWorkoutUseCase = get(),
-            addWorkoutUseCase = get(),
-            updateWorkoutUseCase = get()
+            saveWorkoutUseCase = get()
         )
     }
 }
