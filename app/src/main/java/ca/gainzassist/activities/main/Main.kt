@@ -55,7 +55,7 @@ class Main : AppCompatActivity() {
                         is MainViewModelEvent.AddWorkout -> openWorkoutEntry()
                         is MainViewModelEvent.EditWorkout -> {
                             val editIntent = Intent(this@Main, Summary::class.java).apply {
-                                putExtra(EXTRA_CALLING_ACTIVITY, Summary.CallingActivity.WORKOUTS_LIST)
+                                putExtra(Summary.EXTRA_CALLING_ACTIVITY, Summary.CallingActivity.WORKOUTS_LIST)
                                 putExtra(Summary.EXTRA_WORKOUT, Parcels.wrap(event.workout))
                             }
                             startActivity(editIntent)
