@@ -7,6 +7,7 @@ import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutDatabase
+import ca.gainzassist.util.firebase.Database
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
@@ -63,6 +64,7 @@ class RoomWorkoutRepository(
         if (exercises.isNotEmpty()) {
             insertExercises(exercises)
         }
+        Database.addWorkoutFirebase(workout)
     }
 
     override suspend fun updateWorkout(workout: Workout) = withContext(dispatcherProvider.io) {
@@ -78,6 +80,7 @@ class RoomWorkoutRepository(
                 }
             }
         }
+        Database.addWorkoutFirebase(workout)
     }
 
     override suspend fun deleteWorkout(workout: Workout) = withContext(dispatcherProvider.io) {

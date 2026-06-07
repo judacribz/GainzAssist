@@ -3,7 +3,6 @@ package ca.gainzassist.activities.add_workout
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -11,6 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
 import ca.gainzassist.constants.ExerciseConst
 import ca.gainzassist.constants.ExerciseConst.BB_MIN_WEIGHT
@@ -19,11 +22,14 @@ import ca.gainzassist.constants.ExerciseConst.MIN_WEIGHT
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Exercise.SetsType.MAIN_SET
 import ca.gainzassist.models.Workout
-import ca.gainzassist.models.db.WorkoutViewModel
+import ca.gainzassist.presentation.add_workout.SummaryViewModel
+import ca.gainzassist.presentation.add_workout.SummaryViewModelEvent
 import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.gainzassist.util.UI.setInitTheme
-import ca.gainzassist.util.firebase.Database.addWorkoutFirebase
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 import java.util.Locale
 import kotlin.math.max
@@ -48,7 +54,7 @@ class Summary : AppCompatActivity() {
 
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
-    val workoutViewModel by viewModels<WorkoutViewModel>()
+    val summaryViewModel: SummaryViewModel by viewModel()
     var ex: Exercise? = null
 
     private fun sanitizeReps(value: String): Int =
@@ -103,10 +109,12 @@ class Summary : AppCompatActivity() {
         val currentWorkout = workout ?: return
         workoutId = currentWorkout.id
 
+        var isUpdateMode = false
         var initialMainButtonText = getString(R.string.add_workout)
         when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CallingActivity) {
             CallingActivity.WORKOUTS_LIST -> {
                 initialMainButtonText = getString(R.string.update_workout)
+                isUpdateMode = true
             }
 
             else -> {
@@ -117,9 +125,36 @@ class Summary : AppCompatActivity() {
         val initialWorkoutName = currentWorkout.name.orEmpty()
         exercises = currentWorkout.exercises
 
+        summaryViewModel.initialize(currentWorkout, initialWorkoutName, exercises ?: emptyList())
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                summaryViewModel.events.collectLatest { event ->
+                    when (event) {
+                        is SummaryViewModelEvent.Saved -> {
+                            if (isUpdateMode) {
+                                val stateValue = summaryViewModel.state.value
+                                val wName = stateValue.workoutName
+                                if (removeIncompleteWorkoutPref(this@Summary, wName)) {
+                                    removeIncompleteSessionPref(this@Summary, wName)
+                                }
+                            }
+                            setResult(RESULT_OK)
+                            finish()
+                        }
+                        is SummaryViewModelEvent.Error -> {
+                            Toast.makeText(this@Summary, event.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+
         setContent {
-            val exercisesState =
-                remember { mutableStateListOf<Exercise>().apply { exercises?.let { addAll(it) } } }
+            val state by summaryViewModel.state.collectAsStateWithLifecycle()
+
+                    //val exercisesState =
+                remember(state.exercises) { mutableStateListOf<Exercise>().apply { addAll(state.exercises) } }
             var workoutName by rememberSaveable { mutableStateOf(initialWorkoutName) }
             var exerciseName by rememberSaveable { mutableStateOf("") }
             var weight by rememberSaveable { mutableStateOf(getString(R.string.starting_weight)) }
@@ -134,6 +169,11 @@ class Summary : AppCompatActivity() {
             var repsError by rememberSaveable { mutableStateOf<String?>(null) }
             var setsError by rememberSaveable { mutableStateOf<String?>(null) }
 
+            // Sync ViewModel error message
+            if (state.errorMessage != null && workoutNameError == null) {
+                workoutNameError = state.errorMessage
+            }
+
             val minWeight = when (selectedEquipment) {
                 "Barbell" -> BB_MIN_WEIGHT
                 "Dumbbell" -> DB_MIN_WEIGHT
@@ -141,15 +181,15 @@ class Summary : AppCompatActivity() {
             }
 
             val uiState = SummaryUiState(
-                workoutName = workoutName,
+                workoutName = state.workoutName,
                 exerciseName = exerciseName,
                 selectedEquipment = selectedEquipment,
                 equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList(),
                 weight = weight,
                 reps = reps,
                 sets = sets,
-                exerciseNames = exercisesState.mapNotNull { it.name },
-                selectedExerciseName = exercisesState.find { it.exerciseNumber == selectedExerciseNumber }?.name,
+                exerciseNames = state.exercises.mapNotNull { it.name },
+                selectedExerciseName = state.exercises.find { it.exerciseNumber == selectedExerciseNumber }?.name,
                 showAddExerciseButton = selectedExerciseNumber == null,
                 showUpdateExerciseButton = selectedExerciseNumber != null,
                 mainWorkoutButtonText = initialMainButtonText,
@@ -160,7 +200,9 @@ class Summary : AppCompatActivity() {
                 setsError = setsError,
                 canDecrementWeight = (weight.toFloatOrNull() ?: 0f) > minWeight,
                 canDecrementReps = (reps.toIntOrNull() ?: 0) > MIN_INT,
-                canDecrementSets = (sets.toIntOrNull() ?: 0) > MIN_INT
+                canDecrementSets = (sets.toIntOrNull() ?: 0) > MIN_INT,
+                isSaving = state.isSaving,
+
             )
 
             SummaryScreenContent(
@@ -169,6 +211,7 @@ class Summary : AppCompatActivity() {
                 onWorkoutNameChanged = {
                     workoutName = it
                     workoutNameError = null
+                    summaryViewModel.initialize(workout, it, state.exercises)
                 },
                 onExerciseNameChanged = {
                     exerciseName = it
@@ -198,11 +241,11 @@ class Summary : AppCompatActivity() {
                 onSetsChanged = { sets = it; setsError = null },
                 onIncrementWeight = {
                     val current = weight.toFloatOrNull() ?: minWeight
-                    weight = (current + MIN_FLOAT).toString()
+                    weight = formatWeight(current + MIN_FLOAT)
                 },
                 onDecrementWeight = {
                     val current = weight.toFloatOrNull() ?: minWeight
-                    weight = max(current - MIN_FLOAT, minWeight).toString()
+                    weight = formatWeight(max(current - MIN_FLOAT, minWeight))
                 },
                 onIncrementReps = {
                     val current = reps.toIntOrNull() ?: MIN_INT
@@ -245,7 +288,7 @@ class Summary : AppCompatActivity() {
                     }
 
                     if (isValid) {
-                        if (exerciseNameExistsForOtherExercise(exercisesState, exerciseName, null)) {
+                        if (exerciseNameExistsForOtherExercise(state.exercises, exerciseName, null)) {
                             exerciseNameError =
                                 getString(R.string.err_exercise_exists, exerciseName)
                         } else {
@@ -257,7 +300,7 @@ class Summary : AppCompatActivity() {
                             sets = finalSets.toString()
                             weight = formatWeight(finalWeight)
 
-                            val newExNumber = exercisesState.size
+                            val newExNumber = state.exercises.size
                             val exercise = Exercise(
                                 newExNumber,
                                 exerciseName,
@@ -269,8 +312,9 @@ class Summary : AppCompatActivity() {
                                 MAIN_SET
                             ).apply { this.workoutId = this@Summary.workoutId }
 
-                            exercises?.add(exercise)
-                            exercisesState.add(exercise)
+                            val updatedExercises = ArrayList(state.exercises).apply { add(exercise) }
+                            exercises = updatedExercises
+                            summaryViewModel.initialize(workout, state.workoutName, updatedExercises)
 
                             exerciseName = ""
                             exerciseNameError = null
@@ -298,7 +342,7 @@ class Summary : AppCompatActivity() {
                     }
 
                     if (isValid) {
-                        if (exerciseNameExistsForOtherExercise(exercisesState, exerciseName, selectedExerciseNumber)) {
+                        if (exerciseNameExistsForOtherExercise(state.exercises, exerciseName, selectedExerciseNumber)) {
                             exerciseNameError = getString(R.string.err_exercise_exists, exerciseName)
                         } else {
                             val finalReps = sanitizeReps(reps)
@@ -311,7 +355,7 @@ class Summary : AppCompatActivity() {
 
                             val num = selectedExerciseNumber
                             if (num != null) {
-                                val currentEx = exercisesState.find { it.exerciseNumber == num }
+                                val currentEx = state.exercises.find { it.exerciseNumber == num }
                                 val exercise = Exercise(
                                     num,
                                     exerciseName,
@@ -326,12 +370,12 @@ class Summary : AppCompatActivity() {
                                     this.id = currentEx?.id ?: -1
                                 }
 
-                                exercises?.let { exList ->
-                                    val indexInOriginal = exList.indexOfFirst { it.exerciseNumber == num }
-                                    if (indexInOriginal != -1) exList[indexInOriginal] = exercise
+                                val updatedExercises = ArrayList(state.exercises).apply {
+                                    val indexInState = indexOfFirst { it.exerciseNumber == num }
+                                    if (indexInState != -1) this[indexInState] = exercise
                                 }
-                                val indexInState = exercisesState.indexOfFirst { it.exerciseNumber == num }
-                                if (indexInState != -1) exercisesState[indexInState] = exercise
+                                exercises = updatedExercises
+                                summaryViewModel.initialize(workout, state.workoutName, updatedExercises)
 
                                 exerciseName = ""
                                 exerciseNameError = null
@@ -345,7 +389,7 @@ class Summary : AppCompatActivity() {
                     }
                 },
                 onExerciseClicked = { exName ->
-                    val clickedEx = exercisesState.find { it.name == exName }
+                    val clickedEx = state.exercises.find { it.name == exName }
                     if (clickedEx != null) {
                         ex = clickedEx
                         exerciseName = clickedEx.name ?: ""
@@ -360,42 +404,20 @@ class Summary : AppCompatActivity() {
                     }
                 },
                 onDiscardWorkout = {
-                    setResult(RESULT_OK)
+                    setResult(RESULT_CANCELED)
                     finish()
                 },
                 onAddOrUpdateWorkout = {
-                    if (workoutName.isBlank()) {
+                    if (state.workoutName.isBlank()) {
                         workoutNameError = getString(R.string.err_required)
+                    } else if (state.exercises.isEmpty()) {
+                        Toast.makeText(
+                            this@Summary,
+                            "Error: No exercises added.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
-                        val currentExercises = exercises
-                        if (currentExercises.isNullOrEmpty()) {
-                            Toast.makeText(
-                                this@Summary,
-                                "Error: No exercises added.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            val currentWorkout = workout
-                            if (currentWorkout != null) {
-                                currentWorkout.name = workoutName
-                                currentWorkout.exercises = currentExercises
-
-                                addWorkoutFirebase(currentWorkout)
-
-                                if ("add workout" == initialMainButtonText.lowercase()) {
-                                    workoutViewModel.insertWorkout(currentWorkout)
-                                } else {
-                                    workoutViewModel.updateWorkout(currentWorkout)
-                                    currentWorkout.name?.let {
-                                        if (removeIncompleteWorkoutPref(this@Summary, it)) {
-                                            removeIncompleteSessionPref(this@Summary, it)
-                                        }
-                                    }
-                                }
-                                setResult(RESULT_OK)
-                                finish()
-                            }
-                        }
+                        summaryViewModel.onSaveClicked(isUpdateMode)
                     }
                 }
             )
