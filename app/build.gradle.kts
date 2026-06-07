@@ -137,6 +137,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.espresso.core)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // 3. Architecture Components (AndroidX)
     implementation(libs.androidx.room.runtime)
