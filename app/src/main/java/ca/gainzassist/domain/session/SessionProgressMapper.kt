@@ -40,11 +40,11 @@ object SessionProgressMapper {
             val stringKey = key?.toString() ?: continue
             val intKey = stringKey.toIntOrNull() ?: continue
             
-            // Value could be Long (from JSON/Firebase), Int, or null
             val intValue = when (value) {
+                null -> null
                 is Number -> value.toInt()
-                is String -> value.toIntOrNull()
-                else -> null
+                is String -> value.toIntOrNull() ?: continue
+                else -> continue
             }
 
             parsedMap[intKey] = intValue

@@ -79,4 +79,20 @@ class SessionProgressMapperTest {
         assertEquals(expectedExerciseProgress, snapshot.exerciseProgress)
         assertEquals(expectedSetProgress, snapshot.setProgress)
     }
+
+    @Test
+    fun `fromLegacyMap ignores invalid values safely`() {
+        val legacyMap = mapOf(
+            "exercise progress" to mapOf("1" to "bad", "2" to null),
+            "set progress" to mapOf("10" to 50)
+        )
+
+        val snapshot = SessionProgressMapper.fromLegacyMap(legacyMap)
+
+        val expectedExerciseProgress = mapOf(2 to null)
+        val expectedSetProgress = mapOf(10 to 50)
+
+        assertEquals(expectedExerciseProgress, snapshot.exerciseProgress)
+        assertEquals(expectedSetProgress, snapshot.setProgress)
+    }
 }
