@@ -29,12 +29,7 @@ import ca.gainzassist.components.GainzTabItem
 import ca.gainzassist.components.GainzTabRow
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.presentation.start_workout.StartWorkoutViewModelState
-
-enum class StartWorkoutTab(val titleResId: Int, val iconResId: Int) {
-    WARMUPS(R.string.warmups, R.drawable.ic_warmups),
-    WORKOUT(R.string.workout, R.drawable.ic_workout),
-    EXERCISES(R.string.exercises, R.drawable.ic_exercises)
-}
+import ca.gainzassist.presentation.start_workout.StartWorkoutTab
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

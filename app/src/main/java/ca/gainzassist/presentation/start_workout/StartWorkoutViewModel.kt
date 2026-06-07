@@ -2,7 +2,6 @@ package ca.gainzassist.presentation.start_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ca.gainzassist.activities.start_workout.StartWorkoutTab
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
