@@ -51,9 +51,31 @@ class StartWorkoutViewModel(
     private val _events = MutableSharedFlow<StartWorkoutViewModelEvent>()
     val events: SharedFlow<StartWorkoutViewModelEvent> = _events.asSharedFlow()
 
-    fun initialize(workoutName: String) {
-        _state.update { it.copy(workoutName = workoutName) }
-        // Scaffold: Logic to fetch workout and exercises using getWorkoutWithExercisesByNameUseCase
+    fun initializeFromWorkout(workout: ca.gainzassist.models.Workout) {
+        _state.update { 
+            it.copy(
+                workoutName = workout.name ?: "",
+                exercises = workout.exercises ?: emptyList()
+            ) 
+        }
+    }
+
+    fun onWarmupsGenerated(warmups: List<Exercise>) {
+        _state.update { currentState ->
+            if (warmups.isEmpty()) {
+                currentState.copy(
+                    availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+                    selectedTab = StartWorkoutTab.WORKOUT,
+                    warmups = warmups
+                )
+            } else {
+                currentState.copy(
+                    availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+                    selectedTab = StartWorkoutTab.WORKOUT,
+                    warmups = warmups
+                )
+            }
+        }
     }
 
     fun onTabSelected(tab: StartWorkoutTab) {
