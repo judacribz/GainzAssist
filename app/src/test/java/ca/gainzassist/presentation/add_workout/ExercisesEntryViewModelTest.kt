@@ -93,4 +93,20 @@ class ExercisesEntryViewModelTest {
         assertEquals(2, viewModel.state.value.numberOfExercises)
         assertEquals(2, viewModel.state.value.exercises.size)
     }
+
+    @Test
+    fun submittingExercise_advancesToNextEmptyTab() {
+        viewModel.initialize("Leg Day", 3)
+        
+        assertEquals(0, viewModel.state.value.selectedIndex)
+
+        viewModel.onExerciseSubmitted(Exercise().apply { exerciseNumber = 0; name = "Squat" })
+        
+        assertEquals(1, viewModel.state.value.selectedIndex)
+        
+        viewModel.onTabSelected(2)
+        viewModel.onExerciseSubmitted(Exercise().apply { exerciseNumber = 2; name = "Lunge" })
+        
+        assertEquals(1, viewModel.state.value.selectedIndex)
+    }
 }
