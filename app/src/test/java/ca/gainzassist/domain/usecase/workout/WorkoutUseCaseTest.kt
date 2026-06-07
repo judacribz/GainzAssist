@@ -42,6 +42,11 @@ class WorkoutUseCaseTest {
         exerciseExistsUseCase = ExerciseExistsUseCase()
     }
 
+    private fun <T> assertNotNullValue(value: T?): T {
+        assertNotNull(value)
+        return value ?: error("Expected non-null value")
+    }
+
     @Test
     fun `addWorkoutUseCase inserts workout into repository`() = runTest {
         val workout = Workout("Push Day", null)
@@ -67,7 +72,7 @@ class WorkoutUseCaseTest {
         val workout = Workout("Leg Day", null)
         addWorkoutUseCase(workout)
         
-        val retrieved = getWorkoutByNameUseCase("Leg Day")!!
+        val retrieved = assertNotNullValue(getWorkoutByNameUseCase("Leg Day"))
         retrieved.name = "Leg Day Updated"
         
         saveWorkoutUseCase(retrieved, isUpdate = true)
@@ -81,7 +86,7 @@ class WorkoutUseCaseTest {
         val workout = Workout("Yoga", null)
         addWorkoutUseCase(workout)
         
-        val retrieved = getWorkoutByNameUseCase("Yoga")!!
+        val retrieved = assertNotNullValue(getWorkoutByNameUseCase("Yoga"))
         retrieved.name = "Advanced Yoga"
         
         updateWorkoutUseCase(retrieved)
@@ -115,7 +120,7 @@ class WorkoutUseCaseTest {
     fun `getWorkoutWithExercisesByNameUseCase retrieves workout and its exercises`() = runTest {
         val workout = Workout("Full Body", null)
         addWorkoutUseCase(workout)
-        val savedWorkout = getWorkoutByNameUseCase("Full Body")!!
+        val savedWorkout = assertNotNullValue(getWorkoutByNameUseCase("Full Body"))
         
         val exercise = Exercise().apply {
             name = "Squat"
@@ -133,7 +138,7 @@ class WorkoutUseCaseTest {
     fun `observeUniqueExerciseNamesUseCase reflects changes`() = runTest {
         val workout = Workout("W1", null)
         addWorkoutUseCase(workout)
-        val savedWorkout = getWorkoutByNameUseCase("W1")!!
+        val savedWorkout = assertNotNullValue(getWorkoutByNameUseCase("W1"))
         
         repository.insertExercise(Exercise().apply { name = "Pushup"; workoutId = savedWorkout.id })
         repository.insertExercise(Exercise().apply { name = "Pushup"; workoutId = savedWorkout.id })
