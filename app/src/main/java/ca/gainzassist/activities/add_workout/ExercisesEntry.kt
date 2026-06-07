@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
@@ -19,14 +17,21 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.activities.add_workout.Summary.Companion.EXTRA_WORKOUT
 import ca.gainzassist.constants.ExerciseConst.MIN_INT
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Workout
 import ca.gainzassist.ui.components.GainzTopBar
-import ca.gainzassist.util.Misc.shrinkTo
 import ca.gainzassist.util.UI.setInitTheme
+import ca.gainzassist.presentation.add_workout.ExercisesEntryViewModel
+import ca.gainzassist.presentation.add_workout.ExercisesEntryViewModelEvent
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 
 class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
@@ -35,22 +40,10 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         const val TAB_LABEL = "Exercise %s"
     }
 
-    private var workout: Workout? = null
-    private var workoutId: Long = -1
-    private var exercises = ArrayList<Exercise>()
-    private var numExs = 0
-    private var addedExs = 0
+    private val viewModel: ExercisesEntryViewModel by viewModel()
 
     // Caching fragments to preserve state during recompositions/paging
     private val fragments = mutableMapOf<Int, ExEntry>()
-
-    private var uiState by mutableStateOf(
-        ExercisesEntryUiState(
-            selectedIndex = 0,
-            tabs = emptyList(),
-            numExercises = 0
-        )
-    )
 
     private val summaryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -66,19 +59,54 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         setInitTheme(this)
 
         val workoutEntryIntent = intent
+        val workoutName = workoutEntryIntent.getStringExtra(WorkoutEntry.EXTRA_WORKOUT_NAME) ?: ""
+        val numExs = workoutEntryIntent.getIntExtra(WorkoutEntry.EXTRA_NUM_EXERCISES, MIN_INT)
 
-        workout = Workout()
-        workout?.id = -1
-        workoutId = workout?.id ?: -1
+        viewModel.initialize(workoutName, numExs)
 
-        workout?.name = workoutEntryIntent.getStringExtra(WorkoutEntry.EXTRA_WORKOUT_NAME)
-        numExs = workoutEntryIntent.getIntExtra(WorkoutEntry.EXTRA_NUM_EXERCISES, MIN_INT)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        is ExercisesEntryViewModelEvent.GoToSummary -> {
+                            val workout = Workout().apply {
+                                this.id = -1
+                                this.name = event.workoutName
+                                this.exercises = ArrayList(event.exercises)
+                            }
 
-        exercises = ArrayList(List(numExs) { Exercise() })
-
-        updateUiState(0)
+                            val newWorkoutSummaryIntent = Intent(this@ExercisesEntry, Summary::class.java)
+                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
+                            newWorkoutSummaryIntent.putExtra(
+                                EXTRA_CALLING_ACTIVITY,
+                                Summary.CallingActivity.EXERCISES_ENTRY
+                            )
+                            summaryLauncher.launch(newWorkoutSummaryIntent)
+                        }
+                    }
+                }
+            }
+        }
 
         setContent {
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
+                ExerciseEntryTab(
+                    index = i,
+                    title = String.format(TAB_LABEL, i + 1),
+                    id = i.toLong()
+                )
+            }.toMutableList()
+
+            tabs.add(ExerciseEntryTab(index = state.numberOfExercises, title = "", id = Long.MAX_VALUE, isAddTab = true))
+
+            val uiState = ExercisesEntryUiState(
+                selectedIndex = state.selectedIndex,
+                tabs = tabs,
+                numExercises = state.numberOfExercises
+            )
+
             Column(Modifier.fillMaxSize()) {
                 GainzTopBar(
                     title = "Exercises Entry",
@@ -88,13 +116,20 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
                 ExercisesEntryScreen(
                     uiState = uiState,
                     onTabSelected = { index ->
-                        handleTabSelected(index)
+                        if (index == state.numberOfExercises) {
+                            viewModel.onAddExerciseClicked()
+                            if (state.numberOfExercises > 0) {
+                                fragments.values.forEach { it.showDelete() }
+                            }
+                        } else {
+                            viewModel.onTabSelected(index)
+                        }
                     },
                     pageContent = { pageIndex ->
                         ExEntryFragmentContainer(
                             pageIndex = pageIndex,
                             fragmentManager = supportFragmentManager,
-                            getFragment = { idx -> getOrCreateFragment(idx) }
+                            getFragment = { idx -> getOrCreateFragment(idx, state.numberOfExercises) }
                         )
                     }
                 )
@@ -102,58 +137,13 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         }
     }
 
-    private fun handleTabSelected(index: Int) {
-        val tab = uiState.tabs.getOrNull(index)
-        if (tab?.isAddTab == true) {
-            addNewExercise()
-        } else {
-            updateUiState(index)
-        }
-    }
-
-    private fun addNewExercise() {
-        numExs++
-        exercises.add(Exercise())
-        updateUiState(numExs - 1)
-        
-        // Show delete on all fragments since we have more than 1 exercise
-        if (numExs > 1) {
-            fragments.values.forEach { it.showDelete() }
-        }
-    }
-
-    private fun updateUiState(selectedIndex: Int) {
-        val tabs = exercises.take(numExs).mapIndexed { i, ex ->
-            ExerciseEntryTab(
-                index = i,
-                title = String.format(TAB_LABEL, i + 1),
-                id = System.identityHashCode(ex).toLong()
-            )
-        }.toMutableList()
-
-        // Plus Tab
-        tabs.add(ExerciseEntryTab(index = numExs, title = "", id = Long.MAX_VALUE, isAddTab = true))
-
-        uiState = uiState.copy(
-            selectedIndex = selectedIndex,
-            tabs = tabs,
-            numExercises = numExs
-        )
-    }
-
-
-
-    private fun getOrCreateFragment(index: Int): ExEntry {
+    private fun getOrCreateFragment(index: Int, numExs: Int): ExEntry {
         var fragment = fragments[index]
         if (fragment == null) {
             fragment = ExEntry().apply {
                 setInd(index)
                 if (numExs <= 1) {
                     hideDelete()
-                }
-                val ex = exercises.getOrNull(index)
-                if (ex != null && ex.name != null) {
-                    updateExFields(ex)
                 }
             }
             fragments[index] = fragment
@@ -166,41 +156,17 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         return super.onSupportNavigateUp()
     }
 
-    private fun checkAndGoToSummary() {
-        if (addedExs >= numExs) {
-            workout?.exercises = exercises
-
-            val newWorkoutSummaryIntent = Intent(this, Summary::class.java)
-            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
-            newWorkoutSummaryIntent.putExtra(
-                EXTRA_CALLING_ACTIVITY,
-                Summary.CallingActivity.EXERCISES_ENTRY
-            )
-            summaryLauncher.launch(newWorkoutSummaryIntent)
-        } else {
-            setFirstEmptyTab()
-        }
-    }
-
-    fun setFirstEmptyTab() {
-        val firstEmptyIndex = exercises.indexOfFirst { it.name == null }
-        if (firstEmptyIndex != -1) {
-            updateUiState(firstEmptyIndex)
-        }
-    }
-
     override fun exerciseDoesNotExist(
         fmt: ExEntry,
         exerciseName: String?,
         skipIndex: Int
     ): Boolean {
         val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
+        val names = viewModel.state.value.exerciseNames
 
-        for (ex in exercises) {
-            if (skipIndex == exercises.indexOf(ex)) continue
-
-            val name = ex.name
-            if (name == targetName) {
+        for ((i, name) in names.withIndex()) {
+            if (i == skipIndex) continue
+            if (name.equals(targetName, ignoreCase = true)) {
                 fmt.setExerciseExists()
                 return false
             }
@@ -211,31 +177,11 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
 
     override fun exerciseDataReceived(exercise: Exercise?, update: Boolean) {
         exercise ?: return
-        exercise.workoutId = workoutId
-        exercises[exercise.exerciseNumber] = exercise
-
-        if (!update) {
-            addedExs++
-        }
-
-        checkAndGoToSummary()
+        exercise.workoutId = -1
+        viewModel.onExerciseSubmitted(exercise)
     }
 
     override fun deleteExercise(exercise: Exercise?, index: Int) {
-        if (exercise != null && exercise.name != null) {
-            addedExs--
-        }
-
-        numExs--
-
-        exercises.removeAt(index)
-        shrinkTo(exercises, numExs)
-
-        // Re-index remaining exercises
-        exercises.forEachIndexed { i, ex ->
-            ex.exerciseNumber = i
-        }
-
         // Shift fragments down to match new indices
         val newFragments = mutableMapOf<Int, ExEntry>()
         fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
@@ -244,7 +190,6 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
             newFragments[newIdx] = frag
         }
 
-        // Optional: Remove the deleted fragment from FragmentManager to fully clean up
         val deletedFrag = fragments[index]
         if (deletedFrag != null) {
             supportFragmentManager.commit {
@@ -255,20 +200,11 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
         fragments.clear()
         fragments.putAll(newFragments)
 
-        var selectedIndex = index
-        if (selectedIndex >= numExs) {
-            selectedIndex = numExs - 1
-        }
-        if (selectedIndex < 0) {
-            selectedIndex = 0
-        }
-
-        if (numExs <= 1) {
+        if (viewModel.state.value.numberOfExercises <= 2) {
             fragments[0]?.hideDelete()
         }
 
-        updateUiState(selectedIndex)
-        checkAndGoToSummary()
+        viewModel.onExerciseDeleted(index)
     }
 }
 
