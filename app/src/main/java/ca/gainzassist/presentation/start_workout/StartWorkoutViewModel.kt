@@ -30,7 +30,8 @@ data class StartWorkoutViewModelState(
     val exercises: List<Exercise> = emptyList(),
     val warmups: List<Exercise> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isSessionReady: Boolean = false
 )
 
 sealed interface StartWorkoutViewModelEvent {
@@ -133,5 +134,9 @@ class StartWorkoutViewModel(
         viewModelScope.launch {
             _events.emit(StartWorkoutViewModelEvent.FinishWorkout)
         }
+    }
+
+    fun onSessionReady() {
+        _state.update { it.copy(isSessionReady = true) }
     }
 }

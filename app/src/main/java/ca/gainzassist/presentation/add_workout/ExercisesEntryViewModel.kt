@@ -79,8 +79,16 @@ class ExercisesEntryViewModel(
             currentState.enteredExerciseCount
         }
 
+        val newSelectedIndex = if (newEnteredCount < currentState.numberOfExercises) {
+            val firstEmptyIndex = exercises.indexOfFirst { it.name.isNullOrBlank() }
+            if (firstEmptyIndex != -1) firstEmptyIndex else currentState.selectedIndex
+        } else {
+            currentState.selectedIndex
+        }
+
         _state.update {
             it.copy(
+                selectedIndex = newSelectedIndex,
                 exerciseNames = exercises.map { ex -> ex.name ?: "" },
                 exercises = exercises.toList(),
                 enteredExerciseCount = newEnteredCount
