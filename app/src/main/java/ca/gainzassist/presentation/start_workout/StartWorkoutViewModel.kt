@@ -22,7 +22,10 @@ import kotlinx.coroutines.launch
 data class StartWorkoutViewModelState(
     val workoutName: String = "",
     val selectedTab: StartWorkoutTab = StartWorkoutTab.WORKOUT,
-    val availableTabs: List<StartWorkoutTab> = emptyList(),
+    val availableTabs: List<StartWorkoutTab> = listOf(
+        StartWorkoutTab.WORKOUT,
+        StartWorkoutTab.EXERCISES
+    ),
     val exercises: List<Exercise> = emptyList(),
     val warmups: List<Exercise> = emptyList(),
     val isLoading: Boolean = false,
@@ -55,6 +58,8 @@ class StartWorkoutViewModel(
         _state.update { 
             it.copy(
                 workoutName = workout.name ?: "",
+                selectedTab = StartWorkoutTab.WORKOUT,
+                availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
                 exercises = workout.exercises ?: emptyList()
             ) 
         }
