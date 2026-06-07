@@ -145,6 +145,10 @@ class ExercisesEntry : AppCompatActivity(), ExEntry.ExEntryDataListener {
                 if (numExs <= 1) {
                     hideDelete()
                 }
+                val ex = viewModel.state.value.exercises.getOrNull(index)
+                if (ex != null && ex.name != null) {
+                    updateExFields(ex)
+                }
             }
             fragments[index] = fragment
         }
