@@ -23,6 +23,11 @@ class WorkoutScreenViewModelTest {
     private lateinit var saveSessionProgressUseCase: SaveSessionProgressUseCase
     private lateinit var viewModel: WorkoutScreenViewModel
 
+    private fun <T> assertNotNullValue(value: T?): T {
+        assertTrue(value != null)
+        return value ?: error("Expected non-null value")
+    }
+
     @Before
     fun setup() {
         fakeRepository = FakeSessionPreferencesRepository()
@@ -47,11 +52,11 @@ class WorkoutScreenViewModelTest {
 
         viewModel.saveSessionProgress(workoutName, snapshot)
 
-        val savedJson = fakeRepository.getSessionProgress(workoutName)
+        val savedJsonNullable = fakeRepository.getSessionProgress(workoutName)
+        val savedJson = assertNotNullValue(savedJsonNullable)
         
         // Assert it contains expected legacy keys
-        assertTrue(savedJson != null)
-        assertTrue(savedJson!!.contains("\"exercise progress\""))
+        assertTrue(savedJson.contains("\"exercise progress\""))
         assertTrue(savedJson.contains("\"set progress\""))
     }
 
@@ -64,11 +69,11 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        val loadedSnapshot = viewModel.getSessionProgress(workoutName)
+        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
-        assertTrue(loadedSnapshot != null)
-        assertEquals(snapshot.exerciseProgress, loadedSnapshot?.exerciseProgress)
-        assertEquals(snapshot.setProgress, loadedSnapshot?.setProgress)
+        assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)
+        assertEquals(snapshot.setProgress, loadedSnapshot.setProgress)
     }
 
     @Test
@@ -77,12 +82,12 @@ class WorkoutScreenViewModelTest {
         // Force invalid JSON string using the repository directly
         fakeRepository.saveSessionProgress(workoutName, "invalid json string")
 
-        val loadedSnapshot = viewModel.getSessionProgress(workoutName)
+        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
         
         // Misc.readValue catches the exception and returns an empty map.
         // SessionProgressMapper.fromLegacyMap(emptyMap) should return empty snapshot.
-        assertTrue(loadedSnapshot != null)
-        assertTrue(loadedSnapshot!!.exerciseProgress.isEmpty())
+        assertTrue(loadedSnapshot.exerciseProgress.isEmpty())
         assertTrue(loadedSnapshot.setProgress.isEmpty())
     }
 
@@ -95,10 +100,10 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Null Test"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        val loadedSnapshot = viewModel.getSessionProgress(workoutName)
+        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
-        assertTrue(loadedSnapshot != null)
-        assertEquals(snapshot.exerciseProgress, loadedSnapshot?.exerciseProgress)
-        assertEquals(snapshot.setProgress, loadedSnapshot?.setProgress)
+        assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)
+        assertEquals(snapshot.setProgress, loadedSnapshot.setProgress)
     }
 }
