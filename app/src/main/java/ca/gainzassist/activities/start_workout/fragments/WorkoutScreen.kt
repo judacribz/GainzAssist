@@ -34,7 +34,6 @@ import ca.gainzassist.models.ExerciseSet
 import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.domain.session.SessionProgressSnapshot
 import ca.gainzassist.models.db.WorkoutViewModel
-import ca.gainzassist.util.Preferences
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -349,12 +348,10 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
                         .insertSession(session)
                 }
 
-                if (Preferences.removeIncompleteWorkoutPref(a, currWorkout.workoutName)) {
-                    Preferences.removeIncompleteSessionPref(a, currWorkout.workoutName)
+                lifecycleScope.launch {
+                    viewModel.clearFinishedWorkoutState(currWorkout.workoutName)
+                    a.finish()
                 }
-
-                Preferences.removeSessionProgressPref(a, currWorkout.workoutName)
-                a.finish()
             }
         }
     }

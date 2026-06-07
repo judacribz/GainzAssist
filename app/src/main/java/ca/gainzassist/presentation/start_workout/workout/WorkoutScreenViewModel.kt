@@ -5,6 +5,9 @@ import ca.gainzassist.domain.session.SessionProgressMapper
 import ca.gainzassist.domain.session.SessionProgressSnapshot
 import ca.gainzassist.domain.usecase.session.GetSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
+import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
+import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
+import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
 import ca.gainzassist.util.Misc
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +18,10 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class WorkoutScreenViewModel(
     private val getSessionProgressUseCase: GetSessionProgressUseCase,
-    private val saveSessionProgressUseCase: SaveSessionProgressUseCase
+    private val saveSessionProgressUseCase: SaveSessionProgressUseCase,
+    private val removeIncompleteWorkoutUseCase: RemoveIncompleteWorkoutUseCase,
+    private val removeIncompleteSessionUseCase: RemoveIncompleteSessionUseCase,
+    private val removeSessionProgressUseCase: RemoveSessionProgressUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkoutScreenState())
@@ -67,5 +73,13 @@ class WorkoutScreenViewModel(
         val map = SessionProgressMapper.toLegacyMap(snapshot)
         val json = Misc.writeValueAsString(map)
         saveSessionProgressUseCase(workoutName, json)
+    }
+
+    suspend fun clearFinishedWorkoutState(workoutName: String) {
+        if (workoutName.isBlank()) return
+        if (removeIncompleteWorkoutUseCase(workoutName)) {
+            removeIncompleteSessionUseCase(workoutName)
+        }
+        removeSessionProgressUseCase(workoutName)
     }
 }
