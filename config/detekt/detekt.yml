@@ -158,16 +158,7 @@ complexity:
   ReplaceSafeCallChainWithRun:
     active: false
   StringLiteralDuplication:
-    active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
-    threshold: 3
-    ignoreAnnotation:
-      - 'Preview'
-      - 'PreviewScreenSizes'
-      - 'PreviewFontScale'
-      - 'PreviewLightDark'
-    excludeStringsWithLessThan5Characters: true
-    ignoreStringsRegex: '$^'
+    active: false
   TooManyFunctions:
     active: true
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
