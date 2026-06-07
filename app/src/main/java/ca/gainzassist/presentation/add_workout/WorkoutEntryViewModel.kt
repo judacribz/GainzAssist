@@ -2,6 +2,7 @@ package ca.gainzassist.presentation.add_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ca.gainzassist.constants.ExerciseConst
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 
 data class WorkoutEntryViewModelState(
     val workoutName: String = "",
-    val numberOfExercises: String = "",
+    val numberOfExercises: String = "3",
     val workoutNameError: String? = null,
     val numberOfExercisesError: String? = null
 )
@@ -54,17 +55,10 @@ class WorkoutEntryViewModel : ViewModel() {
     fun onContinueClicked() {
         val currentState = _state.value
         var isValid = true
-        var nameError: String? = null
         var exercisesError: String? = null
 
-        val name = currentState.workoutName.trim()
-        if (name.isEmpty()) {
-            nameError = "Required"
-            isValid = false
-        }
-
         val numEx = currentState.numberOfExercises.toIntOrNull()
-        if (numEx == null || numEx <= 0) {
+        if (numEx == null || numEx < ExerciseConst.MIN_INT) {
             exercisesError = "Must be a positive number"
             isValid = false
         }
@@ -73,7 +67,7 @@ class WorkoutEntryViewModel : ViewModel() {
             viewModelScope.launch {
                 _events.emit(
                     WorkoutEntryViewModelEvent.ContinueToExercises(
-                        workoutName = name,
+                        workoutName = currentState.workoutName.trim(),
                         numberOfExercises = numEx
                     )
                 )
@@ -81,7 +75,6 @@ class WorkoutEntryViewModel : ViewModel() {
         } else {
             _state.update {
                 it.copy(
-                    workoutNameError = nameError,
                     numberOfExercisesError = exercisesError
                 )
             }
