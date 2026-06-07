@@ -90,12 +90,12 @@ class RoomWorkoutRepository(
 
     override suspend fun deleteWorkout(workout: Workout) = withContext(dispatcherProvider.io) {
         workoutDao.delete(workout)
-        // TODO: Remote sync for deleting workout (e.g. Firebase) should be handled by UseCases
+        Database.deleteWorkoutFirebase(workout.name)
     }
 
     override suspend fun deleteWorkoutByName(workoutName: String) = withContext(dispatcherProvider.io) {
         workoutDao.delete(workoutName)
-        // TODO: Remote sync for deleting workout (e.g. Firebase) should be handled by UseCases
+        Database.deleteWorkoutFirebase(workoutName)
     }
 
     override suspend fun deleteAllWorkouts() = withContext(dispatcherProvider.io) {
