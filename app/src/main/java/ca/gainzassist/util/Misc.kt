@@ -41,7 +41,9 @@ object Misc {
         val exercises = ArrayList<Exercise>()
         var exercise: Exercise?
         val idObj = workoutShot.child("id").value
-        val workoutId = idObj?.toString()?.toLongOrNull() ?: Date().time
+        val workoutId = idObj?.toString()?.toLongOrNull()
+            ?: workoutShot.key?.hashCode()?.toLong()?.let { kotlin.math.abs(it) }
+            ?: Date().time
         for (exerciseShot in workoutShot.child("exercises").children) {
             if (exerciseShot != null) {
                 exercise = exerciseShot.getValue(Exercise::class.java)
