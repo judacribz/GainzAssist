@@ -16,6 +16,7 @@ import ca.gainzassist.core.di.presentationModule
 import ca.gainzassist.core.di.mainViewModelModule
 import ca.gainzassist.core.di.addWorkoutViewModelModule
 import ca.gainzassist.core.di.startWorkoutViewModelModule
+import ca.gainzassist.core.di.workoutScreenViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -36,6 +37,7 @@ class App : Application() {
                 mainViewModelModule,
                 addWorkoutViewModelModule,
                 startWorkoutViewModelModule,
+                workoutScreenViewModelModule,
                 presentationModule
             )
         }
