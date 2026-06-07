@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS
 import java.util.Locale
+import ca.gainzassist.presentation.start_workout.workout.WorkoutProgressUiItem
 
 data class WorkoutUiState(
     val exerciseTitle: String = "",
@@ -65,10 +66,6 @@ data class WorkoutUiState(
     val isResumeWorkoutVisible: Boolean = false
 )
 
-data class WorkoutProgressUiItem(
-    val number: Int,
-    val status: PROGRESS_STATUS
-)
 
 data class WorkoutUiActions(
     val onTimerClick: () -> Unit = {},
