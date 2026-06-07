@@ -3,7 +3,6 @@ package ca.gainzassist.presentation.add_workout
 import ca.gainzassist.domain.usecase.workout.SaveWorkoutUseCase
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.Workout
-import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,13 +26,11 @@ class SummaryViewModelTest {
 
     private lateinit var viewModel: SummaryViewModel
     private lateinit var fakeWorkoutRepository: FakeWorkoutRepository
-    private lateinit var fakeSessionPreferencesRepository: FakeSessionPreferencesRepository
     private lateinit var saveWorkoutUseCase: SaveWorkoutUseCase
 
     @Before
     fun setup() {
         fakeWorkoutRepository = FakeWorkoutRepository()
-        fakeSessionPreferencesRepository = FakeSessionPreferencesRepository()
         saveWorkoutUseCase = SaveWorkoutUseCase(fakeWorkoutRepository)
 
         viewModel = SummaryViewModel(saveWorkoutUseCase)
