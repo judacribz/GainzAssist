@@ -2,7 +2,6 @@ package ca.gainzassist.presentation.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ca.gainzassist.activities.main.MainTab
 import ca.gainzassist.domain.usecase.session.GetIncompleteWorkoutNamesUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteAllWorkoutsUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteWorkoutUseCase

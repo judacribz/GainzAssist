@@ -16,11 +16,7 @@ import ca.gainzassist.components.GainzTabItem
 import ca.gainzassist.components.GainzTabRow
 
 
-enum class MainTab(val title: String) {
-    RESUME("RESUME"),
-    WORKOUTS("WORKOUTS"),
-    SETTINGS("SETTINGS")
-}
+import ca.gainzassist.presentation.main.MainTab
 
 data class MainUiState(
     val selectedTab: MainTab = MainTab.WORKOUTS,
