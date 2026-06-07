@@ -26,6 +26,14 @@ import ca.gainzassist.util.Preferences.getIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
 import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
 import ca.gainzassist.util.UI.setInitTheme
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import ca.gainzassist.presentation.start_workout.StartWorkoutViewModel
+import ca.gainzassist.presentation.start_workout.StartWorkoutViewModelEvent
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 
 class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
@@ -34,18 +42,10 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         const val EXTRA_HOW_TO_VID = "ca.gainzassist.activities.start_workout.EXTRA_HOW_TO_VID"
     }
 
+    private val viewModel: StartWorkoutViewModel by viewModel()
     private val currWorkout = CurrWorkout.getInstance()
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
-
-    private var uiState by mutableStateOf(
-        StartWorkoutUiState(
-            selectedTab = StartWorkoutTab.WORKOUT,
-            availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-            exercises = arrayListOf(),
-            warmups = arrayListOf()
-        )
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,22 +54,45 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         val currentWorkout = workout ?: return
         exercises = currentWorkout.exercises
         
-        uiState = uiState.copy(exercises = exercises ?: arrayListOf())
+        viewModel.initializeFromWorkout(currentWorkout)
 
         setInitTheme(this)
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        is StartWorkoutViewModelEvent.OpenHowToVideos -> {
+                            val vidIntent = Intent(this@StartWorkout, HowToVideos::class.java)
+                            vidIntent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
+                            startActivity(vidIntent)
+                        }
+                        is StartWorkoutViewModelEvent.ExitWorkout -> {
+                            onBackPressed()
+                        }
+                        is StartWorkoutViewModelEvent.FinishWorkout -> {
+                            // Handled later
+                        }
+                        is StartWorkoutViewModelEvent.Error -> {
+                            // Handle error
+                        }
+                    }
+                }
+            }
+        }
+
         setContent {
+            val uiState by viewModel.state.collectAsStateWithLifecycle()
+
             Column(Modifier.fillMaxSize()) {
                 GainzTopBar(
                     title = currentWorkout.name.orEmpty(),
                     showBack = true,
-                    onBackClick = { onBackPressed() },
+                    onBackClick = { viewModel.onBackClicked() },
                     actions = {
                         IconButton(
                             onClick = {
-                                val intent = Intent(this@StartWorkout, HowToVideos::class.java)
-                                intent.putExtra(EXTRA_HOW_TO_VID, currWorkout.currExName)
-                                startActivity(intent)
+                                viewModel.onHowToVideosClicked()
                             }
                         ) {
                             Icon(
@@ -84,7 +107,7 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
                 StartWorkoutScreen(
                     uiState = uiState,
                     onTabSelected = { tab ->
-                        uiState = uiState.copy(selectedTab = tab)
+                        viewModel.onTabSelected(tab)
                     }
                 )
             }
@@ -95,7 +118,8 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         super.onResume()
         // Initialize session if not already set. We check if uiState's tabs match a fresh load.
         // But since we removed the pager adapter check, we can use a boolean flag.
-        if (uiState.warmups.isEmpty() && uiState.availableTabs.size == 2 && !sessionSet) {
+        val currentState = viewModel.state.value
+        if (currentState.warmups.isEmpty() && currentState.availableTabs.size == 2 && !sessionSet) {
             setCurrSession()
             sessionSet = true
         }
@@ -176,18 +200,6 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
 
     override fun warmupsGenerated(warmups: ArrayList<Exercise>) {
-        uiState = if (warmups.isEmpty()) {
-            uiState.copy(
-                availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                selectedTab = StartWorkoutTab.WORKOUT,
-                warmups = warmups
-            )
-        } else {
-            uiState.copy(
-                availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                selectedTab = StartWorkoutTab.WORKOUT,
-                warmups = warmups
-            )
-        }
+        viewModel.onWarmupsGenerated(warmups)
     }
 }
