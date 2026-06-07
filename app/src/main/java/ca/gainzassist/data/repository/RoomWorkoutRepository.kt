@@ -58,10 +58,14 @@ class RoomWorkoutRepository(
     }
 
     override suspend fun insertWorkout(workout: Workout) = withContext(dispatcherProvider.io) {
-        workoutDao.insert(workout)
+        val newId = workoutDao.insert(workout)
+        workout.id = newId
         
         val exercises = workout.exercises
         if (exercises.isNotEmpty()) {
+            for (ex in exercises) {
+                ex.workoutId = newId
+            }
             insertExercises(exercises)
         }
         Database.addWorkoutFirebase(workout)
@@ -73,6 +77,7 @@ class RoomWorkoutRepository(
         val exercises = workout.exercises
         if (exercises.isNotEmpty()) {
             for (ex in exercises) {
+                ex.workoutId = workout.id
                 if (exerciseDao.get(ex.id) == null) {
                     exerciseDao.insert(ex)
                 } else {

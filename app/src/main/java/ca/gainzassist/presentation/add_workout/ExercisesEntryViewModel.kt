@@ -18,6 +18,7 @@ data class ExercisesEntryViewModelState(
     val numberOfExercises: Int = 1,
     val selectedIndex: Int = 0,
     val exerciseNames: List<String> = emptyList(),
+    val exercises: List<Exercise> = emptyList(),
     val enteredExerciseCount: Int = 0,
     val selectedExerciseName: String? = null,
     val duplicateExerciseError: String? = null
@@ -54,6 +55,7 @@ class ExercisesEntryViewModel(
                 numberOfExercises = numberOfExercises,
                 selectedIndex = 0,
                 exerciseNames = exercises.map { ex -> ex.name ?: "" },
+                exercises = exercises.toList(),
                 enteredExerciseCount = 0
             )
         }
@@ -80,6 +82,7 @@ class ExercisesEntryViewModel(
         _state.update {
             it.copy(
                 exerciseNames = exercises.map { ex -> ex.name ?: "" },
+                exercises = exercises.toList(),
                 enteredExerciseCount = newEnteredCount
             )
         }
@@ -122,6 +125,7 @@ class ExercisesEntryViewModel(
                 numberOfExercises = newNumberOfExercises,
                 selectedIndex = newSelectedIndex,
                 exerciseNames = exercises.map { ex -> ex.name ?: "" },
+                exercises = exercises.toList(),
                 enteredExerciseCount = newEnteredCount
             )
         }
@@ -148,7 +152,8 @@ class ExercisesEntryViewModel(
             it.copy(
                 numberOfExercises = newIndex + 1,
                 selectedIndex = newIndex,
-                exerciseNames = exercises.map { ex -> ex.name ?: "" }
+                exerciseNames = exercises.map { ex -> ex.name ?: "" },
+                exercises = exercises.toList()
             )
         }
     }
