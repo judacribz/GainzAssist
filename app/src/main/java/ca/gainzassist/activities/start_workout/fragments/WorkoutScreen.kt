@@ -37,6 +37,7 @@ import ca.gainzassist.util.Misc.writeValueAsString
 import ca.gainzassist.util.Preferences
 import com.orhanobut.logger.Logger
 import java.util.Locale
+import ca.gainzassist.presentation.start_workout.workout.WorkoutProgressUiItem
 
 class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
 
