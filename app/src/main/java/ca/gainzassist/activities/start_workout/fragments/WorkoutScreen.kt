@@ -31,15 +31,20 @@ import ca.gainzassist.constants.UIConst.PROGRESS_CODE_MAP
 import ca.gainzassist.constants.UIConst.PROGRESS_STATUS_MAP
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
+import androidx.lifecycle.lifecycleScope
+import ca.gainzassist.domain.session.SessionProgressSnapshot
 import ca.gainzassist.models.db.WorkoutViewModel
-import ca.gainzassist.util.Misc.readValue
-import ca.gainzassist.util.Misc.writeValueAsString
 import ca.gainzassist.util.Preferences
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 import ca.gainzassist.presentation.start_workout.workout.WorkoutProgressUiItem
+import ca.gainzassist.presentation.start_workout.workout.WorkoutScreenViewModel
 
 class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
+
+    private val viewModel: WorkoutScreenViewModel by viewModel()
 
     private val currWorkout = CurrWorkout.getInstance()
     private var act: StartWorkout? = null
@@ -114,32 +119,30 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
 
     private fun refreshFromResume() {
         currWorkout.setDataListener(this)
-        val progressJson = Preferences.getSessionProgressPref(act, currWorkout.workoutName)
 
-        if (progressJson != null && setProgress == null) {
-            val map = readValue(progressJson)
-            val exMap = readValue(map["exercise progress"])
-            val setMap = readValue(map["set progress"])
+        lifecycleScope.launch {
+            if (setProgress == null) {
+                val snapshot = viewModel.getSessionProgress(currWorkout.workoutName)
+                if (snapshot != null) {
+                    exProgress = SparseArray()
+                    for ((key, value) in snapshot.exerciseProgress) {
+                        if (value != null) {
+                            exProgress?.put(key, PROGRESS_STATUS_MAP[value])
+                        }
+                    }
+                    setProgress = SparseArray()
+                    for ((key, value) in snapshot.setProgress) {
+                        if (value != null) {
+                            setProgress?.put(key, PROGRESS_STATUS_MAP[value])
+                        }
+                    }
+                }
+            }
 
-            exProgress = SparseArray()
-            for ((key, value) in exMap) {
-                exProgress?.put(
-                    key.toInt(),
-                    PROGRESS_STATUS_MAP[value.toString().toInt()]
-                )
-            }
-            setProgress = SparseArray()
-            for ((key, value) in setMap) {
-                setProgress?.put(
-                    key.toInt(),
-                    PROGRESS_STATUS_MAP[value.toString().toInt()]
-                )
-            }
+            updateProgressExs(currWorkout.currNumExs)
+            updateProgSets(currWorkout.currNumSets)
+            updateUI()
         }
-
-        updateProgressExs(currWorkout.currNumExs)
-        updateProgSets(currWorkout.currNumSets)
-        updateUI()
     }
 
     fun updateProgressExs(numExs: Int) {
@@ -174,29 +177,26 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
     }
 
     fun saveProgressMap() {
-        val progressMap = HashMap<String, Any>()
-        val exMap = HashMap<String, Int?>()
-        val setMap = HashMap<String, Int?>()
+        val exMap = mutableMapOf<Int, Int?>()
+        val setMap = mutableMapOf<Int, Int?>()
 
         exProgress?.let {
             for (i in 0 until it.size) {
-                exMap[i.toString()] = PROGRESS_CODE_MAP[it.get(i)]
+                exMap[i] = PROGRESS_CODE_MAP[it.get(i)]
             }
         }
 
         setProgress?.let {
             for (i in 0 until it.size) {
-                setMap[i.toString()] = PROGRESS_CODE_MAP[it.get(i)]
+                setMap[i] = PROGRESS_CODE_MAP[it.get(i)]
             }
         }
 
-        progressMap["exercise progress"] = exMap
-        progressMap["set progress"] = setMap
-        Preferences.addSessionProgressPref(
-            act,
-            currWorkout.workoutName,
-            writeValueAsString(progressMap)
-        )
+        val snapshot = SessionProgressSnapshot(exMap, setMap)
+
+        lifecycleScope.launch {
+            viewModel.saveSessionProgress(currWorkout.workoutName, snapshot)
+        }
     }
 
     override fun startTimer(timeInMillis: Long) {
