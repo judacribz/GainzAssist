@@ -9,29 +9,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import ca.gainzassist.R
-import ca.gainzassist.activities.how_to_videos.HowToVideos
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Workout
-import ca.gainzassist.ui.components.GainzTopBar
-import ca.gainzassist.util.Misc.readValue
-import ca.gainzassist.util.Preferences.addIncompleteSessionPref
-import ca.gainzassist.util.Preferences.addIncompleteWorkoutPref
-import ca.gainzassist.util.Preferences.getIncompleteSessionPref
-import ca.gainzassist.util.Preferences.removeIncompleteSessionPref
-import ca.gainzassist.util.Preferences.removeIncompleteWorkoutPref
-import ca.gainzassist.util.UI.setInitTheme
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import ca.gainzassist.R
+import ca.gainzassist.activities.how_to_videos.HowToVideos
+import ca.gainzassist.models.Exercise
+import ca.gainzassist.models.Workout
+import ca.gainzassist.presentation.start_workout.StartWorkoutRestoreDecision
 import ca.gainzassist.presentation.start_workout.StartWorkoutViewModel
 import ca.gainzassist.presentation.start_workout.StartWorkoutViewModelEvent
+import ca.gainzassist.ui.components.GainzTopBar
+import ca.gainzassist.util.Misc.readValue
+import ca.gainzassist.util.UI.setInitTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
@@ -133,30 +127,25 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
         val currentWorkout = workout ?: return
         val workoutName = currentWorkout.name ?: return
 
-        if (removeIncompleteWorkoutPref(this, workoutName)) {
-            try {
-                val savedSession = getIncompleteSessionPref(this, workoutName)
-
-                if (savedSession.isNullOrEmpty()) {
-                    removeIncompleteSessionPref(this, workoutName)
+        lifecycleScope.launch {
+            val decision = viewModel.prepareSessionRestore(workoutName)
+            when (decision) {
+                is StartWorkoutRestoreDecision.StartFresh -> {
                     currWorkout.setCurrWorkout(currentWorkout)
-                    return
                 }
-
-                @Suppress("UNCHECKED_CAST")
-                currWorkout.setRetrievedWorkout(
-                    readValue(savedSession) as Map<String, Any?>,
-                    currentWorkout
-                )
-
-                removeIncompleteSessionPref(this, workoutName)
-            } catch (ex: Exception) {
-                com.orhanobut.logger.Logger.e(ex, "Failed to restore incomplete workout. Starting fresh.")
-                removeIncompleteSessionPref(this, workoutName)
-                currWorkout.setCurrWorkout(currentWorkout)
+                is StartWorkoutRestoreDecision.RestoreFromJson -> {
+                    try {
+                        @Suppress("UNCHECKED_CAST")
+                        currWorkout.setRetrievedWorkout(
+                            readValue(decision.sessionJson) as Map<String, Any?>,
+                            currentWorkout
+                        )
+                    } catch (ex: Exception) {
+                        com.orhanobut.logger.Logger.e(ex, "Failed to restore incomplete workout. Starting fresh.")
+                        currWorkout.setCurrWorkout(currentWorkout)
+                    }
+                }
             }
-        } else {
-            currWorkout.setCurrWorkout(currentWorkout)
         }
     }
 
@@ -172,28 +161,25 @@ class StartWorkout : AppCompatActivity(), CurrWorkout.WarmupsListener {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        handleLeavingScreen()
+        lifecycleScope.launch {
+            handleLeavingScreen()
+        }
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        currWorkout.unsetTimer()
-        handleLeavingScreen()
+        lifecycleScope.launch {
+            currWorkout.unsetTimer()
+            handleLeavingScreen()
+            super.onBackPressed()
+        }
     }
 
-    fun handleLeavingScreen() {
+    suspend fun handleLeavingScreen() {
         val currentWorkout = workout ?: return
         val workoutName = currentWorkout.name ?: return
 
         val jsonStr = currWorkout.saveSessionState()
-        if (jsonStr.isNotEmpty()) {
-            addIncompleteSessionPref(
-                this,
-                workoutName,
-                jsonStr
-            )
-        }
-        addIncompleteWorkoutPref(this, workoutName)
+        viewModel.saveLeavingSession(workoutName, jsonStr)
         currWorkout.resetLocks()
     }
 

@@ -2,13 +2,15 @@ package ca.gainzassist.presentation.start_workout
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ca.gainzassist.models.Exercise
+import ca.gainzassist.domain.usecase.session.AddIncompleteWorkoutUseCase
+import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCase
+import ca.gainzassist.models.Exercise
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -40,7 +42,9 @@ sealed interface StartWorkoutViewModelEvent {
 
 class StartWorkoutViewModel(
     private val getWorkoutWithExercisesByNameUseCase: GetWorkoutWithExercisesByNameUseCase,
+    private val addIncompleteWorkoutUseCase: AddIncompleteWorkoutUseCase,
     private val saveIncompleteSessionUseCase: SaveIncompleteSessionUseCase,
+    private val getIncompleteSessionUseCase: GetIncompleteSessionUseCase,
     private val saveSessionProgressUseCase: SaveSessionProgressUseCase,
     private val removeIncompleteWorkoutUseCase: RemoveIncompleteWorkoutUseCase,
     private val removeIncompleteSessionUseCase: RemoveIncompleteSessionUseCase,
@@ -62,6 +66,33 @@ class StartWorkoutViewModel(
                 exercises = workout.exercises ?: emptyList()
             ) 
         }
+    }
+
+    suspend fun prepareSessionRestore(workoutName: String): StartWorkoutRestoreDecision {
+        if (workoutName.isBlank()) {
+            return StartWorkoutRestoreDecision.StartFresh
+        }
+
+        val hasIncompleteWorkout = removeIncompleteWorkoutUseCase(workoutName)
+        if (!hasIncompleteWorkout) {
+            return StartWorkoutRestoreDecision.StartFresh
+        }
+
+        val sessionJson = getIncompleteSessionUseCase(workoutName)
+        if (sessionJson.isNullOrEmpty()) {
+            removeIncompleteSessionUseCase(workoutName)
+            return StartWorkoutRestoreDecision.StartFresh
+        }
+
+        removeIncompleteSessionUseCase(workoutName)
+        return StartWorkoutRestoreDecision.RestoreFromJson(sessionJson)
+    }
+
+    suspend fun saveLeavingSession(workoutName: String, sessionJson: String) {
+        if (sessionJson.isNotEmpty()) {
+            saveIncompleteSessionUseCase(workoutName, sessionJson)
+        }
+        addIncompleteWorkoutUseCase(workoutName)
     }
 
     fun onWarmupsGenerated(warmups: List<Exercise>) {
