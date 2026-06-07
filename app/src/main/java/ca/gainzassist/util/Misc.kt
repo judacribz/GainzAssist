@@ -3,6 +3,8 @@ package ca.gainzassist.util
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
+import ca.gainzassist.constants.ExerciseConst.EXERCISES
+import ca.gainzassist.constants.ExerciseConst.SET_LIST
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
 import ca.gainzassist.models.Session
@@ -14,9 +16,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.google.firebase.database.DataSnapshot
 import com.orhanobut.logger.Logger
 import java.io.IOException
-import java.util.*
-import ca.gainzassist.constants.ExerciseConst.EXERCISES
-import ca.gainzassist.constants.ExerciseConst.SET_LIST
+import java.util.Date
 
 object Misc {
 
@@ -40,8 +40,8 @@ object Misc {
     fun extractWorkout(workoutShot: DataSnapshot): Workout {
         val exercises = ArrayList<Exercise>()
         var exercise: Exercise?
-        val workoutId = workoutShot.child("id").value.toString().toLong()
-
+        val idObj = workoutShot.child("id").value
+        val workoutId = idObj?.toString()?.toLongOrNull() ?: Date().time
         for (exerciseShot in workoutShot.child("exercises").children) {
             if (exerciseShot != null) {
                 exercise = exerciseShot.getValue(Exercise::class.java)
@@ -101,15 +101,6 @@ object Misc {
     }
 
     @JvmStatic
-    fun exerciseSetsToMap(exercises: ArrayList<Exercise>): Map<String, Any?> {
-        val exs = HashMap<String, Any?>()
-        for (exercise in exercises) {
-            exs[exercise.exerciseNumber.toString()] = exercise.setsToMap()
-        }
-        return exs
-    }
-
-    @JvmStatic
     fun enablePrettyMapper() {
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
@@ -147,8 +138,7 @@ object Misc {
     @JvmStatic
     fun shrinkTo(list: MutableList<*>?, newSize: Int) {
         list?.let {
-            val size = it.size
-            for (i in newSize until size) {
+            while (it.size > newSize) {
                 it.removeAt(it.size - 1)
             }
         }

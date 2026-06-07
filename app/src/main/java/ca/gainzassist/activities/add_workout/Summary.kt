@@ -404,7 +404,7 @@ class Summary : AppCompatActivity() {
                     }
                 },
                 onDiscardWorkout = {
-                    setResult(RESULT_OK)
+                    setResult(RESULT_CANCELED)
                     finish()
                 },
                 onAddOrUpdateWorkout = {
