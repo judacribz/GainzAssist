@@ -234,12 +234,7 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
         numItems: Int,
         itemInd: Int
     ): SparseArray<PROGRESS_STATUS> {
-        val progressStatus = SparseArray<PROGRESS_STATUS>()
-        for (i in 0 until numItems) {
-            progressStatus.put(i, UNSELECTED)
-        }
-        progressStatus.put(itemInd - 1, SELECTED)
-        return progressStatus
+        return ca.gainzassist.presentation.start_workout.workout.WorkoutProgressMapper.setupProgress(numItems, itemInd)
     }
 
     fun changeTimerState() {
@@ -505,41 +500,14 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
     }
 }
 
-private fun SparseArray<PROGRESS_STATUS>.deselectCurrent() {
-    for (i in 0 until size) {
-        val key = keyAt(i)
-        when (get(key)) {
-            SELECTED -> put(key, UNSELECTED)
-            SUCCESS_SELECTED -> put(key, SUCCESS)
-            FAIL_SELECTED -> put(key, FAIL)
-            else -> Unit
-        }
-    }
-}
-
 private fun SparseArray<PROGRESS_STATUS>.selectOneBased(index: Int) {
-    deselectCurrent()
-    val zeroBased = index - 1
-    val status = get(zeroBased)
-    when (status) {
-        SUCCESS -> put(zeroBased, SUCCESS_SELECTED)
-        FAIL -> put(zeroBased, FAIL_SELECTED)
-        else -> put(zeroBased, SELECTED)
-    }
+    ca.gainzassist.presentation.start_workout.workout.WorkoutProgressMapper.selectOneBased(this, index)
 }
 
 private fun SparseArray<PROGRESS_STATUS>.setCurrentOneBased(index: Int, success: Boolean) {
-    selectOneBased(index)
-    if (index > 1) {
-        put(index - 2, if (success) SUCCESS else FAIL)
-    }
+    ca.gainzassist.presentation.start_workout.workout.WorkoutProgressMapper.setCurrentOneBased(this, index, success)
 }
 
 private fun SparseArray<PROGRESS_STATUS>.toProgressUiItems(count: Int): List<WorkoutProgressUiItem> {
-    return (0 until count).map { zeroBased ->
-        WorkoutProgressUiItem(
-            number = zeroBased + 1,
-            status = get(zeroBased) ?: UNSELECTED
-        )
-    }
+    return ca.gainzassist.presentation.start_workout.workout.WorkoutProgressMapper.toProgressUiItems(this, count)
 }
