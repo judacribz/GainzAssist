@@ -21,7 +21,7 @@ class RoomWorkoutRepository(
     private val setDao = database.setDao()
 
     override fun observeWorkouts(): Flow<List<Workout>> {
-        return workoutDao.all.asFlow()
+        return workoutDao.getAll().asFlow()
     }
 
     override fun observeWorkout(id: Long): Flow<Workout?> {
@@ -41,7 +41,7 @@ class RoomWorkoutRepository(
     }
 
     override fun observeUniqueExerciseNames(): Flow<List<String>> {
-        return exerciseDao.allUniqueNames.asFlow()
+        return exerciseDao.getAllUniqueNames().asFlow()
     }
 
     override suspend fun getWorkoutByName(name: String): Workout? = withContext(dispatcherProvider.io) {
