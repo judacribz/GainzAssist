@@ -35,15 +35,14 @@ abstract class WorkoutDatabase : RoomDatabase() {
         @JvmStatic
         fun getDatabase(context: Context): WorkoutDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+                INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     WorkoutDatabase::class.java,
                     "workout_database"
                 )
-                .addCallback(sRoomDatabaseCallback)
-                .build()
-                INSTANCE = instance
-                instance
+                    .addCallback(sRoomDatabaseCallback)
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }
