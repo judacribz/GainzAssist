@@ -2,6 +2,7 @@ package ca.gainzassist.domain.repository
 
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
+import ca.gainzassist.models.Session
 import ca.gainzassist.models.Workout
 import kotlinx.coroutines.flow.Flow
 
@@ -29,4 +30,6 @@ interface WorkoutRepository {
 
     suspend fun insertSet(exerciseSet: ExerciseSet)
     suspend fun deleteSet(exerciseSet: ExerciseSet)
+
+    suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean = true)
 }

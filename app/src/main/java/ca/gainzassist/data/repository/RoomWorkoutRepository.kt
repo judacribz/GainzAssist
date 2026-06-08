@@ -5,9 +5,11 @@ import ca.gainzassist.core.coroutines.DispatcherProvider
 import ca.gainzassist.domain.repository.WorkoutRepository
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
+import ca.gainzassist.models.Session
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutDatabase
 import ca.gainzassist.util.firebase.Database
+import ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
@@ -19,6 +21,7 @@ class RoomWorkoutRepository(
     private val workoutDao = database.workoutDao()
     private val exerciseDao = database.exerciseDao()
     private val setDao = database.setDao()
+    private val sessionDao = database.sessionDao()
 
     override fun observeWorkouts(): Flow<List<Workout>> {
         return workoutDao.getAll().asFlow()
@@ -126,5 +129,26 @@ class RoomWorkoutRepository(
 
     override suspend fun deleteSet(exerciseSet: ExerciseSet) = withContext(dispatcherProvider.io) {
         setDao.delete(exerciseSet)
+    }
+
+    override suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean) = withContext(dispatcherProvider.io) {
+        sessionDao.insert(session)
+        val calculateNextWeight = CalculateNextExerciseWeightUseCase()
+
+        for (exercise in session.sessionExs) {
+            val finishedSets = exercise.getFinishedSetsList()
+            for (set in finishedSets) {
+                setDao.insert(set)
+            }
+            if (exercise.setsType == Exercise.SetsType.MAIN_SET) {
+                val nextWeight = calculateNextWeight(exercise, finishedSets)
+                exerciseDao.updateWeight(nextWeight, exercise.id)
+                session.avgWeights.put(exercise.exerciseNumber, nextWeight)
+            }
+        }
+
+        if (syncToFirebase) {
+            Database.addWorkoutSessionFirebase(session)
+        }
     }
 }
