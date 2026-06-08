@@ -1,10 +1,7 @@
 package ca.gainzassist.activities.main.fragments
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +9,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import ca.gainzassist.activities.start_workout.StartWorkout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import ca.gainzassist.activities.main.Main
 import ca.gainzassist.activities.main.fragments.resume.ResumeScreen
 import ca.gainzassist.activities.main.fragments.resume.ResumeUiState
+import ca.gainzassist.activities.start_workout.StartWorkout
 import ca.gainzassist.models.Workout
 import ca.gainzassist.models.db.WorkoutViewModel
 import ca.gainzassist.util.Preferences.getIncompleteWorkouts
 import kotlinx.coroutines.flow.MutableStateFlow
-import java.util.*
 
 class Resume : Fragment() {
 
@@ -81,9 +81,9 @@ class Resume : Fragment() {
         uiStateFlow.value = ResumeUiState(workoutNames = workoutNames)
     }
 
-    private fun onWorkoutClicked(workoutName: String) {
+    private fun onWorkoutClicked(workoutName: String) = context?.let { context ->
         intent = Intent(context, StartWorkout::class.java)
-        extraKey = ca.gainzassist.activities.main.Main.EXTRA_WORKOUT
+        extraKey = Main.EXTRA_WORKOUT
         workoutViewModel?.getWorkoutFromName(context, workoutName)
     }
 

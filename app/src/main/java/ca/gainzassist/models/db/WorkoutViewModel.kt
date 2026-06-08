@@ -54,7 +54,7 @@ class WorkoutViewModel(app: Application) : AndroidViewModel(app) {
         return workoutRepo.getWorkout(id.toLong())
     }
 
-    fun getWorkoutFromName(context: Context?, name: String) {
+    fun getWorkoutFromName(context: Context, name: String) {
         workoutRepo.getWorkoutFromName(context, name)
     }
 
