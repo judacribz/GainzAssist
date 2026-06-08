@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.util.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import ca.gainzassist.R
 import ca.gainzassist.activities.start_workout.CurrWorkout
 import ca.gainzassist.activities.start_workout.StartWorkout
@@ -33,7 +32,6 @@ import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
 import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.domain.session.SessionProgressSnapshot
-import ca.gainzassist.models.db.WorkoutViewModel
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -342,13 +340,11 @@ class WorkoutScreen : Fragment(), CurrWorkout.DataListener {
 
             val a = act
             if (a != null) {
-                val session = currWorkout.currSession
-                if (session != null) {
-                    ViewModelProvider(a)[WorkoutViewModel::class.java]
-                        .insertSession(session)
-                }
-
                 lifecycleScope.launch {
+                    val session = currWorkout.currSession
+                    if (session != null) {
+                        viewModel.insertCompletedSession(session)
+                    }
                     viewModel.clearFinishedWorkoutState(currWorkout.workoutName)
                     a.finish()
                 }
