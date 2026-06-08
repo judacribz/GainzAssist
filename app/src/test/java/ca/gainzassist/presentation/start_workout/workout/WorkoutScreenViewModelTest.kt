@@ -6,7 +6,10 @@ import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
+import ca.gainzassist.domain.usecase.workout.InsertCompletedSessionUseCase
+import ca.gainzassist.models.Session
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
+import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -24,6 +27,7 @@ class WorkoutScreenViewModelTest {
 
     private lateinit var viewModel: WorkoutScreenViewModel
     private lateinit var sessionPreferencesRepository: FakeSessionPreferencesRepository
+    private lateinit var fakeWorkoutRepository: FakeWorkoutRepository
 
     private fun <T> assertNotNullValue(value: T?): T {
         assertTrue(value != null)
@@ -33,12 +37,14 @@ class WorkoutScreenViewModelTest {
     @Before
     fun setup() {
         sessionPreferencesRepository = FakeSessionPreferencesRepository()
+        fakeWorkoutRepository = FakeWorkoutRepository()
         viewModel = WorkoutScreenViewModel(
             getSessionProgressUseCase = GetSessionProgressUseCase(sessionPreferencesRepository),
             saveSessionProgressUseCase = SaveSessionProgressUseCase(sessionPreferencesRepository),
             removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(sessionPreferencesRepository),
             removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(sessionPreferencesRepository),
-            removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository)
+            removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository),
+            insertCompletedSessionUseCase = InsertCompletedSessionUseCase(fakeWorkoutRepository)
         )
     }
 
@@ -114,7 +120,7 @@ class WorkoutScreenViewModelTest {
     }
 
     @Test
-    fun clearFinishedWorkoutState_removesIncompleteSessionAndProgress() = runTest {
+    fun clearFinishedWorkoutState_removesIncompleteAndProgress() = runTest {
         val workoutName = "Push Day"
         sessionPreferencesRepository.addIncompleteWorkout(workoutName)
         sessionPreferencesRepository.saveIncompleteSession(workoutName, "{\"session\":true}")
@@ -128,7 +134,7 @@ class WorkoutScreenViewModelTest {
     }
 
     @Test
-    fun clearFinishedWorkoutState_clearsProgressEvenIfIncompleteWorkoutDidNotExist() = runTest {
+    fun clearFinishedWorkoutState_alwaysClearsProgress() = runTest {
         val workoutName = "Pull Day"
         sessionPreferencesRepository.saveIncompleteSession(workoutName, "{\"session\":true}")
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
@@ -137,5 +143,24 @@ class WorkoutScreenViewModelTest {
 
         assertEquals(null, sessionPreferencesRepository.getSessionProgress(workoutName))
         assertEquals("{\"session\":true}", sessionPreferencesRepository.getIncompleteSession(workoutName))
+    }
+
+    @Test
+    fun insertCompletedSession_delegatesToUseCase() = runTest {
+        val session = Session().apply { workoutName = "Chest Day" }
+        viewModel.insertCompletedSession(session)
+
+        assertEquals(1, fakeWorkoutRepository.insertedSessions.size)
+        assertEquals(session, fakeWorkoutRepository.insertedSessions.first())
+        assertEquals(true, fakeWorkoutRepository.completedSessionSyncFlags.first())
+    }
+
+    @Test
+    fun insertCompletedSession_doesNotModifySessionWhenRepositoryFakeOnlyRecords() = runTest {
+        val session = Session().apply { workoutName = "Leg Day" }
+        viewModel.insertCompletedSession(session)
+
+        val recorded = fakeWorkoutRepository.insertedSessions.first()
+        assertEquals("Leg Day", recorded.workoutName)
     }
 }

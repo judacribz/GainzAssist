@@ -5,5 +5,5 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val workoutScreenViewModelModule = module {
-    viewModel { WorkoutScreenViewModel(get(), get(), get(), get(), get()) }
+    viewModel { WorkoutScreenViewModel(get(), get(), get(), get(), get(), get()) }
 }
