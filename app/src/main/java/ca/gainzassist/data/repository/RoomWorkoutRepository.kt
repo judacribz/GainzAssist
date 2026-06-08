@@ -143,6 +143,7 @@ class RoomWorkoutRepository(
             if (exercise.setsType == Exercise.SetsType.MAIN_SET) {
                 val nextWeight = calculateNextWeight(exercise, finishedSets)
                 exerciseDao.updateWeight(nextWeight, exercise.id)
+                session.avgWeights.put(exercise.exerciseNumber, nextWeight)
             }
         }
 
