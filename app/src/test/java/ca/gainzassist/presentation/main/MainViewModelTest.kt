@@ -132,4 +132,41 @@ class MainViewModelTest {
         assertTrue(events.contains(MainViewModelEvent.LoggedOut))
         job.cancel()
     }
+
+    @Test
+    fun refreshResumeWorkouts_updatesState() = runTest {
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Chest Day" })
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Leg Day" })
+        
+        // Initially no incomplete workouts
+        assertTrue(viewModel.state.value.resumeWorkoutNames.isEmpty())
+
+        // Add incomplete workout to fake repository
+        fakeSessionPreferencesRepository.addIncompleteWorkout("Chest Day")
+        
+        // Call refresh
+        viewModel.refreshResumeWorkouts()
+
+        assertEquals(listOf("Chest Day"), viewModel.state.value.resumeWorkoutNames)
+        
+        // Remove incomplete workout
+        fakeSessionPreferencesRepository.removeIncompleteWorkout("Chest Day")
+        
+        // Call refresh
+        viewModel.refreshResumeWorkouts()
+        
+        assertTrue(viewModel.state.value.resumeWorkoutNames.isEmpty())
+    }
+
+    @Test
+    fun onTabSelected_ResumeTab_refreshesResumeWorkouts() = runTest {
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Leg Day" })
+        fakeSessionPreferencesRepository.addIncompleteWorkout("Leg Day")
+
+        // Select Resume tab
+        viewModel.onTabSelected(MainTab.RESUME)
+
+        assertEquals(MainTab.RESUME, viewModel.state.value.selectedTab)
+        assertEquals(listOf("Leg Day"), viewModel.state.value.resumeWorkoutNames)
+    }
 }

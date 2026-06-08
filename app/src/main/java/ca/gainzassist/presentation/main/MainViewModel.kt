@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -61,24 +60,37 @@ class MainViewModel(
     private fun observeWorkouts() {
         observeWorkoutsUseCase().onEach { workouts ->
             val workoutNames = workouts.mapNotNull { it.name }
-            val incompleteNames = getIncompleteWorkoutNamesUseCase()
-            val resumeNames = workoutNames.filter { incompleteNames.contains(it) }
-
-            _state.update { currentState ->
-                val filtered = workoutNames.filter {
-                    it.lowercase().contains(currentState.searchQuery.lowercase())
-                }
-                currentState.copy(
-                    allWorkoutNames = workoutNames,
-                    resumeWorkoutNames = resumeNames,
-                    filteredWorkoutNames = filtered
-                )
-            }
+            refreshResumeWorkoutsInternal(workoutNames)
         }.launchIn(viewModelScope)
+    }
+
+    fun refreshResumeWorkouts() {
+        viewModelScope.launch {
+            refreshResumeWorkoutsInternal(_state.value.allWorkoutNames)
+        }
+    }
+
+    private suspend fun refreshResumeWorkoutsInternal(allWorkoutNames: List<String>) {
+        val incompleteNames = getIncompleteWorkoutNamesUseCase()
+        val resumeNames = allWorkoutNames.filter { incompleteNames.contains(it) }
+
+        _state.update { currentState ->
+            val filtered = allWorkoutNames.filter {
+                it.lowercase().contains(currentState.searchQuery.lowercase())
+            }
+            currentState.copy(
+                allWorkoutNames = allWorkoutNames,
+                resumeWorkoutNames = resumeNames,
+                filteredWorkoutNames = filtered
+            )
+        }
     }
 
     fun onTabSelected(tab: MainTab) {
         _state.update { it.copy(selectedTab = tab, isSearchExpanded = false) }
+        if (tab == MainTab.RESUME) {
+            refreshResumeWorkouts()
+        }
     }
 
     fun onSearchExpanded() {

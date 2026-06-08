@@ -4,8 +4,8 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
@@ -35,8 +35,6 @@ class Main : AppCompatActivity() {
     companion object {
         const val EXTRA_LOGOUT_USER = "ca.gainzassist.EXTRA_LOGOUT_USER"
         const val EXTRA_WORKOUT = "ca.gainzassist.activities.main.Main.EXTRA_WORKOUT"
-        const val EXTRA_CALLING_ACTIVITY = "ca.gainzassist.activities.main.Main.EXTRA_CALLING_ACTIVITY"
-        const val EXERCISES_ENTRY = "ca.gainzassist.activities.main.Main.EXERCISES_ENTRY"
         private const val MAIL_TO = "mailto:"
     }
 
@@ -114,6 +112,11 @@ class Main : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mainViewModel.refreshResumeWorkouts()
     }
 
     private fun openWorkoutEntry() {
