@@ -1,24 +1,22 @@
-# Java-to-Kotlin DB Migration Plan
+# Java-to-Kotlin DB Migration Complete
 
-This document outlines the migration strategy for remaining legacy Java database components to Kotlin.
+The Java-to-Kotlin DB migration is now completely finished. All legacy Java database components have been successfully converted to Kotlin.
 
-## Remaining Java Files
-- `WorkoutDatabase.java`
-- `WorkoutRepo.java`
-- `WorkoutViewModel.java`
-- Various DAO interfaces (e.g., `WorkoutDao.java`, `ExerciseDao.java`, etc.)
+## Completed Conversions
+- DAO interfaces (e.g., `WorkoutDao.kt`, `ExerciseDao.kt`, `SessionDao.kt`, `SetDao.kt`)
+- `WorkoutDatabase.kt`
+- `WorkoutRepo.kt`
+- `WorkoutViewModel.kt`
 
-## Conversion Order
-To minimize breakage and properly adopt coroutines and Flow, the conversion must follow this bottom-up order:
-1. **DAOs**
-2. **WorkoutDatabase**
-3. **WorkoutRepo**
-4. **WorkoutViewModel** or remove after callers migrate
+## Remaining Architecture Follow-ups
+- Remove legacy `WorkoutViewModel` usage from `WorkoutScreen`
+- Replace Thread-based `WorkoutRepo` with coroutine path/use cases
+- Eventually remove legacy `WorkoutRepo` if no longer used
 
-## Risk Areas
-- **Room annotation parity**: Ensure annotations translate correctly to Kotlin (e.g., `@get:Query` vs `@Query`, nullability of return types).
-- **Java/Kotlin nullability**: Java's implicit nullability might lead to strict NPEs in Kotlin if DB fields were unexpectedly null.
-- **legacy WorkoutRepo background threads**: Transitioning from Executor patterns to Coroutines can introduce threading issues if not carefully converted.
-- **insertSession progression persistence from PR #79**: Ensure the new progression persistence continues to work correctly.
-- **Firebase side effects**: Some DB operations might trigger or rely on Firebase syncs.
-- **WorkoutScreen still using legacy WorkoutViewModel**: Requires careful coordination so as not to break its existing lifecycle.
+## Verification Commands
+To verify the migration and test the application, run the following commands:
+- `find app/src/main/java -name "*.java"` (Should return no files)
+- `./gradlew clean :app:assembleDebug`
+- `./gradlew :app:lintDebug`
+- `./gradlew testDebugUnitTest`
+- `./gradlew connectedDebugAndroidTest`
