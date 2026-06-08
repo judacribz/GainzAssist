@@ -74,8 +74,8 @@ class WorkoutDatabaseCharacterizationTest {
 
         // Query workout by name
         val queriedWorkout = workoutDao.getFromName("Test Workout")
-        assertNotNull(queriedWorkout)
-        assertEquals(workoutId, queriedWorkout?.id)
+        val queriedWorkoutValue = assertNotNullValue(queriedWorkout)
+        assertEquals(workoutId, queriedWorkoutValue.id)
 
         // Query exercises by workout id ordered by exercise_number
         val exercises = exerciseDao.getFromWorkout(workoutId)
@@ -85,11 +85,11 @@ class WorkoutDatabaseCharacterizationTest {
 
         // Update exercise weight through ExerciseDao.updateWeight
         exerciseDao.updateWeight(110f, ex1Id)
-        val updatedEx1 = exerciseDao.get(ex1Id)!!
+        val updatedEx1 = assertNotNullValue(exerciseDao.get(ex1Id))
         assertEquals(110f, updatedEx1.weight, 0.1f)
 
         // Insert session
-        val session = Session(queriedWorkout!!)
+        val session = Session(queriedWorkoutValue)
         val sessionId = sessionDao.insert(session)
         assertTrue(sessionId > 0)
 
@@ -130,8 +130,8 @@ class WorkoutDatabaseCharacterizationTest {
             exerciseDao.get(exId)?.weight == 110f
         }
 
-        val updatedEx = exerciseDao.get(exId)
-        assertEquals(110f, updatedEx?.weight!!, 0.1f)
+        val updatedEx = assertNotNullValue(exerciseDao.get(exId))
+        assertEquals(110f, updatedEx.weight, 0.1f)
     }
 
     @Test
@@ -163,8 +163,13 @@ class WorkoutDatabaseCharacterizationTest {
             exerciseDao.get(exId)?.weight == 130f
         }
 
-        val updatedEx = exerciseDao.get(exId)
-        assertEquals(130f, updatedEx?.weight!!, 0.1f)
+        val updatedEx = assertNotNullValue(exerciseDao.get(exId))
+        assertEquals(130f, updatedEx.weight, 0.1f)
+    }
+
+    private fun <T> assertNotNullValue(value: T?): T {
+        assertNotNull(value)
+        return value ?: error("Expected non-null value")
     }
 
     private fun waitForCondition(timeoutMs: Long = 2000, condition: () -> Boolean) {
