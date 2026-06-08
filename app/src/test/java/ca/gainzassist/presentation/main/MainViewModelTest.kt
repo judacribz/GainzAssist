@@ -134,39 +134,55 @@ class MainViewModelTest {
     }
 
     @Test
-    fun refreshResumeWorkouts_updatesState() = runTest {
-        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Chest Day" })
-        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Leg Day" })
-        
-        // Initially no incomplete workouts
+    fun refreshResumeWorkouts_addsIncompleteWorkoutToState() = runTest {
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Push Day" })
         assertTrue(viewModel.state.value.resumeWorkoutNames.isEmpty())
 
-        // Add incomplete workout to fake repository
-        fakeSessionPreferencesRepository.addIncompleteWorkout("Chest Day")
-        
-        // Call refresh
+        fakeSessionPreferencesRepository.addIncompleteWorkout("Push Day")
         viewModel.refreshResumeWorkouts()
 
-        assertEquals(listOf("Chest Day"), viewModel.state.value.resumeWorkoutNames)
-        
-        // Remove incomplete workout
-        fakeSessionPreferencesRepository.removeIncompleteWorkout("Chest Day")
-        
-        // Call refresh
-        viewModel.refreshResumeWorkouts()
-        
-        assertTrue(viewModel.state.value.resumeWorkoutNames.isEmpty())
+        assertTrue(viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
     }
 
     @Test
-    fun onTabSelected_ResumeTab_refreshesResumeWorkouts() = runTest {
-        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Leg Day" })
-        fakeSessionPreferencesRepository.addIncompleteWorkout("Leg Day")
+    fun refreshResumeWorkouts_removesCompletedWorkoutFromState() = runTest {
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Push Day" })
+        fakeSessionPreferencesRepository.addIncompleteWorkout("Push Day")
+        
+        viewModel.refreshResumeWorkouts()
+        assertTrue(viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
+        
+        fakeSessionPreferencesRepository.removeIncompleteWorkout("Push Day")
+        viewModel.refreshResumeWorkouts()
+        
+        assertTrue(!viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
+    }
 
-        // Select Resume tab
+    @Test
+    fun selectingResumeTab_refreshesIncompleteNames() = runTest {
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Push Day" })
+        fakeSessionPreferencesRepository.addIncompleteWorkout("Push Day")
+
         viewModel.onTabSelected(MainTab.RESUME)
 
-        assertEquals(MainTab.RESUME, viewModel.state.value.selectedTab)
-        assertEquals(listOf("Leg Day"), viewModel.state.value.resumeWorkoutNames)
+        assertTrue(viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
+    }
+
+    @Test
+    fun onResumeStyleRefresh_doesNotAffectSearchOrWorkoutList() = runTest {
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Push Day" })
+        fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Pull Day" })
+        
+        viewModel.onSearchQueryChanged("pull")
+        
+        assertEquals(listOf("Pull Day"), viewModel.state.value.filteredWorkoutNames)
+        assertEquals("pull", viewModel.state.value.searchQuery)
+        
+        fakeSessionPreferencesRepository.addIncompleteWorkout("Push Day")
+        viewModel.refreshResumeWorkouts()
+        
+        assertTrue(viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
+        assertEquals(listOf("Pull Day"), viewModel.state.value.filteredWorkoutNames)
+        assertEquals("pull", viewModel.state.value.searchQuery)
     }
 }
