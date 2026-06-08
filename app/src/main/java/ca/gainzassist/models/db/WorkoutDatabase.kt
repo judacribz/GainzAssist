@@ -22,20 +22,29 @@ abstract class WorkoutDatabase : RoomDatabase() {
     abstract fun sessionDao(): SessionDao
 
     companion object {
+        private const val DATABASE_NAME = "workout_database"
+
         @Volatile
         private var INSTANCE: WorkoutDatabase? = null
+
+        private val sRoomDatabaseCallback = object : Callback() {
+            /* no-op */
+        }
 
         @JvmStatic
         fun getDatabase(context: Context): WorkoutDatabase {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    WorkoutDatabase::class.java,
-                    "workout_database"
-                )
+                INSTANCE ?: getDatabaseBuilder(context)
+                    .addCallback(sRoomDatabaseCallback)
                     .build()
                     .also { INSTANCE = it }
             }
         }
+
+        private fun getDatabaseBuilder(context: Context) = Room.databaseBuilder(
+            context.applicationContext,
+            WorkoutDatabase::class.java,
+            DATABASE_NAME
+        )
     }
 }
