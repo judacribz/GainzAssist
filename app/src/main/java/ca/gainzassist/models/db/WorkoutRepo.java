@@ -1,30 +1,23 @@
 package ca.gainzassist.models.db;
 
+import static ca.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
+import static ca.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
+
 import android.app.Application;
-import androidx.lifecycle.LiveData;
 import android.content.Context;
-import android.os.AsyncTask;
-import androidx.annotation.Nullable;
-import android.util.SparseArray;
+
+import androidx.lifecycle.LiveData;
+
+import com.google.firebase.database.DataSnapshot;
+
+import java.util.List;
+
+import ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase;
 import ca.gainzassist.interfaces.OnWorkoutReceivedListener;
 import ca.gainzassist.models.Exercise;
 import ca.gainzassist.models.ExerciseSet;
 import ca.gainzassist.models.Session;
 import ca.gainzassist.models.Workout;
-import com.google.firebase.database.DataSnapshot;
-import com.orhanobut.logger.Logger;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import static ca.gainzassist.models.Exercise.SetsType.MAIN_SET;
-import static ca.gainzassist.models.db.WorkoutRepo.RepoTask.*;
-import static ca.gainzassist.models.db.WorkoutRepo.TableTxn.*;
-import static ca.gainzassist.util.Misc.extractWorkout;
-import static ca.gainzassist.util.firebase.Database.addWorkoutSessionFirebase;
-import static ca.gainzassist.util.firebase.Database.deleteWorkoutFirebase;
 
 public class WorkoutRepo {
     static private WorkoutDao workoutDao;
@@ -92,8 +85,13 @@ public class WorkoutRepo {
     public void insertSession(Session session, boolean toFireBase) {
         new Thread(() -> {
             sessionDao.insert(session);
+            CalculateNextExerciseWeightUseCase calculateNextWeight = new CalculateNextExerciseWeightUseCase();
             for (Exercise ex : session.getSessionExs()) {
                 insertSet(ex.getFinishedSetsList().toArray(new ExerciseSet[0]));
+                if (ex.getSetsType() == Exercise.SetsType.MAIN_SET) {
+                    float nextWeight = calculateNextWeight.invoke(ex, ex.getFinishedSetsList());
+                    exerciseDao.updateWeight(nextWeight, ex.getId());
+                }
             }
         }).start();
 
