@@ -11,35 +11,10 @@ import ca.gainzassist.models.Session
 import ca.gainzassist.models.Workout
 import ca.gainzassist.util.firebase.Database.addWorkoutSessionFirebase
 import ca.gainzassist.util.firebase.Database.deleteWorkoutFirebase
-import com.google.firebase.database.DataSnapshot
 
 class WorkoutRepo(app: Application) {
-    private var workoutShot: DataSnapshot? = null
-    var onWorkoutReceivedListener: OnWorkoutReceivedListener? = null
 
-    enum class TableTxn {
-        WORKOUTS_TXN,
-        EXERCISES_TXN,
-        SESSIONS_TXN,
-        SETS_TXN
-    }
-
-    enum class RepoTask {
-        GET_WORKOUT,
-        GET_EXERCISES,
-        INSERT_EXERCISE,
-        INSERT_WORKOUT,
-        INSERT_SESSION,
-        INSERT_SET,
-        UPDATE_WORKOUT,
-        UPDATE_EXERCISE,
-        UPDATE_EXERCISE_WEIGHT,
-        UPDATE_SET,
-        DELETE_ALL_WORKOUTS,
-        DELETE_WORKOUT,
-        DELETE_EXERCISE,
-        DELETE_SET
-    }
+    private var onWorkoutReceivedListener: OnWorkoutReceivedListener? = null
 
     init {
         val db = WorkoutDatabase.getDatabase(app)
