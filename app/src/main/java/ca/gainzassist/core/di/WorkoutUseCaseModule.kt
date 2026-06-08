@@ -13,5 +13,6 @@ val workoutUseCaseModule = module {
     factory { UpdateWorkoutUseCase(workoutRepository = get()) }
     factory { DeleteWorkoutUseCase(workoutRepository = get()) }
     factory { DeleteAllWorkoutsUseCase(workoutRepository = get()) }
+    factory { InsertCompletedSessionUseCase(workoutRepository = get()) }
     factory { ExerciseExistsUseCase() }
 }

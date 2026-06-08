@@ -3,6 +3,7 @@ package ca.gainzassist.test.fakes
 import ca.gainzassist.domain.repository.WorkoutRepository
 import ca.gainzassist.models.Exercise
 import ca.gainzassist.models.ExerciseSet
+import ca.gainzassist.models.Session
 import ca.gainzassist.models.Workout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ class FakeWorkoutRepository : WorkoutRepository {
     private val workouts = MutableStateFlow<List<Workout>>(emptyList())
     private val exercises = MutableStateFlow<List<Exercise>>(emptyList())
     private val sets = MutableStateFlow<List<ExerciseSet>>(emptyList())
+    val insertedSessions = mutableListOf<Session>()
 
     override fun observeWorkouts(): Flow<List<Workout>> = workouts
 
@@ -121,5 +123,9 @@ class FakeWorkoutRepository : WorkoutRepository {
         val current = sets.value.toMutableList()
         current.removeIf { it.id == exerciseSet.id }
         sets.value = current
+    }
+
+    override suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean) {
+        insertedSessions.add(session)
     }
 }
