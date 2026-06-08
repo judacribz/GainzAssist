@@ -1,46 +1,50 @@
-package ca.gainzassist.models.db;
+package ca.gainzassist.models.db
 
-import androidx.sqlite.db.SupportSQLiteDatabase;
-import androidx.room.*;
-import android.content.Context;
-import androidx.annotation.NonNull;
-import ca.gainzassist.models.Exercise;
-import ca.gainzassist.models.Session;
-import ca.gainzassist.models.ExerciseSet;
-import ca.gainzassist.models.Workout;
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import ca.gainzassist.models.Exercise
+import ca.gainzassist.models.ExerciseSet
+import ca.gainzassist.models.Session
+import ca.gainzassist.models.Workout
 
-@Database(entities = {Workout.class, Exercise.class, ExerciseSet.class, Session.class},
-          version = 1,
-          exportSchema = false)
-public abstract class WorkoutDatabase extends RoomDatabase {
+@Database(
+    entities = [Workout::class, Exercise::class, ExerciseSet::class, Session::class],
+    version = 1,
+    exportSchema = false
+)
+abstract class WorkoutDatabase : RoomDatabase() {
 
-    public abstract WorkoutDao workoutDao();
-    public abstract ExerciseDao exerciseDao();
-    public abstract SetDao setDao();
-    public abstract SessionDao sessionDao();
+    abstract fun workoutDao(): WorkoutDao
+    abstract fun exerciseDao(): ExerciseDao
+    abstract fun setDao(): SetDao
+    abstract fun sessionDao(): SessionDao
 
-    private static volatile WorkoutDatabase INSTANCE;
+    companion object {
+        @Volatile
+        private var INSTANCE: WorkoutDatabase? = null
 
-    private static RoomDatabase.Callback sRoomDatabaseCallback =
-            new RoomDatabase.Callback(){
-
-                @Override
-                public void onOpen (@NonNull SupportSQLiteDatabase db){
-                    super.onOpen(db);
-                }
-            };
-
-    public static WorkoutDatabase getDatabase(final Context context) {
-        if (INSTANCE == null) {
-            synchronized (WorkoutDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            WorkoutDatabase.class, "workout_database")
-                            .addCallback(sRoomDatabaseCallback)
-                            .build();
-                }
+        private val sRoomDatabaseCallback = object : RoomDatabase.Callback() {
+            override fun onOpen(db: SupportSQLiteDatabase) {
+                super.onOpen(db)
             }
         }
-        return INSTANCE;
+
+        @JvmStatic
+        fun getDatabase(context: Context): WorkoutDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    WorkoutDatabase::class.java,
+                    "workout_database"
+                )
+                .addCallback(sRoomDatabaseCallback)
+                .build()
+                INSTANCE = instance
+                instance
+            }
+        }
     }
 }
