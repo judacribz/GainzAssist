@@ -48,13 +48,16 @@ class FakeWorkoutRepository : WorkoutRepository {
         return workout
     }
 
-    override suspend fun insertWorkout(workout: Workout) {
+    val insertedWorkoutSyncFlags = mutableListOf<Boolean>()
+
+    override suspend fun insertWorkout(workout: Workout, syncToFirebase: Boolean) {
         val current = workouts.value.toMutableList()
         if (workout.id == -1L || workout.id == 0L) {
             workout.id = (current.maxOfOrNull { it.id } ?: 0L) + 1L
         }
         current.add(workout)
         workouts.value = current
+        insertedWorkoutSyncFlags.add(syncToFirebase)
     }
 
     override suspend fun updateWorkout(workout: Workout) {
@@ -91,8 +94,8 @@ class FakeWorkoutRepository : WorkoutRepository {
         exercises.value = current
     }
 
-    override suspend fun insertExercises(newExercises: List<Exercise>) {
-        newExercises.forEach { insertExercise(it) }
+    override suspend fun insertExercises(exercises: List<Exercise>) {
+        exercises.forEach { insertExercise(it) }
     }
 
     override suspend fun updateExercise(exercise: Exercise) {

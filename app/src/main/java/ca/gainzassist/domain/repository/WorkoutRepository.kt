@@ -17,7 +17,7 @@ interface WorkoutRepository {
     suspend fun getWorkoutByName(name: String): Workout?
     suspend fun getWorkoutWithExercisesByName(name: String): Workout?
 
-    suspend fun insertWorkout(workout: Workout)
+    suspend fun insertWorkout(workout: Workout, syncToFirebase: Boolean = true)
     suspend fun updateWorkout(workout: Workout)
     suspend fun deleteWorkout(workout: Workout)
     suspend fun deleteWorkoutByName(workoutName: String)
