@@ -7,12 +7,9 @@ import android.widget.Toast
 import ca.gainzassist.R
 import ca.gainzassist.activities.authentication.Login
 import ca.gainzassist.background.FirebaseService
-import ca.gainzassist.models.db.WorkoutViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.*
-import androidx.lifecycle.ViewModelProvider
-import androidx.fragment.app.FragmentActivity
 
 object Authentication {
 
@@ -74,14 +71,10 @@ object Authentication {
             }
     }
 
-    @JvmStatic
     fun signOut(act: Activity, signInClient: GoogleSignInClient) {
         FirebaseAuth.getInstance().signOut()
         signInClient.signOut().addOnCompleteListener(act) {}
         act.stopService(Intent(act, FirebaseService::class.java))
-        if (act is FragmentActivity) {
-            ViewModelProvider(act).get(WorkoutViewModel::class.java).deleteAllWorkouts()
-        }
     }
 
     private fun getExceptionMsg(act: Activity, taskEx: Exception?): String {

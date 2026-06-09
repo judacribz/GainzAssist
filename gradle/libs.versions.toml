@@ -1,5 +1,5 @@
 [versions]
-compose-bom = "2024.04.01"
+compose-bom = "2024.10.01"
 activity-compose = "1.9.0"
 
 # Android / Kotlin / Google Plugins
@@ -22,6 +22,9 @@ fragment-ktx = "1.7.1"
 # Architecture Components (AndroidX)
 lifecycle = "2.8.1"
 room = "2.6.1"
+
+# DI
+koin = "4.0.2"
 
 # Facebook
 facebook-android-sdk = "17.0.0"
@@ -54,6 +57,7 @@ logger = "2.2.0"
 junit = "4.13.2"
 androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
+kotlinx-coroutines-test = "1.8.1"
 
 
 [libraries]
@@ -88,6 +92,11 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 
+# DI
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
+
 # Facebook
 facebook-android-sdk = { module = "com.facebook.android:facebook-android-sdk", version.ref = "facebook-android-sdk" }
 facebook-rebound = { module = "com.facebook.rebound:rebound", version.ref = "facebook-rebound" }
@@ -118,6 +127,7 @@ parceler-api = { module = "org.parceler:parceler-api", version.ref = "parceler" 
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }
 
 # UI / Logging
 autofittextview = { module = "me.grantland:autofittextview", version.ref = "autofittextview" }

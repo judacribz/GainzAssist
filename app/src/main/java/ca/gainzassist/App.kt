@@ -6,11 +6,42 @@ import com.facebook.appevents.AppEventsLogger
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 
+import ca.gainzassist.core.di.coreModule
+import ca.gainzassist.core.di.dataModule
+import ca.gainzassist.core.di.preferencesDataModule
+import ca.gainzassist.core.di.domainModule
+import ca.gainzassist.core.di.workoutUseCaseModule
+import ca.gainzassist.core.di.sessionSettingsUseCaseModule
+import ca.gainzassist.core.di.presentationModule
+import ca.gainzassist.core.di.mainViewModelModule
+import ca.gainzassist.core.di.addWorkoutViewModelModule
+import ca.gainzassist.core.di.startWorkoutViewModelModule
+import ca.gainzassist.core.di.workoutScreenViewModelModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
         
+        startKoin {
+            androidContext(this@App)
+            modules(
+                coreModule,
+                dataModule,
+                preferencesDataModule,
+                domainModule,
+                workoutUseCaseModule,
+                sessionSettingsUseCaseModule,
+                mainViewModelModule,
+                addWorkoutViewModelModule,
+                startWorkoutViewModelModule,
+                workoutScreenViewModelModule,
+                presentationModule
+            )
+        }
+
         val isFacebookEnabled = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
 
         if (validateSecrets(isFacebookEnabled)) {

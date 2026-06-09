@@ -137,6 +137,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.espresso.core)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 
     // 3. Architecture Components (AndroidX)
     implementation(libs.androidx.room.runtime)
@@ -146,6 +147,11 @@ dependencies {
 
     implementation(libs.bundles.androidx.lifecycle)
     kapt(libs.androidx.lifecycle.compiler)
+
+    // DI (Koin)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    testImplementation(libs.koin.test)
 
     // 4. AndroidX Core
     implementation(libs.bundles.androidx.core)

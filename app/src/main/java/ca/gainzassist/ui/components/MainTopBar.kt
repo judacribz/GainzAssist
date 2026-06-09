@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.R
-import ca.gainzassist.activities.main.MainTab
+import ca.gainzassist.presentation.main.MainTab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

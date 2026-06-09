@@ -6,14 +6,14 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import ca.gainzassist.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ca.gainzassist.constants.ExerciseConst.MIN_INT
+import ca.gainzassist.presentation.add_workout.WorkoutEntryViewModel
+import ca.gainzassist.presentation.add_workout.WorkoutEntryViewModelEvent
 import ca.gainzassist.util.UI.setInitTheme
+import org.koin.androidx.compose.koinViewModel
 import kotlin.math.max
 
 class WorkoutEntry : AppCompatActivity() {
@@ -36,24 +36,38 @@ class WorkoutEntry : AppCompatActivity() {
         setInitTheme(this)
 
         setContent {
-            var workoutName by rememberSaveable { mutableStateOf("") }
-            var numExercises by rememberSaveable {
-                mutableIntStateOf(getString(R.string.initial_num_exercises).toInt())
+            val viewModel: WorkoutEntryViewModel = koinViewModel()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            LaunchedEffect(viewModel.events) {
+                viewModel.events.collect { event ->
+                    when (event) {
+                        is WorkoutEntryViewModelEvent.ContinueToExercises -> {
+                            enterWorkoutName(event.workoutName, event.numberOfExercises)
+                        }
+                    }
+                }
             }
 
             WorkoutEntryScreen(
-                uiState = WorkoutEntryUiState(
-                    workoutName = workoutName,
-                    numExercises = numExercises
-                ),
-                onWorkoutNameChanged = { workoutName = it },
-                onNumExercisesChanged = { numExercises = it },
-                onIncrementExercises = { numExercises++ },
+                workoutName = state.workoutName,
+                numberOfExercises = state.numberOfExercises,
+                workoutNameError = state.workoutNameError,
+                numberOfExercisesError = state.numberOfExercisesError,
+                onWorkoutNameChanged = viewModel::onWorkoutNameChanged,
+                onNumberOfExercisesChanged = viewModel::onNumberOfExercisesChanged,
+                onIncrementExercises = {
+                    val current = state.numberOfExercises.toIntOrNull() ?: MIN_INT
+                    viewModel.onNumberOfExercisesChanged((current + 1).toString())
+                },
                 onDecrementExercises = {
-                    if (numExercises > MIN_INT) numExercises--
+                    val current = state.numberOfExercises.toIntOrNull() ?: MIN_INT
+                    if (current > MIN_INT) {
+                        viewModel.onNumberOfExercisesChanged((current - 1).toString())
+                    }
                 },
                 onCancel = { finish() },
-                onEnter = { enterWorkoutName(workoutName, numExercises) },
+                onContinueClicked = viewModel::onContinueClicked,
                 onBack = { finish() }
             )
         }

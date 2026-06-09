@@ -53,21 +53,19 @@ val Staatliches = FontFamily(
     Font(R.font.staatliches, FontWeight.Normal)
 )
 
-data class WorkoutEntryUiState(
-    val workoutName: String = "",
-    val numExercises: Int = 3
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutEntryScreen(
-    uiState: WorkoutEntryUiState,
+    workoutName: String,
+    numberOfExercises: String,
+    workoutNameError: String?,
+    numberOfExercisesError: String?,
     onWorkoutNameChanged: (String) -> Unit,
-    onNumExercisesChanged: (Int) -> Unit,
+    onNumberOfExercisesChanged: (String) -> Unit,
     onIncrementExercises: () -> Unit,
     onDecrementExercises: () -> Unit,
     onCancel: () -> Unit,
-    onEnter: () -> Unit,
+    onContinueClicked: () -> Unit,
     onBack: () -> Unit
 ) {
     val blue = colorResource(id = R.color.blue)
@@ -102,7 +100,8 @@ fun WorkoutEntryScreen(
             // Workout Name Section
             WorkoutNameSection(
                 modifier = Modifier.weight(0.25f), // Matches ll_md_weight
-                workoutName = uiState.workoutName,
+                workoutName = workoutName,
+                workoutNameError = workoutNameError,
                 onWorkoutNameChanged = onWorkoutNameChanged,
                 colorBg = colorBg
             )
@@ -112,8 +111,9 @@ fun WorkoutEntryScreen(
             // Number of Exercises Section
             NumExercisesSection(
                 modifier = Modifier.weight(0.5f), // Matches ll_lg_weight
-                numExercises = uiState.numExercises,
-                onNumExercisesChanged = onNumExercisesChanged,
+                numberOfExercises = numberOfExercises,
+                numberOfExercisesError = numberOfExercisesError,
+                onNumberOfExercisesChanged = onNumberOfExercisesChanged,
                 onIncrementExercises = onIncrementExercises,
                 onDecrementExercises = onDecrementExercises,
                 grey = grey,
@@ -127,9 +127,9 @@ fun WorkoutEntryScreen(
             // Footer Section
             FooterSection(
                 modifier = Modifier.weight(0.25f), // Matches ll_md_weight
-                isNameEmpty = uiState.workoutName.trim().isEmpty(),
+                isNameEmpty = workoutName.trim().isEmpty(),
                 onCancel = onCancel,
-                onEnter = onEnter,
+                onEnter = onContinueClicked,
                 fontFamily = safeFontFamily
             )
         }
@@ -188,6 +188,7 @@ fun CustomToolbar(onBack: () -> Unit, fontFamily: FontFamily) {
 fun WorkoutNameSection(
     modifier: Modifier = Modifier,
     workoutName: String,
+    workoutNameError: String?,
     onWorkoutNameChanged: (String) -> Unit,
     colorBg: Color
 ) {
@@ -203,6 +204,8 @@ fun WorkoutNameSection(
         GainzOutlinedTextField(
             value = workoutName,
             onValueChange = onWorkoutNameChanged,
+            isError = workoutNameError != null,
+            errorText = workoutNameError,
             label = if (LocalInspectionMode.current) "Workout Name" else stringResource(
                 id = R.string.hint_workout_name
             ).trim(),
@@ -217,8 +220,9 @@ fun WorkoutNameSection(
 @Composable
 fun NumExercisesSection(
     modifier: Modifier = Modifier,
-    numExercises: Int,
-    onNumExercisesChanged: (Int) -> Unit,
+    numberOfExercises: String,
+    numberOfExercisesError: String?,
+    onNumberOfExercisesChanged: (String) -> Unit,
     onIncrementExercises: () -> Unit,
     onDecrementExercises: () -> Unit,
     grey: Color,
@@ -265,7 +269,8 @@ fun NumExercisesSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Minus Button - Hidden when disabled to match legacy View.GONE behavior
-                if (numExercises > ExerciseConst.MIN_INT) {
+                val numExercisesInt = numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
+                if (numExercisesInt > ExerciseConst.MIN_INT) {
                     GainzButton(
                         text = "-",
                         onClick = onDecrementExercises,
@@ -288,16 +293,10 @@ fun NumExercisesSection(
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextField(
-                        value = numExercises.toString(),
+                        value = numberOfExercises,
                         onValueChange = {
                             val newValueStr = it.filter { char -> char.isDigit() }.take(3)
-                            if (newValueStr.isEmpty()) {
-                                // Restore MIN_INT if field is cleared
-                                onNumExercisesChanged(ExerciseConst.MIN_INT)
-                            } else {
-                                val newValue = newValueStr.toInt()
-                                onNumExercisesChanged(kotlin.math.max(ExerciseConst.MIN_INT, newValue))
-                            }
+                            onNumberOfExercisesChanged(newValueStr)
                         },
                         textStyle = TextStyle(
                             fontFamily = fontFamily,
@@ -319,6 +318,15 @@ fun NumExercisesSection(
                         .fillMaxHeight()
                         .width(80.dp)
                         .padding(vertical = 10.dp)
+                )
+            }
+
+            if (numberOfExercisesError != null) {
+                Text(
+                    text = numberOfExercisesError,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp)
                 )
             }
         }
@@ -371,13 +379,16 @@ fun FooterSection(
 @Composable
 fun WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises() {
     WorkoutEntryScreen(
-        uiState = WorkoutEntryUiState(workoutName = "", numExercises = 3),
+        workoutName = "",
+        numberOfExercises = "3",
+        workoutNameError = null,
+        numberOfExercisesError = null,
         onWorkoutNameChanged = {},
-        onNumExercisesChanged = {},
+        onNumberOfExercisesChanged = {},
         onIncrementExercises = {},
         onDecrementExercises = {},
         onCancel = {},
-        onEnter = {},
+        onContinueClicked = {},
         onBack = {}
     )
 }
@@ -386,13 +397,16 @@ fun WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises() {
 @Composable
 fun WorkoutEntryScreenPreview_WithName_Enter_FiveExercises() {
     WorkoutEntryScreen(
-        uiState = WorkoutEntryUiState(workoutName = "Push Day", numExercises = 5),
+        workoutName = "Push Day",
+        numberOfExercises = "5",
+        workoutNameError = null,
+        numberOfExercisesError = null,
         onWorkoutNameChanged = {},
-        onNumExercisesChanged = {},
+        onNumberOfExercisesChanged = {},
         onIncrementExercises = {},
         onDecrementExercises = {},
         onCancel = {},
-        onEnter = {},
+        onContinueClicked = {},
         onBack = {}
     )
 }
@@ -401,13 +415,16 @@ fun WorkoutEntryScreenPreview_WithName_Enter_FiveExercises() {
 @Composable
 fun WorkoutEntryScreenPreview_MinExerciseCount_DisabledMinus() {
     WorkoutEntryScreen(
-        uiState = WorkoutEntryUiState(workoutName = "", numExercises = 1),
+        workoutName = "",
+        numberOfExercises = "1",
+        workoutNameError = null,
+        numberOfExercisesError = null,
         onWorkoutNameChanged = {},
-        onNumExercisesChanged = {},
+        onNumberOfExercisesChanged = {},
         onIncrementExercises = {},
         onDecrementExercises = {},
         onCancel = {},
-        onEnter = {},
+        onContinueClicked = {},
         onBack = {}
     )
 }
@@ -416,16 +433,16 @@ fun WorkoutEntryScreenPreview_MinExerciseCount_DisabledMinus() {
 @Composable
 fun WorkoutEntryScreenPreview_LongWorkoutName() {
     WorkoutEntryScreen(
-        uiState = WorkoutEntryUiState(
-            workoutName = "Very Long Workout Name to Test Layout",
-            numExercises = 3
-        ),
+        workoutName = "Very Long Workout Name to Test Layout",
+        numberOfExercises = "3",
+        workoutNameError = null,
+        numberOfExercisesError = null,
         onWorkoutNameChanged = {},
-        onNumExercisesChanged = {},
+        onNumberOfExercisesChanged = {},
         onIncrementExercises = {},
         onDecrementExercises = {},
         onCancel = {},
-        onEnter = {},
+        onContinueClicked = {},
         onBack = {}
     )
 }

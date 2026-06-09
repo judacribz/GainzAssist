@@ -28,24 +28,13 @@ import ca.gainzassist.activities.start_workout.fragments.WorkoutScreen
 import ca.gainzassist.components.GainzTabItem
 import ca.gainzassist.components.GainzTabRow
 import ca.gainzassist.models.Exercise
-
-enum class StartWorkoutTab(val titleResId: Int, val iconResId: Int) {
-    WARMUPS(R.string.warmups, R.drawable.ic_warmups),
-    WORKOUT(R.string.workout, R.drawable.ic_workout),
-    EXERCISES(R.string.exercises, R.drawable.ic_exercises)
-}
-
-data class StartWorkoutUiState(
-    val selectedTab: StartWorkoutTab,
-    val availableTabs: List<StartWorkoutTab>,
-    val exercises: ArrayList<Exercise>,
-    val warmups: ArrayList<Exercise>
-)
+import ca.gainzassist.presentation.start_workout.StartWorkoutViewModelState
+import ca.gainzassist.presentation.start_workout.StartWorkoutTab
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StartWorkoutScreen(
-    uiState: StartWorkoutUiState,
+    uiState: StartWorkoutViewModelState,
     onTabSelected: (StartWorkoutTab) -> Unit
 ) {
     val pagerState = rememberPagerState(
@@ -76,7 +65,7 @@ fun StartWorkoutScreen(
     ) {
         HorizontalPager(
             state = pagerState,
-            beyondBoundsPageCount = 2,
+            beyondViewportPageCount = 1,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
@@ -119,13 +108,13 @@ fun WorkoutFragmentContainer() {
             }
         },
         update = { view ->
-            val activity = context as? AppCompatActivity
-            if (activity != null) {
-                val fragmentManager = activity.supportFragmentManager
-                if (fragmentManager.findFragmentById(view.id) == null) {
-                    fragmentManager.commit {
-                        replace(view.id, WorkoutScreen.getInstance())
-                    }
+            val activity = context as? AppCompatActivity ?: return@AndroidView
+            val fragmentManager = activity.supportFragmentManager
+            val currentFragment = fragmentManager.findFragmentById(view.id)
+
+            if (currentFragment == null || currentFragment.view == null || currentFragment.view?.parent == null) {
+                fragmentManager.commit {
+                    replace(view.id, WorkoutScreen.getInstance())
                 }
             }
         }
@@ -137,11 +126,11 @@ fun WorkoutFragmentContainer() {
 fun StartWorkoutScreenPreview_WithWarmups() {
     MaterialTheme {
         StartWorkoutScreen(
-            uiState = StartWorkoutUiState(
+            uiState = StartWorkoutViewModelState(
                 selectedTab = StartWorkoutTab.WORKOUT,
                 availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                exercises = arrayListOf(),
-                warmups = arrayListOf()
+                exercises = emptyList(),
+                warmups = emptyList()
             ),
             onTabSelected = {}
         )
@@ -153,11 +142,11 @@ fun StartWorkoutScreenPreview_WithWarmups() {
 fun StartWorkoutScreenPreview_NoWarmups() {
     MaterialTheme {
         StartWorkoutScreen(
-            uiState = StartWorkoutUiState(
+            uiState = StartWorkoutViewModelState(
                 selectedTab = StartWorkoutTab.WORKOUT,
                 availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                exercises = arrayListOf(),
-                warmups = arrayListOf()
+                exercises = emptyList(),
+                warmups = emptyList()
             ),
             onTabSelected = {}
         )
@@ -169,11 +158,11 @@ fun StartWorkoutScreenPreview_NoWarmups() {
 fun StartWorkoutScreenPreview_ExercisesSelected() {
     MaterialTheme {
         StartWorkoutScreen(
-            uiState = StartWorkoutUiState(
+            uiState = StartWorkoutViewModelState(
                 selectedTab = StartWorkoutTab.EXERCISES,
                 availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                exercises = arrayListOf(),
-                warmups = arrayListOf()
+                exercises = emptyList(),
+                warmups = emptyList()
             ),
             onTabSelected = {}
         )
@@ -185,11 +174,11 @@ fun StartWorkoutScreenPreview_ExercisesSelected() {
 fun StartWorkoutScreenPreview_SmallPhone() {
     MaterialTheme {
         StartWorkoutScreen(
-            uiState = StartWorkoutUiState(
+            uiState = StartWorkoutViewModelState(
                 selectedTab = StartWorkoutTab.WORKOUT,
                 availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                exercises = arrayListOf(),
-                warmups = arrayListOf()
+                exercises = emptyList(),
+                warmups = emptyList()
             ),
             onTabSelected = {}
         )
@@ -201,11 +190,11 @@ fun StartWorkoutScreenPreview_SmallPhone() {
 fun StartWorkoutScreenPreview_LargeFont() {
     MaterialTheme {
         StartWorkoutScreen(
-            uiState = StartWorkoutUiState(
+            uiState = StartWorkoutViewModelState(
                 selectedTab = StartWorkoutTab.WORKOUT,
                 availableTabs = listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                exercises = arrayListOf(),
-                warmups = arrayListOf()
+                exercises = emptyList(),
+                warmups = emptyList()
             ),
             onTabSelected = {}
         )
