@@ -125,7 +125,10 @@ class FakeWorkoutRepository : WorkoutRepository {
         sets.value = current
     }
 
+    val completedSessionSyncFlags = mutableListOf<Boolean>()
+
     override suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean) {
         insertedSessions.add(session)
+        completedSessionSyncFlags.add(syncToFirebase)
     }
 }

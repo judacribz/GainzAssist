@@ -8,6 +8,8 @@ import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
+import ca.gainzassist.domain.usecase.workout.InsertCompletedSessionUseCase
+import ca.gainzassist.models.Session
 import ca.gainzassist.util.Misc
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +23,8 @@ class WorkoutScreenViewModel(
     private val saveSessionProgressUseCase: SaveSessionProgressUseCase,
     private val removeIncompleteWorkoutUseCase: RemoveIncompleteWorkoutUseCase,
     private val removeIncompleteSessionUseCase: RemoveIncompleteSessionUseCase,
-    private val removeSessionProgressUseCase: RemoveSessionProgressUseCase
+    private val removeSessionProgressUseCase: RemoveSessionProgressUseCase,
+    private val insertCompletedSessionUseCase: InsertCompletedSessionUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WorkoutScreenState())
@@ -81,5 +84,9 @@ class WorkoutScreenViewModel(
             removeIncompleteSessionUseCase(workoutName)
         }
         removeSessionProgressUseCase(workoutName)
+    }
+
+    suspend fun insertCompletedSession(session: Session) {
+        insertCompletedSessionUseCase(session, true)
     }
 }
