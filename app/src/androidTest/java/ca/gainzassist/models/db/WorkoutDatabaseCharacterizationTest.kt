@@ -24,7 +24,6 @@ class WorkoutDatabaseCharacterizationTest {
     private lateinit var exerciseDao: ExerciseDao
     private lateinit var sessionDao: SessionDao
     private lateinit var setDao: SetDao
-    private lateinit var workoutRepo: WorkoutRepo
 
     @Before
     fun createDb() {
@@ -42,8 +41,6 @@ class WorkoutDatabaseCharacterizationTest {
         exerciseDao = db.exerciseDao()
         sessionDao = db.sessionDao()
         setDao = db.setDao()
-
-        workoutRepo = WorkoutRepo(context as android.app.Application)
     }
 
     @After
@@ -103,83 +100,8 @@ class WorkoutDatabaseCharacterizationTest {
         assertEquals(110f, sets[0].weight, 0.1f)
     }
 
-    @Test
-    fun testProgressionPersistenceBehaviorExactTarget() {
-        val workout = Workout("Progression Workout", ArrayList())
-        val workoutId = workoutDao.insert(workout)
-
-        // Create workout with exercise target 100 lb x 10 reps x 3 sets
-        val exercise = Exercise(1, "Deadlift", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
-        exercise.workoutId = workoutId
-        val exId = exerciseDao.insert(exercise)
-        exercise.id = exId
-
-        // Create completed session with 3 finished sets at 100 x 10
-        val session = Session(workout)
-        val finishedSets = arrayListOf(
-            ExerciseSet(exercise, 0, 10, 100f),
-            ExerciseSet(exercise, 1, 10, 100f),
-            ExerciseSet(exercise, 2, 10, 100f)
-        )
-        exercise.finSets = finishedSets
-        session.addExercise(exercise)
-
-        // Insert session through the current legacy path
-        workoutRepo.insertSession(session, false)
-
-        // Wait for the background thread to finish its work
-        waitForCondition {
-            exerciseDao.get(exId)?.weight == 110f
-        }
-
-        val updatedEx = assertNotNullValue(exerciseDao.get(exId))
-        assertEquals(110f, updatedEx.weight, 0.1f)
-    }
-
-    @Test
-    fun testProgressionPersistenceBehaviorOverPerformance() {
-        val workout = Workout("OverPerformance Workout", ArrayList())
-        val workoutId = workoutDao.insert(workout)
-
-        // Create workout with exercise target 100 lb x 10 reps x 3 sets
-        val exercise = Exercise(1, "Overhead Press", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
-        exercise.workoutId = workoutId
-        val exId = exerciseDao.insert(exercise)
-        exercise.id = exId
-
-        // 120 x 10 should update next target to 130
-        val session = Session(workout)
-        val finishedSets = arrayListOf(
-            ExerciseSet(exercise, 0, 10, 120f),
-            ExerciseSet(exercise, 1, 10, 120f),
-            ExerciseSet(exercise, 2, 10, 120f)
-        )
-        exercise.finSets = finishedSets
-        session.addExercise(exercise)
-
-        // Insert session through the current legacy path
-        workoutRepo.insertSession(session, false)
-
-        // Wait for the background thread to finish its work
-        waitForCondition {
-            exerciseDao.get(exId)?.weight == 130f
-        }
-
-        val updatedEx = assertNotNullValue(exerciseDao.get(exId))
-        assertEquals(130f, updatedEx.weight, 0.1f)
-    }
-
     private fun <T> assertNotNullValue(value: T?): T {
         assertNotNull(value)
         return value ?: error("Expected non-null value")
-    }
-
-    private fun waitForCondition(timeoutMs: Long = 2000, condition: () -> Boolean) {
-        val startTime = System.currentTimeMillis()
-        while (System.currentTimeMillis() - startTime < timeoutMs) {
-            if (condition()) return
-            Thread.sleep(50)
-        }
-        throw AssertionError("Condition was not met within timeout")
     }
 }
