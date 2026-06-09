@@ -33,19 +33,23 @@ class FirebaseService : IntentService("FirebaseService"), KoinComponent {
     private var workoutListener: ChildEventListener? = null
     private var sessionListener: ChildEventListener? = null
 
+    @Deprecated("Deprecated in Java")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        userWorkoutsRef = getWorkoutsRef()
-        userSessionRef = getWorkoutSessionsRef()
-
         if (workoutListener == null) {
-            workoutListener = createWorkoutListener().also { listener ->
-                userWorkoutsRef?.addChildEventListener(listener)
+            getWorkoutsRef()?.let { ref ->
+                val listener = createWorkoutListener()
+                userWorkoutsRef = ref
+                workoutListener = listener
+                ref.addChildEventListener(listener)
             }
         }
 
         if (sessionListener == null) {
-            sessionListener = createSessionListener().also { listener ->
-                userSessionRef?.addChildEventListener(listener)
+            getWorkoutSessionsRef()?.let { ref ->
+                val listener = createSessionListener()
+                userSessionRef = ref
+                sessionListener = listener
+                ref.addChildEventListener(listener)
             }
         }
 
@@ -94,8 +98,10 @@ class FirebaseService : IntentService("FirebaseService"), KoinComponent {
         }
     }
 
-    override fun onHandleIntent(intent: Intent?) {}
+    @Deprecated("Deprecated in Java")
+    override fun onHandleIntent(intent: Intent?) = Unit
 
+    @Deprecated("Deprecated in Java")
     override fun onDestroy() {
         workoutListener?.let { listener ->
             userWorkoutsRef?.removeEventListener(listener)
