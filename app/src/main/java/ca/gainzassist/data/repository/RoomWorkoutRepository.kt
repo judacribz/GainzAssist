@@ -60,7 +60,10 @@ class RoomWorkoutRepository(
         workout
     }
 
-    override suspend fun insertWorkout(workout: Workout) = withContext(dispatcherProvider.io) {
+    override suspend fun insertWorkout(
+        workout: Workout,
+        syncToFirebase: Boolean
+    ) = withContext(dispatcherProvider.io) {
         val newId = workoutDao.insert(workout)
         workout.id = newId
         
@@ -71,7 +74,10 @@ class RoomWorkoutRepository(
             }
             insertExercises(exercises)
         }
-        Database.addWorkoutFirebase(workout)
+        
+        if (syncToFirebase) {
+            Database.addWorkoutFirebase(workout)
+        }
     }
 
     override suspend fun updateWorkout(workout: Workout) = withContext(dispatcherProvider.io) {
