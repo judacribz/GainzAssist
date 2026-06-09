@@ -64,11 +64,13 @@ class WorkoutDatabaseCharacterizationTest {
         // Insert exercises for workout
         val exercise1 = Exercise(1, "Bench Press", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
         exercise1.workoutId = workoutId
+        exercise1.id = 101L
         val ex1Id = exerciseDao.insert(exercise1)
         exercise1.id = ex1Id
 
         val exercise2 = Exercise(2, "Squat", "Strength", BARBELL, 3, 10, 200f, Exercise.SetsType.MAIN_SET)
         exercise2.workoutId = workoutId
+        exercise2.id = 102L
         val ex2Id = exerciseDao.insert(exercise2)
         exercise2.id = ex2Id
 
