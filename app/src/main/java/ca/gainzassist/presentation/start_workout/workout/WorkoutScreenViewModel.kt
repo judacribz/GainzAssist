@@ -87,6 +87,6 @@ class WorkoutScreenViewModel(
     }
 
     suspend fun insertCompletedSession(session: Session) {
-        insertCompletedSessionUseCase(session, true)
+        insertCompletedSessionUseCase(session, syncToFirebase = true)
     }
 }

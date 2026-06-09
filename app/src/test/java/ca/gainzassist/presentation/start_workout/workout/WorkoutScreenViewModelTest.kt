@@ -163,4 +163,17 @@ class WorkoutScreenViewModelTest {
         val recorded = fakeWorkoutRepository.insertedSessions.first()
         assertEquals("Leg Day", recorded.workoutName)
     }
+
+    @Test
+    fun insertCompletedSession_delegatesToUseCaseAndRepository() = runTest {
+        val session = Session().apply {
+            workoutId = 1L
+            workoutName = "Test Insert"
+        }
+
+        viewModel.insertCompletedSession(session)
+
+        assertEquals(1, fakeWorkoutRepository.insertedSessions.size)
+        assertTrue(fakeWorkoutRepository.insertedSessions.contains(session))
+    }
 }
