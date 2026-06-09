@@ -4,7 +4,7 @@ import android.app.IntentService
 import android.app.Service
 import android.content.Intent
 import android.widget.Toast
-import ca.gainzassist.models.db.WorkoutRepo
+import ca.gainzassist.domain.repository.WorkoutRepository
 import ca.gainzassist.util.Misc.extractSession
 import ca.gainzassist.util.Misc.extractWorkout
 import ca.gainzassist.util.firebase.Database.getWorkoutSessionsRef
@@ -12,17 +12,19 @@ import ca.gainzassist.util.firebase.Database.getWorkoutsRef
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class FirebaseService : IntentService("FirebaseService") {
+class FirebaseService : IntentService("FirebaseService"), KoinComponent {
 
-    private var workoutRepo: WorkoutRepo? = null
-
-    override fun onCreate() {
-        super.onCreate()
-        workoutRepo = WorkoutRepo(application)
-    }
+    private val workoutRepository: WorkoutRepository by inject()
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val userWorkoutsRef = getWorkoutsRef()
@@ -31,7 +33,12 @@ class FirebaseService : IntentService("FirebaseService") {
         if (userWorkoutsRef != null) {
             userWorkoutsRef.addChildEventListener(object : ChildEventListener {
                 override fun onChildAdded(workoutShot: DataSnapshot, s: String?) {
-                    workoutRepo!!.insertWorkout(extractWorkout(workoutShot))
+                    val workout = extractWorkout(workoutShot)
+                    if (workout != null) {
+                        serviceScope.launch {
+                            workoutRepository.insertWorkout(workout)
+                        }
+                    }
                 }
 
                 override fun onChildChanged(workoutShot: DataSnapshot, s: String?) {
@@ -56,7 +63,9 @@ class FirebaseService : IntentService("FirebaseService") {
                 override fun onChildAdded(sessionShot: DataSnapshot, s: String?) {
                     val session = extractSession(sessionShot)
                     if (session != null) {
-                        workoutRepo!!.insertSession(session, false)
+                        serviceScope.launch {
+                            workoutRepository.insertCompletedSession(session, syncToFirebase = false)
+                        }
                     }
                 }
 
@@ -76,4 +85,9 @@ class FirebaseService : IntentService("FirebaseService") {
     }
 
     override fun onHandleIntent(intent: Intent?) {}
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
+    }
 }
