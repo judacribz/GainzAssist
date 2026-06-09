@@ -4,6 +4,7 @@ package ca.gainzassist.activities.main
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -58,8 +59,9 @@ fun MainScreen(
         }
 
         Box(modifier = Modifier.weight(1f)) {
-            androidx.compose.foundation.pager.HorizontalPager(
+            HorizontalPager(
                 state = pagerState,
+                beyondViewportPageCount = 1,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (MainTab.entries[page]) {

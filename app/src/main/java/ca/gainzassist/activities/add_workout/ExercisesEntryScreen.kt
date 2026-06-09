@@ -75,7 +75,7 @@ fun ExercisesEntryScreen(
         // but typically the state updates and pushes a new tab before it renders.
         HorizontalPager(
             state = pagerState,
-            beyondViewportPageCount = uiState.tabs.size,
+            beyondViewportPageCount = 1,
             key = { page -> uiState.tabs.getOrNull(page)?.id ?: page.toLong() },
             modifier = Modifier
                 .fillMaxWidth()
