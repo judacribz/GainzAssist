@@ -65,7 +65,7 @@ fun StartWorkoutScreen(
     ) {
         HorizontalPager(
             state = pagerState,
-            beyondViewportPageCount = uiState.availableTabs.size,
+            beyondViewportPageCount = 1,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
