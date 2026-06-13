@@ -1,5 +1,7 @@
 package ca.gainzassist.presentation.start_workout.workout
 
+import ca.gainzassist.activities.start_workout.workout_screen.WorkoutScreenViewModel
+import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.session.SessionProgressSnapshot
 import ca.gainzassist.domain.usecase.session.GetSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
@@ -7,7 +9,6 @@ import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.workout.InsertCompletedSessionUseCase
-import ca.gainzassist.models.Session
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
@@ -41,8 +42,12 @@ class WorkoutScreenViewModelTest {
         viewModel = WorkoutScreenViewModel(
             getSessionProgressUseCase = GetSessionProgressUseCase(sessionPreferencesRepository),
             saveSessionProgressUseCase = SaveSessionProgressUseCase(sessionPreferencesRepository),
-            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(sessionPreferencesRepository),
-            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(sessionPreferencesRepository),
+            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(
+                sessionPreferencesRepository
+            ),
+            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(
+                sessionPreferencesRepository
+            ),
             removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository),
             insertCompletedSessionUseCase = InsertCompletedSessionUseCase(fakeWorkoutRepository)
         )

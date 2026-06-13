@@ -1,7 +1,7 @@
 package ca.gainzassist.domain.usecase.workout
 
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.repository.WorkoutRepository
-import ca.gainzassist.models.Workout
 
 class GetWorkoutWithExercisesByNameUseCase(
     private val workoutRepository: WorkoutRepository

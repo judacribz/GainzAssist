@@ -1,7 +1,7 @@
 package ca.gainzassist.domain.usecase.workout
 
+import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.repository.WorkoutRepository
-import ca.gainzassist.models.Session
 
 class InsertCompletedSessionUseCase(
     private val workoutRepository: WorkoutRepository

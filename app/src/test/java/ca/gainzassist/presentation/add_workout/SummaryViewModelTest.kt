@@ -1,8 +1,10 @@
 package ca.gainzassist.presentation.add_workout
 
+import ca.gainzassist.activities.add_workout.summary.SummaryViewModel
+import ca.gainzassist.activities.add_workout.summary.SummaryViewModelEvent
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.workout.SaveWorkoutUseCase
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Workout
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi

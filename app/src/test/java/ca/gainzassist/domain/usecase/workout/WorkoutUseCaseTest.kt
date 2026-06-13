@@ -1,7 +1,7 @@
 package ca.gainzassist.domain.usecase.workout
 
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Workout
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

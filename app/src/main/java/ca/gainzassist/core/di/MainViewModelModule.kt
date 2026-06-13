@@ -1,7 +1,7 @@
 package ca.gainzassist.core.di
 
-import ca.gainzassist.presentation.main.MainViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import ca.gainzassist.activities.main.MainViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val mainViewModelModule = module {

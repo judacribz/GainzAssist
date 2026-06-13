@@ -1,7 +1,7 @@
 package ca.gainzassist.core.di
 
-import ca.gainzassist.presentation.start_workout.StartWorkoutViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
+import ca.gainzassist.activities.start_workout.StartWorkoutViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val startWorkoutViewModelModule = module {

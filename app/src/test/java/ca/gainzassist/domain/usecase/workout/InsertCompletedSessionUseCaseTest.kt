@@ -1,6 +1,6 @@
 package ca.gainzassist.domain.usecase.workout
 
-import ca.gainzassist.models.Session
+import ca.gainzassist.domain.model.Session
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals

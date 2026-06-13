@@ -1,9 +1,9 @@
 package ca.gainzassist.domain.repository
 
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.models.Session
-import ca.gainzassist.models.Workout
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
+import ca.gainzassist.domain.model.Session
+import ca.gainzassist.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 
 interface WorkoutRepository {

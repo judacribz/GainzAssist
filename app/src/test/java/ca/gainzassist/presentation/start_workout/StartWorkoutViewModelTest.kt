@@ -1,9 +1,19 @@
 package ca.gainzassist.presentation.start_workout
 
-import ca.gainzassist.domain.usecase.session.*
+import ca.gainzassist.activities.start_workout.StartWorkoutRestoreDecision
+import ca.gainzassist.activities.start_workout.StartWorkoutViewModel
+import ca.gainzassist.activities.start_workout.StartWorkoutViewModelEvent
+import ca.gainzassist.activities.start_workout.view.StartWorkoutTab
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.Workout
+import ca.gainzassist.domain.usecase.session.AddIncompleteWorkoutUseCase
+import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
+import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
+import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
+import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
+import ca.gainzassist.domain.usecase.session.SaveIncompleteSessionUseCase
+import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCase
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.Workout
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
@@ -32,13 +42,19 @@ class StartWorkoutViewModelTest {
         workoutRepository = FakeWorkoutRepository()
         sessionPreferencesRepository = FakeSessionPreferencesRepository()
         viewModel = StartWorkoutViewModel(
-            getWorkoutWithExercisesByNameUseCase = GetWorkoutWithExercisesByNameUseCase(workoutRepository),
+            getWorkoutWithExercisesByNameUseCase = GetWorkoutWithExercisesByNameUseCase(
+                workoutRepository
+            ),
             addIncompleteWorkoutUseCase = AddIncompleteWorkoutUseCase(sessionPreferencesRepository),
             saveIncompleteSessionUseCase = SaveIncompleteSessionUseCase(sessionPreferencesRepository),
             getIncompleteSessionUseCase = GetIncompleteSessionUseCase(sessionPreferencesRepository),
             saveSessionProgressUseCase = SaveSessionProgressUseCase(sessionPreferencesRepository),
-            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(sessionPreferencesRepository),
-            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(sessionPreferencesRepository),
+            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(
+                sessionPreferencesRepository
+            ),
+            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(
+                sessionPreferencesRepository
+            ),
             removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository)
         )
     }

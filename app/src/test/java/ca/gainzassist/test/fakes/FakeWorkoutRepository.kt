@@ -1,10 +1,10 @@
 package ca.gainzassist.test.fakes
 
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
+import ca.gainzassist.domain.model.Session
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.repository.WorkoutRepository
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.models.Session
-import ca.gainzassist.models.Workout
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

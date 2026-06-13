@@ -3,11 +3,16 @@ package ca.gainzassist.models.db
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ca.gainzassist.constants.ExerciseConst.BARBELL
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.models.Session
-import ca.gainzassist.models.Workout
+import ca.gainzassist.core.constants.ExerciseConst.BARBELL
+import ca.gainzassist.data.local.database.ExerciseDao
+import ca.gainzassist.data.local.database.SessionDao
+import ca.gainzassist.data.local.database.SetDao
+import ca.gainzassist.data.local.database.WorkoutDao
+import ca.gainzassist.data.local.database.WorkoutDatabase
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
+import ca.gainzassist.domain.model.Session
+import ca.gainzassist.domain.model.Workout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -59,13 +64,15 @@ class WorkoutDatabaseCharacterizationTest {
         assertTrue(workoutId > 0)
 
         // Insert exercises for workout
-        val exercise1 = Exercise(1, "Bench Press", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
+        val exercise1 =
+            Exercise(1, "Bench Press", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
         exercise1.workoutId = workoutId
         exercise1.id = 101L
         val ex1Id = exerciseDao.insert(exercise1)
         exercise1.id = ex1Id
 
-        val exercise2 = Exercise(2, "Squat", "Strength", BARBELL, 3, 10, 200f, Exercise.SetsType.MAIN_SET)
+        val exercise2 =
+            Exercise(2, "Squat", "Strength", BARBELL, 3, 10, 200f, Exercise.SetsType.MAIN_SET)
         exercise2.workoutId = workoutId
         exercise2.id = 102L
         val ex2Id = exerciseDao.insert(exercise2)
@@ -84,7 +91,7 @@ class WorkoutDatabaseCharacterizationTest {
 
         // Update exercise weight through ExerciseDao.updateWeight
         exerciseDao.updateWeight(110f, ex1Id)
-        val updatedEx1 = assertNotNullValue(exerciseDao.get(ex1Id))
+        val updatedEx1 = assertNotNullValue(exerciseDao.getName(ex1Id))
         assertEquals(110f, updatedEx1.weight, 0.1f)
 
         // Insert session
