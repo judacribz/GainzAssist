@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.add_workout.summary.view
 
 import androidx.compose.foundation.background
@@ -77,6 +76,62 @@ data class SummaryUiState(
     val isSaving: Boolean
 )
 
+data class SummaryScreenActions(
+    val onBack: () -> Unit = {},
+    val onWorkoutNameChanged: (String) -> Unit = {},
+    val onExerciseNameChanged: (String) -> Unit = {},
+    val onEquipmentSelected: (String) -> Unit = {},
+    val onWeightChanged: (String) -> Unit = {},
+    val onRepsChanged: (String) -> Unit = {},
+    val onSetsChanged: (String) -> Unit = {},
+    val onIncrementWeight: () -> Unit = {},
+    val onDecrementWeight: () -> Unit = {},
+    val onIncrementReps: () -> Unit = {},
+    val onDecrementReps: () -> Unit = {},
+    val onIncrementSets: () -> Unit = {},
+    val onDecrementSets: () -> Unit = {},
+    val onClearExercise: () -> Unit = {},
+    val onAddExercise: () -> Unit = {},
+    val onUpdateExercise: () -> Unit = {},
+    val onExerciseClicked: (String) -> Unit = {},
+    val onDiscardWorkout: () -> Unit = {},
+    val onAddOrUpdateWorkout: () -> Unit = {}
+)
+
+private val ToolbarShadowBlur = 5f
+private val ToolbarShadowOffset = 1f
+private val ToolbarHeight = 56.dp
+private val ToolbarBorderWidth = 2.dp
+private val CardPadding = 4.dp
+private val CardElevation = 3.dp
+private val CardCornerRadius = 5.dp
+private val CardBorderWidth = 0.5.dp
+private val StepperCornerRadius = 20.dp
+private val StepperBorderWidth = 4.dp
+private val StepperPadding = 4.dp
+private val IconButtonSize = 40.dp
+private val InputFontSize = 35.sp
+private val StepperInternalPadding = 4.dp
+private val ChipPadding = 2.dp
+private val ChipSize = 60.dp
+private val ChipCornerRadius = 10.dp
+private val ChipFontSize = 20.sp
+private val ScreenPadding = 4.dp
+private val SectionVerticalPadding = 4.dp
+private val WorkoutNameHeight = 80.dp
+private val ExerciseNameHeight = 150.dp
+private val InputBottomPadding = 8.dp
+private val RowVerticalPadding = 4.dp
+private val ColumnEndPadding = 4.dp
+private val ColumnStartPadding = 4.dp
+private val ButtonTopPadding = 8.dp
+private val ButtonHeight = 55.dp
+private val FooterButtonHeight = 60.dp
+private val ExercisesTitleFontSize = 18.sp
+private val ExercisesTitleBottomPadding = 4.dp
+private val ExerciseChipEndPadding = 4.dp
+private const val WeightFull = 1f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryToolbar(onBack: () -> Unit) {
@@ -110,8 +165,8 @@ fun SummaryToolbar(onBack: () -> Unit) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .border(width = 2.dp, color = colorResource(id = R.color.colorAccent))
+            .height(ToolbarHeight)
+            .border(width = ToolbarBorderWidth, color = colorResource(id = R.color.colorAccent))
     )
 }
 
@@ -119,18 +174,18 @@ fun SummaryToolbar(onBack: () -> Unit) {
 fun SummaryCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(
         modifier = modifier
-            .padding(4.dp)
-            .shadow(elevation = 3.dp, shape = RoundedCornerShape(5.dp))
+            .padding(CardPadding)
+            .shadow(elevation = CardElevation, shape = RoundedCornerShape(CardCornerRadius))
             .background(
                 color = colorResource(id = R.color.colorLightBg),
-                shape = RoundedCornerShape(5.dp)
+                shape = RoundedCornerShape(CardCornerRadius)
             )
             .border(
-                width = 0.5.dp,
+                width = CardBorderWidth,
                 color = colorResource(id = R.color.colorBg),
-                shape = RoundedCornerShape(5.dp)
+                shape = RoundedCornerShape(CardCornerRadius)
             )
-            .padding(4.dp)
+            .padding(CardPadding)
     ) {
         content()
     }
@@ -150,20 +205,20 @@ fun NumericStepperField(
         modifier = modifier
             .background(
                 color = colorResource(id = R.color.colorLightAccent),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(StepperCornerRadius)
             )
             .border(
-                width = 4.dp,
+                width = StepperBorderWidth,
                 color = colorResource(id = R.color.blueDark),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(StepperCornerRadius)
             )
-            .padding(4.dp),
+            .padding(StepperPadding),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
             onClick = onDecrement,
             enabled = canDecrement,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(IconButtonSize)
         ) {
             if (canDecrement) {
                 Icon(
@@ -179,7 +234,7 @@ fun NumericStepperField(
             onValueChange = onValueChange,
             textStyle = TextStyle(
                 fontFamily = StaatlichesFont,
-                fontSize = 35.sp,
+                fontSize = InputFontSize,
                 color = colorResource(id = R.color.colorText),
                 textAlign = TextAlign.Center
             ),
@@ -192,13 +247,13 @@ fun NumericStepperField(
                 }
             ),
             modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 4.dp)
+                .weight(WeightFull)
+                .padding(horizontal = StepperInternalPadding)
         )
 
         IconButton(
             onClick = onIncrement,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier.size(IconButtonSize)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_plus_dark),
@@ -217,9 +272,9 @@ fun ExerciseChipButton(
 ) {
     Box(
         modifier = modifier
-            .padding(2.dp)
-            .size(60.dp)
-            .background(colorResource(id = R.color.blueDark), RoundedCornerShape(10.dp))
+            .padding(ChipPadding)
+            .size(ChipSize)
+            .background(colorResource(id = R.color.blueDark), RoundedCornerShape(ChipCornerRadius))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -227,7 +282,7 @@ fun ExerciseChipButton(
             text = text,
             color = Color.White,
             fontFamily = StaatlichesFont,
-            fontSize = 20.sp
+            fontSize = ChipFontSize
         )
     }
 }
@@ -235,161 +290,143 @@ fun ExerciseChipButton(
 @Composable
 fun SummaryScreenContent(
     uiState: SummaryUiState,
-    onBack: () -> Unit,
-    onWorkoutNameChanged: (String) -> Unit,
-    onExerciseNameChanged: (String) -> Unit,
-    onEquipmentSelected: (String) -> Unit,
-    onWeightChanged: (String) -> Unit,
-    onRepsChanged: (String) -> Unit,
-    onSetsChanged: (String) -> Unit,
-    onIncrementWeight: () -> Unit,
-    onDecrementWeight: () -> Unit,
-    onIncrementReps: () -> Unit,
-    onDecrementReps: () -> Unit,
-    onIncrementSets: () -> Unit,
-    onDecrementSets: () -> Unit,
-    onClearExercise: () -> Unit,
-    onAddExercise: () -> Unit,
-    onUpdateExercise: () -> Unit,
-    onExerciseClicked: (String) -> Unit,
-    onDiscardWorkout: () -> Unit,
-    onAddOrUpdateWorkout: () -> Unit
+    actions: SummaryScreenActions
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(4.dp)
+            .padding(ScreenPadding)
             .verticalScroll(rememberScrollState())
     ) {
-        SummaryToolbar(onBack = onBack)
+        SummaryToolbar(onBack = actions.onBack)
 
         SummaryCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(vertical = SectionVerticalPadding)
         ) {
             GainzOutlinedTextField(
                 value = uiState.workoutName,
-                onValueChange = onWorkoutNameChanged,
+                onValueChange = actions.onWorkoutNameChanged,
                 label = stringResource(id = R.string.hint_workout_name),
                 isError = uiState.workoutNameError != null,
                 errorText = uiState.workoutNameError,
                 modifier = Modifier
-                    .padding(4.dp)
-                    .height(80.dp)
+                    .padding(CardPadding)
+                    .height(WorkoutNameHeight)
             )
         }
 
         SummaryCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(vertical = SectionVerticalPadding)
         ) {
-            Column(modifier = Modifier.padding(4.dp)) {
+            Column(modifier = Modifier.padding(CardPadding)) {
                 GainzOutlinedTextField(
                     value = uiState.exerciseName,
-                    onValueChange = onExerciseNameChanged,
+                    onValueChange = actions.onExerciseNameChanged,
                     label = stringResource(id = R.string.hint_exercise_name),
                     isError = uiState.exerciseNameError != null,
                     errorText = uiState.exerciseNameError,
                     singleLine = false,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(bottom = 8.dp)
+                        .height(ExerciseNameHeight)
+                        .padding(bottom = InputBottomPadding)
                 )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = RowVerticalPadding),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     NumericStepperField(
                         value = uiState.weight,
-                        onValueChange = onWeightChanged,
-                        onIncrement = onIncrementWeight,
-                        onDecrement = onDecrementWeight,
+                        onValueChange = actions.onWeightChanged,
+                        onIncrement = actions.onIncrementWeight,
+                        onDecrement = actions.onDecrementWeight,
                         canDecrement = uiState.canDecrementWeight,
                         isFloat = true,
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 4.dp)
+                            .weight(WeightFull)
+                            .padding(end = ColumnEndPadding)
                     )
                     GainzDropdown(
                         selectedValue = uiState.selectedEquipment,
                         options = uiState.equipmentOptions,
-                        onOptionSelected = onEquipmentSelected,
+                        onOptionSelected = actions.onEquipmentSelected,
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 4.dp)
+                            .weight(WeightFull)
+                            .padding(start = ColumnStartPadding)
                     )
                 }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = RowVerticalPadding),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     NumericStepperField(
                         value = uiState.sets,
-                        onValueChange = onSetsChanged,
-                        onIncrement = onIncrementSets,
-                        onDecrement = onDecrementSets,
+                        onValueChange = actions.onSetsChanged,
+                        onIncrement = actions.onIncrementSets,
+                        onDecrement = actions.onDecrementSets,
                         canDecrement = uiState.canDecrementSets,
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 4.dp)
+                            .weight(WeightFull)
+                            .padding(end = ColumnEndPadding)
                     )
                     NumericStepperField(
                         value = uiState.reps,
-                        onValueChange = onRepsChanged,
-                        onIncrement = onIncrementReps,
-                        onDecrement = onDecrementReps,
+                        onValueChange = actions.onRepsChanged,
+                        onIncrement = actions.onIncrementReps,
+                        onDecrement = actions.onDecrementReps,
                         canDecrement = uiState.canDecrementReps,
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 4.dp)
+                            .weight(WeightFull)
+                            .padding(start = ColumnStartPadding)
                     )
                 }
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = ButtonTopPadding),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     GainzButton(
                         text = stringResource(id = R.string.clear),
-                        onClick = onClearExercise,
+                        onClick = actions.onClearExercise,
                         fontFamily = StaatlichesFont,
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 4.dp)
-                            .height(55.dp)
+                            .weight(WeightFull)
+                            .padding(end = ColumnEndPadding)
+                            .height(ButtonHeight)
                     )
 
                     if (uiState.showUpdateExerciseButton) {
                         GainzButton(
                             text = stringResource(id = R.string.update_exercise),
-                            onClick = onUpdateExercise,
+                            onClick = actions.onUpdateExercise,
                             fontFamily = StaatlichesFont,
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 4.dp)
-                                .height(55.dp)
+                                .weight(WeightFull)
+                                .padding(start = ColumnStartPadding)
+                                .height(ButtonHeight)
                         )
                     } else if (uiState.showAddExerciseButton) {
                         GainzButton(
                             text = stringResource(id = R.string.add_exercise),
-                            onClick = onAddExercise,
+                            onClick = actions.onAddExercise,
                             fontFamily = StaatlichesFont,
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 4.dp)
-                                .height(55.dp)
+                                .weight(WeightFull)
+                                .padding(start = ColumnStartPadding)
+                                .height(ButtonHeight)
                         )
                     }
                 }
@@ -399,54 +436,54 @@ fun SummaryScreenContent(
         SummaryCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(vertical = SectionVerticalPadding)
         ) {
-            Column(modifier = Modifier.padding(4.dp)) {
+            Column(modifier = Modifier.padding(CardPadding)) {
                 Text(
                     text = stringResource(id = R.string.exercises).uppercase(),
                     fontFamily = StaatlichesFont,
-                    fontSize = 18.sp,
+                    fontSize = ExercisesTitleFontSize,
                     color = colorResource(id = R.color.colorBg),
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = ExercisesTitleBottomPadding)
                 )
                 LazyRow {
                     items(uiState.exerciseNames) { name ->
                         ExerciseChipButton(
                             text = name,
-                            onClick = { onExerciseClicked(name) },
-                            modifier = Modifier.padding(end = 4.dp)
+                            onClick = { actions.onExerciseClicked(name) },
+                            modifier = Modifier.padding(end = ExerciseChipEndPadding)
                         )
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(WeightFull))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = ButtonTopPadding),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             GainzButton(
                 text = stringResource(id = R.string.discard),
-                onClick = onDiscardWorkout,
+                onClick = actions.onDiscardWorkout,
                 fontFamily = StaatlichesFont,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(end = 4.dp)
-                    .height(60.dp)
+                    .weight(WeightFull)
+                    .padding(end = ColumnEndPadding)
+                    .height(FooterButtonHeight)
             )
             GainzButton(
                 text = uiState.mainWorkoutButtonText,
                 enabled = !uiState.isSaving,
-                onClick = onAddOrUpdateWorkout,
+                onClick = actions.onAddOrUpdateWorkout,
                 fontFamily = StaatlichesFont,
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 4.dp)
-                    .height(60.dp)
+                    .weight(WeightFull)
+                    .padding(start = ColumnStartPadding)
+                    .height(FooterButtonHeight)
             )
         }
     }
@@ -455,47 +492,11 @@ fun SummaryScreenContent(
 @Composable
 fun SummaryScreen(
     uiState: SummaryUiState,
-    onBack: () -> Unit,
-    onWorkoutNameChanged: (String) -> Unit,
-    onExerciseNameChanged: (String) -> Unit,
-    onEquipmentSelected: (String) -> Unit,
-    onWeightChanged: (String) -> Unit,
-    onRepsChanged: (String) -> Unit,
-    onSetsChanged: (String) -> Unit,
-    onIncrementWeight: () -> Unit,
-    onDecrementWeight: () -> Unit,
-    onIncrementReps: () -> Unit,
-    onDecrementReps: () -> Unit,
-    onIncrementSets: () -> Unit,
-    onDecrementSets: () -> Unit,
-    onClearExercise: () -> Unit,
-    onAddExercise: () -> Unit,
-    onUpdateExercise: () -> Unit,
-    onExerciseClicked: (String) -> Unit,
-    onDiscardWorkout: () -> Unit,
-    onAddOrUpdateWorkout: () -> Unit
+    actions: SummaryScreenActions = SummaryScreenActions()
 ) {
     SummaryScreenContent(
         uiState = uiState,
-        onBack = onBack,
-        onWorkoutNameChanged = onWorkoutNameChanged,
-        onExerciseNameChanged = onExerciseNameChanged,
-        onEquipmentSelected = onEquipmentSelected,
-        onWeightChanged = onWeightChanged,
-        onRepsChanged = onRepsChanged,
-        onSetsChanged = onSetsChanged,
-        onIncrementWeight = onIncrementWeight,
-        onDecrementWeight = onDecrementWeight,
-        onIncrementReps = onIncrementReps,
-        onDecrementReps = onDecrementReps,
-        onIncrementSets = onIncrementSets,
-        onDecrementSets = onDecrementSets,
-        onClearExercise = onClearExercise,
-        onAddExercise = onAddExercise,
-        onUpdateExercise = onUpdateExercise,
-        onExerciseClicked = onExerciseClicked,
-        onDiscardWorkout = onDiscardWorkout,
-        onAddOrUpdateWorkout = onAddOrUpdateWorkout
+        actions = actions
     )
 }
 
@@ -532,25 +533,6 @@ fun SummaryScreenPreviewEmptyInitial() {
             workoutName = "",
             exerciseNames = emptyList()
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -562,25 +544,6 @@ fun SummaryScreenPreviewWithWorkoutAndExerciseText() {
             exerciseName = "Squat",
             weight = "225.0"
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -591,25 +554,6 @@ fun SummaryScreenPreviewWithOneExercise() {
         uiState = summaryPreviewState.copy(
             exerciseNames = listOf("Bench Press")
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -620,25 +564,6 @@ fun SummaryScreenPreviewUpdateWorkoutMode() {
         uiState = summaryPreviewState.copy(
             mainWorkoutButtonText = "UPDATE WORKOUT"
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -653,25 +578,6 @@ fun SummaryScreenPreviewUpdateExerciseMode() {
             showUpdateExerciseButton = true,
             weight = "135.0"
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -683,25 +589,6 @@ fun SummaryScreenPreviewDuplicateExerciseError() {
             exerciseName = "Bench Press",
             exerciseNameError = "Bench Press exists"
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -713,25 +600,6 @@ fun SummaryScreenPreviewMinWeight() {
             weight = "45.0",
             canDecrementWeight = false
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -744,25 +612,6 @@ fun SummaryScreenPreviewDumbbellSelected() {
             selectedEquipment = "Dumbbell",
             weight = "15.0"
         ),
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -771,25 +620,6 @@ fun SummaryScreenPreviewDumbbellSelected() {
 fun SummaryScreenPreviewSmallPhone360x800() {
     SummaryScreen(
         uiState = summaryPreviewState,
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -798,25 +628,6 @@ fun SummaryScreenPreviewSmallPhone360x800() {
 fun SummaryScreenPreviewLargePhone412x915() {
     SummaryScreen(
         uiState = summaryPreviewState,
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }
 
@@ -825,24 +636,5 @@ fun SummaryScreenPreviewLargePhone412x915() {
 fun SummaryScreenPreviewFontScaleLarge() {
     SummaryScreen(
         uiState = summaryPreviewState,
-        onBack = {},
-        onWorkoutNameChanged = {},
-        onExerciseNameChanged = {},
-        onEquipmentSelected = {},
-        onWeightChanged = {},
-        onRepsChanged = {},
-        onSetsChanged = {},
-        onIncrementWeight = {},
-        onDecrementWeight = {},
-        onIncrementReps = {},
-        onDecrementReps = {},
-        onIncrementSets = {},
-        onDecrementSets = {},
-        onClearExercise = {},
-        onAddExercise = {},
-        onUpdateExercise = {},
-        onExerciseClicked = {},
-        onDiscardWorkout = {},
-        onAddOrUpdateWorkout = {}
     )
 }

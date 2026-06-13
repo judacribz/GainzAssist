@@ -55,21 +55,23 @@ class WorkoutEntryActivity : AppCompatActivity() {
                 numberOfExercises = state.numberOfExercises,
                 workoutNameError = state.workoutNameError,
                 numberOfExercisesError = state.numberOfExercisesError,
-                onWorkoutNameChanged = viewModel::onWorkoutNameChanged,
-                onNumberOfExercisesChanged = viewModel::onNumberOfExercisesChanged,
-                onIncrementExercises = {
-                    val current = state.numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
-                    viewModel.onNumberOfExercisesChanged((current + 1).toString())
-                },
-                onDecrementExercises = {
-                    val current = state.numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
-                    if (current > ExerciseConst.MIN_INT) {
-                        viewModel.onNumberOfExercisesChanged((current - 1).toString())
-                    }
-                },
-                onCancel = { finish() },
-                onContinueClicked = viewModel::onContinueClicked,
-                onBack = { finish() }
+                actions = WorkoutEntryScreenActions(
+                    onWorkoutNameChanged = viewModel::onWorkoutNameChanged,
+                    onNumberOfExercisesChanged = viewModel::onNumberOfExercisesChanged,
+                    onIncrementExercises = {
+                        val current = state.numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
+                        viewModel.onNumberOfExercisesChanged((current + 1).toString())
+                    },
+                    onDecrementExercises = {
+                        val current = state.numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
+                        if (current > ExerciseConst.MIN_INT) {
+                            viewModel.onNumberOfExercisesChanged((current - 1).toString())
+                        }
+                    },
+                    onCancel = { finish() },
+                    onContinueClicked = viewModel::onContinueClicked,
+                    onBack = { finish() }
+                )
             )
         }
     }

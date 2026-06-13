@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.ui.components
 
 import androidx.compose.foundation.background
@@ -29,7 +28,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import ca.gainzassist.R
+
+private val DropdownMinHeight = 48.dp
+private val DropdownCornerRadius = 5.dp
+private val DropdownBorderWidth = 2.dp
+private val DropdownPaddingHorizontal = 8.dp
+private val DropdownIconSize = 24.dp
+private val DropdownFontSize = 22.sp
 
 @Composable
 fun GainzDropdown(
@@ -47,29 +54,29 @@ fun GainzDropdown(
 
     Box(
         modifier = modifier
-            .defaultMinSize(minHeight = 48.dp)
-            .background(colorLightAccent, RoundedCornerShape(5.dp))
-            .border(2.dp, colorAccent, RoundedCornerShape(5.dp))
+            .defaultMinSize(minHeight = DropdownMinHeight)
+            .background(colorLightAccent, RoundedCornerShape(DropdownCornerRadius))
+            .border(DropdownBorderWidth, colorAccent, RoundedCornerShape(DropdownCornerRadius))
             .clickable(enabled = enabled) { expanded = true }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = DropdownPaddingHorizontal),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = selectedValue,
                 color = colorDarkText,
-                fontSize = 22.sp,
+                fontSize = DropdownFontSize,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
             )
             Icon(
                 painter = painterResource(id = R.drawable.ic_drop_dark),
-                contentDescription = "Dropdown",
-                modifier = Modifier.size(24.dp),
+                contentDescription = stringResource(id = R.string.cd_dropdown),
+                modifier = Modifier.size(DropdownIconSize),
                 tint = colorDarkText
             )
         }
@@ -85,7 +92,7 @@ fun GainzDropdown(
                         Text(
                             text = option,
                             color = colorDarkText,
-                            fontSize = 22.sp
+                            fontSize = DropdownFontSize
                         )
                     },
                     onClick = {

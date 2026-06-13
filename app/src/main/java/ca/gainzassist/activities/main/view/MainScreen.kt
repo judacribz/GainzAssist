@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 @file:OptIn(ExperimentalFoundationApi::class)
 
 package ca.gainzassist.activities.main.view
@@ -15,8 +14,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.activities.main.view.tab_screens.ResumeScreen
 import ca.gainzassist.activities.main.view.tab_screens.ResumeUiState
 import ca.gainzassist.activities.main.view.tab_screens.SettingsScreen
+import ca.gainzassist.activities.main.view.tab_screens.SettingsScreenActions
 import ca.gainzassist.activities.main.view.tab_screens.SettingsUiState
 import ca.gainzassist.activities.main.view.tab_screens.WorkoutsScreen
+import ca.gainzassist.activities.main.view.tab_screens.WorkoutsScreenActions
 import ca.gainzassist.ui.components.GainzTabItem
 import ca.gainzassist.ui.components.GainzTabRow
 
@@ -28,20 +29,24 @@ data class MainUiState(
     val settingsUiState: SettingsUiState = SettingsUiState(signedInText = "", versionText = "")
 )
 
+data class MainScreenActions(
+    val onTabSelected: (MainTab) -> Unit = {},
+    val onResumeWorkoutClick: (String) -> Unit = {},
+    val onWorkoutClick: (String) -> Unit = {},
+    val onWorkoutLongClick: (String) -> Unit = {},
+    val onDismissWorkoutDialog: () -> Unit = {},
+    val onEditWorkout: (String) -> Unit = {},
+    val onDeleteWorkout: (String) -> Unit = {},
+    val onSettingsSignOutClick: () -> Unit = {},
+    val onPrivacyPolicyClick: () -> Unit = {},
+    val onAccountDeletionClick: () -> Unit = {},
+    val onContactSupportClick: () -> Unit = {}
+)
+
 @Composable
 fun MainScreen(
     uiState: MainUiState,
-    onTabSelected: (MainTab) -> Unit,
-    onResumeWorkoutClick: (String) -> Unit,
-    onWorkoutClick: (String) -> Unit,
-    onWorkoutLongClick: (String) -> Unit,
-    onDismissWorkoutDialog: () -> Unit,
-    onEditWorkout: (String) -> Unit,
-    onDeleteWorkout: (String) -> Unit,
-    onSettingsSignOutClick: () -> Unit,
-    onPrivacyPolicyClick: () -> Unit,
-    onAccountDeletionClick: () -> Unit,
-    onContactSupportClick: () -> Unit
+    actions: MainScreenActions = MainScreenActions()
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         val pagerState = rememberPagerState(
@@ -55,7 +60,7 @@ fun MainScreen(
 
         LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
             if (!pagerState.isScrollInProgress && uiState.selectedTab.ordinal != pagerState.currentPage) {
-                onTabSelected(MainTab.entries[pagerState.currentPage])
+                actions.onTabSelected(MainTab.entries[pagerState.currentPage])
             }
         }
 
@@ -69,27 +74,32 @@ fun MainScreen(
                     MainTab.RESUME -> {
                         ResumeScreen(
                             uiState = ResumeUiState(workoutNames = uiState.resumeWorkoutNames),
-                            onWorkoutClick = onResumeWorkoutClick
+                            onWorkoutClick = actions.onResumeWorkoutClick
                         )
                     }
+
                     MainTab.WORKOUTS -> {
                         WorkoutsScreen(
                             workoutNames = uiState.workoutNames,
                             selectedWorkoutName = uiState.selectedWorkoutName,
-                            onWorkoutClick = onWorkoutClick,
-                            onWorkoutLongClick = onWorkoutLongClick,
-                            onDismissDialog = onDismissWorkoutDialog,
-                            onEditWorkout = onEditWorkout,
-                            onDeleteWorkout = onDeleteWorkout
+                            actions = WorkoutsScreenActions(
+                                onWorkoutClick = actions.onWorkoutClick,
+                                onWorkoutLongClick = actions.onWorkoutLongClick,
+                                onDismissDialog = actions.onDismissWorkoutDialog,
+                                onEditWorkout = actions.onEditWorkout,
+                                onDeleteWorkout = actions.onDeleteWorkout
+                            )
                         )
                     }
                     MainTab.SETTINGS -> {
                         SettingsScreen(
                             uiState = uiState.settingsUiState,
-                            onSignOutClick = onSettingsSignOutClick,
-                            onPrivacyPolicyClick = onPrivacyPolicyClick,
-                            onAccountDeletionClick = onAccountDeletionClick,
-                            onContactSupportClick = onContactSupportClick
+                            actions = SettingsScreenActions(
+                                onSignOutClick = actions.onSettingsSignOutClick,
+                                onPrivacyPolicyClick = actions.onPrivacyPolicyClick,
+                                onAccountDeletionClick = actions.onAccountDeletionClick,
+                                onContactSupportClick = actions.onContactSupportClick
+                            )
                         )
                     }
                 }
@@ -114,18 +124,7 @@ fun MainScreenPreviewWorkouts() {
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
             workoutNames = listOf("Chest", "Back", "Legs")
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 
@@ -136,18 +135,7 @@ fun MainScreenPreviewResume() {
         uiState = MainUiState(
             selectedTab = MainTab.RESUME,
             resumeWorkoutNames = listOf("Chest Day (In Progress)")
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 
@@ -161,18 +149,7 @@ fun MainScreenPreviewSettings() {
                 signedInText = "test@example.com",
                 versionText = "1.0.0"
             )
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 
@@ -184,18 +161,7 @@ fun MainScreenPreviewWorkoutDialog() {
             selectedTab = MainTab.WORKOUTS,
             workoutNames = listOf("Chest", "Back", "Legs"),
             selectedWorkoutName = "Back"
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 
@@ -206,18 +172,7 @@ fun MainScreenPreviewEmpty() {
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
             workoutNames = emptyList()
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 
@@ -228,18 +183,7 @@ fun MainScreenPreviewSmallPhone() {
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
             workoutNames = listOf("Chest", "Back")
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 
@@ -250,18 +194,7 @@ fun MainScreenPreviewLargeFont() {
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
             workoutNames = listOf("Chest", "Back")
-        ),
-        onTabSelected = {},
-        onResumeWorkoutClick = {},
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissWorkoutDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {},
-        onSettingsSignOutClick = {},
-        onPrivacyPolicyClick = {},
-        onAccountDeletionClick = {},
-        onContactSupportClick = {}
+        )
     )
 }
 

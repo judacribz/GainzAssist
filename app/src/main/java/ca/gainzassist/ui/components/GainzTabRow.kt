@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -37,9 +36,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import ca.gainzassist.R
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+
+private val EdgePadding = 0.dp
+private val IndicatorHeight = 2.dp
+private val TabPaddingStart = 16.dp
+private val TabPaddingVerticalIcon = 8.dp
+private val TabPaddingVerticalNoIcon = 14.dp
+private val TabIconSize = 24.dp
+private val TabIconPaddingBottom = 4.dp
+private val TabFontSize = 10.sp
+private val PlusIconSize = 16.dp
+private const val RippleDelayMs = 100L
+private const val ColorLerpMin = 0f
+private const val ColorLerpMax = 1f
+private const val FontWeightThreshold = 0.5f
 
 data class GainzTabItem(
     val title: String,
@@ -60,7 +74,7 @@ fun GainzTabRow(
     if (scrollable) {
         ScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
-            edgePadding = 0.dp,
+            edgePadding = EdgePadding,
             modifier = modifier
                 .fillMaxWidth()
                 .background(
@@ -152,7 +166,7 @@ private fun GainzTabIndicator(
                 .offset(x = indicatorOffset)
                 .width(indicatorWidth),
             color = colorResource(id = R.color.blue),
-            height = 2.dp
+            height = IndicatorHeight
         )
     }
 }
@@ -168,7 +182,7 @@ private fun GainzTabItems(
 ) {
     tabs.forEachIndexed { index, tab ->
         val pageOffset = ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction)
-        val distance = abs(pageOffset).coerceIn(0f, 1f)
+        val distance = abs(pageOffset).coerceIn(ColorLerpMin, ColorLerpMax)
         val color = androidx.compose.ui.graphics.lerp(
             colorResource(id = R.color.blue),
             Color.White,
@@ -178,7 +192,7 @@ private fun GainzTabItems(
         val isPlusTab = tab.iconResId != null && tab.title.isBlank()
         val tabWidthModifier = if (scrollable) {
             if (isPlusTab) {
-                Modifier.wrapContentWidth(Alignment.Start).padding(start = 16.dp)
+                Modifier.wrapContentWidth(Alignment.Start).padding(start = TabPaddingStart)
             } else {
                 Modifier.wrapContentWidth()
             }
@@ -197,7 +211,7 @@ private fun GainzTabItems(
                         }
                     }
                 }
-                .padding(vertical = if (tab.iconResId != null && tab.title.isNotBlank()) 8.dp else 14.dp),
+                .padding(vertical = if (tab.iconResId != null && tab.title.isNotBlank()) TabPaddingVerticalIcon else TabPaddingVerticalNoIcon),
             contentAlignment = Alignment.Center
         ) {
             if (tab.iconResId != null && tab.title.isNotBlank()) {
@@ -207,22 +221,22 @@ private fun GainzTabItems(
                         contentDescription = tab.title,
                         tint = color,
                         modifier = Modifier
-                            .padding(bottom = 4.dp)
-                            .size(24.dp)
+                            .padding(bottom = TabIconPaddingBottom)
+                            .size(TabIconSize)
                     )
                     Text(
                         text = tab.title.uppercase(),
                         color = color,
-                        fontSize = 10.sp,
-                        fontWeight = if (distance < 0.5f) FontWeight.Bold else FontWeight.Normal
+                        fontSize = TabFontSize,
+                        fontWeight = if (distance < FontWeightThreshold) FontWeight.Bold else FontWeight.Normal
                     )
                 }
             } else if (tab.iconResId != null && tab.title.isBlank()) {
                 Icon(
                     painter = painterResource(id = tab.iconResId),
-                    contentDescription = "Add",
+                    contentDescription = stringResource(id = R.string.cd_add),
                     tint = color,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(PlusIconSize)
                 )
             } else {
                 Text(
@@ -248,7 +262,7 @@ fun Modifier.instantClickable(onClick: () -> Unit): Modifier {
                     val press = PressInteraction.Press(offset)
                     val rippleJob = coroutineScope.launch {
                         interactionSource.emit(press)
-                        kotlinx.coroutines.delay(100) // Minimum ripple visibility duration
+                        kotlinx.coroutines.delay(RippleDelayMs) // Minimum ripple visibility duration
                     }
 
                     val released = tryAwaitRelease()

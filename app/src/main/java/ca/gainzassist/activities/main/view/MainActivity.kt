@@ -25,6 +25,7 @@ import ca.gainzassist.activities.start_workout.view.StartWorkoutActivity
 import ca.gainzassist.core.util.UI
 import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.ui.components.MainTopBar
+import ca.gainzassist.ui.components.MainTopBarActions
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
@@ -94,11 +95,13 @@ class MainActivity : AppCompatActivity() {
                     selectedTab = state.selectedTab,
                     isSearchExpanded = state.isSearchExpanded,
                     searchQuery = state.searchQuery,
-                    onSearchQueryChange = { mainViewModel.onSearchQueryChanged(it) },
-                    onSearchClick = { mainViewModel.onSearchExpanded() },
-                    onCloseSearchClick = { mainViewModel.onSearchClosed() },
-                    onAddWorkoutClick = { mainViewModel.onAddWorkoutClicked() },
-                    onLogoutClick = { mainViewModel.onLogoutClicked() }
+                    actions = MainTopBarActions(
+                        onSearchQueryChange = { mainViewModel.onSearchQueryChanged(it) },
+                        onSearchClick = { mainViewModel.onSearchExpanded() },
+                        onCloseSearchClick = { mainViewModel.onSearchClosed() },
+                        onAddWorkoutClick = { mainViewModel.onAddWorkoutClicked() },
+                        onLogoutClick = { mainViewModel.onLogoutClicked() }
+                    )
                 )
 
                 MainScreen(
@@ -109,29 +112,19 @@ class MainActivity : AppCompatActivity() {
                         selectedWorkoutName = state.selectedWorkoutName,
                         settingsUiState = getSettingsUiState()
                     ),
-                    onTabSelected = { tab -> mainViewModel.onTabSelected(tab) },
-                    onResumeWorkoutClick = { workoutName ->
-                        mainViewModel.onResumeWorkoutClicked(
-                            workoutName
-                        )
-                    },
-                    onWorkoutClick = { workoutName -> mainViewModel.onWorkoutClicked(workoutName) },
-                    onWorkoutLongClick = { workoutName ->
-                        mainViewModel.onWorkoutLongClicked(
-                            workoutName
-                        )
-                    },
-                    onDismissWorkoutDialog = { mainViewModel.onDismissWorkoutDialog() },
-                    onEditWorkout = { workoutName -> mainViewModel.onEditWorkoutClicked(workoutName) },
-                    onDeleteWorkout = { workoutName ->
-                        mainViewModel.onDeleteWorkoutClicked(
-                            workoutName
-                        )
-                    },
-                    onSettingsSignOutClick = { mainViewModel.onLogoutClicked() },
-                    onPrivacyPolicyClick = { openPrivacyPolicy() },
-                    onAccountDeletionClick = { openAccountDeletion() },
-                    onContactSupportClick = { contactSupport() }
+                    actions = MainScreenActions(
+                        onTabSelected = { tab -> mainViewModel.onTabSelected(tab) },
+                        onResumeWorkoutClick = { workoutName -> mainViewModel.onResumeWorkoutClicked(workoutName) },
+                        onWorkoutClick = { workoutName -> mainViewModel.onWorkoutClicked(workoutName) },
+                        onWorkoutLongClick = { workoutName -> mainViewModel.onWorkoutLongClicked(workoutName) },
+                        onDismissWorkoutDialog = { mainViewModel.onDismissWorkoutDialog() },
+                        onEditWorkout = { workoutName -> mainViewModel.onEditWorkoutClicked(workoutName) },
+                        onDeleteWorkout = { workoutName -> mainViewModel.onDeleteWorkoutClicked(workoutName) },
+                        onSettingsSignOutClick = { mainViewModel.onLogoutClicked() },
+                        onPrivacyPolicyClick = { openPrivacyPolicy() },
+                        onAccountDeletionClick = { openAccountDeletion() },
+                        onContactSupportClick = { contactSupport() }
+                    )
                 )
             }
         }
@@ -178,7 +171,7 @@ class MainActivity : AppCompatActivity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, "Browser not available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.err_browser_unavailable), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -188,7 +181,7 @@ class MainActivity : AppCompatActivity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, "Browser not available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.err_browser_unavailable), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -203,7 +196,7 @@ class MainActivity : AppCompatActivity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, "Mail app not available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.err_mail_unavailable), Toast.LENGTH_SHORT).show()
         }
     }
 }

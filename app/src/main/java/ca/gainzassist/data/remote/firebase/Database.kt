@@ -3,7 +3,6 @@ package ca.gainzassist.data.remote.firebase
 import android.app.Activity
 import android.content.Intent
 import android.util.SparseArray
-import ca.gainzassist.core.util.Misc.isMyServiceRunning
 import ca.gainzassist.data.service.FirebaseService
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
@@ -60,7 +59,7 @@ object Database {
                         userRef?.child(EMAIL)?.setValue(firebaseUser?.email)
                         copyDefaultWorkoutsFirebase()
                     }
-                    if (!isMyServiceRunning(act, FirebaseService::class.java)) {
+                    if (!FirebaseService.isRunning) {
                         act.startService(Intent(act, FirebaseService::class.java))
                     }
                 }

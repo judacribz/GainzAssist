@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 @file:OptIn(ExperimentalFoundationApi::class)
 
 package ca.gainzassist.activities.add_workout.exercises_entry.view
@@ -34,6 +33,8 @@ data class ExerciseEntryTab(
     val id: Long,
     val isAddTab: Boolean = false
 )
+
+private const val WeightFull = 1f
 
 @Composable
 fun ExercisesEntryScreen(
@@ -78,7 +79,7 @@ fun ExercisesEntryScreen(
             key = { page -> uiState.tabs.getOrNull(page)?.id ?: page.toLong() },
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(WeightFull)
         ) { page ->
             if (page < uiState.numExercises) {
                 pageContent(page)

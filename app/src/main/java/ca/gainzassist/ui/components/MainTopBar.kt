@@ -34,17 +34,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.R
 import ca.gainzassist.activities.main.view.MainTab
 
+data class MainTopBarActions(
+    val onSearchQueryChange: (String) -> Unit = {},
+    val onSearchClick: () -> Unit = {},
+    val onCloseSearchClick: () -> Unit = {},
+    val onAddWorkoutClick: () -> Unit = {},
+    val onLogoutClick: () -> Unit = {}
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
     selectedTab: MainTab,
     isSearchExpanded: Boolean,
     searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onSearchClick: () -> Unit,
-    onCloseSearchClick: () -> Unit,
-    onAddWorkoutClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    actions: MainTopBarActions = MainTopBarActions()
 ) {
     var overflowExpanded by remember { mutableStateOf(false) }
 
@@ -53,9 +57,9 @@ fun MainTopBar(
             title = {
                 TextField(
                     value = searchQuery,
-                    onValueChange = onSearchQueryChange,
+                    onValueChange = actions.onSearchQueryChange,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search workouts...", color = Color.Gray) },
+                    placeholder = { Text(stringResource(id = R.string.hint_search_workouts), color = Color.Gray) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { /* just dismiss keyboard or do nothing since filter is reactive */ }),
@@ -71,20 +75,20 @@ fun MainTopBar(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = onCloseSearchClick) {
+                IconButton(onClick = actions.onCloseSearchClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Close search",
+                        contentDescription = stringResource(id = R.string.cd_close_search),
                         tint = colorResource(id = R.color.colorBg)
                     )
                 }
             },
             actions = {
                 if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { onSearchQueryChange("") }) {
+                    IconButton(onClick = { actions.onSearchQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Clear search",
+                            contentDescription = stringResource(id = R.string.cd_clear_search),
                             tint = colorResource(id = R.color.colorBg)
                         )
                     }
@@ -100,20 +104,20 @@ fun MainTopBar(
             showBack = false,
             actions = {
                 if (selectedTab != MainTab.SETTINGS) {
-                    IconButton(onClick = onSearchClick) {
+                    IconButton(onClick = actions.onSearchClick) {
                         Icon(
                             imageVector = Icons.Filled.Search,
-                            contentDescription = "Search",
+                            contentDescription = stringResource(id = R.string.cd_search),
                             tint = colorResource(id = R.color.colorBg)
                         )
                     }
                 }
                 
                 if (selectedTab == MainTab.WORKOUTS) {
-                    IconButton(onClick = onAddWorkoutClick) {
+                    IconButton(onClick = actions.onAddWorkoutClick) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = "Add workout",
+                            contentDescription = stringResource(id = R.string.cd_add_workout),
                             tint = colorResource(id = R.color.colorBg)
                         )
                     }
@@ -123,7 +127,7 @@ fun MainTopBar(
                 IconButton(onClick = { overflowExpanded = true }) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "More actions",
+                        contentDescription = stringResource(id = R.string.cd_more_actions),
                         tint = colorResource(id = R.color.colorBg)
                     )
                 }
@@ -133,10 +137,10 @@ fun MainTopBar(
                     onDismissRequest = { overflowExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Logout") },
+                        text = { Text(stringResource(id = R.string.logout)) },
                         onClick = {
                             overflowExpanded = false
-                            onLogoutClick()
+                            actions.onLogoutClick()
                         },
                         leadingIcon = {
                             Icon(
@@ -157,12 +161,7 @@ fun MainTopBarPreviewWorkouts() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = ""
     )
 }
 
@@ -172,12 +171,7 @@ fun MainTopBarPreviewResume() {
     MainTopBar(
         selectedTab = MainTab.RESUME,
         isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = ""
     )
 }
 
@@ -187,12 +181,7 @@ fun MainTopBarPreviewSettings() {
     MainTopBar(
         selectedTab = MainTab.SETTINGS,
         isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = ""
     )
 }
 
@@ -202,11 +191,6 @@ fun MainTopBarPreviewSearchExpanded() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = true,
-        searchQuery = "Legs",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = "Legs"
     )
 }

@@ -1,8 +1,8 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.data.service
 
-import android.app.IntentService
+import android.app.Service
 import android.content.Intent
+import android.os.IBinder
 import android.widget.Toast
 import ca.gainzassist.core.util.Misc.extractSession
 import ca.gainzassist.core.util.Misc.extractWorkout
@@ -22,8 +22,11 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-@Suppress("DEPRECATION")
-class FirebaseService : IntentService("FirebaseService"), KoinComponent {
+class FirebaseService : Service(), KoinComponent {
+
+    companion object {
+        var isRunning = false
+    }
 
     private val workoutRepository: WorkoutRepository by inject()
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -34,8 +37,8 @@ class FirebaseService : IntentService("FirebaseService"), KoinComponent {
     private var workoutListener: ChildEventListener? = null
     private var sessionListener: ChildEventListener? = null
 
-    @Deprecated("Deprecated in Java")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        isRunning = true
         if (workoutListener == null) {
             getWorkoutsRef()?.let { ref ->
                 val listener = createWorkoutListener()
@@ -99,11 +102,10 @@ class FirebaseService : IntentService("FirebaseService"), KoinComponent {
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onHandleIntent(intent: Intent?) = Unit
+    override fun onBind(intent: Intent?): IBinder? = null
 
-    @Deprecated("Deprecated in Java")
     override fun onDestroy() {
+        isRunning = false
         workoutListener?.let { listener ->
             userWorkoutsRef?.removeEventListener(listener)
         }

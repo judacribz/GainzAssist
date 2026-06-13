@@ -1,11 +1,10 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.core.util
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -35,7 +34,7 @@ object UI {
         } else {
             backPressedTwice = true
             Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
-            Handler().postDelayed({ backPressedTwice = false }, 2000)
+            Handler(Looper.getMainLooper()).postDelayed({ backPressedTwice = false }, 2000)
         }
     }
 
@@ -176,55 +175,5 @@ object UI {
     @JvmStatic
     fun setText(view: EditText, num: Number) {
         view.setText(num.toString())
-    }
-
-    class ProgressHandler : Handler() {
-        private var progress: ProgressDialog? = null
-        private var blurLayout: View? = null
-        private var msg: String? = null
-        private var count = 0
-
-        fun setProgress(context: Context?, msg: String, blurLayout: View?) {
-            progress = ProgressDialog(context)
-            this.blurLayout = blurLayout
-            this.msg = msg + DOT
-            progress!!.setMessage(this.msg)
-            progress!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        }
-
-        fun setTitle(title: String?) {
-            progress!!.setTitle(title)
-        }
-
-        fun show() {
-            if (progress != null) {
-                progress!!.show()
-                if (blurLayout != null) {
-                    blurLayout!!.visibility = View.VISIBLE
-                    blurLayout!!.top = 0
-                }
-                Thread {
-                    try {
-                        while (progress!!.isShowing) {
-                            Thread.sleep(10)
-                            progress!!.setMessage(msg!!.substring(0, msg!!.length - 1 - ++count % 3))
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }.start()
-            }
-        }
-
-        fun dismiss() {
-            if (progress != null) {
-                progress!!.dismiss()
-                blurLayout!!.visibility = View.GONE
-            }
-        }
-
-        companion object {
-            private const val DOT = "..."
-        }
     }
 }

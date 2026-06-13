@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.workout_screen.view
 
 import android.content.Context
@@ -21,7 +20,6 @@ import ca.gainzassist.R
 import ca.gainzassist.activities.start_workout.WorkoutController
 import ca.gainzassist.activities.start_workout.view.StartWorkoutActivity
 import ca.gainzassist.activities.start_workout.workout_screen.WorkoutProgressMapper
-import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutProgressUiItem
 import ca.gainzassist.activities.start_workout.workout_screen.WorkoutScreenViewModel
 import ca.gainzassist.core.constants.ExerciseConst.MIN_REPS
 import ca.gainzassist.core.constants.UIConst.PROGRESS_CODE_MAP
@@ -29,9 +27,9 @@ import ca.gainzassist.core.constants.UIConst.PROGRESS_STATUS_MAP
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.session.SessionProgressSnapshot
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.ProgressStatus
+import ca.gainzassist.ui.ProgressStatus.FAIL
+import ca.gainzassist.ui.ProgressStatus.SUCCESS
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

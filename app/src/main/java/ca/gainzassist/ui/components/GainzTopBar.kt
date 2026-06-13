@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.ui.components
 
 import androidx.compose.foundation.background
@@ -29,7 +28,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import ca.gainzassist.R
+
+private val TopBarPaddingBottom = 2.dp
+private val TopBarCornerRadiusBg = 3.dp
+private val TopBarHeight = 56.dp
+private val TopBarCornerRadius = 2.dp
+private val TopBarBorderWidth = 1.dp
+private val TopBarPaddingHorizontal = 4.dp
+private val TopBarSpacerWidth = 12.dp
+private val TopBarTitleFontSize = 35.sp
+private val TopBarShadowOffset = 1f
+private val TopBarShadowBlur = 5f
+private val TopBarTitleMaxLines = 2
 
 @Composable
 fun GainzTopBar(
@@ -41,47 +53,47 @@ fun GainzTopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 2.dp)
-            .background(colorResource(id = R.color.colorLightAccent), RoundedCornerShape(3.dp))
+            .padding(bottom = TopBarPaddingBottom)
+            .background(colorResource(id = R.color.colorLightAccent), RoundedCornerShape(TopBarCornerRadiusBg))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .background(colorResource(id = R.color.colorLightBg), RoundedCornerShape(2.dp))
-                .border(1.dp, colorResource(id = R.color.colorBg), RoundedCornerShape(2.dp))
-                .padding(horizontal = 4.dp),
+                .height(TopBarHeight)
+                .background(colorResource(id = R.color.colorLightBg), RoundedCornerShape(TopBarCornerRadius))
+                .border(TopBarBorderWidth, colorResource(id = R.color.colorBg), RoundedCornerShape(TopBarCornerRadius))
+                .padding(horizontal = TopBarPaddingHorizontal),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (showBack) {
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(id = R.string.cd_back),
                         tint = colorResource(id = R.color.colorBg)
                     )
                 }
             } else {
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(TopBarSpacerWidth))
             }
 
             Text(
                 text = title,
                 style = TextStyle(
-                    fontSize = 35.sp,
+                    fontSize = TopBarTitleFontSize,
                     color = colorResource(id = R.color.colorBg),
                     fontWeight = FontWeight.Normal,
                     shadow = Shadow(
                         color = colorResource(id = R.color.colorBg),
-                        offset = Offset(1f, 1f),
-                        blurRadius = 5f
+                        offset = Offset(TopBarShadowOffset, TopBarShadowOffset),
+                        blurRadius = TopBarShadowBlur
                     )
                 ),
-                maxLines = 2,
+                maxLines = TopBarTitleMaxLines,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = if (showBack) 0.dp else 4.dp)
+                    .padding(start = if (showBack) 0.dp else TopBarPaddingHorizontal)
             )
 
             actions()

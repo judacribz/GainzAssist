@@ -2,13 +2,13 @@ package ca.gainzassist.activities.start_workout.workout_screen
 
 import android.util.SparseArray
 import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutProgressUiItem
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.UNSELECTED
+import ca.gainzassist.ui.ProgressStatus
+import ca.gainzassist.ui.ProgressStatus.FAIL
+import ca.gainzassist.ui.ProgressStatus.FAIL_SELECTED
+import ca.gainzassist.ui.ProgressStatus.SELECTED
+import ca.gainzassist.ui.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.ProgressStatus.SUCCESS_SELECTED
+import ca.gainzassist.ui.ProgressStatus.UNSELECTED
 import androidx.core.util.size
 
 object WorkoutProgressMapper {

@@ -73,8 +73,7 @@ class WorkoutScreenViewModel(
 
     suspend fun getSessionProgress(workoutName: String): SessionProgressSnapshot? {
         val json = getSessionProgressUseCase(workoutName) ?: return null
-        @Suppress("UNCHECKED_CAST")
-        val map = Misc.readValue(json) as? Map<String, Any>
+        val map = Misc.readValue(json)
         return SessionProgressMapper.fromLegacyMap(map)
     }
 

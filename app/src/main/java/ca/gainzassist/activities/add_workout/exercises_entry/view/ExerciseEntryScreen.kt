@@ -70,7 +70,30 @@ interface ExEntryActions {
     fun onDelete()
 }
 
-@Suppress("kotlin:S107")
+private val ContainerPadding = 4.dp
+private val SectionElevation = 3.dp
+private val SectionCornerRadius = 5.dp
+private val SectionBorderWidth = 0.5.dp
+private val InnerPadding = 4.dp
+private val EquipmentTextFontSize = 18.sp
+private val EquipmentTextPadding = 5.dp
+private val DropdownPadding = 2.dp
+private val RowPadding = 2.dp
+private val ButtonCornerRadius = 15.dp
+private val ButtonElevation = 2.dp
+private val PlusMinusFontSize = 40.sp
+private val FooterTopPadding = 10.dp
+private val FooterBottomPadding = 5.dp
+private val FooterHorizontalPadding = 2.dp
+private val FooterButtonHorizontalPadding = 2.dp
+
+private const val WeightExerciseName = 4f
+private const val WeightEquipment = 3f
+private const val WeightMetrics = 10f
+private const val WeightFooter = 4f
+private const val WeightButton = 1f
+private const val WeightValueInput = 1.5f
+
 @Composable
 fun ExEntryScreen(
     uiState: ExEntryUiState,
@@ -88,18 +111,18 @@ fun ExEntryScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colorLightBg)
-            .padding(4.dp)
+            .padding(ContainerPadding)
     ) {
         // Exercise Name Section (weight 4)
         Box(
             modifier = Modifier
-                .weight(4f)
+                .weight(WeightExerciseName)
                 .fillMaxWidth()
-                .padding(4.dp)
-                .shadow(elevation = 3.dp, shape = RoundedCornerShape(5.dp))
-                .background(colorLightBg, RoundedCornerShape(5.dp))
-                .border(0.5.dp, colorBg, RoundedCornerShape(5.dp))
-                .padding(4.dp)
+                .padding(ContainerPadding)
+                .shadow(elevation = SectionElevation, shape = RoundedCornerShape(SectionCornerRadius))
+                .background(colorLightBg, RoundedCornerShape(SectionCornerRadius))
+                .border(SectionBorderWidth, colorBg, RoundedCornerShape(SectionCornerRadius))
+                .padding(InnerPadding)
         ) {
             val errorText = uiState.duplicateExerciseError ?: uiState.exerciseNameError
             GainzOutlinedTextField(
@@ -116,13 +139,13 @@ fun ExEntryScreen(
         // Equipment Section (weight 3)
         Box(
             modifier = Modifier
-                .weight(3f)
+                .weight(WeightEquipment)
                 .fillMaxWidth()
-                .padding(4.dp)
-                .shadow(elevation = 3.dp, shape = RoundedCornerShape(5.dp))
-                .background(colorLightBg, RoundedCornerShape(5.dp))
-                .border(0.5.dp, colorBg, RoundedCornerShape(5.dp))
-                .padding(4.dp)
+                .padding(ContainerPadding)
+                .shadow(elevation = SectionElevation, shape = RoundedCornerShape(SectionCornerRadius))
+                .background(colorLightBg, RoundedCornerShape(SectionCornerRadius))
+                .border(SectionBorderWidth, colorBg, RoundedCornerShape(SectionCornerRadius))
+                .padding(InnerPadding)
         ) {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -131,9 +154,9 @@ fun ExEntryScreen(
                 Text(
                     text = stringResource(id = R.string.equipment),
                     fontFamily = staatliches,
-                    fontSize = 18.sp,
+                    fontSize = EquipmentTextFontSize,
                     color = colorDarkText,
-                    modifier = Modifier.padding(5.dp),
+                    modifier = Modifier.padding(EquipmentTextPadding),
                     textAlign = TextAlign.Center
                 )
 
@@ -143,7 +166,7 @@ fun ExEntryScreen(
                     onOptionSelected = actions::onEquipmentSelected,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(2.dp)
+                        .padding(DropdownPadding)
                 )
             }
         }
@@ -151,13 +174,13 @@ fun ExEntryScreen(
         // Weight/Reps/Sets Section (weight 10)
         Column(
             modifier = Modifier
-                .weight(10f)
+                .weight(WeightMetrics)
                 .fillMaxWidth()
-                .padding(4.dp)
-                .shadow(elevation = 3.dp, shape = RoundedCornerShape(5.dp))
-                .background(colorLightBg, RoundedCornerShape(5.dp))
-                .border(0.5.dp, colorBg, RoundedCornerShape(5.dp))
-                .padding(4.dp)
+                .padding(ContainerPadding)
+                .shadow(elevation = SectionElevation, shape = RoundedCornerShape(SectionCornerRadius))
+                .background(colorLightBg, RoundedCornerShape(SectionCornerRadius))
+                .border(SectionBorderWidth, colorBg, RoundedCornerShape(SectionCornerRadius))
+                .padding(InnerPadding)
         ) {
             // Reusable row for Weight, Reps, Sets
             @Composable
@@ -174,7 +197,7 @@ fun ExEntryScreen(
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
-                        .padding(2.dp),
+                        .padding(RowPadding),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -182,18 +205,18 @@ fun ExEntryScreen(
                     if (canDecrement) {
                         Box(
                             modifier = Modifier
-                                .weight(1f)
+                                .weight(WeightButton)
                                 .fillMaxHeight()
-                                .padding(2.dp)
-                                .shadow(elevation = 2.dp, shape = RoundedCornerShape(15.dp))
-                                .background(colorBlue, RoundedCornerShape(15.dp))
+                                .padding(RowPadding)
+                                .shadow(elevation = ButtonElevation, shape = RoundedCornerShape(ButtonCornerRadius))
+                                .background(colorBlue, RoundedCornerShape(ButtonCornerRadius))
                                 .clickable { onDecrement() },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("-", color = colorText, fontSize = 40.sp, fontFamily = staatliches, textAlign = TextAlign.Center)
+                            Text("-", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)
                         }
                     } else {
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(WeightButton))
                     }
 
                     // Value Input
@@ -202,9 +225,9 @@ fun ExEntryScreen(
                         onValueChange = onValueChange,
                         label = "",
                         modifier = Modifier
-                            .weight(1.5f)
+                            .weight(WeightValueInput)
                             .fillMaxHeight()
-                            .padding(2.dp),
+                            .padding(RowPadding),
                         textAlign = TextAlign.Center,
                         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                         isError = errorText != null,
@@ -214,15 +237,15 @@ fun ExEntryScreen(
                     // Increment Button
                     Box(
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(WeightButton)
                             .fillMaxHeight()
-                            .padding(2.dp)
-                            .shadow(elevation = 2.dp, shape = RoundedCornerShape(15.dp))
-                            .background(colorBlue, RoundedCornerShape(15.dp))
+                            .padding(RowPadding)
+                            .shadow(elevation = ButtonElevation, shape = RoundedCornerShape(ButtonCornerRadius))
+                            .background(colorBlue, RoundedCornerShape(ButtonCornerRadius))
                             .clickable { onIncrement() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("+", color = colorText, fontSize = 40.sp, fontFamily = staatliches, textAlign = TextAlign.Center)
+                        Text("+", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)
                     }
                 }
             }
@@ -235,7 +258,7 @@ fun ExEntryScreen(
                 onDecrement = actions::onDecrementWeight,
                 onIncrement = actions::onIncrementWeight,
                 keyboardType = KeyboardType.Decimal,
-                modifier = Modifier.weight(3f)
+                modifier = Modifier.weight(WeightEquipment)
             )
             NumberRow(
                 value = uiState.reps,
@@ -245,7 +268,7 @@ fun ExEntryScreen(
                 onDecrement = actions::onDecrementReps,
                 onIncrement = actions::onIncrementReps,
                 keyboardType = KeyboardType.Number,
-                modifier = Modifier.weight(3f)
+                modifier = Modifier.weight(WeightEquipment)
             )
             NumberRow(
                 value = uiState.sets,
@@ -255,16 +278,16 @@ fun ExEntryScreen(
                 onDecrement = actions::onDecrementSets,
                 onIncrement = actions::onIncrementSets,
                 keyboardType = KeyboardType.Number,
-                modifier = Modifier.weight(3f)
+                modifier = Modifier.weight(WeightEquipment)
             )
         }
 
         // Footer Section (weight 4)
         Row(
             modifier = Modifier
-                .weight(4f)
+                .weight(WeightFooter)
                 .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 5.dp, start = 2.dp, end = 2.dp),
+                .padding(top = FooterTopPadding, bottom = FooterBottomPadding, start = FooterHorizontalPadding, end = FooterHorizontalPadding),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -273,13 +296,13 @@ fun ExEntryScreen(
                     text = stringResource(id = R.string.delete).uppercase(),
                     onClick = actions::onDelete,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(WeightButton)
                         .fillMaxHeight()
-                        .padding(horizontal = 2.dp),
+                        .padding(horizontal = FooterButtonHorizontalPadding),
                     fontFamily = staatliches
                 )
             } else {
-                Spacer(modifier = Modifier.weight(1f).padding(horizontal = 2.dp))
+                Spacer(modifier = Modifier.weight(WeightButton).padding(horizontal = FooterButtonHorizontalPadding))
             }
 
             if (uiState.showEnter) {
@@ -287,9 +310,9 @@ fun ExEntryScreen(
                     text = stringResource(id = R.string.enter).uppercase(),
                     onClick = actions::onEnter,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(WeightButton)
                         .fillMaxHeight()
-                        .padding(horizontal = 2.dp),
+                        .padding(horizontal = FooterButtonHorizontalPadding),
                     fontFamily = staatliches
                 )
             } else if (uiState.showUpdate) {
@@ -297,13 +320,13 @@ fun ExEntryScreen(
                     text = stringResource(id = R.string.update).uppercase(),
                     onClick = actions::onUpdate,
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(WeightButton)
                         .fillMaxHeight()
-                        .padding(horizontal = 2.dp),
+                        .padding(horizontal = FooterButtonHorizontalPadding),
                     fontFamily = staatliches
                 )
             } else {
-                Spacer(modifier = Modifier.weight(1f).padding(horizontal = 2.dp))
+                Spacer(modifier = Modifier.weight(WeightButton).padding(horizontal = FooterButtonHorizontalPadding))
             }
         }
     }

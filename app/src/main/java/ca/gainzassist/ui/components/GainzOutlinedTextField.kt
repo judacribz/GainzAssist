@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.ui.components
 
 import androidx.compose.foundation.border
@@ -32,7 +31,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+
+private val CornerRadius = 20.dp
+private val ShadowElevation = 4.dp
+private val OuterBorderWidth = 1.dp
+private val InnerBorderWidth = 3.dp
+private val BoxPadding = 1.dp
+private val InputFontSize = 30.sp
+private val LabelFontSize = 16.sp
+private val LabelPaddingStart = 16.dp
+private val LabelPaddingTop = 8.dp
+private val InputPaddingHorizontal = 16.dp
+private val InputPaddingVertical = 8.dp
+private val ErrorFontSize = 12.sp
+private val ErrorPaddingTop = 2.dp
 
 private val StaatlichesFont = FontFamily(
     Font(R.font.staatliches, FontWeight.Normal)
@@ -80,16 +94,16 @@ fun GainzOutlinedTextField(
     Column(modifier = modifier) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(20.dp),
-            shadowElevation = 4.dp,
+            shape = RoundedCornerShape(CornerRadius),
+            shadowElevation = ShadowElevation,
             color = grey
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .border(1.dp, Color.Black, RoundedCornerShape(20.dp))
-                    .padding(1.dp)
-                    .border(3.dp, innerBorderColor, RoundedCornerShape(20.dp))
+                    .border(OuterBorderWidth, Color.Black, RoundedCornerShape(CornerRadius))
+                    .padding(BoxPadding)
+                    .border(InnerBorderWidth, innerBorderColor, RoundedCornerShape(CornerRadius))
             ) {
                 BasicTextField(
                     value = value,
@@ -98,7 +112,7 @@ fun GainzOutlinedTextField(
                     interactionSource = interactionSource,
                     textStyle = TextStyle(
                         fontFamily = safeFontFamily,
-                        fontSize = 30.sp,
+                        fontSize = InputFontSize,
                         textAlign = textAlign,
                         color = colorDarkText,
                     ),
@@ -114,10 +128,10 @@ fun GainzOutlinedTextField(
                                     style = TextStyle(
                                         fontFamily = safeFontFamily,
                                         fontStyle = FontStyle.Italic,
-                                        fontSize = 16.sp,
+                                        fontSize = LabelFontSize,
                                         color = colorBg.copy(alpha = 0.7f)
                                     ),
-                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp)
+                                    modifier = Modifier.padding(start = LabelPaddingStart, top = LabelPaddingTop)
                                 )
                             }
 
@@ -125,7 +139,7 @@ fun GainzOutlinedTextField(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    .padding(horizontal = InputPaddingHorizontal, vertical = InputPaddingVertical),
                                 contentAlignment = alignment
                             ) {
                                 if (!isFloating) {
@@ -133,7 +147,7 @@ fun GainzOutlinedTextField(
                                         text = label,
                                         style = TextStyle(
                                             fontFamily = safeFontFamily,
-                                            fontSize = 30.sp,
+                                            fontSize = InputFontSize,
                                             textAlign = textAlign,
                                             color = colorDarkText.copy(alpha = 0.5f),
                                             fontStyle = FontStyle.Italic
@@ -153,8 +167,8 @@ fun GainzOutlinedTextField(
             Text(
                 text = errorText,
                 color = Color.Red,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(start = 16.dp, top = 2.dp)
+                fontSize = ErrorFontSize,
+                modifier = Modifier.padding(start = LabelPaddingStart, top = ErrorPaddingTop)
             )
         }
     }

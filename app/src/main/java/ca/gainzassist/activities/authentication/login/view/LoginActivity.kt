@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.authentication.login.view
 
 import android.content.Intent
@@ -38,7 +37,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.orhanobut.logger.Logger
 import java.io.IOException
 
-@Suppress("DEPRECATION")
+import androidx.activity.result.contract.ActivityResultContracts
 class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
 
     companion object {
@@ -60,6 +59,34 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
 
     private val isFacebookEnabled: Boolean
         get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
+
+    private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            uiState = uiState.copy(isLoading = true)
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val token = account?.idToken
+                if (token != null) {
+                    googleCred = GoogleAuthProvider.getCredential(token, null)
+                    val cred = googleCred
+                    if (cred != null) {
+                        Authentication.signIn(this, cred)
+                    } else {
+                        authError("Google authentication failed: credential null")
+                    }
+                } else {
+                    authError("Google authentication failed: account or ID token null")
+                }
+            } catch (ex: ApiException) {
+                ex.printStackTrace()
+                uiState = uiState.copy(isLoading = false)
+                Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            uiState = uiState.copy(isLoading = false)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,38 +177,7 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            uiState = uiState.copy(isLoading = true)
-            when (requestCode) {
-                Authentication.RC_SIGN_IN -> {
-                    val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-                    try {
-                        val account = task.getResult(ApiException::class.java)
-                        val token = account?.idToken
-                        if (token != null) {
-                            googleCred = GoogleAuthProvider.getCredential(token, null)
-                            val cred = googleCred
-                            if (cred != null) {
-                                Authentication.signIn(this, cred)
-                            } else {
-                                authError("Google authentication failed: credential null")
-                            }
-                        } else {
-                            authError("Google authentication failed: account or ID token null")
-                        }
-                    } catch (ex: ApiException) {
-                        ex.printStackTrace()
-                        uiState = uiState.copy(isLoading = false)
-                        Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                else -> {
-                    callbackManager?.onActivityResult(requestCode, resultCode, data)
-                }
-            }
-        } else {
-            uiState = uiState.copy(isLoading = false)
-        }
+        callbackManager?.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onStop() {
@@ -263,7 +259,7 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
         val client = signInClient
         val signInIntent = client?.signInIntent
         if (client != null && signInIntent != null) {
-            startActivityForResult(signInIntent, Authentication.RC_SIGN_IN)
+            googleSignInLauncher.launch(signInIntent)
         } else {
             authError("Google Login unavailable: client uninitialized")
         }

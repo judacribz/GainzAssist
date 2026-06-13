@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.add_workout.summary.view
 
 import android.os.Bundle
@@ -169,7 +168,6 @@ class SummaryActivity : AppCompatActivity() {
         }
     }
 
-    @Suppress("kotlin:S107", "kotlin:S3776")
     @Composable
     private fun SummaryActivityContent(
         initialWorkoutName: String,
@@ -179,60 +177,61 @@ class SummaryActivity : AppCompatActivity() {
     ) {
         val state by summaryViewModel.state.collectAsStateWithLifecycle()
 
-            //val exercisesState =
-            remember(state.exercises) { mutableStateListOf<Exercise>().apply { addAll(state.exercises) } }
-            var workoutName by rememberSaveable { mutableStateOf(initialWorkoutName) }
-            var exerciseName by rememberSaveable { mutableStateOf("") }
-            var weight by rememberSaveable { mutableStateOf(getString(R.string.starting_weight)) }
-            var reps by rememberSaveable { mutableStateOf(getString(R.string.starting_reps)) }
-            var sets by rememberSaveable { mutableStateOf(getString(R.string.starting_sets)) }
-            var selectedEquipment by rememberSaveable { mutableStateOf("Barbell") }
-            var selectedExerciseNumber by rememberSaveable { mutableStateOf<Int?>(null) }
+        //val exercisesState =
+        remember(state.exercises) { mutableStateListOf<Exercise>().apply { addAll(state.exercises) } }
+        var workoutName by rememberSaveable { mutableStateOf(initialWorkoutName) }
+        var exerciseName by rememberSaveable { mutableStateOf("") }
+        var weight by rememberSaveable { mutableStateOf(getString(R.string.starting_weight)) }
+        var reps by rememberSaveable { mutableStateOf(getString(R.string.starting_reps)) }
+        var sets by rememberSaveable { mutableStateOf(getString(R.string.starting_sets)) }
+        var selectedEquipment by rememberSaveable { mutableStateOf("Barbell") }
+        var selectedExerciseNumber by rememberSaveable { mutableStateOf<Int?>(null) }
 
-            var workoutNameError by rememberSaveable { mutableStateOf<String?>(null) }
-            var exerciseNameError by rememberSaveable { mutableStateOf<String?>(null) }
-            var weightError by rememberSaveable { mutableStateOf<String?>(null) }
-            var repsError by rememberSaveable { mutableStateOf<String?>(null) }
-            var setsError by rememberSaveable { mutableStateOf<String?>(null) }
+        var workoutNameError by rememberSaveable { mutableStateOf<String?>(null) }
+        var exerciseNameError by rememberSaveable { mutableStateOf<String?>(null) }
+        var weightError by rememberSaveable { mutableStateOf<String?>(null) }
+        var repsError by rememberSaveable { mutableStateOf<String?>(null) }
+        var setsError by rememberSaveable { mutableStateOf<String?>(null) }
 
-            // Sync ViewModel error message
-            if (state.errorMessage != null && workoutNameError == null) {
-                workoutNameError = state.errorMessage
-            }
+        // Sync ViewModel error message
+        if (state.errorMessage != null && workoutNameError == null) {
+            workoutNameError = state.errorMessage
+        }
 
-            val minWeight = when (selectedEquipment) {
-                "Barbell" -> ExerciseConst.BB_MIN_WEIGHT
-                "Dumbbell" -> ExerciseConst.DB_MIN_WEIGHT
-                else -> ExerciseConst.MIN_WEIGHT
-            }
+        val minWeight = when (selectedEquipment) {
+            "Barbell" -> ExerciseConst.BB_MIN_WEIGHT
+            "Dumbbell" -> ExerciseConst.DB_MIN_WEIGHT
+            else -> ExerciseConst.MIN_WEIGHT
+        }
 
-            val uiState = SummaryUiState(
-                workoutName = state.workoutName,
-                exerciseName = exerciseName,
-                selectedEquipment = selectedEquipment,
-                equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList(),
-                weight = weight,
-                reps = reps,
-                sets = sets,
-                exerciseNames = state.exercises.mapNotNull { it.name },
-                selectedExerciseName = state.exercises.find { it.exerciseNumber == selectedExerciseNumber }?.name,
-                showAddExerciseButton = selectedExerciseNumber == null,
-                showUpdateExerciseButton = selectedExerciseNumber != null,
-                mainWorkoutButtonText = initialMainButtonText,
-                workoutNameError = workoutNameError,
-                exerciseNameError = exerciseNameError,
-                weightError = weightError,
-                repsError = repsError,
-                setsError = setsError,
-                canDecrementWeight = (weight.toFloatOrNull() ?: 0f) > minWeight,
-                canDecrementReps = (reps.toIntOrNull() ?: 0) > MIN_INT,
-                canDecrementSets = (sets.toIntOrNull() ?: 0) > MIN_INT,
-                isSaving = state.isSaving,
+        val uiState = SummaryUiState(
+            workoutName = state.workoutName,
+            exerciseName = exerciseName,
+            selectedEquipment = selectedEquipment,
+            equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList(),
+            weight = weight,
+            reps = reps,
+            sets = sets,
+            exerciseNames = state.exercises.mapNotNull { it.name },
+            selectedExerciseName = state.exercises.find { it.exerciseNumber == selectedExerciseNumber }?.name,
+            showAddExerciseButton = selectedExerciseNumber == null,
+            showUpdateExerciseButton = selectedExerciseNumber != null,
+            mainWorkoutButtonText = initialMainButtonText,
+            workoutNameError = workoutNameError,
+            exerciseNameError = exerciseNameError,
+            weightError = weightError,
+            repsError = repsError,
+            setsError = setsError,
+            canDecrementWeight = (weight.toFloatOrNull() ?: 0f) > minWeight,
+            canDecrementReps = (reps.toIntOrNull() ?: 0) > MIN_INT,
+            canDecrementSets = (sets.toIntOrNull() ?: 0) > MIN_INT,
+            isSaving = state.isSaving,
 
-                )
+            )
 
-            SummaryScreenContent(
-                uiState = uiState,
+        SummaryScreenContent(
+            uiState = uiState,
+            actions = SummaryScreenActions(
                 onBack = { finish() },
                 onWorkoutNameChanged = {
                     workoutName = it
@@ -467,5 +466,6 @@ class SummaryActivity : AppCompatActivity() {
                     }
                 }
             )
+        )
     }
 }

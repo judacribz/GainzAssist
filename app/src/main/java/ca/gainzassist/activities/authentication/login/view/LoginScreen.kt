@@ -223,7 +223,6 @@ private fun ActionButton(
     }
 }
 
-@Suppress("kotlin:S107")
 @Composable
 fun LoginScreen(
     state: LoginUiState,

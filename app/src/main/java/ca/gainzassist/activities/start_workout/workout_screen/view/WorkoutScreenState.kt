@@ -1,6 +1,6 @@
 package ca.gainzassist.activities.start_workout.workout_screen.view
 
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
+import ca.gainzassist.ui.ProgressStatus
 
 data class WorkoutScreenState(
     val exerciseTitle: String = "",

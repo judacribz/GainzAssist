@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.workout_screen.view
 
 import android.annotation.SuppressLint
@@ -55,8 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
-import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutProgressUiItem
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
+import ca.gainzassist.ui.ProgressStatus
 import java.util.Locale
 import kotlin.math.min
 
@@ -95,7 +93,6 @@ data class WorkoutUiActions(
     val onSetProgressClick: (Int) -> Unit = {}
 )
 
-@Suppress("kotlin:S107")
 @Composable
 fun WorkoutComposeScreen(
     uiState: WorkoutUiState,
@@ -127,18 +124,8 @@ fun WorkoutComposeScreen(
             modifier = Modifier.weight(4f)
         )
         WorkoutRepsWeightControls(
-            repsText = uiState.repsText,
-            weightText = uiState.weightText,
-            isMinReps = uiState.isMinReps,
-            isMinWeight = uiState.isMinWeight,
-            onRepsChanged = actions.onRepsChanged,
-            onWeightChanged = actions.onWeightChanged,
-            onRepsFocusLost = actions.onRepsFocusLost,
-            onWeightFocusLost = actions.onWeightFocusLost,
-            onIncreaseReps = actions.onIncreaseReps,
-            onDecreaseReps = actions.onDecreaseReps,
-            onIncreaseWeight = actions.onIncreaseWeight,
-            onDecreaseWeight = actions.onDecreaseWeight,
+            uiState = uiState,
+            actions = actions,
             modifier = Modifier.weight(3f)
         )
         WorkoutFooterControls(
@@ -453,18 +440,8 @@ fun WorkoutEquipmentCanvas(
 
 @Composable
 fun WorkoutRepsWeightControls(
-    repsText: String,
-    weightText: String,
-    isMinReps: Boolean,
-    isMinWeight: Boolean,
-    onRepsChanged: (String) -> Unit,
-    onWeightChanged: (String) -> Unit,
-    onRepsFocusLost: () -> Unit,
-    onWeightFocusLost: () -> Unit,
-    onIncreaseReps: () -> Unit,
-    onDecreaseReps: () -> Unit,
-    onIncreaseWeight: () -> Unit,
-    onDecreaseWeight: () -> Unit,
+    uiState: WorkoutUiState,
+    actions: WorkoutUiActions,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -472,23 +449,23 @@ fun WorkoutRepsWeightControls(
     ) {
         WorkoutCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
             WorkoutNumberControl(
-                value = repsText,
-                onValueChanged = onRepsChanged,
-                onFocusLost = onRepsFocusLost,
-                onIncrease = onIncreaseReps,
-                onDecrease = onDecreaseReps,
-                isMin = isMinReps,
+                value = uiState.repsText,
+                onValueChanged = actions.onRepsChanged,
+                onFocusLost = actions.onRepsFocusLost,
+                onIncrease = actions.onIncreaseReps,
+                onDecrease = actions.onDecreaseReps,
+                isMin = uiState.isMinReps,
                 modifier = Modifier.fillMaxSize()
             )
         }
         WorkoutCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
             WorkoutNumberControl(
-                value = weightText,
-                onValueChanged = onWeightChanged,
-                onFocusLost = onWeightFocusLost,
-                onIncrease = onIncreaseWeight,
-                onDecrease = onDecreaseWeight,
-                isMin = isMinWeight,
+                value = uiState.weightText,
+                onValueChanged = actions.onWeightChanged,
+                onFocusLost = actions.onWeightFocusLost,
+                onIncrease = actions.onIncreaseWeight,
+                onDecrease = actions.onDecreaseWeight,
+                isMin = uiState.isMinWeight,
                 isDecimal = true,
                 modifier = Modifier.fillMaxSize()
             )
@@ -505,7 +482,6 @@ fun WorkoutNumberControl(
     onDecrease: () -> Unit,
     isMin: Boolean,
     isDecimal: Boolean = false,
-    @SuppressLint("ModifierParameter")
     modifier: Modifier = Modifier
 ) {
     Row(

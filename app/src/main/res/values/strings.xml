@@ -92,4 +92,18 @@
     <string name="support_email">gainzassist.support@gmail.com</string>
     <string name="support_email_subject">GainzAssist Support Request</string>
     <string name="no_warmups">No warmups.</string>
+    <string name="cd_dropdown">Dropdown</string>
+    <string name="dumbbell">Dumbbell</string>
+    <string name="n_a">N/A</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_add">Add</string>
+    <string name="err_browser_unavailable">Browser not available</string>
+    <string name="err_mail_unavailable">Mail app not available</string>
+    <string name="hint_search_workouts">Search workouts…</string>
+    <string name="cd_close_search">Close search</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_add_workout">Add workout</string>
+    <string name="cd_more_actions">More actions</string>
+    <string name="logout">Logout</string>
 </resources>

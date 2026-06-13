@@ -55,6 +55,47 @@ val Staatliches = FontFamily(
     Font(R.font.staatliches, FontWeight.Normal)
 )
 
+data class WorkoutEntryScreenActions(
+    val onWorkoutNameChanged: (String) -> Unit = {},
+    val onNumberOfExercisesChanged: (String) -> Unit = {},
+    val onIncrementExercises: () -> Unit = {},
+    val onDecrementExercises: () -> Unit = {},
+    val onCancel: () -> Unit = {},
+    val onContinueClicked: () -> Unit = {},
+    val onBack: () -> Unit = {}
+)
+
+private val ScreenPadding = 4.dp
+private val SectionSpacing = 4.dp
+private val ToolbarHeight = 56.dp
+private val BorderWidthLarge = 4.dp
+private val BorderWidthSmall = 1.dp
+private val BorderWidthXSmall = 0.5.dp
+private val CornerRadiusSmall = 2.dp
+private val CornerRadiusMedium = 3.dp
+private val CornerRadiusLarge = 5.dp
+private val CornerRadiusXLarge = 20.dp
+private val ShadowElevationMedium = 3.dp
+private val TextShadowOffset = 1f
+private val TextShadowBlurLarge = 5f
+private val TextShadowBlurSmall = 2f
+private val FontSizeTitle = 35.sp
+private val FontSizeSubtitle = 20.sp
+private val FontSizeError = 12.sp
+private val ToolbarTextPaddingStart = 48.dp
+private val CardPadding = 4.dp
+private val ContentPadding = 8.dp
+private val ButtonWidth = 80.dp
+private val InputBoxWidth = 150.dp
+private val ButtonVerticalPadding = 10.dp
+private val FooterTopPadding = 10.dp
+private val FooterHorizontalPadding = 2.dp
+private val FooterSpacing = 4.dp
+private val FooterButtonPaddingBottom = 5.dp
+private const val WeightMd = 0.25f
+private const val WeightLg = 0.5f
+private const val WeightFull = 1f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutEntryScreen(
@@ -62,13 +103,7 @@ fun WorkoutEntryScreen(
     numberOfExercises: String,
     workoutNameError: String?,
     numberOfExercisesError: String?,
-    onWorkoutNameChanged: (String) -> Unit,
-    onNumberOfExercisesChanged: (String) -> Unit,
-    onIncrementExercises: () -> Unit,
-    onDecrementExercises: () -> Unit,
-    onCancel: () -> Unit,
-    onContinueClicked: () -> Unit,
-    onBack: () -> Unit
+    actions: WorkoutEntryScreenActions = WorkoutEntryScreenActions()
 ) {
     val blue = colorResource(id = R.color.blue)
     val grey = colorResource(id = R.color.grey)
@@ -92,46 +127,46 @@ fun WorkoutEntryScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(4.dp)
+                .padding(ScreenPadding)
         ) {
             // Toolbar
-            CustomToolbar(onBack = onBack, fontFamily = safeFontFamily)
+            CustomToolbar(onBack = actions.onBack, fontFamily = safeFontFamily)
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(SectionSpacing))
 
             // Workout Name Section
             WorkoutNameSection(
-                modifier = Modifier.weight(0.25f), // Matches ll_md_weight
+                modifier = Modifier.weight(WeightMd), // Matches ll_md_weight
                 workoutName = workoutName,
                 workoutNameError = workoutNameError,
-                onWorkoutNameChanged = onWorkoutNameChanged,
+                onWorkoutNameChanged = actions.onWorkoutNameChanged,
                 colorBg = colorBg
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(SectionSpacing))
 
             // Number of Exercises Section
             NumExercisesSection(
-                modifier = Modifier.weight(0.5f), // Matches ll_lg_weight
+                modifier = Modifier.weight(WeightLg), // Matches ll_lg_weight
                 numberOfExercises = numberOfExercises,
                 numberOfExercisesError = numberOfExercisesError,
-                onNumberOfExercisesChanged = onNumberOfExercisesChanged,
-                onIncrementExercises = onIncrementExercises,
-                onDecrementExercises = onDecrementExercises,
+                onNumberOfExercisesChanged = actions.onNumberOfExercisesChanged,
+                onIncrementExercises = actions.onIncrementExercises,
+                onDecrementExercises = actions.onDecrementExercises,
                 grey = grey,
                 blue = blue,
                 colorBg = colorBg,
                 fontFamily = safeFontFamily
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(SectionSpacing))
 
             // Footer Section
             FooterSection(
-                modifier = Modifier.weight(0.25f), // Matches ll_md_weight
+                modifier = Modifier.weight(WeightMd), // Matches ll_md_weight
                 isNameEmpty = workoutName.trim().isEmpty(),
-                onCancel = onCancel,
-                onEnter = onContinueClicked,
+                onCancel = actions.onCancel,
+                onEnter = actions.onContinueClicked,
                 fontFamily = safeFontFamily
             )
         }
@@ -147,11 +182,11 @@ fun CustomToolbar(onBack: () -> Unit, fontFamily: FontFamily) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .background(colorLightAccent, RoundedCornerShape(3.dp))
-            .padding(bottom = 2.dp)
-            .background(colorLightBg, RoundedCornerShape(2.dp))
-            .border(1.dp, colorBg, RoundedCornerShape(2.dp))
+            .height(ToolbarHeight)
+            .background(colorLightAccent, RoundedCornerShape(CornerRadiusMedium))
+            .padding(bottom = CornerRadiusSmall)
+            .background(colorLightBg, RoundedCornerShape(CornerRadiusSmall))
+            .border(BorderWidthSmall, colorBg, RoundedCornerShape(CornerRadiusSmall))
     ) {
         IconButton(
             onClick = onBack,
@@ -159,27 +194,25 @@ fun CustomToolbar(onBack: () -> Unit, fontFamily: FontFamily) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(id = R.string.cd_back),
                 tint = colorBg
             )
         }
         Text(
-            text = if (LocalInspectionMode.current) "Add Workout" else stringResource(
-                id = R.string.add_workout
-            ),
+            text = stringResource(id = R.string.add_workout),
             style = TextStyle(
                 fontFamily = fontFamily,
-                fontSize = 35.sp,
+                fontSize = FontSizeTitle,
                 color = colorBg,
                 shadow = Shadow(
                     color = colorBg,
-                    offset = Offset(1f, 1f),
-                    blurRadius = 5f
+                    offset = Offset(TextShadowOffset, TextShadowOffset),
+                    blurRadius = TextShadowBlurLarge
                 )
             ),
             modifier = Modifier
                 .align(Alignment.Center)
-                .padding(start = 48.dp)
+                .padding(start = ToolbarTextPaddingStart)
                 .fillMaxWidth(),
             textAlign = TextAlign.Start
         )
@@ -208,13 +241,11 @@ fun WorkoutNameSection(
             onValueChange = onWorkoutNameChanged,
             isError = workoutNameError != null,
             errorText = workoutNameError,
-            label = if (LocalInspectionMode.current) "Workout Name" else stringResource(
-                id = R.string.hint_workout_name
-            ).trim(),
+            label = stringResource(id = R.string.hint_workout_name).trim(),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(ContentPadding)
         )
     }
 }
@@ -235,38 +266,36 @@ fun NumExercisesSection(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(4.dp)
-            .shadow(3.dp, RoundedCornerShape(5.dp)),
-        shape = RoundedCornerShape(5.dp),
+            .padding(CardPadding)
+            .shadow(ShadowElevationMedium, RoundedCornerShape(CornerRadiusLarge)),
+        shape = RoundedCornerShape(CornerRadiusLarge),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(0.5.dp, colorBg)
+        border = BorderStroke(BorderWidthSmall, colorBg)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(ContentPadding)
         ) {
             Text(
-                text = if (LocalInspectionMode.current) "# OF EXERCISES" else stringResource(
-                    id = R.string.num_of_exercises
-                ).uppercase(),
+                text = stringResource(id = R.string.num_of_exercises).uppercase(),
                 style = TextStyle(
                     fontFamily = fontFamily,
-                    fontSize = 20.sp,
+                    fontSize = FontSizeSubtitle,
                     color = colorBg,
                     shadow = Shadow(
                         color = colorResource(id = R.color.greenDark),
-                        offset = Offset(1f, 1f),
-                        blurRadius = 2f
+                        offset = Offset(TextShadowOffset, TextShadowOffset),
+                        blurRadius = TextShadowBlurSmall
                     )
                 ),
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = ContentPadding)
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .weight(WeightFull),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -278,20 +307,20 @@ fun NumExercisesSection(
                         onClick = onDecrementExercises,
                         modifier = Modifier
                             .fillMaxHeight()
-                            .width(80.dp)
-                            .padding(vertical = 10.dp)
+                            .width(ButtonWidth)
+                            .padding(vertical = ButtonVerticalPadding)
                     )
                 } else {
-                    Spacer(modifier = Modifier.width(80.dp))
+                    Spacer(modifier = Modifier.width(ButtonWidth))
                 }
 
                 // Number Display
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(150.dp)
-                        .background(grey, RoundedCornerShape(20.dp))
-                        .border(4.dp, blue, RoundedCornerShape(20.dp)),
+                        .width(InputBoxWidth)
+                        .background(grey, RoundedCornerShape(CornerRadiusXLarge))
+                        .border(BorderWidthLarge, blue, RoundedCornerShape(CornerRadiusXLarge)),
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextField(
@@ -302,7 +331,7 @@ fun NumExercisesSection(
                         },
                         textStyle = TextStyle(
                             fontFamily = fontFamily,
-                            fontSize = 35.sp,
+                            fontSize = FontSizeTitle,
                             color = colorBg,
                             textAlign = TextAlign.Center
                         ),
@@ -318,8 +347,8 @@ fun NumExercisesSection(
                     onClick = onIncrementExercises,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(80.dp)
-                        .padding(vertical = 10.dp)
+                        .width(ButtonWidth)
+                        .padding(vertical = ButtonVerticalPadding)
                 )
             }
 
@@ -327,8 +356,8 @@ fun NumExercisesSection(
                 Text(
                     text = numberOfExercisesError,
                     color = Color.Red,
-                    fontSize = 12.sp,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 4.dp)
+                    fontSize = FontSizeError,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = CardPadding)
                 )
             }
         }
@@ -346,32 +375,26 @@ fun FooterSection(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, start = 2.dp, end = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+            .padding(top = FooterTopPadding, start = FooterHorizontalPadding, end = FooterHorizontalPadding),
+        horizontalArrangement = Arrangement.spacedBy(FooterSpacing)
     ) {
         GainzButton(
-            text = if (LocalInspectionMode.current) "CANCEL" else stringResource(
-                id = R.string.cancel
-            ),
+            text = stringResource(id = R.string.cancel),
             onClick = onCancel,
             modifier = Modifier
-                .weight(1f)
+                .weight(WeightFull)
                 .fillMaxHeight()
-                .padding(bottom = 5.dp),
+                .padding(bottom = FooterButtonPaddingBottom),
             fontFamily = fontFamily
         )
 
         GainzButton(
-            text = if (LocalInspectionMode.current) {
-                if (isNameEmpty) "SKIP" else "ENTER"
-            } else {
-                if (isNameEmpty) stringResource(id = R.string.skip) else stringResource(id = R.string.enter)
-            },
+            text = if (isNameEmpty) stringResource(id = R.string.skip) else stringResource(id = R.string.enter),
             onClick = onEnter,
             modifier = Modifier
-                .weight(1f)
+                .weight(WeightFull)
                 .fillMaxHeight()
-                .padding(bottom = 5.dp),
+                .padding(bottom = FooterButtonPaddingBottom),
             fontFamily = fontFamily
         )
     }
@@ -384,14 +407,7 @@ fun WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises() {
         workoutName = "",
         numberOfExercises = "3",
         workoutNameError = null,
-        numberOfExercisesError = null,
-        onWorkoutNameChanged = {},
-        onNumberOfExercisesChanged = {},
-        onIncrementExercises = {},
-        onDecrementExercises = {},
-        onCancel = {},
-        onContinueClicked = {},
-        onBack = {}
+        numberOfExercisesError = null
     )
 }
 
@@ -402,14 +418,7 @@ fun WorkoutEntryScreenPreviewWithNameEnterFiveExercises() {
         workoutName = "Push Day",
         numberOfExercises = "5",
         workoutNameError = null,
-        numberOfExercisesError = null,
-        onWorkoutNameChanged = {},
-        onNumberOfExercisesChanged = {},
-        onIncrementExercises = {},
-        onDecrementExercises = {},
-        onCancel = {},
-        onContinueClicked = {},
-        onBack = {}
+        numberOfExercisesError = null
     )
 }
 
@@ -420,14 +429,7 @@ fun WorkoutEntryScreenPreviewMinExerciseCountDisabledMinus() {
         workoutName = "",
         numberOfExercises = "1",
         workoutNameError = null,
-        numberOfExercisesError = null,
-        onWorkoutNameChanged = {},
-        onNumberOfExercisesChanged = {},
-        onIncrementExercises = {},
-        onDecrementExercises = {},
-        onCancel = {},
-        onContinueClicked = {},
-        onBack = {}
+        numberOfExercisesError = null
     )
 }
 
@@ -438,14 +440,7 @@ fun WorkoutEntryScreenPreviewLongWorkoutName() {
         workoutName = "Very Long Workout Name to Test Layout",
         numberOfExercises = "3",
         workoutNameError = null,
-        numberOfExercisesError = null,
-        onWorkoutNameChanged = {},
-        onNumberOfExercisesChanged = {},
-        onIncrementExercises = {},
-        onDecrementExercises = {},
-        onCancel = {},
-        onContinueClicked = {},
-        onBack = {}
+        numberOfExercisesError = null
     )
 }
 

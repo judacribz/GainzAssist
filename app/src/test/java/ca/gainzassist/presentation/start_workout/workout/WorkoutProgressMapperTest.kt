@@ -2,13 +2,13 @@ package ca.gainzassist.presentation.start_workout.workout
 
 import android.util.SparseArray
 import ca.gainzassist.activities.start_workout.workout_screen.WorkoutProgressMapper
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.UNSELECTED
+import ca.gainzassist.ui.ProgressStatus
+import ca.gainzassist.ui.ProgressStatus.FAIL
+import ca.gainzassist.ui.ProgressStatus.FAIL_SELECTED
+import ca.gainzassist.ui.ProgressStatus.SELECTED
+import ca.gainzassist.ui.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.ProgressStatus.SUCCESS_SELECTED
+import ca.gainzassist.ui.ProgressStatus.UNSELECTED
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

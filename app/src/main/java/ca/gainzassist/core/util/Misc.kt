@@ -23,20 +23,6 @@ object Misc {
     private val mapper = ObjectMapper()
 
     @JvmStatic
-    @Suppress("deprecation")
-    fun isMyServiceRunning(act: Activity, serviceClass: Class<*>): Boolean {
-        val manager = act.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-        if (manager != null) {
-            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                if (serviceClass.name == service.service.className) {
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    @JvmStatic
     fun extractWorkout(workoutShot: DataSnapshot): Workout {
         val exercises = ArrayList<Exercise>()
         var exercise: Exercise?

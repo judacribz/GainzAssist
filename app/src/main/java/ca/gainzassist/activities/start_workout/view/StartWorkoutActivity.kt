@@ -1,8 +1,8 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.view
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 
-@Suppress("DEPRECATION")
 class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListener {
 
     companion object {
@@ -60,6 +59,15 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
 
         UI.setInitTheme(this)
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                workoutController.unsetTimer()
+                handleLeavingScreen()
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            }
+        })
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.events.collect { event ->
@@ -71,7 +79,7 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
                             startActivity(vidIntent)
                         }
                         is StartWorkoutViewModelEvent.ExitWorkout -> {
-                            onBackPressed()
+                            onBackPressedDispatcher.onBackPressed()
                         }
                         is StartWorkoutViewModelEvent.FinishWorkout -> {
                             // Handled later
@@ -165,7 +173,7 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         return super.onSupportNavigateUp()
     }
 
@@ -177,12 +185,6 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         handleLeavingScreen()
-    }
-
-    override fun onBackPressed() {
-        workoutController.unsetTimer()
-        handleLeavingScreen()
-        super.onBackPressed()
     }
 
     fun handleLeavingScreen() {

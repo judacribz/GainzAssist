@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.view
 
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +28,8 @@ import ca.gainzassist.activities.start_workout.view.components.WarmupsListScreen
 import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutFragment
 import ca.gainzassist.ui.components.GainzTabItem
 import ca.gainzassist.ui.components.GainzTabRow
+
+private const val WeightFull = 1f
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -67,7 +68,7 @@ fun StartWorkoutScreen(
             beyondViewportPageCount = 1,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(WeightFull)
         ) { page ->
             when (uiState.availableTabs[page]) {
                 StartWorkoutTab.WARMUPS -> {

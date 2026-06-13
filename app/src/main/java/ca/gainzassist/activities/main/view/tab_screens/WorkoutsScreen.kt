@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.main.view.tab_screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -34,21 +33,38 @@ import androidx.compose.ui.window.DialogProperties
 import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzButton
 
+data class WorkoutsScreenActions(
+    val onWorkoutClick: (String) -> Unit = {},
+    val onWorkoutLongClick: (String) -> Unit = {},
+    val onDismissDialog: () -> Unit = {},
+    val onEditWorkout: (String) -> Unit = {},
+    val onDeleteWorkout: (String) -> Unit = {}
+)
+
+private val ContainerPadding = 15.dp
+private val TitleBottomPadding = 10.dp
+private val ItemVerticalPadding = 5.dp
+private val ItemHeight = 120.dp
+private val DialogWidthFraction = 0.9f
+private val DialogBorderWidth = 2.5.dp
+private val DialogCornerRadius = 20.dp
+private val DialogPadding = 20.dp
+private val DialogTitleFontSize = 30.sp
+private val DialogTitleBottomPadding = 20.dp
+private val DialogButtonWeight = 1f
+private val DialogButtonSpacing = 20.dp
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WorkoutsScreen(
     workoutNames: List<String>,
     selectedWorkoutName: String?,
-    onWorkoutClick: (String) -> Unit,
-    onWorkoutLongClick: (String) -> Unit,
-    onDismissDialog: () -> Unit,
-    onEditWorkout: (String) -> Unit,
-    onDeleteWorkout: (String) -> Unit
+    actions: WorkoutsScreenActions = WorkoutsScreenActions()
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(15.dp)
+            .padding(ContainerPadding)
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -57,7 +73,7 @@ fun WorkoutsScreen(
                 text = stringResource(id = R.string.workout_list),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = TitleBottomPadding)
             )
 
             LazyColumn(
@@ -66,8 +82,8 @@ fun WorkoutsScreen(
                 items(workoutNames) { workoutName ->
                     WorkoutListItem(
                         workoutName = workoutName,
-                        onClick = { onWorkoutClick(workoutName) },
-                        onLongClick = { onWorkoutLongClick(workoutName) }
+                        onClick = { actions.onWorkoutClick(workoutName) },
+                        onLongClick = { actions.onWorkoutLongClick(workoutName) }
                     )
                 }
             }
@@ -76,9 +92,9 @@ fun WorkoutsScreen(
         if (selectedWorkoutName != null) {
             WorkoutOptionsDialog(
                 workoutName = selectedWorkoutName,
-                onDismiss = onDismissDialog,
-                onEdit = { onEditWorkout(selectedWorkoutName) },
-                onDelete = { onDeleteWorkout(selectedWorkoutName) }
+                onDismiss = actions.onDismissDialog,
+                onEdit = { actions.onEditWorkout(selectedWorkoutName) },
+                onDelete = { actions.onDeleteWorkout(selectedWorkoutName) }
             )
         }
     }
@@ -96,8 +112,8 @@ fun WorkoutListItem(
         onLongClick = onLongClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp)
-            .height(120.dp)
+            .padding(vertical = ItemVerticalPadding)
+            .height(ItemHeight)
     )
 }
 
@@ -114,27 +130,27 @@ fun WorkoutOptionsDialog(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth(0.9f)
+                .fillMaxWidth(DialogWidthFraction)
                 .wrapContentHeight()
                 .border(
-                    width = 2.5.dp,
+                    width = DialogBorderWidth,
                     color = colorResource(id = R.color.blue),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(DialogCornerRadius)
                 ),
             color = colorResource(id = R.color.grey),
-            shape = RoundedCornerShape(20.dp)
+            shape = RoundedCornerShape(DialogCornerRadius)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(DialogPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = workoutName,
-                    fontSize = 30.sp,
+                    fontSize = DialogTitleFontSize,
                     color = colorResource(id = R.color.colorBg),
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    modifier = Modifier.padding(bottom = DialogTitleBottomPadding)
                 )
 
                 Row(
@@ -147,12 +163,12 @@ fun WorkoutOptionsDialog(
                             containerColor = Color.LightGray,
                             contentColor = Color.Black
                         ),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(DialogButtonWeight)
                     ) {
                         Text(text = stringResource(id = R.string.delete))
                     }
 
-                    Spacer(modifier = Modifier.width(20.dp))
+                    Spacer(modifier = Modifier.width(DialogButtonSpacing))
 
                     Button(
                         onClick = onEdit,
@@ -160,7 +176,7 @@ fun WorkoutOptionsDialog(
                             containerColor = Color.LightGray,
                             contentColor = Color.Black
                         ),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(DialogButtonWeight)
                     ) {
                         Text(text = stringResource(id = R.string.edit))
                     }
@@ -175,12 +191,7 @@ fun WorkoutOptionsDialog(
 fun WorkoutsScreenEmptyPreview() {
     WorkoutsScreen(
         workoutNames = emptyList(),
-        selectedWorkoutName = null,
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {}
+        selectedWorkoutName = null
     )
 }
 
@@ -189,12 +200,7 @@ fun WorkoutsScreenEmptyPreview() {
 fun WorkoutsScreenPopulatedPreview() {
     WorkoutsScreen(
         workoutNames = listOf("Chest Day", "Leg Day", "Back Day"),
-        selectedWorkoutName = null,
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {}
+        selectedWorkoutName = null
     )
 }
 
@@ -203,11 +209,6 @@ fun WorkoutsScreenPopulatedPreview() {
 fun WorkoutsScreenDialogPreview() {
     WorkoutsScreen(
         workoutNames = listOf("Chest Day", "Leg Day", "Back Day"),
-        selectedWorkoutName = "Leg Day",
-        onWorkoutClick = {},
-        onWorkoutLongClick = {},
-        onDismissDialog = {},
-        onEditWorkout = {},
-        onDeleteWorkout = {}
+        selectedWorkoutName = "Leg Day"
     )
 }
