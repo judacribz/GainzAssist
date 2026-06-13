@@ -101,11 +101,11 @@ fun ExEntryScreen(
     modifier: Modifier = Modifier
 ) {
     val staatliches = FontFamily(Font(R.font.staatliches))
-    val colorBg = colorResource(id = R.color.colorBg) // black
-    val colorLightBg = colorResource(id = R.color.colorLightBg) // white
-    val colorText = colorResource(id = R.color.colorText) // white
-    val colorDarkText = colorResource(id = R.color.colorDarkText) // #333333
-    val colorBlue = colorResource(id = R.color.blue)
+    val colorBg = colorResource(R.color.colorBg) // black
+    val colorLightBg = colorResource(R.color.colorLightBg) // white
+    val colorText = colorResource(R.color.colorText) // white
+    val colorDarkText = colorResource(R.color.colorDarkText) // #333333
+    val colorBlue = colorResource(R.color.blue)
 
     Column(
         modifier = modifier
@@ -128,7 +128,7 @@ fun ExEntryScreen(
             GainzOutlinedTextField(
                 value = uiState.exerciseName,
                 onValueChange = actions::onExerciseNameChanged,
-                label = stringResource(id = R.string.hint_exercise_name),
+                label = stringResource(R.string.hint_exercise_name),
                 modifier = Modifier.fillMaxSize(),
                 textAlign = TextAlign.Start,
                 isError = errorText != null,
@@ -152,7 +152,7 @@ fun ExEntryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(id = R.string.equipment),
+                    text = stringResource(R.string.equipment),
                     fontFamily = staatliches,
                     fontSize = EquipmentTextFontSize,
                     color = colorDarkText,
@@ -293,7 +293,7 @@ fun ExEntryScreen(
         ) {
             if (uiState.showDelete) {
                 GainzButton(
-                    text = stringResource(id = R.string.delete).uppercase(),
+                    text = stringResource(R.string.delete).uppercase(),
                     onClick = actions::onDelete,
                     modifier = Modifier
                         .weight(WeightButton)
@@ -307,7 +307,7 @@ fun ExEntryScreen(
 
             if (uiState.showEnter) {
                 GainzButton(
-                    text = stringResource(id = R.string.enter).uppercase(),
+                    text = stringResource(R.string.enter).uppercase(),
                     onClick = actions::onEnter,
                     modifier = Modifier
                         .weight(WeightButton)
@@ -317,7 +317,7 @@ fun ExEntryScreen(
                 )
             } else if (uiState.showUpdate) {
                 GainzButton(
-                    text = stringResource(id = R.string.update).uppercase(),
+                    text = stringResource(R.string.update).uppercase(),
                     onClick = actions::onUpdate,
                     modifier = Modifier
                         .weight(WeightButton)

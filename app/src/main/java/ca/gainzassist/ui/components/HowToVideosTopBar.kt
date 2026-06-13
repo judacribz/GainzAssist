@@ -48,9 +48,9 @@ fun HowToVideosTopBar(
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = colorResource(id = R.color.colorBg),
-                        unfocusedTextColor = colorResource(id = R.color.colorBg),
-                        cursorColor = colorResource(id = R.color.colorLightAccent),
+                        focusedTextColor = colorResource(R.color.colorBg),
+                        unfocusedTextColor = colorResource(R.color.colorBg),
+                        cursorColor = colorResource(R.color.colorLightAccent),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     )
@@ -61,7 +61,7 @@ fun HowToVideosTopBar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Close search",
-                        tint = colorResource(id = R.color.colorBg)
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             },
@@ -71,13 +71,13 @@ fun HowToVideosTopBar(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Clear search",
-                            tint = colorResource(id = R.color.colorBg)
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = colorResource(id = R.color.colorLightBg)
+                containerColor = colorResource(R.color.colorLightBg)
             )
         )
     } else {
@@ -90,7 +90,7 @@ fun HowToVideosTopBar(
                     Icon(
                         imageVector = Icons.Filled.Search,
                         contentDescription = "Search",
-                        tint = colorResource(id = R.color.colorBg)
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             }

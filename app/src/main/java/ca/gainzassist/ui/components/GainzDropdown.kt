@@ -24,11 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import ca.gainzassist.R
 
 private val DropdownMinHeight = 48.dp
@@ -47,10 +47,10 @@ fun GainzDropdown(
     enabled: Boolean = true,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val colorDarkText = colorResource(id = R.color.colorDarkText)
-    val colorLightBg = colorResource(id = R.color.colorLightBg)
-    val colorAccent = colorResource(id = R.color.colorAccent)
-    val colorLightAccent = colorResource(id = R.color.colorLightAccent)
+    val colorDarkText = colorResource(R.color.colorDarkText)
+    val colorLightBg = colorResource(R.color.colorLightBg)
+    val colorAccent = colorResource(R.color.colorAccent)
+    val colorLightAccent = colorResource(R.color.colorLightAccent)
 
     Box(
         modifier = modifier
@@ -74,8 +74,8 @@ fun GainzDropdown(
                 modifier = Modifier.weight(1f)
             )
             Icon(
-                painter = painterResource(id = R.drawable.ic_drop_dark),
-                contentDescription = stringResource(id = R.string.cd_dropdown),
+                painter = painterResource(R.drawable.ic_drop_dark),
+                contentDescription = stringResource(R.string.cd_dropdown),
                 modifier = Modifier.size(DropdownIconSize),
                 tint = colorDarkText
             )

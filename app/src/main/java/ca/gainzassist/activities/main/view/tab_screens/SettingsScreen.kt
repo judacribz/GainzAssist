@@ -50,7 +50,7 @@ fun SettingsScreen(
     ) {
         // Account Section
         Text(
-            text = stringResource(id = R.string.settings_account),
+            text = stringResource(R.string.settings_account),
             fontSize = SectionTitleFontSize,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = SectionBottomPadding)
@@ -60,7 +60,7 @@ fun SettingsScreen(
             modifier = Modifier.padding(bottom = ItemBottomPadding)
         )
         GainzButton(
-            text = stringResource(id = R.string.settings_sign_out),
+            text = stringResource(R.string.settings_sign_out),
             onClick = actions.onSignOutClick,
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,25 +69,25 @@ fun SettingsScreen(
 
         // Privacy & Support Section
         Text(
-            text = stringResource(id = R.string.settings_privacy_support),
+            text = stringResource(R.string.settings_privacy_support),
             fontSize = SectionTitleFontSize,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = SectionBottomPadding)
         )
         GainzButton(
-            text = stringResource(id = R.string.settings_privacy_policy),
+            text = stringResource(R.string.settings_privacy_policy),
             onClick = actions.onPrivacyPolicyClick,
             modifier = Modifier.fillMaxWidth()
         )
         GainzButton(
-            text = stringResource(id = R.string.settings_account_deletion),
+            text = stringResource(R.string.settings_account_deletion),
             onClick = actions.onAccountDeletionClick,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = ItemTopPadding)
         )
         GainzButton(
-            text = stringResource(id = R.string.settings_contact_support),
+            text = stringResource(R.string.settings_contact_support),
             onClick = actions.onContactSupportClick,
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,7 +96,7 @@ fun SettingsScreen(
 
         // About Section
         Text(
-            text = stringResource(id = R.string.settings_about),
+            text = stringResource(R.string.settings_about),
             fontSize = SectionTitleFontSize,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = SectionBottomPadding)
@@ -106,7 +106,7 @@ fun SettingsScreen(
             modifier = Modifier.padding(bottom = VersionBottomPadding)
         )
         Text(
-            text = stringResource(id = R.string.settings_app_description)
+            text = stringResource(R.string.settings_app_description)
         )
     }
 }

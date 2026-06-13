@@ -59,16 +59,21 @@ fun MainTopBar(
                     value = searchQuery,
                     onValueChange = actions.onSearchQueryChange,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(stringResource(id = R.string.hint_search_workouts), color = Color.Gray) },
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.hint_search_workouts),
+                            color = Color.Gray
+                        )
+                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { /* just dismiss keyboard or do nothing since filter is reactive */ }),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = colorResource(id = R.color.colorBg),
-                        unfocusedTextColor = colorResource(id = R.color.colorBg),
-                        cursorColor = colorResource(id = R.color.colorLightAccent),
+                        focusedTextColor = colorResource(R.color.colorBg),
+                        unfocusedTextColor = colorResource(R.color.colorBg),
+                        cursorColor = colorResource(R.color.colorLightAccent),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     )
@@ -78,8 +83,8 @@ fun MainTopBar(
                 IconButton(onClick = actions.onCloseSearchClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.cd_close_search),
-                        tint = colorResource(id = R.color.colorBg)
+                        contentDescription = stringResource(R.string.cd_close_search),
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             },
@@ -88,56 +93,56 @@ fun MainTopBar(
                     IconButton(onClick = { actions.onSearchQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = stringResource(id = R.string.cd_clear_search),
-                            tint = colorResource(id = R.color.colorBg)
+                            contentDescription = stringResource(R.string.cd_clear_search),
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = colorResource(id = R.color.colorLightBg)
+                containerColor = colorResource(R.color.colorLightBg)
             )
         )
     } else {
         GainzTopBar(
-            title = stringResource(id = R.string.app_name),
+            title = stringResource(R.string.app_name),
             showBack = false,
             actions = {
                 if (selectedTab != MainTab.SETTINGS) {
                     IconButton(onClick = actions.onSearchClick) {
                         Icon(
                             imageVector = Icons.Filled.Search,
-                            contentDescription = stringResource(id = R.string.cd_search),
-                            tint = colorResource(id = R.color.colorBg)
+                            contentDescription = stringResource(R.string.cd_search),
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
-                
+
                 if (selectedTab == MainTab.WORKOUTS) {
                     IconButton(onClick = actions.onAddWorkoutClick) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = stringResource(id = R.string.cd_add_workout),
-                            tint = colorResource(id = R.color.colorBg)
+                            contentDescription = stringResource(R.string.cd_add_workout),
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
-                
+
                 // Overflow menu for Logout
                 IconButton(onClick = { overflowExpanded = true }) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = stringResource(id = R.string.cd_more_actions),
-                        tint = colorResource(id = R.color.colorBg)
+                        contentDescription = stringResource(R.string.cd_more_actions),
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
-                
+
                 DropdownMenu(
                     expanded = overflowExpanded,
                     onDismissRequest = { overflowExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(id = R.string.logout)) },
+                        text = { Text(stringResource(R.string.logout)) },
                         onClick = {
                             overflowExpanded = false
                             actions.onLogoutClick()

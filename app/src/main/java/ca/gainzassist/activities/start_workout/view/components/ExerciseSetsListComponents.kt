@@ -70,14 +70,14 @@ fun ExerciseSetsCard(
             .padding(bottom = 5.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         shape = RoundedCornerShape(0.dp), // To match relative layout background border look
-        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.colorLightBg))
+        colors = CardDefaults.cardColors(colorResource(R.color.colorLightBg))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
                     1.dp,
-                    colorResource(id = R.color.colorDarkText)
+                    colorResource(R.color.colorDarkText)
                 ) // @drawable/border approximation
         ) {
             // Title
@@ -85,9 +85,9 @@ fun ExerciseSetsCard(
                 text = exercise.name ?: "",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colorResource(id = R.color.colorBg))
+                    .background(colorResource(R.color.colorBg))
                     .padding(10.dp),
-                color = colorResource(id = R.color.colorText),
+                color = colorResource(R.color.colorText),
                 fontSize = 30.sp,
                 textAlign = TextAlign.Start
             )
@@ -106,7 +106,7 @@ fun ExerciseSetsCard(
                     modifier = Modifier
                         .width(1.dp)
                         .padding(top = 5.dp)
-                        .background(colorResource(id = R.color.colorDarkText)) // @drawable/border
+                        .background(colorResource(R.color.colorDarkText)) // @drawable/border
                 )
 
                 // Horizontal Sets Row
@@ -131,28 +131,28 @@ fun ExerciseSetSubtitles(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = stringResource(id = R.string.set_num),
+            text = stringResource(R.string.set_num),
             modifier = Modifier
-                .background(colorResource(id = R.color.colorLightBg))
+                .background(colorResource(R.color.colorLightBg))
                 .height(60.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
-            color = colorResource(id = R.color.colorBg),
+            color = colorResource(R.color.colorBg),
             fontSize = 15.sp,
         )
         Text(
-            text = stringResource(id = R.string.reps),
+            text = stringResource(R.string.reps),
             modifier = Modifier
                 .height(60.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
-            color = colorResource(id = R.color.colorBg),
+            color = colorResource(R.color.colorBg),
             fontSize = 15.sp,
         )
         Text(
-            text = stringResource(id = R.string.weight_lbs),
+            text = stringResource(R.string.weight_lbs),
             modifier = Modifier
                 .height(60.dp)
                 .wrapContentHeight(Alignment.CenterVertically),
-            color = colorResource(id = R.color.colorBg),
+            color = colorResource(R.color.colorBg),
             fontSize = 15.sp,
         )
     }

@@ -63,8 +63,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
-import ca.gainzassist.activities.authentication.login.view.LoginActions
-import ca.gainzassist.activities.authentication.login.view.LoginUiState
 
 // Original Colors from resources
 private val ColorBg = Color(0xFF000000) // @color/colorPrimaryDark
@@ -107,7 +105,7 @@ private fun SocialButton(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = imageRes),
+                painter = painterResource(imageRes),
                 contentDescription = contentDescription,
                 modifier = Modifier
                     .size(50.dp)
@@ -124,10 +122,10 @@ private fun LoginInputField(
     onValueChange: (String) -> Unit,
     hint: String,
     iconRes: Int,
+    modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false,
-    error: String? = null,
-    modifier: Modifier = Modifier
+    error: String? = null
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         BasicTextField(
@@ -167,7 +165,7 @@ private fun LoginInputField(
                     innerTextField()
                     
                     Image(
-                        painter = painterResource(id = iconRes),
+                        painter = painterResource(iconRes),
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -236,7 +234,7 @@ fun LoginScreen(
             .background(Color(0xFF2C3E50))
     ) {
         Image(
-            painter = painterResource(id = R.drawable.login_bg),
+            painter = painterResource(R.drawable.login_bg),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -331,7 +329,7 @@ fun LoginScreen(
             LoginInputField(
                 value = state.email,
                 onValueChange = actions::onEmailChanged,
-                hint = stringResource(id = R.string.hint_email),
+                hint = stringResource(R.string.hint_email),
                 iconRes = R.drawable.ic_mail_dark,
                 keyboardType = KeyboardType.Email,
                 error = state.emailError
@@ -342,12 +340,12 @@ fun LoginScreen(
             LoginInputField(
                 value = state.password,
                 onValueChange = actions::onPasswordChanged,
-                hint = stringResource(id = R.string.hint_password),
+                hint = stringResource(R.string.hint_password),
                 iconRes = R.drawable.ic_pass_dark,
+                modifier = Modifier.padding(bottom = 10.dp),
                 keyboardType = KeyboardType.Password,
                 isPassword = true,
-                error = state.passwordError,
-                modifier = Modifier.padding(bottom = 10.dp)
+                error = state.passwordError
             )
 
             Spacer(modifier = Modifier.height(10.dp))

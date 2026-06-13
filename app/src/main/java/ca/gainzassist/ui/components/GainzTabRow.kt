@@ -32,14 +32,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import ca.gainzassist.R
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
 
 private val EdgePadding = 0.dp
 private val IndicatorHeight = 2.dp
@@ -80,9 +82,9 @@ fun GainzTabRow(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            colorResource(id = R.color.blue),
-                            colorResource(id = R.color.colorBg),
-                            colorResource(id = R.color.colorBg)
+                            colorResource(R.color.blue),
+                            colorResource(R.color.colorBg),
+                            colorResource(R.color.colorBg)
                         )
                     )
                 ),
@@ -111,9 +113,9 @@ fun GainzTabRow(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            colorResource(id = R.color.blue),
-                            colorResource(id = R.color.colorBg),
-                            colorResource(id = R.color.colorBg)
+                            colorResource(R.color.blue),
+                            colorResource(R.color.colorBg),
+                            colorResource(R.color.colorBg)
                         )
                     )
                 ),
@@ -165,7 +167,7 @@ private fun GainzTabIndicator(
                 .wrapContentSize(Alignment.BottomStart)
                 .offset(x = indicatorOffset)
                 .width(indicatorWidth),
-            color = colorResource(id = R.color.blue),
+            color = colorResource(R.color.blue),
             height = IndicatorHeight
         )
     }
@@ -184,7 +186,7 @@ private fun GainzTabItems(
         val pageOffset = ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction)
         val distance = abs(pageOffset).coerceIn(ColorLerpMin, ColorLerpMax)
         val color = androidx.compose.ui.graphics.lerp(
-            colorResource(id = R.color.blue),
+            colorResource(R.color.blue),
             Color.White,
             distance
         )
@@ -217,7 +219,7 @@ private fun GainzTabItems(
             if (tab.iconResId != null && tab.title.isNotBlank()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
-                        painter = painterResource(id = tab.iconResId),
+                        painter = painterResource(tab.iconResId),
                         contentDescription = tab.title,
                         tint = color,
                         modifier = Modifier
@@ -233,8 +235,8 @@ private fun GainzTabItems(
                 }
             } else if (tab.iconResId != null && tab.title.isBlank()) {
                 Icon(
-                    painter = painterResource(id = tab.iconResId),
-                    contentDescription = stringResource(id = R.string.cd_add),
+                    painter = painterResource(tab.iconResId),
+                    contentDescription = stringResource(R.string.cd_add),
                     tint = color,
                     modifier = Modifier.size(PlusIconSize)
                 )
@@ -262,7 +264,7 @@ fun Modifier.instantClickable(onClick: () -> Unit): Modifier {
                     val press = PressInteraction.Press(offset)
                     val rippleJob = coroutineScope.launch {
                         interactionSource.emit(press)
-                        kotlinx.coroutines.delay(RippleDelayMs) // Minimum ripple visibility duration
+                        delay(RippleDelayMs.milliseconds) // Minimum ripple visibility duration
                     }
 
                     val released = tryAwaitRelease()

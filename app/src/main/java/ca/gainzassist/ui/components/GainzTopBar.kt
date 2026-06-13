@@ -22,13 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import ca.gainzassist.R
 
 private val TopBarPaddingBottom = 2.dp
@@ -54,14 +54,24 @@ fun GainzTopBar(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = TopBarPaddingBottom)
-            .background(colorResource(id = R.color.colorLightAccent), RoundedCornerShape(TopBarCornerRadiusBg))
+            .background(
+                color = colorResource(R.color.colorLightAccent),
+                shape = RoundedCornerShape(TopBarCornerRadiusBg)
+            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(TopBarHeight)
-                .background(colorResource(id = R.color.colorLightBg), RoundedCornerShape(TopBarCornerRadius))
-                .border(TopBarBorderWidth, colorResource(id = R.color.colorBg), RoundedCornerShape(TopBarCornerRadius))
+                .background(
+                    color = colorResource(id = R.color.colorLightBg),
+                    shape = RoundedCornerShape(TopBarCornerRadius)
+                )
+                .border(
+                    width = TopBarBorderWidth,
+                    color = colorResource(R.color.colorBg),
+                    shape = RoundedCornerShape(TopBarCornerRadius)
+                )
                 .padding(horizontal = TopBarPaddingHorizontal),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -69,8 +79,8 @@ fun GainzTopBar(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.cd_back),
-                        tint = colorResource(id = R.color.colorBg)
+                        contentDescription = stringResource(R.string.cd_back),
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             } else {
@@ -81,10 +91,10 @@ fun GainzTopBar(
                 text = title,
                 style = TextStyle(
                     fontSize = TopBarTitleFontSize,
-                    color = colorResource(id = R.color.colorBg),
+                    color = colorResource(R.color.colorBg),
                     fontWeight = FontWeight.Normal,
                     shadow = Shadow(
-                        color = colorResource(id = R.color.colorBg),
+                        color = colorResource(R.color.colorBg),
                         offset = Offset(TopBarShadowOffset, TopBarShadowOffset),
                         blurRadius = TopBarShadowBlur
                     )

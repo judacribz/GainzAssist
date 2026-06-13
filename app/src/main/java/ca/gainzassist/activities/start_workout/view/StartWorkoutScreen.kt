@@ -85,7 +85,7 @@ fun StartWorkoutScreen(
 
         val tabs = uiState.availableTabs.map { tab ->
             GainzTabItem(
-                title = stringResource(id = tab.titleResId),
+                title = stringResource(tab.titleResId),
                 iconResId = tab.iconResId
             )
         }

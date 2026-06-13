@@ -1,6 +1,5 @@
 package ca.gainzassist.activities.start_workout.workout_screen.view
 
-import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.foundation.BorderStroke
@@ -103,7 +102,7 @@ fun WorkoutComposeScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(3.dp)
-            .background(colorResource(id = R.color.colorLightBg))
+            .background(colorResource(R.color.colorLightBg))
     ) {
         WorkoutCard(modifier = Modifier.weight(5f).fillMaxWidth()) {
             WorkoutProgressHeader(
@@ -157,7 +156,7 @@ fun WorkoutProgressHeader(
     ) {
         Text(
             text = title,
-            color = colorResource(id = R.color.colorAccent),
+            color = colorResource(R.color.colorAccent),
             fontSize = 32.sp,
             fontFamily = staatliches,
             textAlign = TextAlign.Center,
@@ -170,7 +169,7 @@ fun WorkoutProgressHeader(
         )
         Text(
             text = setNumText,
-            color = colorResource(id = R.color.colorAccent),
+            color = colorResource(R.color.colorAccent),
             fontSize = 32.sp,
             fontFamily = staatliches,
             textAlign = TextAlign.Center
@@ -209,41 +208,41 @@ fun WorkoutProgressItem(
     modifier: Modifier = Modifier
 ) {
     val unselectedBrush = Brush.radialGradient(
-        colors = listOf(colorResource(id = R.color.colorLightAccent), colorResource(id = R.color.colorBg)),
+        colors = listOf(colorResource(R.color.colorLightAccent), colorResource(R.color.colorBg)),
         radius = 60f
     )
     val successBrush = Brush.radialGradient(
-        colors = listOf(colorResource(id = R.color.green), colorResource(id = R.color.colorBg)),
+        colors = listOf(colorResource(R.color.green), colorResource(R.color.colorBg)),
         radius = 60f
     )
     val failBrush = Brush.radialGradient(
-        colors = listOf(colorResource(id = R.color.red), colorResource(id = R.color.colorBg)),
+        colors = listOf(colorResource(R.color.red), colorResource(R.color.colorBg)),
         radius = 60f
     )
     val selectedBrush = Brush.radialGradient(
         colorStops = arrayOf(
-            0.0f to colorResource(id = R.color.colorBg),
-            0.6f to colorResource(id = R.color.colorBg),
+            0.0f to colorResource(R.color.colorBg),
+            0.6f to colorResource(R.color.colorBg),
             0.85f to Color.White,
-            1.0f to colorResource(id = R.color.colorBg)
+            1.0f to colorResource(R.color.colorBg)
         ),
         radius = 60f
     )
     val successSelectedBrush = Brush.radialGradient(
         colorStops = arrayOf(
-            0.0f to colorResource(id = R.color.green),
-            0.6f to colorResource(id = R.color.green),
+            0.0f to colorResource(R.color.green),
+            0.6f to colorResource(R.color.green),
             0.85f to Color.White,
-            1.0f to colorResource(id = R.color.colorBg)
+            1.0f to colorResource(R.color.colorBg)
         ),
         radius = 60f
     )
     val failSelectedBrush = Brush.radialGradient(
         colorStops = arrayOf(
-            0.0f to colorResource(id = R.color.red),
-            0.6f to colorResource(id = R.color.red),
+            0.0f to colorResource(R.color.red),
+            0.6f to colorResource(R.color.red),
             0.85f to Color.White,
-            1.0f to colorResource(id = R.color.colorBg)
+            1.0f to colorResource(R.color.colorBg)
         ),
         radius = 60f
     )
@@ -260,7 +259,7 @@ fun WorkoutProgressItem(
     val textColor = if (item.status == ProgressStatus.SELECTED) {
         Color.White
     } else {
-        colorResource(id = R.color.colorBg)
+        colorResource(R.color.colorBg)
     }
 
     Box(
@@ -311,7 +310,7 @@ fun WorkoutEquipmentTimer(
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             Text(
                 text = timerText,
-                color = colorResource(id = R.color.colorAccent),
+                color = colorResource(R.color.colorAccent),
                 fontSize = 50.sp,
                 fontFamily = FontFamily(Font(R.font.staatliches)),
                 textAlign = TextAlign.Center
@@ -327,7 +326,7 @@ fun WorkoutEquipmentCanvas(
     equipment: String,
     modifier: Modifier = Modifier
 ) {
-    val barbellName = stringResource(id = R.string.barbell).lowercase(Locale.getDefault())
+    val barbellName = stringResource(R.string.barbell).lowercase(Locale.getDefault())
     val eqLower = equipment.lowercase(Locale.getDefault())
     
     Canvas(modifier = modifier.padding(8.dp)) {
@@ -466,8 +465,8 @@ fun WorkoutRepsWeightControls(
                 onIncrease = actions.onIncreaseWeight,
                 onDecrease = actions.onDecreaseWeight,
                 isMin = uiState.isMinWeight,
-                isDecimal = true,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                isDecimal = true
             )
         }
     }
@@ -481,8 +480,8 @@ fun WorkoutNumberControl(
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
     isMin: Boolean,
-    isDecimal: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isDecimal: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -494,9 +493,9 @@ fun WorkoutNumberControl(
             if (!isMin) {
                 IconButton(onClick = onDecrease) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_minus),
+                        painter = painterResource(R.drawable.ic_minus),
                         contentDescription = "Decrease",
-                        tint = colorResource(id = R.color.colorAccent),
+                        tint = colorResource(R.color.colorAccent),
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -523,7 +522,7 @@ fun WorkoutNumberControl(
                     }
                 },
                 textStyle = TextStyle(
-                    color = colorResource(id = R.color.colorAccent),
+                    color = colorResource(R.color.colorAccent),
                     fontSize = 35.sp,
                     fontFamily = FontFamily(Font(R.font.staatliches)),
                     textAlign = TextAlign.Center
@@ -543,9 +542,9 @@ fun WorkoutNumberControl(
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             IconButton(onClick = onIncrease) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_plus),
+                    painter = painterResource(R.drawable.ic_plus),
                     contentDescription = "Increase",
-                    tint = colorResource(id = R.color.colorAccent),
+                    tint = colorResource(R.color.colorAccent),
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -565,7 +564,7 @@ fun WorkoutFooterControls(
 ) {
     val staatliches = FontFamily(Font(R.font.staatliches))
     val gainzButtonBrush = Brush.verticalGradient(
-        colors = listOf(colorResource(id = R.color.blue), colorResource(id = R.color.blueDark))
+        colors = listOf(colorResource(R.color.blue), colorResource(R.color.blueDark))
     )
     Row(
         modifier = modifier
@@ -593,7 +592,7 @@ fun WorkoutFooterControls(
                 ) {
                     Text(
                         text = "FINISH SET",
-                        color = colorResource(id = R.color.colorText),
+                        color = colorResource(R.color.colorText),
                         fontSize = 32.sp,
                         fontFamily = staatliches
                     )
@@ -619,7 +618,7 @@ fun WorkoutFooterControls(
                     ) {
                         Text(
                             text = "RESUME WORKOUT",
-                            color = colorResource(id = R.color.colorText),
+                            color = colorResource(R.color.colorText),
                             fontSize = 32.sp,
                             fontFamily = staatliches,
                             textAlign = TextAlign.Center
@@ -646,7 +645,7 @@ fun WorkoutFooterControls(
                     ) {
                         Text(
                             text = "UPDATE SET",
-                            color = colorResource(id = R.color.colorText),
+                            color = colorResource(R.color.colorText),
                             fontSize = 32.sp,
                             fontFamily = staatliches,
                             textAlign = TextAlign.Center
@@ -750,7 +749,7 @@ fun WorkoutCard(
         shape = RoundedCornerShape(5.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(0.5.dp, colorResource(id = R.color.colorBg))
+        border = BorderStroke(0.5.dp, colorResource(R.color.colorBg))
     ) {
         content()
     }

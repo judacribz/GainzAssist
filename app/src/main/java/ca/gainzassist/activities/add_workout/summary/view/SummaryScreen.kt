@@ -98,8 +98,6 @@ data class SummaryScreenActions(
     val onAddOrUpdateWorkout: () -> Unit = {}
 )
 
-private val ToolbarShadowBlur = 5f
-private val ToolbarShadowOffset = 1f
 private val ToolbarHeight = 56.dp
 private val ToolbarBorderWidth = 2.dp
 private val CardPadding = 4.dp
@@ -138,13 +136,13 @@ fun SummaryToolbar(onBack: () -> Unit) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(id = R.string.title_new_workout_summary),
+                text = stringResource(R.string.title_new_workout_summary),
                 fontFamily = StaatlichesFont,
                 fontSize = 35.sp,
-                color = colorResource(id = R.color.colorBg),
+                color = colorResource(R.color.colorBg),
                 style = TextStyle(
                     shadow = Shadow(
-                        color = colorResource(id = R.color.colorBg),
+                        color = colorResource(R.color.colorBg),
                         blurRadius = 5f,
                         offset = Offset(1f, 1f)
                     )
@@ -154,19 +152,22 @@ fun SummaryToolbar(onBack: () -> Unit) {
         navigationIcon = {
             IconButton(onClick = onBack) {
                 Icon(
-                    painter = painterResource(id = appCompatR.drawable.abc_ic_ab_back_material),
+                    painter = painterResource(appCompatR.drawable.abc_ic_ab_back_material),
                     contentDescription = "Back",
-                    tint = colorResource(id = R.color.colorBg)
+                    tint = colorResource(R.color.colorBg)
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = colorResource(id = R.color.colorLightBg)
+            containerColor = colorResource(R.color.colorLightBg)
         ),
         modifier = Modifier
             .fillMaxWidth()
             .height(ToolbarHeight)
-            .border(width = ToolbarBorderWidth, color = colorResource(id = R.color.colorAccent))
+            .border(
+                width = ToolbarBorderWidth,
+                color = colorResource(R.color.colorAccent)
+            )
     )
 }
 
@@ -177,12 +178,12 @@ fun SummaryCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) 
             .padding(CardPadding)
             .shadow(elevation = CardElevation, shape = RoundedCornerShape(CardCornerRadius))
             .background(
-                color = colorResource(id = R.color.colorLightBg),
+                color = colorResource(R.color.colorLightBg),
                 shape = RoundedCornerShape(CardCornerRadius)
             )
             .border(
                 width = CardBorderWidth,
-                color = colorResource(id = R.color.colorBg),
+                color = colorResource(R.color.colorBg),
                 shape = RoundedCornerShape(CardCornerRadius)
             )
             .padding(CardPadding)
@@ -204,12 +205,12 @@ fun NumericStepperField(
     Row(
         modifier = modifier
             .background(
-                color = colorResource(id = R.color.colorLightAccent),
+                color = colorResource(R.color.colorLightAccent),
                 shape = RoundedCornerShape(StepperCornerRadius)
             )
             .border(
                 width = StepperBorderWidth,
-                color = colorResource(id = R.color.blueDark),
+                color = colorResource(R.color.blueDark),
                 shape = RoundedCornerShape(StepperCornerRadius)
             )
             .padding(StepperPadding),
@@ -222,7 +223,7 @@ fun NumericStepperField(
         ) {
             if (canDecrement) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_minus_dark),
+                    painter = painterResource(R.drawable.ic_minus_dark),
                     contentDescription = "Decrement",
                     tint = Color.Unspecified
                 )
@@ -235,7 +236,7 @@ fun NumericStepperField(
             textStyle = TextStyle(
                 fontFamily = StaatlichesFont,
                 fontSize = InputFontSize,
-                color = colorResource(id = R.color.colorText),
+                color = colorResource(R.color.colorText),
                 textAlign = TextAlign.Center
             ),
             singleLine = true,
@@ -256,7 +257,7 @@ fun NumericStepperField(
             modifier = Modifier.size(IconButtonSize)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_plus_dark),
+                painter = painterResource(R.drawable.ic_plus_dark),
                 contentDescription = "Increment",
                 tint = Color.Unspecified
             )
@@ -274,7 +275,10 @@ fun ExerciseChipButton(
         modifier = modifier
             .padding(ChipPadding)
             .size(ChipSize)
-            .background(colorResource(id = R.color.blueDark), RoundedCornerShape(ChipCornerRadius))
+            .background(
+                color = colorResource(R.color.blueDark),
+                shape = RoundedCornerShape(ChipCornerRadius)
+            )
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
@@ -309,7 +313,7 @@ fun SummaryScreenContent(
             GainzOutlinedTextField(
                 value = uiState.workoutName,
                 onValueChange = actions.onWorkoutNameChanged,
-                label = stringResource(id = R.string.hint_workout_name),
+                label = stringResource(R.string.hint_workout_name),
                 isError = uiState.workoutNameError != null,
                 errorText = uiState.workoutNameError,
                 modifier = Modifier
@@ -327,7 +331,7 @@ fun SummaryScreenContent(
                 GainzOutlinedTextField(
                     value = uiState.exerciseName,
                     onValueChange = actions.onExerciseNameChanged,
-                    label = stringResource(id = R.string.hint_exercise_name),
+                    label = stringResource(R.string.hint_exercise_name),
                     isError = uiState.exerciseNameError != null,
                     errorText = uiState.exerciseNameError,
                     singleLine = false,
@@ -399,7 +403,7 @@ fun SummaryScreenContent(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     GainzButton(
-                        text = stringResource(id = R.string.clear),
+                        text = stringResource(R.string.clear),
                         onClick = actions.onClearExercise,
                         fontFamily = StaatlichesFont,
                         modifier = Modifier
@@ -410,7 +414,7 @@ fun SummaryScreenContent(
 
                     if (uiState.showUpdateExerciseButton) {
                         GainzButton(
-                            text = stringResource(id = R.string.update_exercise),
+                            text = stringResource(R.string.update_exercise),
                             onClick = actions.onUpdateExercise,
                             fontFamily = StaatlichesFont,
                             modifier = Modifier
@@ -420,7 +424,7 @@ fun SummaryScreenContent(
                         )
                     } else if (uiState.showAddExerciseButton) {
                         GainzButton(
-                            text = stringResource(id = R.string.add_exercise),
+                            text = stringResource(R.string.add_exercise),
                             onClick = actions.onAddExercise,
                             fontFamily = StaatlichesFont,
                             modifier = Modifier
@@ -440,10 +444,10 @@ fun SummaryScreenContent(
         ) {
             Column(modifier = Modifier.padding(CardPadding)) {
                 Text(
-                    text = stringResource(id = R.string.exercises).uppercase(),
+                    text = stringResource(R.string.exercises).uppercase(),
                     fontFamily = StaatlichesFont,
                     fontSize = ExercisesTitleFontSize,
-                    color = colorResource(id = R.color.colorBg),
+                    color = colorResource(R.color.colorBg),
                     modifier = Modifier.padding(bottom = ExercisesTitleBottomPadding)
                 )
                 LazyRow {
@@ -467,7 +471,7 @@ fun SummaryScreenContent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             GainzButton(
-                text = stringResource(id = R.string.discard),
+                text = stringResource(R.string.discard),
                 onClick = actions.onDiscardWorkout,
                 fontFamily = StaatlichesFont,
                 modifier = Modifier

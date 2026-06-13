@@ -70,7 +70,7 @@ fun WorkoutsScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
-                text = stringResource(id = R.string.workout_list),
+                text = stringResource(R.string.workout_list),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = TitleBottomPadding)
@@ -134,10 +134,10 @@ fun WorkoutOptionsDialog(
                 .wrapContentHeight()
                 .border(
                     width = DialogBorderWidth,
-                    color = colorResource(id = R.color.blue),
+                    color = colorResource(R.color.blue),
                     shape = RoundedCornerShape(DialogCornerRadius)
                 ),
-            color = colorResource(id = R.color.grey),
+            color = colorResource(R.color.grey),
             shape = RoundedCornerShape(DialogCornerRadius)
         ) {
             Column(
@@ -149,7 +149,7 @@ fun WorkoutOptionsDialog(
                 Text(
                     text = workoutName,
                     fontSize = DialogTitleFontSize,
-                    color = colorResource(id = R.color.colorBg),
+                    color = colorResource(R.color.colorBg),
                     modifier = Modifier.padding(bottom = DialogTitleBottomPadding)
                 )
 
@@ -165,7 +165,7 @@ fun WorkoutOptionsDialog(
                         ),
                         modifier = Modifier.weight(DialogButtonWeight)
                     ) {
-                        Text(text = stringResource(id = R.string.delete))
+                        Text(text = stringResource(R.string.delete))
                     }
 
                     Spacer(modifier = Modifier.width(DialogButtonSpacing))
@@ -178,7 +178,7 @@ fun WorkoutOptionsDialog(
                         ),
                         modifier = Modifier.weight(DialogButtonWeight)
                     ) {
-                        Text(text = stringResource(id = R.string.edit))
+                        Text(text = stringResource(R.string.edit))
                     }
                 }
             }

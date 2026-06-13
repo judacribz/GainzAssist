@@ -70,7 +70,6 @@ private val SectionSpacing = 4.dp
 private val ToolbarHeight = 56.dp
 private val BorderWidthLarge = 4.dp
 private val BorderWidthSmall = 1.dp
-private val BorderWidthXSmall = 0.5.dp
 private val CornerRadiusSmall = 2.dp
 private val CornerRadiusMedium = 3.dp
 private val CornerRadiusLarge = 5.dp
@@ -105,10 +104,10 @@ fun WorkoutEntryScreen(
     numberOfExercisesError: String?,
     actions: WorkoutEntryScreenActions = WorkoutEntryScreenActions()
 ) {
-    val blue = colorResource(id = R.color.blue)
-    val grey = colorResource(id = R.color.grey)
-    val colorLightBg = colorResource(id = R.color.colorLightBg)
-    val colorBg = colorResource(id = R.color.colorBg)
+    val blue = colorResource(R.color.blue)
+    val grey = colorResource(R.color.grey)
+    val colorLightBg = colorResource(R.color.colorLightBg)
+    val colorBg = colorResource(R.color.colorBg)
 
     val safeFontFamily = if (LocalInspectionMode.current) {
         FontFamily.Default
@@ -175,9 +174,9 @@ fun WorkoutEntryScreen(
 
 @Composable
 fun CustomToolbar(onBack: () -> Unit, fontFamily: FontFamily) {
-    val colorBg = colorResource(id = R.color.colorBg)
-    val colorLightAccent = colorResource(id = R.color.colorLightAccent)
-    val colorLightBg = colorResource(id = R.color.colorLightBg)
+    val colorBg = colorResource(R.color.colorBg)
+    val colorLightAccent = colorResource(R.color.colorLightAccent)
+    val colorLightBg = colorResource(R.color.colorLightBg)
 
     Box(
         modifier = Modifier
@@ -194,12 +193,12 @@ fun CustomToolbar(onBack: () -> Unit, fontFamily: FontFamily) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = stringResource(id = R.string.cd_back),
+                contentDescription = stringResource(R.string.cd_back),
                 tint = colorBg
             )
         }
         Text(
-            text = stringResource(id = R.string.add_workout),
+            text = stringResource(R.string.add_workout),
             style = TextStyle(
                 fontFamily = fontFamily,
                 fontSize = FontSizeTitle,
@@ -241,7 +240,7 @@ fun WorkoutNameSection(
             onValueChange = onWorkoutNameChanged,
             isError = workoutNameError != null,
             errorText = workoutNameError,
-            label = stringResource(id = R.string.hint_workout_name).trim(),
+            label = stringResource(R.string.hint_workout_name).trim(),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxSize()
@@ -278,13 +277,13 @@ fun NumExercisesSection(
                 .padding(ContentPadding)
         ) {
             Text(
-                text = stringResource(id = R.string.num_of_exercises).uppercase(),
+                text = stringResource(R.string.num_of_exercises).uppercase(),
                 style = TextStyle(
                     fontFamily = fontFamily,
                     fontSize = FontSizeSubtitle,
                     color = colorBg,
                     shadow = Shadow(
-                        color = colorResource(id = R.color.greenDark),
+                        color = colorResource(R.color.greenDark),
                         offset = Offset(TextShadowOffset, TextShadowOffset),
                         blurRadius = TextShadowBlurSmall
                     )
@@ -379,7 +378,7 @@ fun FooterSection(
         horizontalArrangement = Arrangement.spacedBy(FooterSpacing)
     ) {
         GainzButton(
-            text = stringResource(id = R.string.cancel),
+            text = stringResource(R.string.cancel),
             onClick = onCancel,
             modifier = Modifier
                 .weight(WeightFull)
@@ -389,7 +388,11 @@ fun FooterSection(
         )
 
         GainzButton(
-            text = if (isNameEmpty) stringResource(id = R.string.skip) else stringResource(id = R.string.enter),
+            text = if (isNameEmpty) {
+                stringResource(R.string.skip)
+            } else {
+                stringResource(R.string.enter)
+            },
             onClick = onEnter,
             modifier = Modifier
                 .weight(WeightFull)

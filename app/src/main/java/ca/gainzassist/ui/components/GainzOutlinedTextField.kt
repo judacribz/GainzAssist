@@ -31,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 
 private val CornerRadius = 20.dp
@@ -74,10 +73,10 @@ fun GainzOutlinedTextField(
         }
     }
 
-    val blue = colorResource(id = R.color.blue)
-    val grey = colorResource(id = R.color.grey)
-    val colorDarkText = colorResource(id = R.color.colorDarkText)
-    val colorBg = colorResource(id = R.color.colorBg)
+    val blue = colorResource(R.color.blue)
+    val grey = colorResource(R.color.grey)
+    val colorDarkText = colorResource(R.color.colorDarkText)
+    val colorBg = colorResource(R.color.colorBg)
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
