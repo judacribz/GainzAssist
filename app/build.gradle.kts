@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S3416")
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -65,6 +66,7 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -116,74 +118,62 @@ tasks.configureEach {
     }
 }
 
+@Suppress("kotlin:S3416")
 dependencies {
-    // Compose
+    // 1. Local files
+    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
+
+    // BOMs
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
-    androidTestImplementation(composeBom)
+    implementation(platform(libs.firebase.bom))
 
+    // implementation
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
-
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    // 1. Local files
-    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
-
-    // 2. Testing
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.espresso.core)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-
-    // 3. Architecture Components (AndroidX)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
-    androidTestImplementation(libs.androidx.room.testing)
-
     implementation(libs.bundles.androidx.lifecycle)
-    kapt(libs.androidx.lifecycle.compiler)
-
-    // DI (Koin)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    testImplementation(libs.koin.test)
-
-    // 4. AndroidX Core
     implementation(libs.bundles.androidx.core)
-
-    // 5. Facebook
     implementation(libs.facebook.android.sdk)
     implementation(libs.facebook.rebound)
-
-    // 6. Jackson
     implementation(libs.bundles.jackson)
-
-    // 7. Google
     implementation(libs.bundles.google)
-
-    // 8. Firebase
-    implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
     implementation(libs.firebase.crashlytics)
-
-    // 9. Parceler
     implementation(libs.parceler.api)
-    kapt(libs.parceler)
-
-    // 10. UI / Logging
     implementation(libs.guava)
     implementation(libs.bundles.ui.logging)
     implementation(libs.android.youtube.player)
     implementation(libs.glide)
+
+    // kapt
+    kapt(libs.androidx.room.compiler)
+    kapt(libs.androidx.lifecycle.compiler)
+    kapt(libs.parceler)
     kapt(libs.glide.compiler)
+
+    // debugImplementation
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // testImplementation
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.koin.test)
+
+    // androidTestImplementation
+    androidTestImplementation(composeBom)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.androidx.room.testing)
 }
 
 val validateReleaseSecrets by tasks.registering {

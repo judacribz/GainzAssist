@@ -1,6 +1,7 @@
 package ca.gainzassist.activities.how_to_videos.view
 
 import android.content.Intent
+import android.content.pm.Signature
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -57,7 +58,7 @@ class HowToVideosActivity : AppCompatActivity() {
     private var isSearchExpanded by mutableStateOf(false)
     private var searchQuery by mutableStateOf("")
 
-    private val queryCache = HashMap<String, Pair<ArrayList<String>, ArrayList<String>>>()
+    private val queryCache: MutableMap<String, Pair<List<String>, List<String>>> = mutableMapOf()
     private var activeQuery: String? = null
 
     // Create the YouTubePlayerView once to pass to AndroidView
@@ -67,11 +68,11 @@ class HowToVideosActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         exerciseName = intent.getStringExtra(EXTRA_HOW_TO_VID)
         setInitTheme(this)
-        
+
         onBackPressedDispatcher.addCallback(this) {
             navigateBack()
         }
-        
+
         setContent {
             Column(Modifier.fillMaxSize()) {
                 HowToVideosTopBar(
@@ -106,7 +107,7 @@ class HowToVideosActivity : AppCompatActivity() {
                         onBackClick = { navigateBack() }
                     )
                 )
-                
+
                 HowToVideosScreen(
                     uiState = HowToVideosUiState(
                         videos = videos,
@@ -227,7 +228,10 @@ class HowToVideosActivity : AppCompatActivity() {
 
     private fun getAppSha1(): String {
         try {
-            val signatures = PackageInfoCompat.getSignatures(packageManager, packageName)
+            val signatures :List<Signature> = PackageInfoCompat.getSignatures(
+                /* packageManager = */ packageManager,
+                /* packageName = */ packageName
+            )
             val signature = signatures.firstOrNull()
             if (signature != null) {
                 val md = MessageDigest.getInstance("SHA-1")
@@ -259,7 +263,12 @@ class HowToVideosActivity : AppCompatActivity() {
     private suspend fun performYouTubeSearch(
         urlString: String,
         ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO
-    ): Pair<ArrayList<String>, ArrayList<String>> = withContext(ioDispatcher) {
+    ): Pair<List<String>, List<String>> = withContext(ioDispatcher) {
+        val jsonResponse = fetchYouTubeResponse(urlString)
+        parseYouTubeResponse(jsonResponse)
+    }
+
+    private fun fetchYouTubeResponse(urlString: String): String {
         var connection: HttpURLConnection? = null
         var reader: BufferedReader? = null
 
@@ -296,12 +305,24 @@ class HowToVideosActivity : AppCompatActivity() {
                 }
                 throw Exception(msg)
             }
+            return buffer.toString()
+        } finally {
+            connection?.disconnect()
+            try {
+                reader?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
 
-            val jsonObject = JSONObject(buffer.toString())
+    private fun parseYouTubeResponse(jsonString: String): Pair<List<String>, List<String>> {
+        try {
+            val jsonObject = JSONObject(jsonString)
             val items = jsonObject.optJSONArray("items")
 
-            val videoIds = ArrayList<String>()
-            val videoTitles = ArrayList<String>()
+            val videoIds = mutableListOf<String>()
+            val videoTitles = mutableListOf<String>()
 
             if (items != null) {
                 for (i in 0 until items.length()) {
@@ -318,24 +339,17 @@ class HowToVideosActivity : AppCompatActivity() {
                     }
                 }
             }
-            Pair(videoIds, videoTitles)
+            return Pair(videoIds, videoTitles)
         } catch (e: JSONException) {
             e.printStackTrace()
             throw Exception("Error parsing response")
-        } finally {
-            connection?.disconnect()
-            try {
-                reader?.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
         }
     }
 
     private fun videoSearchDataReceived(
         queryKey: String,
-        videoIds: ArrayList<String>,
-        videoTitles: ArrayList<String>
+        videoIds: List<String>,
+        videoTitles: List<String>
     ) {
         queryCache[queryKey] = Pair(videoIds, videoTitles)
         if (activeQuery == queryKey) activeQuery = null
@@ -349,7 +363,7 @@ class HowToVideosActivity : AppCompatActivity() {
         Snackbar.make(v, message, Snackbar.LENGTH_LONG).show()
     }
 
-    private fun displaySearchResults(videoIds: ArrayList<String>, videoTitles: ArrayList<String>) {
+    private fun displaySearchResults(videoIds: List<String>, videoTitles: List<String>) {
         if (videoIds.isNotEmpty()) {
             val newList = mutableListOf<HowToVideoUiItem>()
             for (i in 0 until videoIds.size) {
