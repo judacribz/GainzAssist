@@ -31,14 +31,15 @@ facebook-android-sdk = "17.0.0"
 facebook-rebound = "0.3.8"
 
 # Firebase (Modern versions)
-firebase-bom = "32.8.1"
+firebase-bom = "34.14.1"
+firebase-crashlytics-plugin = "3.0.7"
 
 # Google
 gms-play-services-auth = "20.7.0"
 gson = "2.14.0"
 youtube-api = "v3-rev20260430-2.0.0"
 android-youtube-player = "13.0.0"
-glide = "5.0.7"
+glide = "4.16.0"
 
 # Jackson
 jackson-annotations = "2.22"
@@ -105,9 +106,10 @@ facebook-rebound = { module = "com.facebook.rebound:rebound", version.ref = "fac
 
 # Firebase
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
-firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
-firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-database = { module = "com.google.firebase:firebase-database" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 
 # Google
 gms-play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "gms-play-services-auth" }
@@ -161,9 +163,9 @@ androidx-lifecycle = [
 
 # Firebase
 firebase = [
-    "firebase-auth-ktx",
-    "firebase-database-ktx",
-    "firebase-analytics-ktx"
+    "firebase-auth",
+    "firebase-database",
+    "firebase-analytics"
 ]
 
 # Google
@@ -193,6 +195,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets-gradle-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

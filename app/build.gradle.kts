@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.secrets)
 }
@@ -171,6 +172,7 @@ dependencies {
     // 8. Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
+    implementation(libs.firebase.crashlytics)
 
     // 9. Parceler
     implementation(libs.parceler.api)
