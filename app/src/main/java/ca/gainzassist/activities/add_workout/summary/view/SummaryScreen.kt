@@ -48,6 +48,7 @@ import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzButton
 import ca.gainzassist.ui.components.GainzDropdown
 import ca.gainzassist.ui.components.GainzOutlinedTextField
+import ca.gainzassist.ui.components.GainzTextFieldState
 import androidx.appcompat.R as appCompatR
 
 val StaatlichesFont = FontFamily(Font(R.font.staatliches))
@@ -129,6 +130,7 @@ private val ExercisesTitleFontSize = 18.sp
 private val ExercisesTitleBottomPadding = 4.dp
 private val ExerciseChipEndPadding = 4.dp
 private const val WeightFull = 1f
+private const val BENCH_PRESS = "Bench Press"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -311,11 +313,13 @@ fun SummaryScreenContent(
                 .padding(vertical = SectionVerticalPadding)
         ) {
             GainzOutlinedTextField(
-                value = uiState.workoutName,
+                state = GainzTextFieldState(
+                    value = uiState.workoutName,
+                    label = stringResource(R.string.hint_workout_name),
+                    isError = uiState.workoutNameError != null,
+                    errorText = uiState.workoutNameError
+                ),
                 onValueChange = actions.onWorkoutNameChanged,
-                label = stringResource(R.string.hint_workout_name),
-                isError = uiState.workoutNameError != null,
-                errorText = uiState.workoutNameError,
                 modifier = Modifier
                     .padding(CardPadding)
                     .height(WorkoutNameHeight)
@@ -329,11 +333,13 @@ fun SummaryScreenContent(
         ) {
             Column(modifier = Modifier.padding(CardPadding)) {
                 GainzOutlinedTextField(
-                    value = uiState.exerciseName,
+                    state = GainzTextFieldState(
+                        value = uiState.exerciseName,
+                        label = stringResource(R.string.hint_exercise_name),
+                        isError = uiState.exerciseNameError != null,
+                        errorText = uiState.exerciseNameError
+                    ),
                     onValueChange = actions.onExerciseNameChanged,
-                    label = stringResource(R.string.hint_exercise_name),
-                    isError = uiState.exerciseNameError != null,
-                    errorText = uiState.exerciseNameError,
                     singleLine = false,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -513,7 +519,7 @@ val summaryPreviewState = SummaryUiState(
     weight = "45.0",
     reps = "10",
     sets = "3",
-    exerciseNames = listOf("Bench Press", "Overhead Press"),
+    exerciseNames = listOf(BENCH_PRESS, "Overhead Press"),
     selectedExerciseName = null,
     showAddExerciseButton = true,
     showUpdateExerciseButton = false,
@@ -556,7 +562,7 @@ fun SummaryScreenPreviewWithWorkoutAndExerciseText() {
 fun SummaryScreenPreviewWithOneExercise() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
-            exerciseNames = listOf("Bench Press")
+            exerciseNames = listOf(BENCH_PRESS)
         ),
     )
 }
@@ -576,8 +582,8 @@ fun SummaryScreenPreviewUpdateWorkoutMode() {
 fun SummaryScreenPreviewUpdateExerciseMode() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
-            exerciseName = "Bench Press",
-            selectedExerciseName = "Bench Press",
+            exerciseName = BENCH_PRESS,
+            selectedExerciseName = BENCH_PRESS,
             showAddExerciseButton = false,
             showUpdateExerciseButton = true,
             weight = "135.0"
@@ -590,8 +596,8 @@ fun SummaryScreenPreviewUpdateExerciseMode() {
 fun SummaryScreenPreviewDuplicateExerciseError() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
-            exerciseName = "Bench Press",
-            exerciseNameError = "Bench Press exists"
+            exerciseName = BENCH_PRESS,
+            exerciseNameError = "$BENCH_PRESS exists"
         ),
     )
 }

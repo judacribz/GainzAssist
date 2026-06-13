@@ -1,10 +1,10 @@
 package ca.gainzassist.activities.how_to_videos.view
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
@@ -14,11 +14,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.activities.start_workout.view.StartWorkoutActivity.Companion.EXTRA_HOW_TO_VID
 import ca.gainzassist.core.util.UI.setInitTheme
 import ca.gainzassist.ui.components.HowToVideosTopBar
+import ca.gainzassist.ui.components.HowToVideosTopBarActions
+import ca.gainzassist.ui.components.HowToVideosTopBarState
 import com.google.android.material.snackbar.Snackbar
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
@@ -39,7 +43,6 @@ import java.security.MessageDigest
 class HowToVideosActivity : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_VIDEO_ID = "ca.gainzassist.act_how_to_videos.EXTRA_VIDEO_ID"
         private const val ERR_YOUTUBE_LOAD = "Unable to load YouTube videos. Check API key or network."
     }
 
@@ -65,26 +68,43 @@ class HowToVideosActivity : AppCompatActivity() {
         exerciseName = intent.getStringExtra(EXTRA_HOW_TO_VID)
         setInitTheme(this)
         
+        onBackPressedDispatcher.addCallback(this) {
+            navigateBack()
+        }
+        
         setContent {
             Column(Modifier.fillMaxSize()) {
                 HowToVideosTopBar(
-                    title = "How To ${exerciseName ?: ""}",
-                    isSearchExpanded = isSearchExpanded,
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { searchQuery = it },
-                    onSearchSubmit = {
-                        val query = searchQuery.trim()
-                        if (query.isNotEmpty()) {
+                    state = HowToVideosTopBarState(
+                        title = "How To ${exerciseName ?: ""}",
+                        isSearchExpanded = isSearchExpanded,
+                        searchQuery = searchQuery
+                    ),
+                    actions = HowToVideosTopBarActions(
+                        onSearchQueryChange = { searchQuery = it },
+                        onSearchSubmit = {
+                            val query = searchQuery.trim()
+                            if (query.isNotEmpty()) {
+                                isSearchExpanded = false
+                                executeSearch(query)
+                            } else {
+                                Snackbar.make(
+                                    findViewById(android.R.id.content),
+                                    "Please enter a search term",
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                        },
+                        onSearchClick = {
+                            isSearchExpanded = true
+                        },
+                        onCloseSearchClick = {
                             isSearchExpanded = false
-                            executeSearch(query)
-                        } else {
-                            val v = window.decorView.rootView
-                            Snackbar.make(v, "Search for an exercise video.", Snackbar.LENGTH_LONG).show()
-                        }
-                    },
-                    onSearchClick = { isSearchExpanded = true },
-                    onCloseSearchClick = { isSearchExpanded = false },
-                    onBackClick = { navigateBack() }
+                            searchQuery = ""
+                            executeSearch(exerciseName ?: "")
+                        },
+                        onBackClick = { navigateBack() }
+                    )
                 )
                 
                 HowToVideosScreen(
@@ -113,22 +133,23 @@ class HowToVideosActivity : AppCompatActivity() {
         }
 
         youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(player: YouTubePlayer) {
-                youTubePlayer = player
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                this@HowToVideosActivity.youTubePlayer = youTubePlayer
                 pendingVideoId?.let {
-                    player.loadVideo(it, 0f)
+                    youTubePlayer.loadVideo(it, 0f)
                     pendingVideoId = null
                 }
             }
 
-            override fun onError(player: YouTubePlayer, error: PlayerConstants.PlayerError) {
-                super.onError(player, error)
+            override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                super.onError(youTubePlayer, error)
                 val currentVideoId = videoId
                 val v = window.decorView.rootView
                 if (currentVideoId != null) {
                     Snackbar.make(v, "Unable to play this video", Snackbar.LENGTH_LONG)
                         .setAction("Open in YouTube") {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=$currentVideoId"))
+                            val intent = Intent(Intent.ACTION_VIEW,
+                                "https://www.youtube.com/watch?v=$currentVideoId".toUri())
                             startActivity(intent)
                         }
                         .show()
@@ -145,10 +166,6 @@ class HowToVideosActivity : AppCompatActivity() {
         } else {
             finish()
         }
-    }
-
-    override fun onBackPressed() {
-        navigateBack()
     }
 
     private fun onVideoClick(videoId: String) {
@@ -210,19 +227,17 @@ class HowToVideosActivity : AppCompatActivity() {
 
     private fun getAppSha1(): String {
         try {
-            val packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-            val signatures = packageInfo.signatures
-            if (signatures != null) {
-                for (signature in signatures) {
-                    val md = MessageDigest.getInstance("SHA-1")
-                    md.update(signature.toByteArray())
-                    val digest = md.digest()
-                    val hexString = StringBuilder()
-                    for (b in digest) {
-                        hexString.append(String.format("%02X", b))
-                    }
-                    return hexString.toString()
+            val signatures = PackageInfoCompat.getSignatures(packageManager, packageName)
+            val signature = signatures.firstOrNull()
+            if (signature != null) {
+                val md = MessageDigest.getInstance("SHA-1")
+                md.update(signature.toByteArray())
+                val digest = md.digest()
+                val hexString = StringBuilder()
+                for (b in digest) {
+                    hexString.append(String.format("%02X", b))
                 }
+                return hexString.toString()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -232,94 +247,87 @@ class HowToVideosActivity : AppCompatActivity() {
 
     private fun searchYouTube(queryKey: String, urlString: String) {
         lifecycleScope.launch {
-            var errorMessage: String? = null
-            var videoIds: ArrayList<String>? = null
-            var videoTitles: ArrayList<String>? = null
+            try {
+                val (videoIds, videoTitles) = performYouTubeSearch(urlString)
+                videoSearchDataReceived(queryKey, videoIds, videoTitles)
+            } catch (e: Exception) {
+                videoSearchFailed(queryKey, e.message ?: ERR_YOUTUBE_LOAD)
+            }
+        }
+    }
 
-            withContext(Dispatchers.IO) {
-                var connection: HttpURLConnection? = null
-                var reader: BufferedReader? = null
+    private suspend fun performYouTubeSearch(
+        urlString: String,
+        ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO
+    ): Pair<ArrayList<String>, ArrayList<String>> = withContext(ioDispatcher) {
+        var connection: HttpURLConnection? = null
+        var reader: BufferedReader? = null
 
-                try {
-                    val url = URL(urlString)
-                    connection = url.openConnection() as HttpURLConnection
-                    connection.setRequestProperty("X-Android-Package", packageName)
-                    connection.setRequestProperty("X-Android-Cert", getAppSha1())
-                    connection.connect()
+        try {
+            val url = URL(urlString)
+            connection = url.openConnection() as HttpURLConnection
+            connection.setRequestProperty("X-Android-Package", packageName)
+            connection.setRequestProperty("X-Android-Cert", getAppSha1())
+            connection.connect()
 
-                    val responseCode = connection.responseCode
-                    val stream = if (responseCode in 200..299) {
-                        connection.inputStream
-                    } else {
-                        connection.errorStream
-                    }
+            val responseCode = connection.responseCode
+            val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
 
-                    if (stream != null) {
-                        reader = BufferedReader(InputStreamReader(stream))
-                        val buffer = StringBuilder()
-                        var line: String?
-                        while (reader.readLine().also { line = it } != null) {
-                            buffer.append(line).append("\n")
-                        }
+            if (stream == null) {
+                throw Exception(ERR_YOUTUBE_LOAD)
+            }
 
-                        if (responseCode !in 200..299) {
-                            val errorBody = buffer.toString()
-                            val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
-                            Log.e("HowToVideos", "Error $responseCode for $sanitizedUrl\nBody: $errorBody")
+            reader = BufferedReader(InputStreamReader(stream))
+            val buffer = StringBuilder()
+            var line: String?
+            while (reader.readLine().also { line = it } != null) {
+                buffer.append(line).append("\n")
+            }
 
-                            errorMessage = if (errorBody.contains("quotaExceeded") || errorBody.contains("dailyLimitExceeded")) {
-                                "YouTube video search quota exceeded. Please try again later."
-                            } else {
-                                ERR_YOUTUBE_LOAD
-                            }
-                        } else {
-                            val jsonObject = JSONObject(buffer.toString())
-                            val items = jsonObject.optJSONArray("items")
+            if (responseCode !in 200..299) {
+                val errorBody = buffer.toString()
+                val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
+                Log.e("HowToVideos", "Error $responseCode for $sanitizedUrl\nBody: $errorBody")
 
-                            videoIds = ArrayList()
-                            videoTitles = ArrayList()
+                val msg = if (errorBody.contains("quotaExceeded") || errorBody.contains("dailyLimitExceeded")) {
+                    "YouTube video search quota exceeded. Please try again later."
+                } else {
+                    ERR_YOUTUBE_LOAD
+                }
+                throw Exception(msg)
+            }
 
-                            if (items != null) {
-                                for (i in 0 until items.length()) {
-                                    val item = items.optJSONObject(i) ?: continue
-                                    val id = item.optJSONObject("id") ?: continue
-                                    val snippet = item.optJSONObject("snippet") ?: continue
+            val jsonObject = JSONObject(buffer.toString())
+            val items = jsonObject.optJSONArray("items")
 
-                                    val videoId = id.optString("videoId")
-                                    val title = snippet.optString("title")
+            val videoIds = ArrayList<String>()
+            val videoTitles = ArrayList<String>()
 
-                                    if (videoId.isNotEmpty()) {
-                                        videoIds.add(videoId)
-                                        videoTitles.add(title)
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        errorMessage = ERR_YOUTUBE_LOAD
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    errorMessage = ERR_YOUTUBE_LOAD
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    errorMessage = "Error parsing response"
-                } finally {
-                    connection?.disconnect()
-                    try {
-                        reader?.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
+            if (items != null) {
+                for (i in 0 until items.length()) {
+                    val item = items.optJSONObject(i) ?: continue
+                    val id = item.optJSONObject("id") ?: continue
+                    val snippet = item.optJSONObject("snippet") ?: continue
+
+                    val videoId = id.optString("videoId")
+                    val title = snippet.optString("title")
+
+                    if (videoId.isNotEmpty()) {
+                        videoIds.add(videoId)
+                        videoTitles.add(title)
                     }
                 }
             }
-
-            withContext(Dispatchers.Main) {
-                if (errorMessage != null) {
-                    videoSearchFailed(queryKey, errorMessage)
-                } else if (videoIds != null && videoTitles != null) {
-                    videoSearchDataReceived(queryKey, videoIds, videoTitles)
-                }
+            Pair(videoIds, videoTitles)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+            throw Exception("Error parsing response")
+        } finally {
+            connection?.disconnect()
+            try {
+                reader?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
     }

@@ -32,6 +32,7 @@ import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzButton
 import ca.gainzassist.ui.components.GainzDropdown
 import ca.gainzassist.ui.components.GainzOutlinedTextField
+import ca.gainzassist.ui.components.GainzTextFieldState
 
 data class ExEntryUiState(
     val exerciseName: String,
@@ -126,13 +127,15 @@ fun ExEntryScreen(
         ) {
             val errorText = uiState.duplicateExerciseError ?: uiState.exerciseNameError
             GainzOutlinedTextField(
-                value = uiState.exerciseName,
+                state = GainzTextFieldState(
+                    value = uiState.exerciseName,
+                    label = stringResource(R.string.hint_exercise_name),
+                    isError = errorText != null,
+                    errorText = errorText
+                ),
                 onValueChange = actions::onExerciseNameChanged,
-                label = stringResource(R.string.hint_exercise_name),
                 modifier = Modifier.fillMaxSize(),
-                textAlign = TextAlign.Start,
-                isError = errorText != null,
-                errorText = errorText
+                textAlign = TextAlign.Start
             )
         }
 
@@ -183,15 +186,23 @@ fun ExEntryScreen(
                 .padding(InnerPadding)
         ) {
             // Reusable row for Weight, Reps, Sets
+            data class NumberRowState(
+                val value: String,
+                val errorText: String?,
+                val canDecrement: Boolean,
+                val keyboardType: KeyboardType
+            )
+
+            data class NumberRowActions(
+                val onValueChange: (String) -> Unit,
+                val onDecrement: () -> Unit,
+                val onIncrement: () -> Unit
+            )
+
             @Composable
             fun NumberRow(
-                value: String,
-                errorText: String?,
-                onValueChange: (String) -> Unit,
-                canDecrement: Boolean,
-                onDecrement: () -> Unit,
-                onIncrement: () -> Unit,
-                keyboardType: KeyboardType,
+                state: NumberRowState,
+                actions: NumberRowActions,
                 modifier: Modifier = Modifier
             ) {
                 Row(
@@ -202,7 +213,7 @@ fun ExEntryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // Decrement Button
-                    if (canDecrement) {
+                    if (state.canDecrement) {
                         Box(
                             modifier = Modifier
                                 .weight(WeightButton)
@@ -210,7 +221,7 @@ fun ExEntryScreen(
                                 .padding(RowPadding)
                                 .shadow(elevation = ButtonElevation, shape = RoundedCornerShape(ButtonCornerRadius))
                                 .background(colorBlue, RoundedCornerShape(ButtonCornerRadius))
-                                .clickable { onDecrement() },
+                                .clickable { actions.onDecrement() },
                             contentAlignment = Alignment.Center
                         ) {
                             Text("-", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)
@@ -221,17 +232,18 @@ fun ExEntryScreen(
 
                     // Value Input
                     GainzOutlinedTextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        label = "",
+                        state = GainzTextFieldState(
+                            value = state.value,
+                            isError = state.errorText != null,
+                            errorText = state.errorText
+                        ),
+                        onValueChange = actions.onValueChange,
                         modifier = Modifier
                             .weight(WeightValueInput)
                             .fillMaxHeight()
                             .padding(RowPadding),
                         textAlign = TextAlign.Center,
-                        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-                        isError = errorText != null,
-                        errorText = errorText
+                        keyboardOptions = KeyboardOptions(keyboardType = state.keyboardType)
                     )
 
                     // Increment Button
@@ -242,7 +254,7 @@ fun ExEntryScreen(
                             .padding(RowPadding)
                             .shadow(elevation = ButtonElevation, shape = RoundedCornerShape(ButtonCornerRadius))
                             .background(colorBlue, RoundedCornerShape(ButtonCornerRadius))
-                            .clickable { onIncrement() },
+                            .clickable(onClick = actions::onIncrement::invoke),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("+", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)
@@ -251,33 +263,45 @@ fun ExEntryScreen(
             }
 
             NumberRow(
-                value = uiState.weight,
-                errorText = uiState.weightError,
-                onValueChange = actions::onWeightChanged,
-                canDecrement = uiState.canDecrementWeight,
-                onDecrement = actions::onDecrementWeight,
-                onIncrement = actions::onIncrementWeight,
-                keyboardType = KeyboardType.Decimal,
+                state = NumberRowState(
+                    value = uiState.weight,
+                    errorText = uiState.weightError,
+                    canDecrement = uiState.canDecrementWeight,
+                    keyboardType = KeyboardType.Decimal
+                ),
+                actions = NumberRowActions(
+                    onValueChange = actions::onWeightChanged,
+                    onDecrement = actions::onDecrementWeight,
+                    onIncrement = actions::onIncrementWeight
+                ),
                 modifier = Modifier.weight(WeightEquipment)
             )
             NumberRow(
-                value = uiState.reps,
-                errorText = uiState.repsError,
-                onValueChange = actions::onRepsChanged,
-                canDecrement = uiState.canDecrementReps,
-                onDecrement = actions::onDecrementReps,
-                onIncrement = actions::onIncrementReps,
-                keyboardType = KeyboardType.Number,
+                state = NumberRowState(
+                    value = uiState.reps,
+                    errorText = uiState.repsError,
+                    canDecrement = uiState.canDecrementReps,
+                    keyboardType = KeyboardType.Number
+                ),
+                actions = NumberRowActions(
+                    onValueChange = actions::onRepsChanged,
+                    onDecrement = actions::onDecrementReps,
+                    onIncrement = actions::onIncrementReps
+                ),
                 modifier = Modifier.weight(WeightEquipment)
             )
             NumberRow(
-                value = uiState.sets,
-                errorText = uiState.setsError,
-                onValueChange = actions::onSetsChanged,
-                canDecrement = uiState.canDecrementSets,
-                onDecrement = actions::onDecrementSets,
-                onIncrement = actions::onIncrementSets,
-                keyboardType = KeyboardType.Number,
+                state = NumberRowState(
+                    value = uiState.sets,
+                    errorText = uiState.setsError,
+                    canDecrement = uiState.canDecrementSets,
+                    keyboardType = KeyboardType.Number
+                ),
+                actions = NumberRowActions(
+                    onValueChange = actions::onSetsChanged,
+                    onDecrement = actions::onDecrementSets,
+                    onIncrement = actions::onIncrementSets
+                ),
                 modifier = Modifier.weight(WeightEquipment)
             )
         }

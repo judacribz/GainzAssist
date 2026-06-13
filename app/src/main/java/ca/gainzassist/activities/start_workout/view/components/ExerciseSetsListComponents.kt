@@ -37,6 +37,8 @@ import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
 import java.util.Locale
 
+private const val BENCH_PRESS = "Bench Press"
+
 private fun numberColumnWidthDp(vararg values: String): Dp {
     val maxChars = values.maxOfOrNull { it.length } ?: 1
     return maxOf(72.dp, (maxChars * 14).dp + 28.dp)
@@ -215,7 +217,7 @@ fun ExercisesListScreenPreviewEmpty() {
 @Composable
 fun ExercisesListScreenPreviewOneExercise() {
     val exercise = Exercise().apply {
-        name = "Bench Press"
+        name = BENCH_PRESS
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
         setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 155f })
         setsList.add(ExerciseSet().apply { setNumber = 2; reps = 6; weight = 185f })
@@ -258,7 +260,7 @@ fun ExercisesListScreenPreviewLongExerciseName() {
 @Composable
 fun ExercisesListScreenPreviewSmallPhone360x800() {
     val exercise = Exercise().apply {
-        name = "Bench Press"
+        name = BENCH_PRESS
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
         setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 155f })
         setsList.add(ExerciseSet().apply { setNumber = 2; reps = 6; weight = 185f })
@@ -272,7 +274,7 @@ fun ExercisesListScreenPreviewSmallPhone360x800() {
 @Composable
 fun ExercisesListScreenPreviewFontScaleLarge() {
     val exercise = Exercise().apply {
-        name = "Bench Press"
+        name = BENCH_PRESS
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
     }
     Surface {
@@ -284,7 +286,7 @@ fun ExercisesListScreenPreviewFontScaleLarge() {
 @Composable
 fun ExercisesListScreenPreviewThreeDigitWeights() {
     val exercise = Exercise().apply {
-        name = "Bench Press"
+        name = BENCH_PRESS
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 130f })
     }
     Surface {

@@ -216,37 +216,42 @@ private fun GainzTabItems(
                 .padding(vertical = if (tab.iconResId != null && tab.title.isNotBlank()) TabPaddingVerticalIcon else TabPaddingVerticalNoIcon),
             contentAlignment = Alignment.Center
         ) {
-            if (tab.iconResId != null && tab.title.isNotBlank()) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        painter = painterResource(tab.iconResId),
-                        contentDescription = tab.title,
-                        tint = color,
-                        modifier = Modifier
-                            .padding(bottom = TabIconPaddingBottom)
-                            .size(TabIconSize)
-                    )
-                    Text(
-                        text = tab.title.uppercase(),
-                        color = color,
-                        fontSize = TabFontSize,
-                        fontWeight = if (distance < FontWeightThreshold) FontWeight.Bold else FontWeight.Normal
-                    )
-                }
-            } else if (tab.iconResId != null && tab.title.isBlank()) {
-                Icon(
-                    painter = painterResource(tab.iconResId),
-                    contentDescription = stringResource(R.string.cd_add),
-                    tint = color,
-                    modifier = Modifier.size(PlusIconSize)
-                )
-            } else {
-                Text(
-                    text = tab.title,
-                    color = color
-                )
-            }
+            GainzTabItemContent(tab, distance, color)
         }
+    }
+}
+
+@Composable
+private fun GainzTabItemContent(tab: GainzTabItem, distance: Float, color: Color) {
+    if (tab.iconResId != null && tab.title.isNotBlank()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                painter = painterResource(tab.iconResId),
+                contentDescription = tab.title,
+                tint = color,
+                modifier = Modifier
+                    .padding(bottom = TabIconPaddingBottom)
+                    .size(TabIconSize)
+            )
+            Text(
+                text = tab.title.uppercase(),
+                color = color,
+                fontSize = TabFontSize,
+                fontWeight = if (distance < FontWeightThreshold) FontWeight.Bold else FontWeight.Normal
+            )
+        }
+    } else if (tab.iconResId != null && tab.title.isBlank()) {
+        Icon(
+            painter = painterResource(tab.iconResId),
+            contentDescription = stringResource(R.string.cd_add),
+            tint = color,
+            modifier = Modifier.size(PlusIconSize)
+        )
+    } else {
+        Text(
+            text = tab.title,
+            color = color
+        )
     }
 }
 

@@ -37,6 +37,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -56,6 +57,8 @@ import ca.gainzassist.R
 import ca.gainzassist.ui.ProgressStatus
 import java.util.Locale
 import kotlin.math.min
+
+private const val PLATE_WIDTH = 22f
 
 data class WorkoutUiState(
     val exerciseTitle: String = "",
@@ -337,102 +340,103 @@ fun WorkoutEquipmentCanvas(
         if (width <= 0f || height <= 40f) return@Canvas
         
         if (eqLower == barbellName) {
-            var barbellWeight = (weight - 45f) / 2f
-            barbellWeight *= 10f
-            var startX = 20f
-            var newWeight = barbellWeight.toInt()
-            val diam45 = height - 20f
-            
-            val weights = intArrayOf(450, 250, 100, 50, 25)
-            val numWeights = IntArray(5)
-            val plateWidth = 22f
-            
-            // Calculate total plates for sleeve width
-            var totalPlates = 0
-            var tempWeight = newWeight
-            for (j in weights.indices) {
-                val qty = tempWeight / weights[j]
-                val limit = if (j == 0) min(qty, 5) else qty
-                totalPlates += limit
-                tempWeight -= weights[j] * qty
-            }
-            val sleeveWidth = 20f + (totalPlates * plateWidth) + 15f
-            val sleeveHeight = 16f
-            
-            // Draw barbell sleeve
-            drawRect(
-                color = Color.DarkGray,
-                topLeft = Offset(0f, (height - sleeveHeight) / 2f),
-                size = Size(sleeveWidth, sleeveHeight),
-                style = Fill
-            )
-            drawRect(
-                color = Color.Black,
-                topLeft = Offset(0f, (height - sleeveHeight) / 2f),
-                size = Size(sleeveWidth, sleeveHeight),
-                style = Stroke(width = 2f)
-            )
+            drawBarbell(weight, width, height)
+        }
+    }
+}
 
-            // Draw plates
-            for (j in weights.indices) {
-                numWeights[j] = newWeight / weights[j]
-                for (i in 0 until numWeights[j]) {
-                    if (j == 0 && i > 4) continue // Max 5 x 45 plates
-                    
-                    val ratio = weights[j] / 450f
-                    val r = diam45 * (0.4f + 0.6f * ratio) // 45lb is full diam45, smaller weights are smaller
-                    val startY = (height - r) / 2f
-                    
-                    // Fill grey
-                    drawRect(
-                        color = Color.Gray,
-                        topLeft = Offset(startX, startY),
-                        size = Size(plateWidth, r)
-                    )
-                    // Stroke black
-                    drawRect(
-                        color = Color.Black,
-                        topLeft = Offset(startX, startY),
-                        size = Size(plateWidth, r),
-                        style = Stroke(width = 2f)
-                    )
-                    startX += plateWidth
-                }
-                newWeight -= weights[j] * numWeights[j]
-            }
+private fun DrawScope.drawBarbell(
+    weight: Float,
+    width: Float,
+    height: Float
+) {
+    val barbellWeight = ((weight - 45f) / 2f * 10f).toInt()
+    val diam45 = height - 20f
+    
+    val weights = intArrayOf(450, 250, 100, 50, 25)
+    val numWeights = IntArray(5)
+    
+    val sleeveWidth = calculateSleeveWidth(barbellWeight, weights)
+    val sleeveHeight = 16f
+    
+    drawSleeve(height, sleeveWidth, sleeveHeight)
+    drawPlates(barbellWeight, weights, numWeights, diam45, height)
+    drawBarbellText(numWeights, weights, width, height)
+}
+
+private fun calculateSleeveWidth(barbellWeight: Int, weights: IntArray): Float {
+    var totalPlates = 0
+    var tempWeight = barbellWeight
+    for (j in weights.indices) {
+        val qty = tempWeight / weights[j]
+        val limit = if (j == 0) min(qty, 5) else qty
+        totalPlates += limit
+        tempWeight -= weights[j] * qty
+    }
+    return 20f + (totalPlates * PLATE_WIDTH) + 15f
+}
+
+private fun DrawScope.drawSleeve(height: Float, sleeveWidth: Float, sleeveHeight: Float) {
+    val topLeft = Offset(0f, (height - sleeveHeight) / 2f)
+    val size = Size(sleeveWidth, sleeveHeight)
+    drawRect(color = Color.DarkGray, topLeft = topLeft, size = size, style = Fill)
+    drawRect(color = Color.Black, topLeft = topLeft, size = size, style = Stroke(width = 2f))
+}
+
+private fun DrawScope.drawPlates(
+    barbellWeight: Int,
+    weights: IntArray,
+    numWeights: IntArray,
+    diam45: Float,
+    height: Float
+) {
+    var startX = 20f
+    var newWeight = barbellWeight
+    for (j in weights.indices) {
+        numWeights[j] = newWeight / weights[j]
+        for (i in 0 until numWeights[j]) {
+            if (j == 0 && i > 4) continue // Max 5 x 45 plates
             
-            // Draw Text
-            val textPaint = Paint().apply {
-                color = android.graphics.Color.DKGRAY
-                textSize = 45f
-                textAlign = Paint.Align.RIGHT
-                isAntiAlias = true
-                typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-            }
+            val ratio = weights[j] / 450f
+            val r = diam45 * (0.4f + 0.6f * ratio)
+            val startY = (height - r) / 2f
             
-            var distinctWeights = 0
-            for (w in numWeights) if (w > 0) distinctWeights++
-            
-            if (distinctWeights > 0) {
-                val textSpacing = 60f
-                var textY = (height - (distinctWeights * textSpacing)) / 2f + 45f
-                
-                for (j in numWeights.indices) {
-                    if (numWeights[j] > 0) {
-                        val lbs = weights[j] / 10f
-                        val label = "${numWeights[j]} x ${if(lbs % 1 == 0f) lbs.toInt().toString() else lbs.toString()} lbs"
-                        drawIntoCanvas { canvas ->
-                            canvas.nativeCanvas.drawText(
-                                label,
-                                width - 10f,
-                                textY,
-                                textPaint
-                            )
-                        }
-                        textY += textSpacing
-                    }
-                }
+            drawRect(color = Color.Gray, topLeft = Offset(startX, startY), size = Size(PLATE_WIDTH, r))
+            drawRect(color = Color.Black, topLeft = Offset(startX, startY), size = Size(PLATE_WIDTH, r), style = Stroke(width = 2f))
+            startX += PLATE_WIDTH
+        }
+        newWeight -= weights[j] * numWeights[j]
+    }
+}
+
+private fun DrawScope.drawBarbellText(
+    numWeights: IntArray,
+    weights: IntArray,
+    width: Float,
+    height: Float
+) {
+    val distinctWeights = numWeights.count { it > 0 }
+    if (distinctWeights == 0) return
+
+    val textPaint = Paint().apply {
+        color = android.graphics.Color.DKGRAY
+        textSize = 45f
+        textAlign = Paint.Align.RIGHT
+        isAntiAlias = true
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+    }
+    
+    val textSpacing = 60f
+    var textY = (height - (distinctWeights * textSpacing)) / 2f + 45f
+    
+    for (j in numWeights.indices) {
+        if (numWeights[j] > 0) {
+            val lbs = weights[j] / 10f
+            val label = "${numWeights[j]} x ${if(lbs % 1 == 0f) lbs.toInt().toString() else lbs.toString()} lbs"
+            drawIntoCanvas { canvas ->
+                canvas.nativeCanvas.drawText(label, width - 10f, textY, textPaint)
             }
+            textY += textSpacing
         }
     }
 }
@@ -448,40 +452,56 @@ fun WorkoutRepsWeightControls(
     ) {
         WorkoutCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
             WorkoutNumberControl(
-                value = uiState.repsText,
-                onValueChanged = actions.onRepsChanged,
-                onFocusLost = actions.onRepsFocusLost,
-                onIncrease = actions.onIncreaseReps,
-                onDecrease = actions.onDecreaseReps,
-                isMin = uiState.isMinReps,
+                state = WorkoutNumberControlState(
+                    value = uiState.repsText,
+                    isMin = uiState.isMinReps
+                ),
+                actions = WorkoutNumberControlActions(
+                    onValueChanged = actions.onRepsChanged,
+                    onFocusLost = actions.onRepsFocusLost,
+                    onIncrease = actions.onIncreaseReps,
+                    onDecrease = actions.onDecreaseReps
+                ),
                 modifier = Modifier.fillMaxSize()
             )
         }
         WorkoutCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
             WorkoutNumberControl(
-                value = uiState.weightText,
-                onValueChanged = actions.onWeightChanged,
-                onFocusLost = actions.onWeightFocusLost,
-                onIncrease = actions.onIncreaseWeight,
-                onDecrease = actions.onDecreaseWeight,
-                isMin = uiState.isMinWeight,
-                modifier = Modifier.fillMaxSize(),
-                isDecimal = true
+                state = WorkoutNumberControlState(
+                    value = uiState.weightText,
+                    isMin = uiState.isMinWeight,
+                    isDecimal = true
+                ),
+                actions = WorkoutNumberControlActions(
+                    onValueChanged = actions.onWeightChanged,
+                    onFocusLost = actions.onWeightFocusLost,
+                    onIncrease = actions.onIncreaseWeight,
+                    onDecrease = actions.onDecreaseWeight
+                ),
+                modifier = Modifier.fillMaxSize()
             )
         }
     }
 }
 
+data class WorkoutNumberControlState(
+    val value: String,
+    val isMin: Boolean,
+    val isDecimal: Boolean = false
+)
+
+data class WorkoutNumberControlActions(
+    val onValueChanged: (String) -> Unit,
+    val onFocusLost: () -> Unit,
+    val onIncrease: () -> Unit,
+    val onDecrease: () -> Unit
+)
+
 @Composable
 fun WorkoutNumberControl(
-    value: String,
-    onValueChanged: (String) -> Unit,
-    onFocusLost: () -> Unit,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
-    isMin: Boolean,
-    modifier: Modifier = Modifier,
-    isDecimal: Boolean = false
+    state: WorkoutNumberControlState,
+    actions: WorkoutNumberControlActions,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
@@ -490,8 +510,8 @@ fun WorkoutNumberControl(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            if (!isMin) {
-                IconButton(onClick = onDecrease) {
+            if (!state.isMin) {
+                IconButton(onClick = actions.onDecrease) {
                     Icon(
                         painter = painterResource(R.drawable.ic_minus),
                         contentDescription = "Decrease",
@@ -509,15 +529,15 @@ fun WorkoutNumberControl(
             contentAlignment = Alignment.Center
         ) {
             BasicTextField(
-                value = value,
+                value = state.value,
                 onValueChange = { newText ->
-                    if (isDecimal) {
+                    if (state.isDecimal) {
                         if (newText.length <= 7 && newText.count { it == '.' } <= 1) {
-                            onValueChanged(newText)
+                            actions.onValueChanged(newText)
                         }
                     } else {
                         if (newText.length <= 4 && newText.all { it.isDigit() }) {
-                            onValueChanged(newText)
+                            actions.onValueChanged(newText)
                         }
                     }
                 },
@@ -528,19 +548,19 @@ fun WorkoutNumberControl(
                     textAlign = TextAlign.Center
                 ),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = if (isDecimal) KeyboardType.Decimal else KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = if (state.isDecimal) KeyboardType.Decimal else KeyboardType.Number),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .onFocusChanged { state ->
-                        if (!state.isFocused) {
-                            onFocusLost()
+                    .onFocusChanged { focusState ->
+                        if (!focusState.isFocused) {
+                            actions.onFocusLost()
                         }
                     }
             )
         }
         
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-            IconButton(onClick = onIncrease) {
+            IconButton(onClick = actions.onIncrease) {
                 Icon(
                     painter = painterResource(R.drawable.ic_plus),
                     contentDescription = "Increase",

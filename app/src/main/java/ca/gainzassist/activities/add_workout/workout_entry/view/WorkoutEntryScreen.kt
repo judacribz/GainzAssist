@@ -50,6 +50,7 @@ import ca.gainzassist.R
 import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.ui.components.GainzButton
 import ca.gainzassist.ui.components.GainzOutlinedTextField
+import ca.gainzassist.ui.components.GainzTextFieldState
 
 val Staatliches = FontFamily(
     Font(R.font.staatliches, FontWeight.Normal)
@@ -147,15 +148,19 @@ fun WorkoutEntryScreen(
             // Number of Exercises Section
             NumExercisesSection(
                 modifier = Modifier.weight(WeightLg), // Matches ll_lg_weight
-                numberOfExercises = numberOfExercises,
-                numberOfExercisesError = numberOfExercisesError,
-                onNumberOfExercisesChanged = actions.onNumberOfExercisesChanged,
-                onIncrementExercises = actions.onIncrementExercises,
-                onDecrementExercises = actions.onDecrementExercises,
-                grey = grey,
-                blue = blue,
-                colorBg = colorBg,
-                fontFamily = safeFontFamily
+                state = NumExercisesState(
+                    numberOfExercises = numberOfExercises,
+                    numberOfExercisesError = numberOfExercisesError,
+                    grey = grey,
+                    blue = blue,
+                    colorBg = colorBg,
+                    fontFamily = safeFontFamily
+                ),
+                actions = NumExercisesActions(
+                    onNumberOfExercisesChanged = actions.onNumberOfExercisesChanged,
+                    onIncrementExercises = actions.onIncrementExercises,
+                    onDecrementExercises = actions.onDecrementExercises
+                )
             )
 
             Spacer(modifier = Modifier.height(SectionSpacing))
@@ -236,11 +241,13 @@ fun WorkoutNameSection(
         border = BorderStroke(0.5.dp, colorBg)
     ) {
         GainzOutlinedTextField(
-            value = workoutName,
+            state = GainzTextFieldState(
+                value = workoutName,
+                label = stringResource(R.string.hint_workout_name).trim(),
+                isError = workoutNameError != null,
+                errorText = workoutNameError
+            ),
             onValueChange = onWorkoutNameChanged,
-            isError = workoutNameError != null,
-            errorText = workoutNameError,
-            label = stringResource(R.string.hint_workout_name).trim(),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxSize()
@@ -249,18 +256,26 @@ fun WorkoutNameSection(
     }
 }
 
+data class NumExercisesState(
+    val numberOfExercises: String,
+    val numberOfExercisesError: String?,
+    val grey: Color,
+    val blue: Color,
+    val colorBg: Color,
+    val fontFamily: FontFamily
+)
+
+data class NumExercisesActions(
+    val onNumberOfExercisesChanged: (String) -> Unit,
+    val onIncrementExercises: () -> Unit,
+    val onDecrementExercises: () -> Unit
+)
+
 @Composable
 fun NumExercisesSection(
-    modifier: Modifier = Modifier,
-    numberOfExercises: String,
-    numberOfExercisesError: String?,
-    onNumberOfExercisesChanged: (String) -> Unit,
-    onIncrementExercises: () -> Unit,
-    onDecrementExercises: () -> Unit,
-    grey: Color,
-    blue: Color,
-    colorBg: Color,
-    fontFamily: FontFamily
+    state: NumExercisesState,
+    actions: NumExercisesActions,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
@@ -269,19 +284,19 @@ fun NumExercisesSection(
             .shadow(ShadowElevationMedium, RoundedCornerShape(CornerRadiusLarge)),
         shape = RoundedCornerShape(CornerRadiusLarge),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(BorderWidthSmall, colorBg)
+        border = BorderStroke(BorderWidthSmall, state.colorBg)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(ContentPadding)
         ) {
-            Text(
+                Text(
                 text = stringResource(R.string.num_of_exercises).uppercase(),
                 style = TextStyle(
-                    fontFamily = fontFamily,
+                    fontFamily = state.fontFamily,
                     fontSize = FontSizeSubtitle,
-                    color = colorBg,
+                    color = state.colorBg,
                     shadow = Shadow(
                         color = colorResource(R.color.greenDark),
                         offset = Offset(TextShadowOffset, TextShadowOffset),
@@ -299,11 +314,11 @@ fun NumExercisesSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Minus Button - Hidden when disabled to match legacy View.GONE behavior
-                val numExercisesInt = numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
+                val numExercisesInt = state.numberOfExercises.toIntOrNull() ?: ExerciseConst.MIN_INT
                 if (numExercisesInt > ExerciseConst.MIN_INT) {
                     GainzButton(
                         text = "-",
-                        onClick = onDecrementExercises,
+                        onClick = actions.onDecrementExercises,
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(ButtonWidth)
@@ -318,32 +333,32 @@ fun NumExercisesSection(
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(InputBoxWidth)
-                        .background(grey, RoundedCornerShape(CornerRadiusXLarge))
-                        .border(BorderWidthLarge, blue, RoundedCornerShape(CornerRadiusXLarge)),
+                        .background(state.grey, RoundedCornerShape(CornerRadiusXLarge))
+                        .border(BorderWidthLarge, state.blue, RoundedCornerShape(CornerRadiusXLarge)),
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextField(
-                        value = numberOfExercises,
+                        value = state.numberOfExercises,
                         onValueChange = {
                             val newValueStr = it.filter { char -> char.isDigit() }.take(3)
-                            onNumberOfExercisesChanged(newValueStr)
+                            actions.onNumberOfExercisesChanged(newValueStr)
                         },
                         textStyle = TextStyle(
-                            fontFamily = fontFamily,
+                            fontFamily = state.fontFamily,
                             fontSize = FontSizeTitle,
-                            color = colorBg,
+                            color = state.colorBg,
                             textAlign = TextAlign.Center
                         ),
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        cursorBrush = SolidColor(colorBg)
+                        cursorBrush = SolidColor(state.colorBg)
                     )
                 }
 
                 // Plus Button
                 GainzButton(
                     text = "+",
-                    onClick = onIncrementExercises,
+                    onClick = actions.onIncrementExercises,
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(ButtonWidth)
@@ -351,9 +366,9 @@ fun NumExercisesSection(
                 )
             }
 
-            if (numberOfExercisesError != null) {
+            if (state.numberOfExercisesError != null) {
                 Text(
-                    text = numberOfExercisesError,
+                    text = state.numberOfExercisesError,
                     color = Color.Red,
                     fontSize = FontSizeError,
                     modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = CardPadding)

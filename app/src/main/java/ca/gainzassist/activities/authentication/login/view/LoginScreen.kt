@@ -116,20 +116,24 @@ private fun SocialButton(
     }
 }
 
+data class LoginInputFieldState(
+    val value: String,
+    val hint: String,
+    val iconRes: Int,
+    val keyboardType: KeyboardType = KeyboardType.Text,
+    val isPassword: Boolean = false,
+    val error: String? = null
+)
+
 @Composable
 private fun LoginInputField(
-    value: String,
+    state: LoginInputFieldState,
     onValueChange: (String) -> Unit,
-    hint: String,
-    iconRes: Int,
-    modifier: Modifier = Modifier,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    isPassword: Boolean = false,
-    error: String? = null
+    modifier: Modifier = Modifier
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         BasicTextField(
-            value = value,
+            value = state.value,
             onValueChange = onValueChange,
             modifier = Modifier
                 .width(275.dp)
@@ -143,17 +147,17 @@ private fun LoginInputField(
                 textAlign = TextAlign.Center
             ),
             cursorBrush = SolidColor(Color.Black),
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            visualTransformation = if (state.isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = KeyboardOptions(keyboardType = state.keyboardType),
             singleLine = true,
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (value.isEmpty()) {
+                    if (state.value.isEmpty()) {
                         Text(
-                            text = hint,
+                            text = state.hint,
                             style = TextStyle(
                                 color = Color.Gray,
                                 fontStyle = FontStyle.Italic,
@@ -165,7 +169,7 @@ private fun LoginInputField(
                     innerTextField()
                     
                     Image(
-                        painter = painterResource(iconRes),
+                        painter = painterResource(state.iconRes),
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
@@ -174,9 +178,9 @@ private fun LoginInputField(
                 }
             }
         )
-        if (error != null) {
+        if (state.error != null) {
             Text(
-                text = error,
+                text = state.error,
                 color = Color.Red,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(top = 4.dp)
@@ -251,102 +255,17 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Social Login Buttons
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (state.isFacebookEnabled) {
-                    SocialButton(
-                        imageRes = R.drawable.facebook,
-                        innerColor = ColorFacebookBlue,
-                        contentDescription = stringResource(R.string.cd_facebook_login),
-                        onClick = actions::onFacebookSignInClick
-                    )
+            LoginSocialButtonsSection(state = state, actions = actions)
 
-                    Spacer(modifier = Modifier.width(30.dp))
-                }
-
-                SocialButton(
-                    imageRes = R.drawable.google,
-                    innerColor = ColorGoogleWhite,
-                    contentDescription = stringResource(R.string.cd_google_login),
-                    onClick = actions::onGoogleSignInClick
-                )
-            }
-
-            // Main Image Box with Bounce Animation
-            val scale = remember { Animatable(1f) }
-
-            LaunchedEffect(state.imageBounceTrigger) {
-                if (state.imageBounceTrigger > 0) {
-                    scale.animateTo(
-                        targetValue = 1.1f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioHighBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    )
-                    scale.animateTo(
-                        targetValue = 1f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioHighBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
-                    )
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .scale(scale.value)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = actions::onImageBounceClick
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Crossfade(targetState = state.isLoginMode, label = "MainImage") { isLogin ->
-                    val bitmap = if (isLogin) loginImage else signUpImage
-                    val cd = stringResource(if (isLogin) R.string.cd_login_img else R.string.cd_sign_up_img)
-                    
-                    bitmap?.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = cd,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
-                }
-            }
-
-            // Input Fields
-            LoginInputField(
-                value = state.email,
-                onValueChange = actions::onEmailChanged,
-                hint = stringResource(R.string.hint_email),
-                iconRes = R.drawable.ic_mail_dark,
-                keyboardType = KeyboardType.Email,
-                error = state.emailError
+            LoginMainImageSection(
+                state = state,
+                actions = actions,
+                loginImage = loginImage,
+                signUpImage = signUpImage,
+                modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            LoginInputField(
-                value = state.password,
-                onValueChange = actions::onPasswordChanged,
-                hint = stringResource(R.string.hint_password),
-                iconRes = R.drawable.ic_pass_dark,
-                modifier = Modifier.padding(bottom = 10.dp),
-                keyboardType = KeyboardType.Password,
-                isPassword = true,
-                error = state.passwordError
-            )
+            LoginInputFieldsSection(state = state, actions = actions)
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -358,60 +277,182 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Toggle Text
-            AnimatedContent(
-                targetState = state.isLoginMode,
-                transitionSpec = {
-                    if (targetState) {
-                        slideInHorizontally(animationSpec = tween(300)) { -it } togetherWith slideOutHorizontally(animationSpec = tween(300)) { it }
-                    } else {
-                        slideInHorizontally(animationSpec = tween(300)) { it } togetherWith slideOutHorizontally(animationSpec = tween(300)) { -it }
-                    }
-                },
-                label = "toggleTextAnimation"
-            ) { isLogin ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { actions.onToggleMode() }
-                        .padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(style = SpanStyle(color = Color(0xFFD4D4D4), fontWeight = FontWeight.Bold)) {
-                                append(stringResource(if (isLogin) R.string.txt_no_account else R.string.txt_yes_account))
-                                append(" ")
-                            }
-                            withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
-                                append(stringResource(if (isLogin) R.string.txt_sign_up_here else R.string.txt_login_here))
-                            }
-                        },
-                        fontSize = 18.sp
-                    )
-                }
-            }
+            LoginToggleTextSection(state = state, actions = actions)
         }
 
         if (state.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f))
-                    .pointerInput(Unit) {
-                        // Consume all touch events
-                        awaitPointerEventScope {
-                            while (true) {
-                                awaitPointerEvent()
-                            }
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = Color.White)
+            LoginLoadingOverlay()
+        }
+    }
+}
+
+@Composable
+private fun LoginMainImageSection(
+    state: LoginUiState,
+    actions: LoginActions,
+    loginImage: Bitmap?,
+    signUpImage: Bitmap?,
+    modifier: Modifier = Modifier
+) {
+    val scale = remember { Animatable(1f) }
+
+    LaunchedEffect(state.imageBounceTrigger) {
+        if (state.imageBounceTrigger > 0) {
+            scale.animateTo(
+                targetValue = 1.1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioHighBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioHighBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .scale(scale.value)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = actions::onImageBounceClick
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Crossfade(targetState = state.isLoginMode, label = "MainImage") { isLogin ->
+            val bitmap = if (isLogin) loginImage else signUpImage
+            val cd = stringResource(if (isLogin) R.string.cd_login_img else R.string.cd_sign_up_img)
+            
+            bitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = cd,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
     }
+}
+
+@Composable
+private fun LoginLoadingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.3f))
+            .pointerInput(Unit) {
+                // Consume all touch events
+                awaitPointerEventScope {
+                    while (true) {
+                        awaitPointerEvent()
+                    }
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = Color.White)
+    }
+}
+
+@Composable
+private fun LoginSocialButtonsSection(state: LoginUiState, actions: LoginActions) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (state.isFacebookEnabled) {
+            SocialButton(
+                imageRes = R.drawable.facebook,
+                innerColor = ColorFacebookBlue,
+                contentDescription = stringResource(R.string.cd_facebook_login),
+                onClick = actions::onFacebookSignInClick
+            )
+
+            Spacer(modifier = Modifier.width(30.dp))
+        }
+
+        SocialButton(
+            imageRes = R.drawable.google,
+            innerColor = ColorGoogleWhite,
+            contentDescription = stringResource(R.string.cd_google_login),
+            onClick = actions::onGoogleSignInClick
+        )
+    }
+}
+
+@Composable
+private fun LoginInputFieldsSection(state: LoginUiState, actions: LoginActions) {
+    LoginInputField(
+        state = LoginInputFieldState(
+            value = state.email,
+            hint = stringResource(R.string.hint_email),
+            iconRes = R.drawable.ic_mail_dark,
+            keyboardType = KeyboardType.Email,
+            error = state.emailError
+        ),
+        onValueChange = actions::onEmailChanged
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    LoginInputField(
+        state = LoginInputFieldState(
+            value = state.password,
+            hint = stringResource(R.string.hint_password),
+            iconRes = R.drawable.ic_pass_dark,
+            keyboardType = KeyboardType.Password,
+            isPassword = true,
+            error = state.passwordError
+        ),
+        onValueChange = actions::onPasswordChanged,
+        modifier = Modifier.padding(bottom = 10.dp)
+    )
+}
+
+@Composable
+private fun LoginToggleTextSection(state: LoginUiState, actions: LoginActions) {
+    AnimatedContent(
+        targetState = state.isLoginMode,
+        transitionSpec = {
+            if (targetState) {
+                slideInHorizontally(animationSpec = tween(300)) { -it } togetherWith slideOutHorizontally(animationSpec = tween(300)) { it }
+            } else {
+                slideInHorizontally(animationSpec = tween(300)) { it } togetherWith slideOutHorizontally(animationSpec = tween(300)) { -it }
+            }
+        },
+        label = "toggleTextAnimation"
+    ) { isLogin ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { actions.onToggleMode() }
+                .padding(vertical = 10.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = Color(0xFFD4D4D4), fontWeight = FontWeight.Bold)) {
+                        append(stringResource(if (isLogin) R.string.txt_no_account else R.string.txt_yes_account))
+                        append(" ")
+                    }
+                    withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
+                        append(stringResource(if (isLogin) R.string.txt_sign_up_here else R.string.txt_login_here))
+                    }
+                },
+                fontSize = 18.sp
+            )
+        }
+    }
+
 }
 
 @Preview(showBackground = true)
@@ -420,14 +461,14 @@ fun LoginScreenPreview() {
     LoginScreen(
         state = LoginUiState(),
         actions = object : LoginActions {
-            override fun onEmailChanged(email: String) {} // Preview
-            override fun onPasswordChanged(password: String) {} // Preview
-            override fun onToggleMode() {} // Preview
-            override fun onLoginClick() {} // Preview
-            override fun onSignUpClick() {} // Preview
-            override fun onGoogleSignInClick() {} // Preview
-            override fun onFacebookSignInClick() {} // Preview
-            override fun onImageBounceClick() {} // Preview
+            override fun onEmailChanged(email: String) { /* no-op */ }
+            override fun onPasswordChanged(password: String) { /* no-op */ }
+            override fun onToggleMode() { /* no-op */ }
+            override fun onLoginClick() { /* no-op */ }
+            override fun onSignUpClick() { /* no-op */ }
+            override fun onGoogleSignInClick() { /* no-op */ }
+            override fun onFacebookSignInClick() { /* no-op */ }
+            override fun onImageBounceClick() { /* no-op */ }
         }
     )
 }
@@ -438,14 +479,14 @@ fun LoginScreenSignUpModePreview() {
     LoginScreen(
         state = LoginUiState(isLoginMode = false),
         actions = object : LoginActions {
-            override fun onEmailChanged(email: String) {}
-            override fun onPasswordChanged(password: String) {}
-            override fun onToggleMode() {}
-            override fun onLoginClick() {}
-            override fun onSignUpClick() {}
-            override fun onGoogleSignInClick() {}
-            override fun onFacebookSignInClick() {}
-            override fun onImageBounceClick() {}
+            override fun onEmailChanged(email: String) { /* no-op */ }
+            override fun onPasswordChanged(password: String) { /* no-op */ }
+            override fun onToggleMode() { /* no-op */ }
+            override fun onLoginClick() { /* no-op */ }
+            override fun onSignUpClick() { /* no-op */ }
+            override fun onGoogleSignInClick() { /* no-op */ }
+            override fun onFacebookSignInClick() { /* no-op */ }
+            override fun onImageBounceClick() { /* no-op */ }
         }
     )
 }
@@ -456,14 +497,14 @@ fun LoginScreenLoadingPreview() {
     LoginScreen(
         state = LoginUiState(isLoading = true),
         actions = object : LoginActions {
-            override fun onEmailChanged(email: String) {}
-            override fun onPasswordChanged(password: String) {}
-            override fun onToggleMode() {}
-            override fun onLoginClick() {}
-            override fun onSignUpClick() {}
-            override fun onGoogleSignInClick() {}
-            override fun onFacebookSignInClick() {}
-            override fun onImageBounceClick() {}
+            override fun onEmailChanged(email: String) { /* no-op */ }
+            override fun onPasswordChanged(password: String) { /* no-op */ }
+            override fun onToggleMode() { /* no-op */ }
+            override fun onLoginClick() { /* no-op */ }
+            override fun onSignUpClick() { /* no-op */ }
+            override fun onGoogleSignInClick() { /* no-op */ }
+            override fun onFacebookSignInClick() { /* no-op */ }
+            override fun onImageBounceClick() { /* no-op */ }
         }
     )
 }

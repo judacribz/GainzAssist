@@ -53,6 +53,7 @@ private val DialogTitleFontSize = 30.sp
 private val DialogTitleBottomPadding = 20.dp
 private val DialogButtonWeight = 1f
 private val DialogButtonSpacing = 20.dp
+private const val LEG_DAY = "Leg Day"
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -199,7 +200,7 @@ fun WorkoutsScreenEmptyPreview() {
 @Composable
 fun WorkoutsScreenPopulatedPreview() {
     WorkoutsScreen(
-        workoutNames = listOf("Chest Day", "Leg Day", "Back Day"),
+        workoutNames = listOf("Chest Day", LEG_DAY, "Back Day"),
         selectedWorkoutName = null
     )
 }
@@ -208,7 +209,7 @@ fun WorkoutsScreenPopulatedPreview() {
 @Composable
 fun WorkoutsScreenDialogPreview() {
     WorkoutsScreen(
-        workoutNames = listOf("Chest Day", "Leg Day", "Back Day"),
-        selectedWorkoutName = "Leg Day"
+        workoutNames = listOf("Chest Day", LEG_DAY, "Back Day"),
+        selectedWorkoutName = LEG_DAY
     )
 }

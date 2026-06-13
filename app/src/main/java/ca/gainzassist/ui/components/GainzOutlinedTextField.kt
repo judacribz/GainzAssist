@@ -51,17 +51,21 @@ private val StaatlichesFont = FontFamily(
     Font(R.font.staatliches, FontWeight.Normal)
 )
 
+data class GainzTextFieldState(
+    val value: String,
+    val label: String = "",
+    val isError: Boolean = false,
+    val errorText: String? = null
+)
+
 @Composable
 fun GainzOutlinedTextField(
-    value: String,
+    state: GainzTextFieldState,
     onValueChange: (String) -> Unit,
-    label: String,
     modifier: Modifier = Modifier,
     singleLine: Boolean = true,
     textAlign: TextAlign = TextAlign.Center,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    isError: Boolean = false,
-    errorText: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
     val safeFontFamily = if (androidx.compose.ui.platform.LocalInspectionMode.current) {
         FontFamily.Default
@@ -72,18 +76,13 @@ fun GainzOutlinedTextField(
             FontFamily.Default
         }
     }
-
     val blue = colorResource(R.color.blue)
     val grey = colorResource(R.color.grey)
     val colorDarkText = colorResource(R.color.colorDarkText)
-    val colorBg = colorResource(R.color.colorBg)
-
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val isFloating = isFocused || value.isNotEmpty()
-
-    val innerBorderColor = if (isError) Color.Red else blue
-
+    val isFloating = isFocused || state.value.isNotEmpty()
+    val innerBorderColor = if (state.isError) Color.Red else blue
     val alignment = when (textAlign) {
         TextAlign.Start -> Alignment.CenterStart
         TextAlign.End -> Alignment.CenterEnd
@@ -105,7 +104,7 @@ fun GainzOutlinedTextField(
                     .border(InnerBorderWidth, innerBorderColor, RoundedCornerShape(CornerRadius))
             ) {
                 BasicTextField(
-                    value = value,
+                    value = state.value,
                     onValueChange = onValueChange,
                     modifier = Modifier.fillMaxSize(),
                     interactionSource = interactionSource,
@@ -119,52 +118,22 @@ fun GainzOutlinedTextField(
                     keyboardOptions = keyboardOptions,
                     cursorBrush = SolidColor(colorDarkText),
                     decorationBox = { innerTextField ->
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            // Floating Label at top-left
-                            if (isFloating) {
-                                Text(
-                                    text = label,
-                                    style = TextStyle(
-                                        fontFamily = safeFontFamily,
-                                        fontStyle = FontStyle.Italic,
-                                        fontSize = LabelFontSize,
-                                        color = colorBg.copy(alpha = 0.7f)
-                                    ),
-                                    modifier = Modifier.padding(start = LabelPaddingStart, top = LabelPaddingTop)
-                                )
-                            }
-
-                            // Input Area
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = InputPaddingHorizontal, vertical = InputPaddingVertical),
-                                contentAlignment = alignment
-                            ) {
-                                if (!isFloating) {
-                                    Text(
-                                        text = label,
-                                        style = TextStyle(
-                                            fontFamily = safeFontFamily,
-                                            fontSize = InputFontSize,
-                                            textAlign = textAlign,
-                                            color = colorDarkText.copy(alpha = 0.5f),
-                                            fontStyle = FontStyle.Italic
-                                        ),
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        }
+                        GainzTextFieldDecorationBox(
+                            isFloating = isFloating,
+                            label = state.label,
+                            safeFontFamily = safeFontFamily,
+                            textAlign = textAlign,
+                            alignment = alignment,
+                            innerTextField = innerTextField
+                        )
                     }
                 )
             }
         }
 
-        if (isError && !errorText.isNullOrBlank()) {
+        if (state.isError && !state.errorText.isNullOrBlank()) {
             Text(
-                text = errorText,
+                text = state.errorText,
                 color = Color.Red,
                 fontSize = ErrorFontSize,
                 modifier = Modifier.padding(start = LabelPaddingStart, top = ErrorPaddingTop)
@@ -173,13 +142,68 @@ fun GainzOutlinedTextField(
     }
 }
 
+@Composable
+private fun GainzTextFieldDecorationBox(
+    isFloating: Boolean,
+    label: String,
+    safeFontFamily: FontFamily,
+    textAlign: TextAlign,
+    alignment: Alignment,
+    innerTextField: @Composable () -> Unit
+) {
+    val colorBg = colorResource(R.color.colorBg)
+    val colorDarkText = colorResource(R.color.colorDarkText)
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Floating Label at top-left
+        if (isFloating) {
+            Text(
+                text = label,
+                style = TextStyle(
+                    fontFamily = safeFontFamily,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = LabelFontSize,
+                    color = colorBg.copy(alpha = 0.7f)
+                ),
+                modifier = Modifier.padding(start = LabelPaddingStart, top = LabelPaddingTop)
+            )
+        }
+
+        // Input Area
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = InputPaddingHorizontal, vertical = InputPaddingVertical),
+            contentAlignment = alignment
+        ) {
+            if (!isFloating) {
+                Text(
+                    text = label,
+                    style = TextStyle(
+                        fontFamily = safeFontFamily,
+                        fontSize = InputFontSize,
+                        textAlign = textAlign,
+                        color = colorDarkText.copy(alpha = 0.5f),
+                        fontStyle = FontStyle.Italic
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            innerTextField()
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun GainzOutlinedTextFieldPreview() {
     GainzOutlinedTextField(
-        value = "Bench Press",
+        state = GainzTextFieldState(
+            value = "Bench Press",
+            label = "Exercise Name"
+        ),
         onValueChange = {},
-        label = "Exercise Name",
         textAlign = TextAlign.Start,
         modifier = Modifier.height(150.dp).padding(16.dp)
     )
@@ -189,9 +213,11 @@ fun GainzOutlinedTextFieldPreview() {
 @Composable
 fun GainzOutlinedTextFieldEmptyPreview() {
     GainzOutlinedTextField(
-        value = "",
+        state = GainzTextFieldState(
+            value = "",
+            label = "Workout Name"
+        ),
         onValueChange = {},
-        label = "Workout Name",
         modifier = Modifier.height(150.dp).padding(16.dp)
     )
 }
