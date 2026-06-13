@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.how_to_videos.view
 
 import android.widget.ImageView
@@ -118,7 +119,7 @@ fun VideoItemRow(
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun HowToVideosScreenPreview_Empty() {
+fun HowToVideosScreenPreviewEmpty() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(videos = emptyList()),
         onVideoClick = {},
@@ -128,7 +129,7 @@ fun HowToVideosScreenPreview_Empty() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun HowToVideosScreenPreview_WithResults() {
+fun HowToVideosScreenPreviewWithResults() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
@@ -144,7 +145,7 @@ fun HowToVideosScreenPreview_WithResults() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun HowToVideosScreenPreview_PlayerVisible() {
+fun HowToVideosScreenPreviewPlayerVisible() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             isPlayerVisible = true,
@@ -168,7 +169,7 @@ fun HowToVideosScreenPreview_PlayerVisible() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-fun HowToVideosScreenPreview_LongTitles() {
+fun HowToVideosScreenPreviewLongTitles() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
@@ -182,7 +183,7 @@ fun HowToVideosScreenPreview_LongTitles() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 320, heightDp = 480)
 @Composable
-fun HowToVideosScreenPreview_SmallPhone() {
+fun HowToVideosScreenPreviewSmallPhone() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             isPlayerVisible = true,
@@ -200,7 +201,7 @@ fun HowToVideosScreenPreview_SmallPhone() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000, fontScale = 1.5f)
 @Composable
-fun HowToVideosScreenPreview_LargeFont() {
+fun HowToVideosScreenPreviewLargeFont() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(

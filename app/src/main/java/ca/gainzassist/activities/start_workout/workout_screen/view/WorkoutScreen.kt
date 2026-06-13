@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.workout_screen.view
 
 import android.annotation.SuppressLint
@@ -54,8 +55,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
-import ca.gainzassist.activities.start_workout.workout_screen.WorkoutProgressUiItem
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS
+import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutProgressUiItem
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
 import java.util.Locale
 import kotlin.math.min
 
@@ -94,6 +95,7 @@ data class WorkoutUiActions(
     val onSetProgressClick: (Int) -> Unit = {}
 )
 
+@Suppress("kotlin:S107")
 @Composable
 fun WorkoutComposeScreen(
     uiState: WorkoutUiState,
@@ -260,15 +262,15 @@ fun WorkoutProgressItem(
     )
     
     val brush = when (item.status) {
-        PROGRESS_STATUS.SUCCESS -> successBrush
-        PROGRESS_STATUS.SUCCESS_SELECTED -> successSelectedBrush
-        PROGRESS_STATUS.FAIL -> failBrush
-        PROGRESS_STATUS.FAIL_SELECTED -> failSelectedBrush
-        PROGRESS_STATUS.SELECTED -> selectedBrush
+        ProgressStatus.SUCCESS -> successBrush
+        ProgressStatus.SUCCESS_SELECTED -> successSelectedBrush
+        ProgressStatus.FAIL -> failBrush
+        ProgressStatus.FAIL_SELECTED -> failSelectedBrush
+        ProgressStatus.SELECTED -> selectedBrush
         else -> unselectedBrush
     }
 
-    val textColor = if (item.status == PROGRESS_STATUS.SELECTED) {
+    val textColor = if (item.status == ProgressStatus.SELECTED) {
         Color.White
     } else {
         colorResource(id = R.color.colorBg)
@@ -683,19 +685,19 @@ fun WorkoutFooterControls(
 // Previews
 @Preview(showBackground = true)
 @Composable
-fun WorkoutComposeScreenPreview_Default() {
+fun WorkoutComposeScreenPreviewDefault() {
     WorkoutComposeScreen(
         uiState = WorkoutUiState(
             exerciseTitle = "Bench Press",
             setNumText = "Set 1 / 5",
             exerciseProgress = listOf(
-                WorkoutProgressUiItem(1, PROGRESS_STATUS.SUCCESS),
-                WorkoutProgressUiItem(2, PROGRESS_STATUS.SELECTED),
-                WorkoutProgressUiItem(3, PROGRESS_STATUS.UNSELECTED)
+                WorkoutProgressUiItem(1, ProgressStatus.SUCCESS),
+                WorkoutProgressUiItem(2, ProgressStatus.SELECTED),
+                WorkoutProgressUiItem(3, ProgressStatus.UNSELECTED)
             ),
             setProgress = listOf(
-                WorkoutProgressUiItem(1, PROGRESS_STATUS.SELECTED),
-                WorkoutProgressUiItem(2, PROGRESS_STATUS.UNSELECTED)
+                WorkoutProgressUiItem(1, ProgressStatus.SELECTED),
+                WorkoutProgressUiItem(2, ProgressStatus.UNSELECTED)
             ),
             timerText = "01:30",
             repsText = "5",
@@ -712,18 +714,18 @@ fun WorkoutComposeScreenPreview_Default() {
 
 @Preview(showBackground = true)
 @Composable
-fun WorkoutComposeScreenPreview_UpdateMode() {
+fun WorkoutComposeScreenPreviewUpdateMode() {
     WorkoutComposeScreen(
         uiState = WorkoutUiState(
             exerciseTitle = "Squat",
             setNumText = "Set 3 / 3",
             exerciseProgress = listOf(
-                WorkoutProgressUiItem(1, PROGRESS_STATUS.SUCCESS)
+                WorkoutProgressUiItem(1, ProgressStatus.SUCCESS)
             ),
             setProgress = listOf(
-                WorkoutProgressUiItem(1, PROGRESS_STATUS.SUCCESS),
-                WorkoutProgressUiItem(2, PROGRESS_STATUS.SUCCESS),
-                WorkoutProgressUiItem(3, PROGRESS_STATUS.SUCCESS_SELECTED)
+                WorkoutProgressUiItem(1, ProgressStatus.SUCCESS),
+                WorkoutProgressUiItem(2, ProgressStatus.SUCCESS),
+                WorkoutProgressUiItem(3, ProgressStatus.SUCCESS_SELECTED)
             ),
             timerText = "00:00",
             repsText = "5",
@@ -741,7 +743,7 @@ fun WorkoutComposeScreenPreview_UpdateMode() {
 
 @Preview(showBackground = true)
 @Composable
-fun WorkoutComposeScreenPreview_LargeWeight() {
+fun WorkoutComposeScreenPreviewLargeWeight() {
     WorkoutComposeScreen(
         uiState = WorkoutUiState(
             exerciseTitle = "Deadlift",

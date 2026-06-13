@@ -30,13 +30,13 @@ fun WarmupsListScreen(warmups: List<Exercise>?) {
 
 @Preview(showBackground = true)
 @Composable
-fun WarmupsListScreenPreview_Empty() {
+fun WarmupsListScreenPreviewEmpty() {
     WarmupsListScreen(warmups = emptyList())
 }
 
 @Preview(showBackground = true)
 @Composable
-fun WarmupsListScreenPreview_OneWarmup() {
+fun WarmupsListScreenPreviewOneWarmup() {
     val exercise = Exercise()
     exercise.name = "Jumping Jacks"
     exercise.setsList = arrayListOf(ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f))
@@ -45,7 +45,7 @@ fun WarmupsListScreenPreview_OneWarmup() {
 
 @Preview(showBackground = true)
 @Composable
-fun WarmupsListScreenPreview_MultipleWarmups() {
+fun WarmupsListScreenPreviewMultipleWarmups() {
     val ex1 = Exercise()
     ex1.name = "Jumping Jacks"
     ex1.setsList = arrayListOf(
@@ -62,7 +62,7 @@ fun WarmupsListScreenPreview_MultipleWarmups() {
 
 @Preview(showBackground = true)
 @Composable
-fun WarmupsListScreenPreview_LongWarmupName() {
+fun WarmupsListScreenPreviewLongWarmupName() {
     val ex = Exercise()
     ex.name = "Very Long Warmup Exercise Name That Wraps To Next Line"
     ex.setsList = arrayListOf(
@@ -79,7 +79,7 @@ fun WarmupsListScreenPreview_LongWarmupName() {
 
 @Preview(showBackground = true, device = Devices.PIXEL_2)
 @Composable
-fun WarmupsListScreenPreview_SmallPhone_360x800() {
+fun WarmupsListScreenPreviewSmallPhone360x800() {
     val ex = Exercise()
     ex.name = "Jumping Jacks"
     ex.setsList = arrayListOf(ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f))
@@ -88,7 +88,7 @@ fun WarmupsListScreenPreview_SmallPhone_360x800() {
 
 @PreviewFontScale
 @Composable
-fun WarmupsListScreenPreview_FontScaleLarge() {
+fun WarmupsListScreenPreviewFontScaleLarge() {
     val ex = Exercise()
     ex.name = "Jumping Jacks"
     ex.setsList = arrayListOf(ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f))

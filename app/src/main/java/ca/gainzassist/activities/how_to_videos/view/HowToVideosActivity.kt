@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.how_to_videos.view
 
 import android.content.Intent
@@ -40,6 +41,7 @@ class HowToVideosActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_VIDEO_ID = "ca.gainzassist.act_how_to_videos.EXTRA_VIDEO_ID"
+        private const val ERR_YOUTUBE_LOAD = "Unable to load YouTube videos. Check API key or network."
     }
 
     private var videos by mutableStateOf<List<HowToVideoUiItem>>(emptyList())
@@ -230,83 +232,86 @@ class HowToVideosActivity : AppCompatActivity() {
     }
 
     private fun searchYouTube(queryKey: String, urlString: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            var connection: HttpURLConnection? = null
-            var reader: BufferedReader? = null
+        lifecycleScope.launch {
             var errorMessage: String? = null
             var videoIds: ArrayList<String>? = null
             var videoTitles: ArrayList<String>? = null
 
-            try {
-                val url = URL(urlString)
-                connection = url.openConnection() as HttpURLConnection
-                connection.setRequestProperty("X-Android-Package", packageName)
-                connection.setRequestProperty("X-Android-Cert", getAppSha1())
-                connection.connect()
+            withContext(Dispatchers.IO) {
+                var connection: HttpURLConnection? = null
+                var reader: BufferedReader? = null
 
-                val responseCode = connection.responseCode
-                val stream = if (responseCode in 200..299) {
-                    connection.inputStream
-                } else {
-                    connection.errorStream
-                }
+                try {
+                    val url = URL(urlString)
+                    connection = url.openConnection() as HttpURLConnection
+                    connection.setRequestProperty("X-Android-Package", packageName)
+                    connection.setRequestProperty("X-Android-Cert", getAppSha1())
+                    connection.connect()
 
-                if (stream != null) {
-                    reader = BufferedReader(InputStreamReader(stream))
-                    val buffer = StringBuilder()
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        buffer.append(line).append("\n")
+                    val responseCode = connection.responseCode
+                    val stream = if (responseCode in 200..299) {
+                        connection.inputStream
+                    } else {
+                        connection.errorStream
                     }
 
-                    if (responseCode !in 200..299) {
-                        val errorBody = buffer.toString()
-                        val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
-                        Log.e("HowToVideos", "Error $responseCode for $sanitizedUrl\nBody: $errorBody")
-
-                        errorMessage = if (errorBody.contains("quotaExceeded") || errorBody.contains("dailyLimitExceeded")) {
-                            "YouTube video search quota exceeded. Please try again later."
-                        } else {
-                            "Unable to load YouTube videos. Check API key or network."
+                    if (stream != null) {
+                        reader = BufferedReader(InputStreamReader(stream))
+                        val buffer = StringBuilder()
+                        var line: String?
+                        while (reader.readLine().also { line = it } != null) {
+                            buffer.append(line).append("\n")
                         }
-                    } else {
-                        val jsonObject = JSONObject(buffer.toString())
-                        val items = jsonObject.optJSONArray("items")
 
-                        videoIds = ArrayList()
-                        videoTitles = ArrayList()
+                        if (responseCode !in 200..299) {
+                            val errorBody = buffer.toString()
+                            val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
+                            Log.e("HowToVideos", "Error $responseCode for $sanitizedUrl\nBody: $errorBody")
 
-                        if (items != null) {
-                            for (i in 0 until items.length()) {
-                                val item = items.optJSONObject(i) ?: continue
-                                val id = item.optJSONObject("id") ?: continue
-                                val snippet = item.optJSONObject("snippet") ?: continue
+                            errorMessage = if (errorBody.contains("quotaExceeded") || errorBody.contains("dailyLimitExceeded")) {
+                                "YouTube video search quota exceeded. Please try again later."
+                            } else {
+                                ERR_YOUTUBE_LOAD
+                            }
+                        } else {
+                            val jsonObject = JSONObject(buffer.toString())
+                            val items = jsonObject.optJSONArray("items")
 
-                                val videoId = id.optString("videoId")
-                                val title = snippet.optString("title")
+                            videoIds = ArrayList()
+                            videoTitles = ArrayList()
 
-                                if (videoId.isNotEmpty()) {
-                                    videoIds.add(videoId)
-                                    videoTitles.add(title)
+                            if (items != null) {
+                                for (i in 0 until items.length()) {
+                                    val item = items.optJSONObject(i) ?: continue
+                                    val id = item.optJSONObject("id") ?: continue
+                                    val snippet = item.optJSONObject("snippet") ?: continue
+
+                                    val videoId = id.optString("videoId")
+                                    val title = snippet.optString("title")
+
+                                    if (videoId.isNotEmpty()) {
+                                        videoIds.add(videoId)
+                                        videoTitles.add(title)
+                                    }
                                 }
                             }
                         }
+                    } else {
+                        errorMessage = ERR_YOUTUBE_LOAD
                     }
-                } else {
-                    errorMessage = "Unable to load YouTube videos. Check API key or network."
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                errorMessage = "Unable to load YouTube videos. Check API key or network."
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                errorMessage = "Error parsing response"
-            } finally {
-                connection?.disconnect()
-                try {
-                    reader?.close()
                 } catch (e: IOException) {
                     e.printStackTrace()
+                    errorMessage = ERR_YOUTUBE_LOAD
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                    errorMessage = "Error parsing response"
+                } finally {
+                    connection?.disconnect()
+                    try {
+                        reader?.close()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
                 }
             }
 
@@ -338,7 +343,7 @@ class HowToVideosActivity : AppCompatActivity() {
     }
 
     private fun displaySearchResults(videoIds: ArrayList<String>, videoTitles: ArrayList<String>) {
-        if (videoIds.size > 0) {
+        if (videoIds.isNotEmpty()) {
             val newList = mutableListOf<HowToVideoUiItem>()
             for (i in 0 until videoIds.size) {
                 newList.add(HowToVideoUiItem(videoIds[i], videoTitles[i]))

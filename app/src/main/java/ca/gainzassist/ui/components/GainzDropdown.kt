@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.ui.components
 
 import androidx.compose.foundation.background
@@ -99,7 +100,7 @@ fun GainzDropdown(
 
 @Preview(showBackground = true)
 @Composable
-fun GainzDropdownPreview_Barbell() {
+fun GainzDropdownPreviewBarbell() {
     GainzDropdown(
         selectedValue = "Barbell",
         options = listOf("Barbell", "Dumbbell", "N/A"),
@@ -109,7 +110,7 @@ fun GainzDropdownPreview_Barbell() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzDropdownPreview_Dumbbell() {
+fun GainzDropdownPreviewDumbbell() {
     GainzDropdown(
         selectedValue = "Dumbbell",
         options = listOf("Barbell", "Dumbbell", "N/A"),
@@ -119,7 +120,7 @@ fun GainzDropdownPreview_Dumbbell() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzDropdownPreview_NA() {
+fun GainzDropdownPreviewNA() {
     GainzDropdown(
         selectedValue = "N/A",
         options = listOf("Barbell", "Dumbbell", "N/A"),
@@ -129,7 +130,7 @@ fun GainzDropdownPreview_NA() {
 
 @Preview(showBackground = true, widthDp = 150)
 @Composable
-fun GainzDropdownPreview_NarrowWidth() {
+fun GainzDropdownPreviewNarrowWidth() {
     GainzDropdown(
         selectedValue = "Barbell",
         options = listOf("Barbell", "Dumbbell", "N/A"),

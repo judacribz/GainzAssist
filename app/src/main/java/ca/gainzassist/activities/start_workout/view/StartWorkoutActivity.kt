@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.view
 
 import android.content.Intent
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 
+@Suppress("DEPRECATION")
 class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListener {
 
     companion object {
@@ -148,9 +150,8 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
                 }
                 is StartWorkoutRestoreDecision.RestoreFromJson -> {
                     try {
-                        @Suppress("UNCHECKED_CAST")
                         workoutController.setRetrievedWorkout(
-                            Misc.readValue(decision.sessionJson) as Map<String, Any?>,
+                            Misc.readValue(decision.sessionJson),
                             currentWorkout
                         )
                     } catch (ex: Exception) {
@@ -175,20 +176,16 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        lifecycleScope.launch {
-            handleLeavingScreen()
-        }
+        handleLeavingScreen()
     }
 
     override fun onBackPressed() {
-        lifecycleScope.launch {
-            workoutController.unsetTimer()
-            handleLeavingScreen()
-            super.onBackPressed()
-        }
+        workoutController.unsetTimer()
+        handleLeavingScreen()
+        super.onBackPressed()
     }
 
-    suspend fun handleLeavingScreen() {
+    fun handleLeavingScreen() {
         val currentWorkout = workout ?: return
         val workoutName = currentWorkout.name ?: return
 

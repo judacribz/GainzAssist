@@ -90,7 +90,7 @@ fun ResumeScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun ResumeScreenPreview_Empty() {
+fun ResumeScreenPreviewEmpty() {
     MaterialTheme {
         ResumeScreen(
             uiState = ResumeUiState(workoutNames = emptyList()),
@@ -101,7 +101,7 @@ fun ResumeScreenPreview_Empty() {
 
 @Preview(showBackground = true)
 @Composable
-fun ResumeScreenPreview_OneWorkout() {
+fun ResumeScreenPreviewOneWorkout() {
     MaterialTheme {
         ResumeScreen(
             uiState = ResumeUiState(workoutNames = listOf("Chest Day")),
@@ -112,7 +112,7 @@ fun ResumeScreenPreview_OneWorkout() {
 
 @Preview(showBackground = true)
 @Composable
-fun ResumeScreenPreview_MultipleWorkouts() {
+fun ResumeScreenPreviewMultipleWorkouts() {
     MaterialTheme {
         ResumeScreen(
             uiState = ResumeUiState(workoutNames = listOf("Chest Day", "Legs", "Back & Biceps")),
@@ -123,7 +123,7 @@ fun ResumeScreenPreview_MultipleWorkouts() {
 
 @PreviewScreenSizes
 @Composable
-fun ResumeScreenPreview_SmallPhone_360x800() {
+fun ResumeScreenPreviewSmallPhone360x800() {
     MaterialTheme {
         ResumeScreen(
             uiState = ResumeUiState(workoutNames = listOf("Chest Day", "Legs", "Back & Biceps")),
@@ -134,7 +134,7 @@ fun ResumeScreenPreview_SmallPhone_360x800() {
 
 @PreviewFontScale
 @Composable
-fun ResumeScreenPreview_FontScaleLarge() {
+fun ResumeScreenPreviewFontScaleLarge() {
     MaterialTheme {
         ResumeScreen(
             uiState = ResumeUiState(workoutNames = listOf("Chest Day", "Legs")),

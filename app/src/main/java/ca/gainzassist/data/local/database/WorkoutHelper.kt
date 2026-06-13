@@ -41,14 +41,6 @@ class WorkoutHelper(private val context: Context) :
         return gson.fromJson(String(blob), object : TypeToken<ArrayList<Exercise>>() {}.type)
     }
 
-    private fun getBlobFromSets(exerciseSets: ArrayList<ExerciseSet>): ByteArray {
-        return gson.toJson(exerciseSets).toByteArray()
-    }
-
-    private fun getSetsFromBlob(blob: ByteArray): ArrayList<ExerciseSet> {
-        return gson.fromJson(String(blob), object : TypeToken<ArrayList<ExerciseSet>>() {}.type)
-    }
-
     fun exists(): Boolean {
         return File(context.getDatabasePath(TABLE_WORKOUTS).toString()).exists()
     }
@@ -58,7 +50,6 @@ class WorkoutHelper(private val context: Context) :
         cv.clear()
         cv.put(WORKOUT_NAME, workout.name)
         cv.put(EXERCISES, getBlobFromExercises(workout.exercises))
-        // db.insert(TABLE_WORKOUTS, null, cv);
     }
 
     fun workoutExists(workoutName: String): Boolean {

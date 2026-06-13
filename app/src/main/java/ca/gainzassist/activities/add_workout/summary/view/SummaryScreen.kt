@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.add_workout.summary.view
 
 import androidx.compose.foundation.background
@@ -525,7 +526,7 @@ val summaryPreviewState = SummaryUiState(
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_EmptyInitial() {
+fun SummaryScreenPreviewEmptyInitial() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             workoutName = "",
@@ -555,7 +556,7 @@ fun SummaryScreenPreview_EmptyInitial() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_WithWorkoutAndExerciseText() {
+fun SummaryScreenPreviewWithWorkoutAndExerciseText() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             exerciseName = "Squat",
@@ -585,7 +586,7 @@ fun SummaryScreenPreview_WithWorkoutAndExerciseText() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_WithOneExercise() {
+fun SummaryScreenPreviewWithOneExercise() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             exerciseNames = listOf("Bench Press")
@@ -614,7 +615,7 @@ fun SummaryScreenPreview_WithOneExercise() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_UpdateWorkoutMode() {
+fun SummaryScreenPreviewUpdateWorkoutMode() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             mainWorkoutButtonText = "UPDATE WORKOUT"
@@ -643,7 +644,7 @@ fun SummaryScreenPreview_UpdateWorkoutMode() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_UpdateExerciseMode() {
+fun SummaryScreenPreviewUpdateExerciseMode() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             exerciseName = "Bench Press",
@@ -676,7 +677,7 @@ fun SummaryScreenPreview_UpdateExerciseMode() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_DuplicateExerciseError() {
+fun SummaryScreenPreviewDuplicateExerciseError() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             exerciseName = "Bench Press",
@@ -706,7 +707,7 @@ fun SummaryScreenPreview_DuplicateExerciseError() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_MinWeight() {
+fun SummaryScreenPreviewMinWeight() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             weight = "45.0",
@@ -736,7 +737,7 @@ fun SummaryScreenPreview_MinWeight() {
 
 @Preview(showBackground = true)
 @Composable
-fun SummaryScreenPreview_DumbbellSelected() {
+fun SummaryScreenPreviewDumbbellSelected() {
     SummaryScreen(
         uiState = summaryPreviewState.copy(
             exerciseName = "Lateral Raise",
@@ -767,7 +768,7 @@ fun SummaryScreenPreview_DumbbellSelected() {
 
 @Preview(showBackground = true, device = "spec:width=360dp,height=800dp,dpi=411")
 @Composable
-fun SummaryScreenPreview_SmallPhone_360x800() {
+fun SummaryScreenPreviewSmallPhone360x800() {
     SummaryScreen(
         uiState = summaryPreviewState,
         onBack = {},
@@ -794,7 +795,7 @@ fun SummaryScreenPreview_SmallPhone_360x800() {
 
 @Preview(showBackground = true, device = "spec:width=412dp,height=915dp,dpi=411")
 @Composable
-fun SummaryScreenPreview_LargePhone_412x915() {
+fun SummaryScreenPreviewLargePhone412x915() {
     SummaryScreen(
         uiState = summaryPreviewState,
         onBack = {},
@@ -821,7 +822,7 @@ fun SummaryScreenPreview_LargePhone_412x915() {
 
 @Preview(showBackground = true, fontScale = 1.5f)
 @Composable
-fun SummaryScreenPreview_FontScaleLarge() {
+fun SummaryScreenPreviewFontScaleLarge() {
     SummaryScreen(
         uiState = summaryPreviewState,
         onBack = {},

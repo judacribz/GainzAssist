@@ -205,7 +205,7 @@ fun ExerciseSetChip(
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_Empty() {
+fun ExercisesListScreenPreviewEmpty() {
     Surface {
         ExerciseSetsListScreen(exercises = emptyList())
     }
@@ -213,7 +213,7 @@ fun ExercisesListScreenPreview_Empty() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_OneExercise() {
+fun ExercisesListScreenPreviewOneExercise() {
     val exercise = Exercise().apply {
         name = "Bench Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
@@ -227,7 +227,7 @@ fun ExercisesListScreenPreview_OneExercise() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_MultipleExercises() {
+fun ExercisesListScreenPreviewMultipleExercises() {
     val exercise1 = Exercise().apply {
         name = "Squat"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 225f })
@@ -244,7 +244,7 @@ fun ExercisesListScreenPreview_MultipleExercises() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_LongExerciseName() {
+fun ExercisesListScreenPreviewLongExerciseName() {
     val exercise = Exercise().apply {
         name = "Standing Overhead Barbell Shoulder Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 95f })
@@ -256,7 +256,7 @@ fun ExercisesListScreenPreview_LongExerciseName() {
 
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
-fun ExercisesListScreenPreview_SmallPhone_360x800() {
+fun ExercisesListScreenPreviewSmallPhone360x800() {
     val exercise = Exercise().apply {
         name = "Bench Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
@@ -270,7 +270,7 @@ fun ExercisesListScreenPreview_SmallPhone_360x800() {
 
 @Preview(showBackground = true, fontScale = 1.5f)
 @Composable
-fun ExercisesListScreenPreview_FontScaleLarge() {
+fun ExercisesListScreenPreviewFontScaleLarge() {
     val exercise = Exercise().apply {
         name = "Bench Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
@@ -282,7 +282,7 @@ fun ExercisesListScreenPreview_FontScaleLarge() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_ThreeDigitWeights() {
+fun ExercisesListScreenPreviewThreeDigitWeights() {
     val exercise = Exercise().apply {
         name = "Bench Press"
         setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 130f })
@@ -294,7 +294,7 @@ fun ExercisesListScreenPreview_ThreeDigitWeights() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_LargeWeights() {
+fun ExercisesListScreenPreviewLargeWeights() {
     val exercise = Exercise().apply {
         name = "Leg Press"
         setsList.add(ExerciseSet().apply { setNumber = 12; reps = 100; weight = 315f })
@@ -306,7 +306,7 @@ fun ExercisesListScreenPreview_LargeWeights() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExercisesListScreenPreview_MixedDigitWidths() {
+fun ExercisesListScreenPreviewMixedDigitWidths() {
     val exercise = Exercise().apply {
         name = "Heavy Lifting"
         setsList.add(ExerciseSet().apply { setNumber = 123; reps = 1000; weight = 10000f })

@@ -43,13 +43,10 @@ class App : Application() {
         }
 
         val isFacebookEnabled = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
-
-        if (validateSecrets(isFacebookEnabled)) {
+        if (validateSecrets(isFacebookEnabled) && isFacebookEnabled) {
             // Facebook SDK auto-initializes if App ID and Client Token are in manifest.
             // We only need to activate app events.
-            if (isFacebookEnabled) {
-                AppEventsLogger.activateApp(this)
-            }
+            AppEventsLogger.activateApp(this)
         }
     }
 
@@ -80,7 +77,7 @@ class App : Application() {
                 return !missingFacebook
             } else {
                 // Fail loudly in release
-                throw IllegalStateException(errorMsg)
+                error(errorMsg)
             }
         }
         return true

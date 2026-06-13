@@ -1,4 +1,4 @@
-package ca.gainzassist.activities.authentication.login
+package ca.gainzassist.activities.authentication.login.view
 
 interface LoginActions {
     fun onEmailChanged(email: String)

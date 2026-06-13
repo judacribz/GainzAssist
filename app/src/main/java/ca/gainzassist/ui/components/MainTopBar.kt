@@ -153,7 +153,7 @@ fun MainTopBar(
 
 @Preview
 @Composable
-fun MainTopBarPreview_Workouts() {
+fun MainTopBarPreviewWorkouts() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = false,
@@ -168,7 +168,7 @@ fun MainTopBarPreview_Workouts() {
 
 @Preview
 @Composable
-fun MainTopBarPreview_Resume() {
+fun MainTopBarPreviewResume() {
     MainTopBar(
         selectedTab = MainTab.RESUME,
         isSearchExpanded = false,
@@ -183,7 +183,7 @@ fun MainTopBarPreview_Resume() {
 
 @Preview
 @Composable
-fun MainTopBarPreview_Settings() {
+fun MainTopBarPreviewSettings() {
     MainTopBar(
         selectedTab = MainTab.SETTINGS,
         isSearchExpanded = false,
@@ -198,7 +198,7 @@ fun MainTopBarPreview_Settings() {
 
 @Preview
 @Composable
-fun MainTopBarPreview_SearchExpanded() {
+fun MainTopBarPreviewSearchExpanded() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = true,

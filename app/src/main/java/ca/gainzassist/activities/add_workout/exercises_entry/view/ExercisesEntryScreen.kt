@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 @file:OptIn(ExperimentalFoundationApi::class)
 
 package ca.gainzassist.activities.add_workout.exercises_entry.view

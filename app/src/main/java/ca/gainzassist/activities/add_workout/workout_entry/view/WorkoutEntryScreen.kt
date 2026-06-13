@@ -379,7 +379,7 @@ fun FooterSection(
 
 @Preview(showBackground = true, name = "Empty Name, Skip, 3 Exercises")
 @Composable
-fun WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises() {
+fun WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises() {
     WorkoutEntryScreen(
         workoutName = "",
         numberOfExercises = "3",
@@ -397,7 +397,7 @@ fun WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises() {
 
 @Preview(showBackground = true, name = "With Name, Enter, 5 Exercises")
 @Composable
-fun WorkoutEntryScreenPreview_WithName_Enter_FiveExercises() {
+fun WorkoutEntryScreenPreviewWithNameEnterFiveExercises() {
     WorkoutEntryScreen(
         workoutName = "Push Day",
         numberOfExercises = "5",
@@ -415,7 +415,7 @@ fun WorkoutEntryScreenPreview_WithName_Enter_FiveExercises() {
 
 @Preview(showBackground = true, name = "Min Exercise Count, Disabled Minus")
 @Composable
-fun WorkoutEntryScreenPreview_MinExerciseCount_DisabledMinus() {
+fun WorkoutEntryScreenPreviewMinExerciseCountDisabledMinus() {
     WorkoutEntryScreen(
         workoutName = "",
         numberOfExercises = "1",
@@ -433,7 +433,7 @@ fun WorkoutEntryScreenPreview_MinExerciseCount_DisabledMinus() {
 
 @Preview(showBackground = true, name = "Long Workout Name")
 @Composable
-fun WorkoutEntryScreenPreview_LongWorkoutName() {
+fun WorkoutEntryScreenPreviewLongWorkoutName() {
     WorkoutEntryScreen(
         workoutName = "Very Long Workout Name to Test Layout",
         numberOfExercises = "3",
@@ -451,14 +451,14 @@ fun WorkoutEntryScreenPreview_LongWorkoutName() {
 
 @Preview(showBackground = true, device = "spec:width=360dp,height=800dp", name = "Small Phone")
 @Composable
-fun WorkoutEntryScreenPreview_SmallPhone_360x800() {
-    WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises()
+fun WorkoutEntryScreenPreviewSmallPhone360x800() {
+    WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises()
 }
 
 @Preview(showBackground = true, device = "spec:width=412dp,height=915dp", name = "Large Phone")
 @Composable
-fun WorkoutEntryScreenPreview_LargePhone_412x915() {
-    WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises()
+fun WorkoutEntryScreenPreviewLargePhone412x915() {
+    WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises()
 }
 
 @Preview(
@@ -467,24 +467,24 @@ fun WorkoutEntryScreenPreview_LargePhone_412x915() {
     name = "Landscape"
 )
 @Composable
-fun WorkoutEntryScreenPreview_Landscape() {
-    WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises()
+fun WorkoutEntryScreenPreviewLandscape() {
+    WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises()
 }
 
 @Preview(showBackground = true, fontScale = 1.5f, name = "Large Font Scale")
 @Composable
-fun WorkoutEntryScreenPreview_FontScaleLarge() {
-    WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises()
+fun WorkoutEntryScreenPreviewFontScaleLarge() {
+    WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises()
 }
 
 @Preview(showBackground = true, device = "spec:width=320dp,height=640dp", name = "Narrow Width")
 @Composable
-fun WorkoutEntryScreenPreview_NarrowWidth() {
-    WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises()
+fun WorkoutEntryScreenPreviewNarrowWidth() {
+    WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises()
 }
 
 @Preview(showBackground = true, device = "spec:width=360dp,height=1000dp", name = "Tall Phone")
 @Composable
-fun WorkoutEntryScreenPreview_TallPhone() {
-    WorkoutEntryScreenPreview_EmptyName_Skip_ThreeExercises()
+fun WorkoutEntryScreenPreviewTallPhone() {
+    WorkoutEntryScreenPreviewEmptyNameSkipThreeExercises()
 }

@@ -1,17 +1,17 @@
 package ca.gainzassist.core.constants
 
 import android.util.SparseArray
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.UNSELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL_SELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS_SELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.UNSELECTED
 
 object UIConst {
     @JvmField
-    val PROGRESS_STATUS_MAP = object : SparseArray<PROGRESS_STATUS>() {
+    val PROGRESS_STATUS_MAP = object : SparseArray<ProgressStatus>() {
         init {
             put(0, UNSELECTED)
             put(1, SELECTED)
@@ -23,7 +23,7 @@ object UIConst {
     }
 
     @JvmField
-    val PROGRESS_CODE_MAP = object : HashMap<PROGRESS_STATUS, Int>() {
+    val PROGRESS_CODE_MAP = object : HashMap<ProgressStatus, Int>() {
         init {
             put(UNSELECTED, 0)
             put(SELECTED, 1)

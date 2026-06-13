@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 @file:OptIn(ExperimentalFoundationApi::class)
 
 package ca.gainzassist.activities.main.view
@@ -108,7 +109,7 @@ fun MainScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview_Workouts() {
+fun MainScreenPreviewWorkouts() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
@@ -130,7 +131,7 @@ fun MainScreenPreview_Workouts() {
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview_Resume() {
+fun MainScreenPreviewResume() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.RESUME,
@@ -152,7 +153,7 @@ fun MainScreenPreview_Resume() {
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview_Settings() {
+fun MainScreenPreviewSettings() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.SETTINGS,
@@ -177,7 +178,7 @@ fun MainScreenPreview_Settings() {
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview_WorkoutDialog() {
+fun MainScreenPreviewWorkoutDialog() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
@@ -200,7 +201,7 @@ fun MainScreenPreview_WorkoutDialog() {
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview_Empty() {
+fun MainScreenPreviewEmpty() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
@@ -222,7 +223,7 @@ fun MainScreenPreview_Empty() {
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
-fun MainScreenPreview_SmallPhone() {
+fun MainScreenPreviewSmallPhone() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,
@@ -244,7 +245,7 @@ fun MainScreenPreview_SmallPhone() {
 
 @Preview(showBackground = true, fontScale = 1.5f)
 @Composable
-fun MainScreenPreview_LargeFont() {
+fun MainScreenPreviewLargeFont() {
     MainScreen(
         uiState = MainUiState(
             selectedTab = MainTab.WORKOUTS,

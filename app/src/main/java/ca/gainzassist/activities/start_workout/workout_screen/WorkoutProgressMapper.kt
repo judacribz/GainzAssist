@@ -1,21 +1,23 @@
 package ca.gainzassist.activities.start_workout.workout_screen
 
 import android.util.SparseArray
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS_SELECTED
-import ca.gainzassist.ui.adapters.SingleItemAdapter.PROGRESS_STATUS.UNSELECTED
+import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutProgressUiItem
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.FAIL_SELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.SUCCESS_SELECTED
+import ca.gainzassist.ui.adapters.SingleItemAdapter.ProgressStatus.UNSELECTED
+import androidx.core.util.size
 
 object WorkoutProgressMapper {
 
     fun setupProgress(
         numItems: Int,
         selectedOneBasedIndex: Int
-    ): SparseArray<PROGRESS_STATUS> {
-        val progressStatus = SparseArray<PROGRESS_STATUS>()
+    ): SparseArray<ProgressStatus> {
+        val progressStatus = SparseArray<ProgressStatus>()
         for (i in 0 until numItems) {
             progressStatus.put(i, UNSELECTED)
         }
@@ -24,7 +26,7 @@ object WorkoutProgressMapper {
     }
 
     fun toProgressUiItems(
-        progress: SparseArray<PROGRESS_STATUS>?,
+        progress: SparseArray<ProgressStatus>?,
         count: Int
     ): List<WorkoutProgressUiItem> {
         if (progress == null) return emptyList()
@@ -41,12 +43,12 @@ object WorkoutProgressMapper {
     }
 
     fun selectOneBased(
-        progress: SparseArray<PROGRESS_STATUS>,
+        progress: SparseArray<ProgressStatus>,
         selectedOneBasedIndex: Int
     ) {
         deselectCurrent(progress)
         val zeroBased = selectedOneBasedIndex - 1
-        val status = progress.get(zeroBased)
+        val status = progress[zeroBased]
         when (status) {
             SUCCESS -> progress.put(zeroBased, SUCCESS_SELECTED)
             FAIL -> progress.put(zeroBased, FAIL_SELECTED)
@@ -55,7 +57,7 @@ object WorkoutProgressMapper {
     }
 
     fun setCurrentOneBased(
-        progress: SparseArray<PROGRESS_STATUS>,
+        progress: SparseArray<ProgressStatus>,
         selectedOneBasedIndex: Int,
         success: Boolean
     ) {
@@ -65,10 +67,10 @@ object WorkoutProgressMapper {
         }
     }
 
-    private fun deselectCurrent(progress: SparseArray<PROGRESS_STATUS>) {
-        for (i in 0 until progress.size()) {
+    private fun deselectCurrent(progress: SparseArray<ProgressStatus>) {
+        for (i in 0 until progress.size) {
             val key = progress.keyAt(i)
-            when (progress.get(key)) {
+            when (progress[key]) {
                 SELECTED -> progress.put(key, UNSELECTED)
                 SUCCESS_SELECTED -> progress.put(key, SUCCESS)
                 FAIL_SELECTED -> progress.put(key, FAIL)

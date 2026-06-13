@@ -63,8 +63,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
-import ca.gainzassist.activities.authentication.login.LoginActions
-import ca.gainzassist.activities.authentication.login.LoginUiState
+import ca.gainzassist.activities.authentication.login.view.LoginActions
+import ca.gainzassist.activities.authentication.login.view.LoginUiState
 
 // Original Colors from resources
 private val ColorBg = Color(0xFF000000) // @color/colorPrimaryDark
@@ -223,12 +223,13 @@ private fun ActionButton(
     }
 }
 
+@Suppress("kotlin:S107")
 @Composable
 fun LoginScreen(
     state: LoginUiState,
+    actions: LoginActions,
     loginImage: Bitmap? = null,
-    signUpImage: Bitmap? = null,
-    actions: LoginActions
+    signUpImage: Bitmap? = null
 ) {
     Box(
         modifier = Modifier
@@ -422,14 +423,14 @@ fun LoginScreenPreview() {
     LoginScreen(
         state = LoginUiState(),
         actions = object : LoginActions {
-            override fun onEmailChanged(email: String) {}
-            override fun onPasswordChanged(password: String) {}
-            override fun onToggleMode() {}
-            override fun onLoginClick() {}
-            override fun onSignUpClick() {}
-            override fun onGoogleSignInClick() {}
-            override fun onFacebookSignInClick() {}
-            override fun onImageBounceClick() {}
+            override fun onEmailChanged(email: String) {} // Preview
+            override fun onPasswordChanged(password: String) {} // Preview
+            override fun onToggleMode() {} // Preview
+            override fun onLoginClick() {} // Preview
+            override fun onSignUpClick() {} // Preview
+            override fun onGoogleSignInClick() {} // Preview
+            override fun onFacebookSignInClick() {} // Preview
+            override fun onImageBounceClick() {} // Preview
         }
     )
 }

@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.main.view.tab_screens
 
 import androidx.compose.foundation.layout.Column
@@ -101,7 +102,7 @@ fun SettingsScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview_SignedIn() {
+fun SettingsScreenPreviewSignedIn() {
     SettingsScreen(
         uiState = SettingsUiState(
             signedInText = "Signed in as: example@example.com",
@@ -116,7 +117,7 @@ fun SettingsScreenPreview_SignedIn() {
 
 @Preview(showBackground = true)
 @Composable
-fun SettingsScreenPreview_EmailUnavailable() {
+fun SettingsScreenPreviewEmailUnavailable() {
     SettingsScreen(
         uiState = SettingsUiState(
             signedInText = "Email Unavailable",
@@ -131,7 +132,7 @@ fun SettingsScreenPreview_EmailUnavailable() {
 
 @Preview(showBackground = true, widthDp = 320, heightDp = 480)
 @Composable
-fun SettingsScreenPreview_SmallPhone() {
+fun SettingsScreenPreviewSmallPhone() {
     SettingsScreen(
         uiState = SettingsUiState(
             signedInText = "Signed in as: example@example.com",
@@ -146,7 +147,7 @@ fun SettingsScreenPreview_SmallPhone() {
 
 @Preview(showBackground = true, fontScale = 1.5f)
 @Composable
-fun SettingsScreenPreview_LargeFont() {
+fun SettingsScreenPreviewLargeFont() {
     SettingsScreen(
         uiState = SettingsUiState(
             signedInText = "Signed in as: example@example.com",

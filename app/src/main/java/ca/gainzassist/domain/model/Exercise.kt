@@ -186,10 +186,8 @@ class Exercise {
     fun getSet(setIndex: Int): ExerciseSet {
         initSetsList(null)
 
-        if (setIndex < 0 || setIndex >= setsList.size) {
-            throw IllegalStateException(
-                "Exercise '$name' has invalid setIndex=$setIndex, sets=$sets, setsList.size=${setsList.size}, reps=$reps, weight=$weight, equipment=$equipment"
-            )
+        check(!(setIndex < 0 || setIndex >= setsList.size)) {
+            "Exercise '$name' has invalid setIndex=$setIndex, sets=$sets, setsList.size=${setsList.size}, reps=$reps, weight=$weight, equipment=$equipment"
         }
 
         return setsList[setIndex]

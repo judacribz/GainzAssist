@@ -1,4 +1,4 @@
-package ca.gainzassist.activities.authentication.login
+package ca.gainzassist.activities.authentication.login.view
 
 data class LoginUiState(
     val email: String = "",

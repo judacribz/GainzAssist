@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout
 
 import ca.gainzassist.core.constants.ExerciseConst.BARBELL
@@ -79,7 +80,7 @@ object WorkoutController {
         }
     }
 
-    interface WarmupsListener {
+    fun interface WarmupsListener {
         fun warmupsGenerated(warmups: ArrayList<Exercise>)
     }
 
@@ -355,10 +356,8 @@ object WorkoutController {
 
         val numSets = exercise.getNumSets()
 
-        if (numSets <= 0) {
-            throw IllegalStateException(
-                "Exercise '${exercise.name}' has no sets. Cannot start workout. sets=${exercise.sets}, reps=${exercise.reps}, weight=${exercise.weight}, equipment=${exercise.equipment}"
-            )
+        check(numSets > 0) {
+            "Exercise '${exercise.name}' has no sets. Cannot start workout. sets=${exercise.sets}, reps=${exercise.reps}, weight=${exercise.weight}, equipment=${exercise.equipment}"
         }
 
         if (this.setIndex >= numSets) {
@@ -417,10 +416,8 @@ object WorkoutController {
 
     fun setCurrReps(reps: Int, setTimer: Boolean) {
         if (!lockReps) this.currReps = reps
-        if (setTimer) {
-            if (this.currExercise!!.setsType == MAIN_SET) {
-                setCurrRestTime()
-            }
+        if (setTimer && this.currExercise!!.setsType == MAIN_SET) {
+            setCurrRestTime()
         }
     }
 

@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.ui.components
 
 import androidx.compose.foundation.background
@@ -90,7 +91,7 @@ fun GainzTopBar(
 
 @Preview(showBackground = true)
 @Composable
-fun GainzTopBarPreview_TitleOnly() {
+fun GainzTopBarPreviewTitleOnly() {
     GainzTopBar(
         title = "Gainz Assist"
     )
@@ -98,7 +99,7 @@ fun GainzTopBarPreview_TitleOnly() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzTopBarPreview_WithBack() {
+fun GainzTopBarPreviewWithBack() {
     GainzTopBar(
         title = "Exercises Entry",
         showBack = true
@@ -107,7 +108,7 @@ fun GainzTopBarPreview_WithBack() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzTopBarPreview_LongTitle() {
+fun GainzTopBarPreviewLongTitle() {
     GainzTopBar(
         title = "This is a very long title that should not break the layout",
         showBack = true

@@ -66,7 +66,7 @@ class StartWorkoutViewModel(
                 workoutName = workout.name ?: "",
                 selectedTab = StartWorkoutTab.WORKOUT,
                 availableTabs = listOf(StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
-                exercises = workout.exercises ?: emptyList()
+                exercises = workout.exercises
             ) 
         }
     }
@@ -91,11 +91,13 @@ class StartWorkoutViewModel(
         return StartWorkoutRestoreDecision.RestoreFromJson(sessionJson)
     }
 
-    suspend fun saveLeavingSession(workoutName: String, sessionJson: String) {
-        if (sessionJson.isNotEmpty()) {
-            saveIncompleteSessionUseCase(workoutName, sessionJson)
+    fun saveLeavingSession(workoutName: String, sessionJson: String) {
+        viewModelScope.launch {
+            if (sessionJson.isNotEmpty()) {
+                saveIncompleteSessionUseCase(workoutName, sessionJson)
+            }
+            addIncompleteWorkoutUseCase(workoutName)
         }
-        addIncompleteWorkoutUseCase(workoutName)
     }
 
     fun onWarmupsGenerated(warmups: List<Exercise>) {

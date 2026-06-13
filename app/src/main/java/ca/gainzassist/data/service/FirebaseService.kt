@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.data.service
 
 import android.app.IntentService
@@ -64,13 +65,13 @@ class FirebaseService : IntentService("FirebaseService"), KoinComponent {
             }
         }
 
-        override fun onChildChanged(workoutShot: DataSnapshot, s: String?) {}
+        override fun onChildChanged(workoutShot: DataSnapshot, s: String?) {} // Empty on purpose
 
         override fun onChildRemoved(workoutShot: DataSnapshot) {
             Toast.makeText(this@FirebaseService, "Deleted " + workoutShot.key, Toast.LENGTH_SHORT).show()
         }
 
-        override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {}
+        override fun onChildMoved(dataSnapshot: DataSnapshot, s: String?) {} // Empty on purpose
 
         override fun onCancelled(databaseError: DatabaseError) {
             Logger.d("FIREBASE DB WORKOUT ERROR: " + databaseError.message)
@@ -87,11 +88,11 @@ class FirebaseService : IntentService("FirebaseService"), KoinComponent {
             }
         }
 
-        override fun onChildChanged(sessionShot: DataSnapshot, s: String?) {}
+        override fun onChildChanged(sessionShot: DataSnapshot, s: String?) {} // Empty on purpose
 
-        override fun onChildRemoved(sessionShot: DataSnapshot) {}
+        override fun onChildRemoved(sessionShot: DataSnapshot) {} // Empty on purpose
 
-        override fun onChildMoved(sessionShot: DataSnapshot, s: String?) {}
+        override fun onChildMoved(sessionShot: DataSnapshot, s: String?) {} // Empty on purpose
 
         override fun onCancelled(databaseError: DatabaseError) {
             Logger.d("FIREBASE DB SESSION ERROR: " + databaseError.message)

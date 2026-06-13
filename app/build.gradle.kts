@@ -64,7 +64,7 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -179,11 +179,11 @@ dependencies {
     kapt(libs.parceler)
 
     // 10. UI / Logging
-    implementation("com.google.guava:guava:33.2.1-android")
+    implementation(libs.guava)
     implementation(libs.bundles.ui.logging)
     implementation(libs.android.youtube.player)
     implementation(libs.glide)
-    kapt("com.github.bumptech.glide:compiler:4.16.0")
+    kapt(libs.glide.compiler)
 }
 
 val validateReleaseSecrets by tasks.registering {

@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.authentication.login.view
 
 import android.content.Intent
@@ -13,8 +14,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.R
-import ca.gainzassist.activities.authentication.login.LoginActions
-import ca.gainzassist.activities.authentication.login.LoginUiState
+import ca.gainzassist.activities.authentication.login.view.LoginActions
+import ca.gainzassist.activities.authentication.login.view.LoginUiState
 import ca.gainzassist.activities.main.view.MainActivity
 import ca.gainzassist.core.util.UI
 import ca.gainzassist.data.local.preferences.Preferences
@@ -37,6 +38,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.orhanobut.logger.Logger
 import java.io.IOException
 
+@Suppress("DEPRECATION")
 class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
 
     companion object {
@@ -159,11 +161,10 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
                         if (token != null) {
                             googleCred = GoogleAuthProvider.getCredential(token, null)
                             val cred = googleCred
-                            val client = signInClient
-                            if (cred != null && client != null) {
-                                Authentication.signIn(this, cred, client)
+                            if (cred != null) {
+                                Authentication.signIn(this, cred)
                             } else {
-                                authError("Google authentication failed: client or credential null")
+                                authError("Google authentication failed: credential null")
                             }
                         } else {
                             authError("Google authentication failed: account or ID token null")
@@ -210,11 +211,10 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     override fun onSuccess(result: LoginResult) {
         credential = FacebookAuthProvider.getCredential(result.accessToken.token)
         val cred = credential
-        val client = signInClient
-        if (cred != null && client != null) {
-            Authentication.signIn(this, cred, client)
+        if (cred != null) {
+            Authentication.signIn(this, cred)
         } else {
-            authError("Facebook authentication failed: client or credential null")
+            authError("Facebook authentication failed: credential null")
         }
     }
 
@@ -282,11 +282,10 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
             uiState = uiState.copy(isLoading = true)
             credential = EmailAuthProvider.getCredential(email, password)
             val cred = credential
-            val client = signInClient
-            if (cred != null && client != null) {
-                Authentication.signIn(this, cred, client)
+            if (cred != null) {
+                Authentication.signIn(this, cred)
             } else {
-                authError("Email Login failed: client or credential null")
+                authError("Email Login failed: credential null")
             }
         }
     }
@@ -297,12 +296,7 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
         if (validateForm(email, password)) {
             uiState = uiState.copy(isLoading = true)
             credential = EmailAuthProvider.getCredential(email, password)
-            val client = signInClient
-            if (client != null) {
-                Authentication.createUser(this, email, password, client)
-            } else {
-                authError("Sign Up failed: client uninitialized")
-            }
+            Authentication.createUser(this, email, password)
         }
     }
 

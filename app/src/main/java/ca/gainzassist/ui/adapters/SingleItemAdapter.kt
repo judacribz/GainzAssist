@@ -25,11 +25,11 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
     private var context: Context? = null
     private var inflater: LayoutInflater? = null
 
-    enum class PROGRESS_STATUS {
+    enum class ProgressStatus {
         UNSELECTED, SELECTED, SUCCESS, FAIL, SUCCESS_SELECTED, FAIL_SELECTED
     }
 
-    private var progStatus: SparseArray<PROGRESS_STATUS>? = null
+    private var progStatus: SparseArray<ProgressStatus>? = null
     private var itemNames: ArrayList<String>? = null
     private var listItemLayout = 0
     private var listItemId = 0
@@ -54,13 +54,13 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
         numItems: Int,
         listItemLayout: Int,
         listItemId: Int,
-        progStatus: SparseArray<PROGRESS_STATUS>?
+        progStatus: SparseArray<ProgressStatus>?
     ) {
         this.context = context
         inflater = LayoutInflater.from(context)
         itemNames = ArrayList()
         for (i in 1..numItems) {
-            itemNames!!.add(i.toString())
+            itemNames?.add(i.toString())
         }
         this.progStatus = progStatus
         this.listItemLayout = listItemLayout
@@ -69,7 +69,7 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val view = inflater!!.inflate(listItemLayout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(listItemLayout, parent, false)
         val holder = ItemViewHolder(view)
         if (dontRecycle) {
             holder.setIsRecyclable(false)
@@ -82,7 +82,7 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
     }
 
     override fun getItemCount(): Int {
-        return itemNames!!.size
+        return itemNames?.size ?: 0
     }
 
     fun setItems(itemNames: ArrayList<String>?) {
@@ -92,10 +92,11 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
     fun setCurrItem(currSetNum: Int, success: Boolean) {
         setSelected(currSetNum)
         if (currSetNum > 1) {
+            val currentProgStatus = progStatus ?: return
             if (success) {
-                progStatus!!.put(currSetNum - 2, PROGRESS_STATUS.SUCCESS)
+                currentProgStatus.put(currSetNum - 2, ProgressStatus.SUCCESS)
             } else {
-                progStatus!!.put(currSetNum - 2, PROGRESS_STATUS.FAIL)
+                currentProgStatus.put(currSetNum - 2, ProgressStatus.FAIL)
             }
         }
         notifyDataSetChanged()
@@ -105,12 +106,13 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
         var newCurrSetNum = currSetNum
         deselectCurrSelected()
         newCurrSetNum--
-        val status = progStatus!![newCurrSetNum]
+        val currentProgStatus = progStatus ?: return
+        val status = currentProgStatus[newCurrSetNum]
         if (status != null) {
             when (status) {
-                PROGRESS_STATUS.SUCCESS -> progStatus!!.put(newCurrSetNum, PROGRESS_STATUS.SUCCESS_SELECTED)
-                PROGRESS_STATUS.FAIL -> progStatus!!.put(newCurrSetNum, PROGRESS_STATUS.FAIL_SELECTED)
-                else -> progStatus!!.put(newCurrSetNum, PROGRESS_STATUS.SELECTED)
+                ProgressStatus.SUCCESS -> currentProgStatus.put(newCurrSetNum, ProgressStatus.SUCCESS_SELECTED)
+                ProgressStatus.FAIL -> currentProgStatus.put(newCurrSetNum, ProgressStatus.FAIL_SELECTED)
+                else -> currentProgStatus.put(newCurrSetNum, ProgressStatus.SELECTED)
             }
         }
         currSelected = newCurrSetNum
@@ -118,12 +120,13 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
     }
 
     private fun deselectCurrSelected() {
-        val status = progStatus!![currSelected]
+        val currentProgStatus = progStatus ?: return
+        val status = currentProgStatus[currSelected]
         if (status != null) {
             when (status) {
-                PROGRESS_STATUS.SELECTED -> progStatus!!.put(currSelected, PROGRESS_STATUS.UNSELECTED)
-                PROGRESS_STATUS.SUCCESS_SELECTED -> progStatus!!.put(currSelected, PROGRESS_STATUS.SUCCESS)
-                PROGRESS_STATUS.FAIL_SELECTED -> progStatus!!.put(currSelected, PROGRESS_STATUS.FAIL)
+                ProgressStatus.SELECTED -> currentProgStatus.put(currSelected, ProgressStatus.UNSELECTED)
+                ProgressStatus.SUCCESS_SELECTED -> currentProgStatus.put(currSelected, ProgressStatus.SUCCESS)
+                ProgressStatus.FAIL_SELECTED -> currentProgStatus.put(currSelected, ProgressStatus.FAIL)
                 else -> {}
             }
         }
@@ -139,34 +142,34 @@ class SingleItemAdapter : RecyclerView.Adapter<SingleItemAdapter.ItemViewHolder>
         }
 
         fun bind(pos: Int) {
-            listItemView.text = itemNames!![pos]
+            listItemView.text = itemNames?.get(pos)
             if (progStatus != null) {
                 var drawId = -1
                 if (pos < progStatus!!.size()) {
-                    when (progStatus!![pos]) {
-                        PROGRESS_STATUS.UNSELECTED -> drawId = R.drawable.textview_circle
-                        PROGRESS_STATUS.SELECTED -> drawId = R.drawable.textview_circle_selected
-                        PROGRESS_STATUS.SUCCESS -> drawId = R.drawable.textview_circle_success
-                        PROGRESS_STATUS.FAIL -> drawId = R.drawable.textview_circle_fail
-                        PROGRESS_STATUS.SUCCESS_SELECTED -> drawId = R.drawable.textview_circle_success_selected
-                        PROGRESS_STATUS.FAIL_SELECTED -> drawId = R.drawable.textview_circle_fail_selected
+                    when (progStatus!!.get(pos)) {
+                        ProgressStatus.UNSELECTED -> drawId = R.drawable.textview_circle
+                        ProgressStatus.SELECTED -> drawId = R.drawable.textview_circle_selected
+                        ProgressStatus.SUCCESS -> drawId = R.drawable.textview_circle_success
+                        ProgressStatus.FAIL -> drawId = R.drawable.textview_circle_fail
+                        ProgressStatus.SUCCESS_SELECTED -> drawId = R.drawable.textview_circle_success_selected
+                        ProgressStatus.FAIL_SELECTED -> drawId = R.drawable.textview_circle_fail_selected
                     }
                 }
                 if (drawId != -1) {
-                    listItemView.background = context!!.getDrawable(drawId)
+                    listItemView.background = context?.getDrawable(drawId)
                 }
             }
         }
 
         override fun onClick(view: View) {
             if (itemClickObserver != null) {
-                itemClickObserver!!.onItemClick(view)
+                itemClickObserver?.onItemClick(view)
             }
         }
 
         override fun onLongClick(view: View): Boolean {
             if (itemClickObserver != null) {
-                itemClickObserver!!.onItemLongClick(view)
+                itemClickObserver?.onItemLongClick(view)
             }
             return true
         }

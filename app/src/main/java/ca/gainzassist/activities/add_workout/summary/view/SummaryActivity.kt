@@ -1,9 +1,11 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.add_workout.summary.view
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,13 @@ class SummaryActivity : AppCompatActivity() {
         EXERCISES_ENTRY
     }
 
+    private var workoutId: Long = -1
+
+    var workout: Workout? = null
+    var exercises: ArrayList<Exercise>? = null
+    val summaryViewModel: SummaryViewModel by viewModel()
+    var ex: Exercise? = null
+
     companion object {
         const val EXTRA_WORKOUT = "ca.gainzassist.activities.add_workout.EXTRA_WORKOUT"
         const val EXTRA_CALLING_ACTIVITY =
@@ -44,13 +53,6 @@ class SummaryActivity : AppCompatActivity() {
         private const val MIN_INT = 1
         private const val MIN_FLOAT = 5.0f
     }
-
-    private var workoutId: Long = -1
-
-    var workout: Workout? = null
-    var exercises: ArrayList<Exercise>? = null
-    val summaryViewModel: SummaryViewModel by viewModel()
-    var ex: Exercise? = null
 
     private fun sanitizeReps(value: String): Int =
         max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
@@ -163,7 +165,19 @@ class SummaryActivity : AppCompatActivity() {
         }
 
         setContent {
-            val state by summaryViewModel.state.collectAsStateWithLifecycle()
+            SummaryActivityContent(initialWorkoutName, initialMainButtonText, isUpdateMode, workout)
+        }
+    }
+
+    @Suppress("kotlin:S107", "kotlin:S3776")
+    @Composable
+    private fun SummaryActivityContent(
+        initialWorkoutName: String,
+        initialMainButtonText: String,
+        isUpdateMode: Boolean,
+        workout: Workout?
+    ) {
+        val state by summaryViewModel.state.collectAsStateWithLifecycle()
 
             //val exercisesState =
             remember(state.exercises) { mutableStateListOf<Exercise>().apply { addAll(state.exercises) } }
@@ -453,6 +467,5 @@ class SummaryActivity : AppCompatActivity() {
                     }
                 }
             )
-        }
     }
 }

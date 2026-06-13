@@ -8,6 +8,7 @@ import ca.gainzassist.R
 import ca.gainzassist.activities.authentication.login.view.LoginActivity
 import ca.gainzassist.data.service.FirebaseService
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
@@ -24,25 +25,21 @@ object Authentication {
     private var userCreated = false
 
     @JvmStatic
-    val currentUser: FirebaseUser?
-        get() = mAuth.currentUser
-
-    @JvmStatic
-    fun createUser(act: Activity, email: String, password: String, signInClient: GoogleSignInClient) {
+    fun createUser(act: Activity, email: String, password: String) {
         mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(act) { task -> handleOnComplete(act, signInClient, task) }
+            .addOnCompleteListener(act) { task -> handleOnComplete(act, task) }
     }
 
     @JvmStatic
-    fun signIn(act: Activity, cred: AuthCredential, signInClient: GoogleSignInClient) {
+    fun signIn(act: Activity, cred: AuthCredential) {
         mAuth.signInWithCredential(cred)
-            .addOnCompleteListener(act) { task -> handleOnComplete(act, signInClient, task) }
+            .addOnCompleteListener(act) { task -> handleOnComplete(act, task)
+        }
     }
 
     private fun handleOnComplete(
         act: Activity,
-        signInClient: GoogleSignInClient,
-        task: com.google.android.gms.tasks.Task<AuthResult>
+        task: Task<AuthResult>
     ) {
         val msg: String
         if (task.isSuccessful) {
@@ -86,18 +83,18 @@ object Authentication {
     private fun getExceptionMsg(act: Activity, taskEx: Exception?): String {
         var msg = ""
         if (taskEx != null) {
-            try {
+            msg = try {
                 throw taskEx
-            } catch (ex: FirebaseNetworkException) {
-                msg = act.getString(R.string.txt_network_needed)
-            } catch (ex: FirebaseAuthWeakPasswordException) {
-                msg = act.getString(R.string.err_invalid_password)
-            } catch (ex: FirebaseAuthUserCollisionException) {
-                msg = act.getString(R.string.txt_email_registered)
-            } catch (ex: FirebaseAuthInvalidCredentialsException) {
-                msg = act.getString(R.string.err_invalid_email)
-            } catch (ex: Exception) {
-                msg = "Login failed. Check Firebase configuration."
+            } catch (_: FirebaseNetworkException) {
+                act.getString(R.string.txt_network_needed)
+            } catch (_: FirebaseAuthWeakPasswordException) {
+                act.getString(R.string.err_invalid_password)
+            } catch (_: FirebaseAuthUserCollisionException) {
+                act.getString(R.string.txt_email_registered)
+            } catch (_: FirebaseAuthInvalidCredentialsException) {
+                act.getString(R.string.err_invalid_email)
+            } catch (_: Exception) {
+                "Login failed. Check Firebase configuration."
             }
         }
         return msg

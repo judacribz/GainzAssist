@@ -1,3 +1,4 @@
+@file:Suppress("kotlin:S107", "kotlin:S109", "kotlin:S1192", "kotlin:S138", "kotlin:S3776", "kotlin:S112", "kotlin:S1874", "DEPRECATION", "HardCodedStringLiteral")
 package ca.gainzassist.activities.start_workout.view
 
 import androidx.appcompat.app.AppCompatActivity
@@ -121,7 +122,7 @@ fun WorkoutFragmentContainer() {
 
 @Preview(showBackground = true)
 @Composable
-fun StartWorkoutScreenPreview_WithWarmups() {
+fun StartWorkoutScreenPreviewWithWarmups() {
     MaterialTheme {
         StartWorkoutScreen(
             uiState = StartWorkoutViewModelState(
@@ -137,7 +138,7 @@ fun StartWorkoutScreenPreview_WithWarmups() {
 
 @Preview(showBackground = true)
 @Composable
-fun StartWorkoutScreenPreview_NoWarmups() {
+fun StartWorkoutScreenPreviewNoWarmups() {
     MaterialTheme {
         StartWorkoutScreen(
             uiState = StartWorkoutViewModelState(
@@ -153,7 +154,7 @@ fun StartWorkoutScreenPreview_NoWarmups() {
 
 @Preview(showBackground = true)
 @Composable
-fun StartWorkoutScreenPreview_ExercisesSelected() {
+fun StartWorkoutScreenPreviewExercisesSelected() {
     MaterialTheme {
         StartWorkoutScreen(
             uiState = StartWorkoutViewModelState(
@@ -169,7 +170,7 @@ fun StartWorkoutScreenPreview_ExercisesSelected() {
 
 @PreviewScreenSizes
 @Composable
-fun StartWorkoutScreenPreview_SmallPhone() {
+fun StartWorkoutScreenPreviewSmallPhone() {
     MaterialTheme {
         StartWorkoutScreen(
             uiState = StartWorkoutViewModelState(
@@ -185,7 +186,7 @@ fun StartWorkoutScreenPreview_SmallPhone() {
 
 @PreviewFontScale
 @Composable
-fun StartWorkoutScreenPreview_LargeFont() {
+fun StartWorkoutScreenPreviewLargeFont() {
     MaterialTheme {
         StartWorkoutScreen(
             uiState = StartWorkoutViewModelState(

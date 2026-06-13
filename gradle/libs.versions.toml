@@ -40,6 +40,7 @@ gson = "2.14.0"
 youtube-api = "v3-rev20260430-2.0.0"
 android-youtube-player = "13.0.0"
 glide = "4.16.0"
+guava = "33.2.1-android"
 
 # Jackson
 jackson-annotations = "2.22"
@@ -117,6 +118,8 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 youtube-api = { module = "com.google.apis:google-api-services-youtube", version.ref = "youtube-api" }
 android-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "android-youtube-player" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 # Jackson
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson-annotations" }

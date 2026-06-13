@@ -1,7 +1,13 @@
 package ca.gainzassist.activities.start_workout.workout_screen
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutScreenEvent
+import ca.gainzassist.activities.start_workout.workout_screen.view.WorkoutScreenState
+import ca.gainzassist.core.coroutines.DispatcherProvider
+import kotlinx.coroutines.launch
 import ca.gainzassist.core.util.Misc
+import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.session.SessionProgressMapper
 import ca.gainzassist.domain.session.SessionProgressSnapshot
@@ -78,15 +84,19 @@ class WorkoutScreenViewModel(
         saveSessionProgressUseCase(workoutName, json)
     }
 
-    suspend fun clearFinishedWorkoutState(workoutName: String) {
+    fun clearFinishedWorkoutState(workoutName: String) {
         if (workoutName.isBlank()) return
-        if (removeIncompleteWorkoutUseCase(workoutName)) {
-            removeIncompleteSessionUseCase(workoutName)
+        viewModelScope.launch {
+            if (removeIncompleteWorkoutUseCase(workoutName)) {
+                removeIncompleteSessionUseCase(workoutName)
+            }
+            removeSessionProgressUseCase(workoutName)
         }
-        removeSessionProgressUseCase(workoutName)
     }
 
-    suspend fun insertCompletedSession(session: Session) {
-        insertCompletedSessionUseCase(session, syncToFirebase = true)
+    fun insertCompletedSession(session: Session) {
+        viewModelScope.launch {
+            insertCompletedSessionUseCase(session, syncToFirebase = true)
+        }
     }
 }

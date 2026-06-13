@@ -70,6 +70,7 @@ interface ExEntryActions {
     fun onDelete()
 }
 
+@Suppress("kotlin:S107")
 @Composable
 fun ExEntryScreen(
     uiState: ExEntryUiState,
@@ -330,31 +331,31 @@ val defaultPreviewState = ExEntryUiState(
 )
 
 val defaultPreviewActions = object : ExEntryActions {
-    override fun onExerciseNameChanged(name: String) {}
-    override fun onEquipmentSelected(equipment: String) {}
-    override fun onWeightChanged(weight: String) {}
-    override fun onRepsChanged(reps: String) {}
-    override fun onSetsChanged(sets: String) {}
-    override fun onIncrementWeight() {}
-    override fun onDecrementWeight() {}
-    override fun onIncrementReps() {}
-    override fun onDecrementReps() {}
-    override fun onIncrementSets() {}
-    override fun onDecrementSets() {}
-    override fun onEnter() {}
-    override fun onUpdate() {}
-    override fun onDelete() {}
+    override fun onExerciseNameChanged(name: String) {} // Preview
+    override fun onEquipmentSelected(equipment: String) {} // Preview
+    override fun onWeightChanged(weight: String) {} // Preview
+    override fun onRepsChanged(reps: String) {} // Preview
+    override fun onSetsChanged(sets: String) {} // Preview
+    override fun onIncrementWeight() {} // Preview
+    override fun onDecrementWeight() {} // Preview
+    override fun onIncrementReps() {} // Preview
+    override fun onDecrementReps() {} // Preview
+    override fun onIncrementSets() {} // Preview
+    override fun onDecrementSets() {} // Preview
+    override fun onEnter() {} // Preview
+    override fun onUpdate() {} // Preview
+    override fun onDelete() {} // Preview
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_NewExercise_DefaultBarbell() {
+fun ExEntryScreenPreviewNewExerciseDefaultBarbell() {
     ExEntryScreen(uiState = defaultPreviewState, actions = defaultPreviewActions)
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_ExistingExercise_UpdateMode() {
+fun ExEntryScreenPreviewExistingExerciseUpdateMode() {
     ExEntryScreen(
         uiState = defaultPreviewState.copy(
             exerciseName = "Bench Press",
@@ -369,7 +370,7 @@ fun ExEntryScreenPreview_ExistingExercise_UpdateMode() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_DeleteHidden() {
+fun ExEntryScreenPreviewDeleteHidden() {
     ExEntryScreen(
         uiState = defaultPreviewState.copy(
             exerciseName = "Squat",
@@ -383,7 +384,7 @@ fun ExEntryScreenPreview_DeleteHidden() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_DuplicateExerciseError() {
+fun ExEntryScreenPreviewDuplicateExerciseError() {
     ExEntryScreen(
         uiState = defaultPreviewState.copy(
             exerciseName = "Deadlift",
@@ -395,7 +396,7 @@ fun ExEntryScreenPreview_DuplicateExerciseError() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_Dumbbell() {
+fun ExEntryScreenPreviewDumbbell() {
     ExEntryScreen(
         uiState = defaultPreviewState.copy(
             selectedEquipment = "Dumbbell",
@@ -407,7 +408,7 @@ fun ExEntryScreenPreview_Dumbbell() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_MinWeightMinusHidden() {
+fun ExEntryScreenPreviewMinWeightMinusHidden() {
     ExEntryScreen(
         uiState = defaultPreviewState.copy(
             canDecrementWeight = false,
@@ -419,7 +420,7 @@ fun ExEntryScreenPreview_MinWeightMinusHidden() {
 
 @Preview(showBackground = true)
 @Composable
-fun ExEntryScreenPreview_LongExerciseName() {
+fun ExEntryScreenPreviewLongExerciseName() {
     ExEntryScreen(
         uiState = defaultPreviewState.copy(
             exerciseName = "A very long exercise name that should fit nicely"
@@ -430,30 +431,30 @@ fun ExEntryScreenPreview_LongExerciseName() {
 
 @Preview(showBackground = true, device = "id:Nexus 5")
 @Composable
-fun ExEntryScreenPreview_SmallPhone_360x800() {
+fun ExEntryScreenPreviewSmallPhone360x800() {
     ExEntryScreen(uiState = defaultPreviewState, actions = defaultPreviewActions)
 }
 
 @Preview(showBackground = true, device = "id:pixel_4_xl")
 @Composable
-fun ExEntryScreenPreview_LargePhone_412x915() {
+fun ExEntryScreenPreviewLargePhone412x915() {
     ExEntryScreen(uiState = defaultPreviewState, actions = defaultPreviewActions)
 }
 
 @Preview(showBackground = true, device = "id:automotive_1024p_landscape", widthDp = 800, heightDp = 360)
 @Composable
-fun ExEntryScreenPreview_Landscape() {
+fun ExEntryScreenPreviewLandscape() {
     ExEntryScreen(uiState = defaultPreviewState, actions = defaultPreviewActions)
 }
 
 @Preview(showBackground = true, fontScale = 1.5f)
 @Composable
-fun ExEntryScreenPreview_FontScaleLarge() {
+fun ExEntryScreenPreviewFontScaleLarge() {
     ExEntryScreen(uiState = defaultPreviewState, actions = defaultPreviewActions)
 }
 
 @Preview(showBackground = true, widthDp = 250)
 @Composable
-fun ExEntryScreenPreview_NarrowWidth() {
+fun ExEntryScreenPreviewNarrowWidth() {
     ExEntryScreen(uiState = defaultPreviewState, actions = defaultPreviewActions)
 }

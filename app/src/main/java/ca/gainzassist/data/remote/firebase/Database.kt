@@ -14,6 +14,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.orhanobut.logger.Logger
+import androidx.core.util.size
 
 object Database {
 
@@ -52,21 +54,19 @@ object Database {
         firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {
             userRef = getUserRef()
-            if (userRef != null) {
-                userRef!!.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(userShot: DataSnapshot) {
-                        if (!userShot.hasChildren()) {
-                            userRef!!.child(EMAIL).setValue(firebaseUser!!.email)
-                            copyDefaultWorkoutsFirebase()
-                        }
-                        if (!isMyServiceRunning(act, FirebaseService::class.java)) {
-                            act.startService(Intent(act, FirebaseService::class.java))
-                        }
+            userRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(userShot: DataSnapshot) {
+                    if (!userShot.hasChildren()) {
+                        userRef?.child(EMAIL)?.setValue(firebaseUser?.email)
+                        copyDefaultWorkoutsFirebase()
                     }
+                    if (!isMyServiceRunning(act, FirebaseService::class.java)) {
+                        act.startService(Intent(act, FirebaseService::class.java))
+                    }
+                }
 
-                    override fun onCancelled(databaseError: DatabaseError) {}
-                })
-            }
+                override fun onCancelled(databaseError: DatabaseError) = Unit
+            })
         }
     }
 
@@ -79,7 +79,7 @@ object Database {
                     userWorkoutsRef!!.setValue(defaultWorkoutsShot.value)
                 }
 
-                override fun onCancelled(databaseError: DatabaseError) {}
+                override fun onCancelled(databaseError: DatabaseError) = Unit
             })
         }
     }
@@ -87,12 +87,11 @@ object Database {
     @JvmStatic
     fun addWorkoutFirebase(workout: Workout) {
         userWorkoutsRef = getWorkoutsRef()
-
         val workoutName = workout.name
         if (userWorkoutsRef != null && !workoutName.isNullOrBlank()) {
             userWorkoutsRef!!.child(workoutName).setValue(workout.toMap())
         } else {
-            com.orhanobut.logger.Logger.e(
+            Logger.e(
                 "Cannot add workout to Firebase. userWorkoutsRef=$userWorkoutsRef, workoutName=$workoutName"
             )
         }
@@ -101,9 +100,7 @@ object Database {
     @JvmStatic
     fun addWorkoutSessionFirebase(session: Session) {
         val userWorkoutSessionsRef = getWorkoutSessionsRef()
-        if (userWorkoutSessionsRef != null) {
-            userWorkoutSessionsRef.child(session.timestamp.toString()).setValue(session.toMap())
-        }
+        userWorkoutSessionsRef?.child(session.timestamp.toString())?.setValue(session.toMap())
         updateWorkoutWeights(session.workoutName!!, session.avgWeights)
     }
 
@@ -111,9 +108,13 @@ object Database {
     fun updateWorkoutWeights(workoutName: String, newWeights: SparseArray<Float>) {
         userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
-            val workoutRef = userWorkoutsRef!!.child(workoutName)
-            for (i in 0 until newWeights.size()) {
-                workoutRef.child("exercises").child(i.toString()).child("weight").setValue(newWeights.get(i))
+            val workoutRef = userWorkoutsRef?.child(workoutName)
+            for (i in 0 until newWeights.size) {
+                workoutRef
+                    ?.child("exercises")
+                    ?.child(i.toString())
+                    ?.child("weight")
+                    ?.setValue(newWeights[i])
             }
         }
     }
@@ -121,8 +122,8 @@ object Database {
     @JvmStatic
     fun deleteWorkoutFirebase(workoutName: String?) {
         userWorkoutsRef = getWorkoutsRef()
-        if (userWorkoutsRef != null && workoutName != null) {
-            userWorkoutsRef!!.child(workoutName).removeValue()
+        if (workoutName != null) {
+            userWorkoutsRef?.child(workoutName)?.removeValue()
         }
     }
 }

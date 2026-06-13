@@ -54,12 +54,12 @@ class Session {
             weight += exerciseSet.weight * exerciseSet.reps.toFloat() / if (expectedReps == 0f) 1f else expectedReps
         }
 
-        weight = weight / (if (finishedSets.size == 0) 1 else finishedSets.size).toFloat() + weightChange
+        weight = weight / (if (finishedSets.isEmpty()) 1 else finishedSets.size).toFloat() + weightChange
         if (weightChange != 0f) {
             weight -= weight % weightChange
         }
 
-        if (avgWeights.get(exercise.exerciseNumber, -1f) != -1f) {
+        if (avgWeights[exercise.exerciseNumber] != null) {
             this.sessionExs[exercise.exerciseNumber] = exercise
         } else {
             this.sessionExs.add(exercise)
