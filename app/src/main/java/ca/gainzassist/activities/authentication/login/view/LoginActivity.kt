@@ -4,21 +4,17 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.compose.setContent
-import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.R
-import ca.gainzassist.activities.authentication.login.view.LoginActions
-import ca.gainzassist.activities.authentication.login.view.LoginUiState
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.activities.main.view.MainActivity
-import ca.gainzassist.core.util.UI
 import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.data.remote.firebase.Authentication
 import ca.gainzassist.data.remote.firebase.Database
@@ -39,8 +35,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.orhanobut.logger.Logger
 import java.io.IOException
 
-import androidx.activity.result.contract.ActivityResultContracts
-class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
+class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
+    FirebaseAuth.AuthStateListener {
 
     companion object {
         private const val MIN_PASSWORD_LEN = 6
@@ -53,6 +49,8 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     private var googleCred: AuthCredential? = null
     private var signInClient: GoogleSignInClient? = null
     private var callbackManager: CallbackManager? = null
+    private var loginBitmap: Bitmap? = null
+    private var signUpBitmap: Bitmap? = null
 
     var linkGoogle = false
 
@@ -62,7 +60,9 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     private val isFacebookEnabled: Boolean
         get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
 
-    private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         if (result.resultCode == RESULT_OK) {
             uiState = uiState.copy(isLoading = true)
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -90,60 +90,57 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
         }
     }
 
+    override fun onBeforeSetContent() {
+        uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
+        setupSignInMethods()
+        loginBitmap = loadBitmapFromAssets(LOGIN_IMG)
+        signUpBitmap = loadBitmapFromAssets(SIGN_UP_IMG)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        UI.setInitTheme(this)
+    }
 
-        uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
-
-        setupSignInMethods()
-
-        val loginBitmap = loadBitmapFromAssets(LOGIN_IMG)
-        val signUpBitmap = loadBitmapFromAssets(SIGN_UP_IMG)
-
-        setContent {
-        GainzEdgeToEdgeBox {
-            LoginScreen(
-                state = uiState,
-                loginImage = loginBitmap,
-                signUpImage = signUpBitmap,
-                actions = object : LoginActions {
-                    override fun onEmailChanged(email: String) {
-                        uiState = uiState.copy(email = email, emailError = null)
-                    }
-
-                    override fun onPasswordChanged(password: String) {
-                        uiState = uiState.copy(password = password, passwordError = null)
-                    }
-
-                    override fun onToggleMode() {
-                        uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
-                    }
-
-                    override fun onLoginClick() {
-                        login()
-                    }
-
-                    override fun onSignUpClick() {
-                        signUp()
-                    }
-
-                    override fun onGoogleSignInClick() {
-                        googleLogin()
-                    }
-
-                    override fun onFacebookSignInClick() {
-                        facebookLogin()
-                    }
-
-                    override fun onImageBounceClick() {
-                        uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
-                    }
+    @Composable
+    override fun InnerContent() {
+        LoginScreen(
+            state = uiState,
+            loginImage = loginBitmap,
+            signUpImage = signUpBitmap,
+            actions = object : LoginActions {
+                override fun onEmailChanged(email: String) {
+                    uiState = uiState.copy(email = email, emailError = null)
                 }
-            )
-        
-        }}
+
+                override fun onPasswordChanged(password: String) {
+                    uiState = uiState.copy(password = password, passwordError = null)
+                }
+
+                override fun onToggleMode() {
+                    uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
+                }
+
+                override fun onLoginClick() {
+                    login()
+                }
+
+                override fun onSignUpClick() {
+                    signUp()
+                }
+
+                override fun onGoogleSignInClick() {
+                    googleLogin()
+                }
+
+                override fun onFacebookSignInClick() {
+                    facebookLogin()
+                }
+
+                override fun onImageBounceClick() {
+                    uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
+                }
+            }
+        )
     }
 
     private fun loadBitmapFromAssets(fileName: String): Bitmap? {
@@ -272,7 +269,8 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
 
     fun facebookLogin() {
         if (isFacebookEnabled) {
-            LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
+            LoginManager.getInstance()
+                .logInWithReadPermissions(this, listOf("public_profile", "email"))
         }
     }
 

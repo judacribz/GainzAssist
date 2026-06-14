@@ -2,24 +2,21 @@ package ca.gainzassist.activities.add_workout.workout_entry.view
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import android.widget.Toast
-import androidx.activity.compose.setContent
-import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ca.gainzassist.activities.add_workout.exercises_entry.view.ExercisesEntryActivity
 import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModel
 import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModelEvent
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.core.constants.ExerciseConst
-import ca.gainzassist.core.util.UI
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.max
 
-class WorkoutEntryActivity : AppCompatActivity() {
+class WorkoutEntryActivity : GainzBaseActivity() {
 
     companion object {
         const val EXTRA_WORKOUT_NAME = "ca.gainzassist.activities.add_workout.EXTRA_WORKOUT"
@@ -36,11 +33,10 @@ class WorkoutEntryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        UI.setInitTheme(this)
+    }
 
-        setContent {
-        GainzEdgeToEdgeBox {
+    @Composable
+    override fun InnerContent() {
             val viewModel: WorkoutEntryViewModel = koinViewModel()
             val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -77,8 +73,6 @@ class WorkoutEntryActivity : AppCompatActivity() {
                     onBack = { finish() }
                 )
             )
-        
-        }}
     }
 
     private fun enterWorkoutName(workoutName: String, numExercises: Int) {

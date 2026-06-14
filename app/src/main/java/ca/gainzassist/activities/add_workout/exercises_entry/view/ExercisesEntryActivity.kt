@@ -2,12 +2,8 @@ package ca.gainzassist.activities.add_workout.exercises_entry.view
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import android.view.View
-import androidx.activity.compose.setContent
-import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -29,8 +25,8 @@ import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity.Companion.EXTRA_WORKOUT
 import ca.gainzassist.activities.add_workout.workout_entry.view.WorkoutEntryActivity
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.core.constants.ExerciseConst.MIN_INT
-import ca.gainzassist.core.util.UI.setInitTheme
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.ui.components.GainzTopBar
@@ -38,7 +34,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 
-class ExercisesEntryActivity : AppCompatActivity(), ExerciseEntryFragment.ExEntryDataListener {
+class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntryDataListener {
 
     companion object {
         const val TAB_LABEL = "Exercise %s"
@@ -58,18 +54,18 @@ class ExercisesEntryActivity : AppCompatActivity(), ExerciseEntryFragment.ExEntr
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setInitTheme(this)
-
+    override fun onBeforeSetContent() {
         val workoutEntryIntent = intent
         val workoutName =
-            workoutEntryIntent.getStringExtra(WorkoutEntryActivity.EXTRA_WORKOUT_NAME) ?: ""
+            workoutEntryIntent.getStringExtra(WorkoutEntryActivity.EXTRA_WORKOUT_NAME).orEmpty()
         val numExs =
             workoutEntryIntent.getIntExtra(WorkoutEntryActivity.EXTRA_NUM_EXERCISES, MIN_INT)
 
         viewModel.initialize(workoutName, numExs)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -95,68 +91,67 @@ class ExercisesEntryActivity : AppCompatActivity(), ExerciseEntryFragment.ExEntr
                 }
             }
         }
+    }
 
-        setContent {
-        GainzEdgeToEdgeBox {
-            val state by viewModel.state.collectAsStateWithLifecycle()
+    @Composable
+    override fun InnerContent() {
+        val state by viewModel.state.collectAsStateWithLifecycle()
 
-            val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
-                ExerciseEntryTab(
-                    index = i,
-                    title = String.format(TAB_LABEL, i + 1),
-                    id = i.toLong()
-                )
-            }.toMutableList()
-
-            tabs.add(
-                ExerciseEntryTab(
-                    index = state.numberOfExercises,
-                    title = "",
-                    id = Long.MAX_VALUE,
-                    isAddTab = true
-                )
+        val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
+            ExerciseEntryTab(
+                index = i,
+                title = String.format(TAB_LABEL, i + 1),
+                id = i.toLong()
             )
+        }.toMutableList()
 
-            val uiState = ExercisesEntryUiState(
-                selectedIndex = state.selectedIndex,
-                tabs = tabs,
-                numExercises = state.numberOfExercises
+        tabs.add(
+            ExerciseEntryTab(
+                index = state.numberOfExercises,
+                title = "",
+                id = Long.MAX_VALUE,
+                isAddTab = true
             )
+        )
 
-            Column(Modifier.fillMaxSize()) {
-                GainzTopBar(
-                    title = "Exercises Entry",
-                    showBack = true,
-                    onBackClick = { finish() }
-                )
-                ExercisesEntryScreen(
-                    uiState = uiState,
-                    onTabSelected = { index ->
-                        if (index == state.numberOfExercises) {
-                            viewModel.onAddExerciseClicked()
-                            if (state.numberOfExercises > 0) {
-                                fragments.values.forEach { it.showDelete() }
-                            }
-                        } else {
-                            viewModel.onTabSelected(index)
+        val uiState = ExercisesEntryUiState(
+            selectedIndex = state.selectedIndex,
+            tabs = tabs,
+            numExercises = state.numberOfExercises
+        )
+
+        Column(Modifier.fillMaxSize()) {
+            GainzTopBar(
+                title = "Exercises Entry",
+                showBack = true,
+                onBackClick = { finish() }
+            )
+            ExercisesEntryScreen(
+                uiState = uiState,
+                onTabSelected = { index ->
+                    if (index == state.numberOfExercises) {
+                        viewModel.onAddExerciseClicked()
+                        if (state.numberOfExercises > 0) {
+                            fragments.values.forEach { it.showDelete() }
                         }
-                    },
-                    pageContent = { pageIndex ->
-                        ExEntryFragmentContainer(
-                            pageIndex = pageIndex,
-                            fragmentManager = supportFragmentManager,
-                            getFragment = { idx ->
-                                getOrCreateFragment(
-                                    idx,
-                                    state.numberOfExercises
-                                )
-                            }
-                        )
+                    } else {
+                        viewModel.onTabSelected(index)
                     }
-                )
-            }
-        
-        }}
+                },
+                pageContent = { pageIndex ->
+                    ExEntryFragmentContainer(
+                        pageIndex = pageIndex,
+                        fragmentManager = supportFragmentManager,
+                        getFragment = { idx ->
+                            getOrCreateFragment(
+                                idx,
+                                state.numberOfExercises
+                            )
+                        }
+                    )
+                }
+            )
+        }
     }
 
     private fun getOrCreateFragment(index: Int, numExs: Int): ExerciseEntryFragment {
