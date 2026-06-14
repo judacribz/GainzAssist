@@ -10,6 +10,7 @@ import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
+import ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -39,7 +40,7 @@ class RoomWorkoutRepositorySessionTest {
         }
 
         repository = RoomWorkoutRepository(
-            ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase(),
+            CalculateNextExerciseWeightUseCase(),
             testDispatcherProvider,
             db
         )
