@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.secrets)
 }
@@ -29,11 +30,14 @@ val keyAliasValue: String? =
     keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
 val keyPasswordValue: String? =
     keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
-val hasReleaseSigningConfig =
-    storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
+val hasReleaseSigningConfig = storeFileValue != null &&
+        storePasswordValue != null &&
+        keyAliasValue != null &&
+        keyPasswordValue != null
 
-android {
+configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
+    //noinspection GradleDependency
     compileSdk = 35
 
     buildFeatures {
@@ -43,7 +47,8 @@ android {
 
     defaultConfig {
         applicationId = "ca.gainzassist"
-        minSdk = 21
+        minSdk = 23
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 4
         versionName = "2606.0.0"
@@ -53,7 +58,7 @@ android {
     signingConfigs {
         create("release") {
             if (hasReleaseSigningConfig) {
-                storeFile = file(storeFileValue!!)
+                storeFile = project.file(storeFileValue!!)
                 storePassword = storePasswordValue
                 keyAlias = keyAliasValue
                 keyPassword = keyPasswordValue
@@ -63,7 +68,8 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -93,15 +99,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-
     lint {
         abortOnError = false
         checkReleaseBuilds = false
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
@@ -115,71 +121,59 @@ tasks.configureEach {
     }
 }
 
+@Suppress("kotlin:S3416")
 dependencies {
-    // Compose
+    // BOMs
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
-    androidTestImplementation(composeBom)
+    implementation(platform(libs.firebase.bom))
 
+    // implementation
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)
-
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    // 1. Local files
-    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
-
-    // 2. Testing
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.espresso.core)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
-
-    // 3. Architecture Components (AndroidX)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
-    androidTestImplementation(libs.androidx.room.testing)
-
     implementation(libs.bundles.androidx.lifecycle)
-    kapt(libs.androidx.lifecycle.compiler)
-
-    // DI (Koin)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    testImplementation(libs.koin.test)
-
-    // 4. AndroidX Core
     implementation(libs.bundles.androidx.core)
-
-    // 5. Facebook
     implementation(libs.facebook.android.sdk)
     implementation(libs.facebook.rebound)
-
-    // 6. Jackson
     implementation(libs.bundles.jackson)
-
-    // 7. Google
     implementation(libs.bundles.google)
-
-    // 8. Firebase
-    implementation(platform(libs.firebase.bom))
     implementation(libs.bundles.firebase)
-
-    // 9. Parceler
+    implementation(libs.firebase.crashlytics)
     implementation(libs.parceler.api)
-    kapt(libs.parceler)
-
-    // 10. UI / Logging
-    implementation("com.google.guava:guava:33.2.1-android")
+    implementation(libs.guava)
     implementation(libs.bundles.ui.logging)
     implementation(libs.android.youtube.player)
     implementation(libs.glide)
-    kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // kapt
+    kapt(libs.androidx.room.compiler)
+    kapt(libs.androidx.lifecycle.compiler)
+    kapt(libs.parceler)
+    kapt(libs.glide.compiler)
+
+    // debugImplementation
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // testImplementation
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.koin.test)
+
+    // androidTestImplementation
+    androidTestImplementation(composeBom)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.androidx.room.testing)
 }
 
 val validateReleaseSecrets by tasks.registering {
@@ -232,10 +226,7 @@ val validateReleaseSecrets by tasks.registering {
 }
 
 tasks.matching {
-    it.name in listOf(
-        "assembleRelease",
-        "bundleRelease"
-    )
+    it.name in listOf("assembleRelease", "bundleRelease")
 }.configureEach {
     dependsOn(validateReleaseSecrets)
 }

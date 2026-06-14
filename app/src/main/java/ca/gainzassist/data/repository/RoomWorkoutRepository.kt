@@ -2,20 +2,21 @@ package ca.gainzassist.data.repository
 
 import androidx.lifecycle.asFlow
 import ca.gainzassist.core.coroutines.DispatcherProvider
+import ca.gainzassist.data.local.database.WorkoutDatabase
+import ca.gainzassist.data.remote.firebase.Database
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
+import ca.gainzassist.domain.model.Session
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.repository.WorkoutRepository
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.models.Session
-import ca.gainzassist.models.Workout
-import ca.gainzassist.models.db.WorkoutDatabase
-import ca.gainzassist.util.firebase.Database
 import ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class RoomWorkoutRepository(
-    database: WorkoutDatabase,
-    private val dispatcherProvider: DispatcherProvider
+    private val calculateNextExerciseWeightUseCase: CalculateNextExerciseWeightUseCase,
+    private val dispatcherProvider: DispatcherProvider,
+    database: WorkoutDatabase
 ) : WorkoutRepository {
 
     private val workoutDao = database.workoutDao()
@@ -87,7 +88,7 @@ class RoomWorkoutRepository(
         if (exercises.isNotEmpty()) {
             for (ex in exercises) {
                 ex.workoutId = workout.id
-                if (exerciseDao.get(ex.id) == null) {
+                if (exerciseDao.getName(ex.id) == null) {
                     exerciseDao.insert(ex)
                 } else {
                     exerciseDao.update(ex)
@@ -139,15 +140,13 @@ class RoomWorkoutRepository(
 
     override suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean) = withContext(dispatcherProvider.io) {
         sessionDao.insert(session)
-        val calculateNextWeight = CalculateNextExerciseWeightUseCase()
-
         for (exercise in session.sessionExs) {
             val finishedSets = exercise.getFinishedSetsList()
             for (set in finishedSets) {
                 setDao.insert(set)
             }
             if (exercise.setsType == Exercise.SetsType.MAIN_SET) {
-                val nextWeight = calculateNextWeight(exercise, finishedSets)
+                val nextWeight = calculateNextExerciseWeightUseCase(exercise, finishedSets)
                 exerciseDao.updateWeight(nextWeight, exercise.id)
                 session.avgWeights.put(exercise.exerciseNumber, nextWeight)
             }

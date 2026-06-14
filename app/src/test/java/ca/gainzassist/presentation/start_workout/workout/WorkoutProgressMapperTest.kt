@@ -1,13 +1,14 @@
 package ca.gainzassist.presentation.start_workout.workout
 
 import android.util.SparseArray
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.FAIL_SELECTED
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SELECTED
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.SUCCESS_SELECTED
-import ca.gainzassist.adapters.SingleItemAdapter.PROGRESS_STATUS.UNSELECTED
+import ca.gainzassist.activities.start_workout.workout_screen.WorkoutProgressMapper
+import ca.gainzassist.ui.ProgressStatus
+import ca.gainzassist.ui.ProgressStatus.FAIL
+import ca.gainzassist.ui.ProgressStatus.FAIL_SELECTED
+import ca.gainzassist.ui.ProgressStatus.SELECTED
+import ca.gainzassist.ui.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.ProgressStatus.SUCCESS_SELECTED
+import ca.gainzassist.ui.ProgressStatus.UNSELECTED
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -26,7 +27,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun toProgressUiItems_returnsOneBasedNumbersAndCorrectStatuses() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, SUCCESS)
         progress.put(1, SELECTED)
         
@@ -40,7 +41,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun selectOneBased_convertsSuccessToSuccessSelected() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, SUCCESS)
         
         WorkoutProgressMapper.selectOneBased(progress, 1)
@@ -50,7 +51,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun selectOneBased_convertsFailToFailSelected() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, FAIL)
         
         WorkoutProgressMapper.selectOneBased(progress, 1)
@@ -60,7 +61,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun selectOneBased_selectingNewItemDeselectsOldSelectedToUnselected() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, SELECTED)
         progress.put(1, UNSELECTED)
         
@@ -72,7 +73,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun selectOneBased_deselectsOldSuccessSelectedToSuccess() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, SUCCESS_SELECTED)
         progress.put(1, UNSELECTED)
         
@@ -84,7 +85,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun selectOneBased_deselectsOldFailSelectedToFail() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, FAIL_SELECTED)
         progress.put(1, UNSELECTED)
         
@@ -96,7 +97,7 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun setCurrentOneBased_marksPreviousItemSuccessOrFail() {
-        val progress = SparseArray<PROGRESS_STATUS>()
+        val progress = SparseArray<ProgressStatus>()
         progress.put(0, SELECTED)
         progress.put(1, UNSELECTED)
         

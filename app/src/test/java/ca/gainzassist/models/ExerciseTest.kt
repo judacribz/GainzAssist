@@ -1,6 +1,7 @@
 package ca.gainzassist.models
 
-import ca.gainzassist.constants.ExerciseConst
+import ca.gainzassist.core.constants.ExerciseConst
+import ca.gainzassist.domain.model.Exercise
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

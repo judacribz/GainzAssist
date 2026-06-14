@@ -14,7 +14,7 @@ object SessionProgressMapper {
         )
     }
 
-    fun fromLegacyMap(legacyMap: Map<String, Any>?): SessionProgressSnapshot {
+    fun fromLegacyMap(legacyMap: Map<String, Any?>?): SessionProgressSnapshot {
         if (legacyMap == null) {
             return SessionProgressSnapshot(emptyMap(), emptyMap())
         }

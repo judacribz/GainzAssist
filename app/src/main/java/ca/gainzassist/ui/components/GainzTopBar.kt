@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +30,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+
+private val TopBarPaddingBottom = 2.dp
+private val TopBarCornerRadiusBg = 3.dp
+private val TopBarHeight = 56.dp
+private val TopBarCornerRadius = 2.dp
+private val TopBarBorderWidth = 1.dp
+private val TopBarPaddingHorizontal = 4.dp
+private val TopBarSpacerWidth = 12.dp
+private val TopBarTitleFontSize = 35.sp
+private val TopBarShadowOffset = 1f
+private val TopBarShadowBlur = 5f
+private val TopBarTitleMaxLines = 2
 
 @Composable
 fun GainzTopBar(
@@ -40,47 +53,57 @@ fun GainzTopBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 2.dp)
-            .background(colorResource(id = R.color.colorLightAccent), RoundedCornerShape(3.dp))
+            .padding(bottom = TopBarPaddingBottom)
+            .background(
+                color = colorResource(R.color.colorLightAccent),
+                shape = RoundedCornerShape(TopBarCornerRadiusBg)
+            )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
-                .background(colorResource(id = R.color.colorLightBg), RoundedCornerShape(2.dp))
-                .border(1.dp, colorResource(id = R.color.colorBg), RoundedCornerShape(2.dp))
-                .padding(horizontal = 4.dp),
+                .height(TopBarHeight)
+                .background(
+                    color = colorResource(id = R.color.colorLightBg),
+                    shape = RoundedCornerShape(TopBarCornerRadius)
+                )
+                .border(
+                    width = TopBarBorderWidth,
+                    color = colorResource(R.color.colorBg),
+                    shape = RoundedCornerShape(TopBarCornerRadius)
+                )
+                .padding(horizontal = TopBarPaddingHorizontal),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (showBack) {
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = colorResource(id = R.color.colorBg)
+                        contentDescription = stringResource(R.string.cd_back),
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             } else {
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(TopBarSpacerWidth))
             }
 
             Text(
                 text = title,
                 style = TextStyle(
-                    fontSize = 35.sp,
-                    color = colorResource(id = R.color.colorBg),
+                    fontSize = TopBarTitleFontSize,
+                    color = colorResource(R.color.colorBg),
                     fontWeight = FontWeight.Normal,
                     shadow = Shadow(
-                        color = colorResource(id = R.color.colorBg),
-                        offset = Offset(1f, 1f),
-                        blurRadius = 5f
+                        color = colorResource(R.color.colorBg),
+                        offset = Offset(TopBarShadowOffset, TopBarShadowOffset),
+                        blurRadius = TopBarShadowBlur
                     )
                 ),
-                maxLines = 2,
+                maxLines = TopBarTitleMaxLines,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = if (showBack) 0.dp else 4.dp)
+                    .padding(start = if (showBack) 0.dp else TopBarPaddingHorizontal)
             )
 
             actions()
@@ -90,7 +113,7 @@ fun GainzTopBar(
 
 @Preview(showBackground = true)
 @Composable
-fun GainzTopBarPreview_TitleOnly() {
+fun GainzTopBarPreviewTitleOnly() {
     GainzTopBar(
         title = "Gainz Assist"
     )
@@ -98,7 +121,7 @@ fun GainzTopBarPreview_TitleOnly() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzTopBarPreview_WithBack() {
+fun GainzTopBarPreviewWithBack() {
     GainzTopBar(
         title = "Exercises Entry",
         showBack = true
@@ -107,7 +130,7 @@ fun GainzTopBarPreview_WithBack() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzTopBarPreview_LongTitle() {
+fun GainzTopBarPreviewLongTitle() {
     GainzTopBar(
         title = "This is a very long title that should not break the layout",
         showBack = true

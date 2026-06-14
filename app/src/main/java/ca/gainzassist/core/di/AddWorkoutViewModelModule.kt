@@ -1,8 +1,8 @@
 package ca.gainzassist.core.di
 
-import ca.gainzassist.presentation.add_workout.ExercisesEntryViewModel
-import ca.gainzassist.presentation.add_workout.SummaryViewModel
-import ca.gainzassist.presentation.add_workout.WorkoutEntryViewModel
+import ca.gainzassist.activities.add_workout.exercises_entry.ExercisesEntryViewModel
+import ca.gainzassist.activities.add_workout.summary.SummaryViewModel
+import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

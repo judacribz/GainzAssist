@@ -1,10 +1,9 @@
 package ca.gainzassist.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,8 +32,8 @@ fun GainzButton(
     fontFamily: FontFamily = FontFamily.Default,
     onLongClick: (() -> Unit)? = null
 ) {
-    val blueDark = colorResource(id = R.color.blueDark)
-    val blue = colorResource(id = R.color.blue)
+    val blueDark = colorResource(R.color.blueDark)
+    val blue = colorResource(R.color.blue)
 
     val colors = if (enabled) {
         listOf(blueDark, blue)

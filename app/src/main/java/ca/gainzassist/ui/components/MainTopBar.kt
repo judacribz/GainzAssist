@@ -32,7 +32,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.R
-import ca.gainzassist.presentation.main.MainTab
+import ca.gainzassist.activities.main.view.MainTab
+
+data class MainTopBarActions(
+    val onSearchQueryChange: (String) -> Unit = {},
+    val onSearchClick: () -> Unit = {},
+    val onCloseSearchClick: () -> Unit = {},
+    val onAddWorkoutClick: () -> Unit = {},
+    val onLogoutClick: () -> Unit = {}
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,11 +48,7 @@ fun MainTopBar(
     selectedTab: MainTab,
     isSearchExpanded: Boolean,
     searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onSearchClick: () -> Unit,
-    onCloseSearchClick: () -> Unit,
-    onAddWorkoutClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    actions: MainTopBarActions = MainTopBarActions()
 ) {
     var overflowExpanded by remember { mutableStateOf(false) }
 
@@ -53,90 +57,95 @@ fun MainTopBar(
             title = {
                 TextField(
                     value = searchQuery,
-                    onValueChange = onSearchQueryChange,
+                    onValueChange = actions.onSearchQueryChange,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search workouts...", color = Color.Gray) },
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.hint_search_workouts),
+                            color = Color.Gray
+                        )
+                    },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { /* just dismiss keyboard or do nothing since filter is reactive */ }),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = colorResource(id = R.color.colorBg),
-                        unfocusedTextColor = colorResource(id = R.color.colorBg),
-                        cursorColor = colorResource(id = R.color.colorLightAccent),
+                        focusedTextColor = colorResource(R.color.colorBg),
+                        unfocusedTextColor = colorResource(R.color.colorBg),
+                        cursorColor = colorResource(R.color.colorLightAccent),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     )
                 )
             },
             navigationIcon = {
-                IconButton(onClick = onCloseSearchClick) {
+                IconButton(onClick = actions.onCloseSearchClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Close search",
-                        tint = colorResource(id = R.color.colorBg)
+                        contentDescription = stringResource(R.string.cd_close_search),
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             },
             actions = {
                 if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { onSearchQueryChange("") }) {
+                    IconButton(onClick = { actions.onSearchQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Clear search",
-                            tint = colorResource(id = R.color.colorBg)
+                            contentDescription = stringResource(R.string.cd_clear_search),
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = colorResource(id = R.color.colorLightBg)
+                containerColor = colorResource(R.color.colorLightBg)
             )
         )
     } else {
         GainzTopBar(
-            title = stringResource(id = R.string.app_name),
+            title = stringResource(R.string.app_name),
             showBack = false,
             actions = {
                 if (selectedTab != MainTab.SETTINGS) {
-                    IconButton(onClick = onSearchClick) {
+                    IconButton(onClick = actions.onSearchClick) {
                         Icon(
                             imageVector = Icons.Filled.Search,
-                            contentDescription = "Search",
-                            tint = colorResource(id = R.color.colorBg)
+                            contentDescription = stringResource(R.string.cd_search),
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
-                
+
                 if (selectedTab == MainTab.WORKOUTS) {
-                    IconButton(onClick = onAddWorkoutClick) {
+                    IconButton(onClick = actions.onAddWorkoutClick) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = "Add workout",
-                            tint = colorResource(id = R.color.colorBg)
+                            contentDescription = stringResource(R.string.cd_add_workout),
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
-                
+
                 // Overflow menu for Logout
                 IconButton(onClick = { overflowExpanded = true }) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "More actions",
-                        tint = colorResource(id = R.color.colorBg)
+                        contentDescription = stringResource(R.string.cd_more_actions),
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
-                
+
                 DropdownMenu(
                     expanded = overflowExpanded,
                     onDismissRequest = { overflowExpanded = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Logout") },
+                        text = { Text(stringResource(R.string.logout)) },
                         onClick = {
                             overflowExpanded = false
-                            onLogoutClick()
+                            actions.onLogoutClick()
                         },
                         leadingIcon = {
                             Icon(
@@ -153,60 +162,40 @@ fun MainTopBar(
 
 @Preview
 @Composable
-fun MainTopBarPreview_Workouts() {
+fun MainTopBarPreviewWorkouts() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = ""
     )
 }
 
 @Preview
 @Composable
-fun MainTopBarPreview_Resume() {
+fun MainTopBarPreviewResume() {
     MainTopBar(
         selectedTab = MainTab.RESUME,
         isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = ""
     )
 }
 
 @Preview
 @Composable
-fun MainTopBarPreview_Settings() {
+fun MainTopBarPreviewSettings() {
     MainTopBar(
         selectedTab = MainTab.SETTINGS,
         isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = ""
     )
 }
 
 @Preview
 @Composable
-fun MainTopBarPreview_SearchExpanded() {
+fun MainTopBarPreviewSearchExpanded() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = true,
-        searchQuery = "Legs",
-        onSearchQueryChange = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onAddWorkoutClick = {},
-        onLogoutClick = {}
+        searchQuery = "Legs"
     )
 }

@@ -24,11 +24,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+
+private val DropdownMinHeight = 48.dp
+private val DropdownCornerRadius = 5.dp
+private val DropdownBorderWidth = 2.dp
+private val DropdownPaddingHorizontal = 8.dp
+private val DropdownIconSize = 24.dp
+private val DropdownFontSize = 22.sp
 
 @Composable
 fun GainzDropdown(
@@ -39,36 +47,36 @@ fun GainzDropdown(
     enabled: Boolean = true,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val colorDarkText = colorResource(id = R.color.colorDarkText)
-    val colorLightBg = colorResource(id = R.color.colorLightBg)
-    val colorAccent = colorResource(id = R.color.colorAccent)
-    val colorLightAccent = colorResource(id = R.color.colorLightAccent)
+    val colorDarkText = colorResource(R.color.colorDarkText)
+    val colorLightBg = colorResource(R.color.colorLightBg)
+    val colorAccent = colorResource(R.color.colorAccent)
+    val colorLightAccent = colorResource(R.color.colorLightAccent)
 
     Box(
         modifier = modifier
-            .defaultMinSize(minHeight = 48.dp)
-            .background(colorLightAccent, RoundedCornerShape(5.dp))
-            .border(2.dp, colorAccent, RoundedCornerShape(5.dp))
+            .defaultMinSize(minHeight = DropdownMinHeight)
+            .background(colorLightAccent, RoundedCornerShape(DropdownCornerRadius))
+            .border(DropdownBorderWidth, colorAccent, RoundedCornerShape(DropdownCornerRadius))
             .clickable(enabled = enabled) { expanded = true }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = DropdownPaddingHorizontal),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = selectedValue,
                 color = colorDarkText,
-                fontSize = 22.sp,
+                fontSize = DropdownFontSize,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.weight(1f)
             )
             Icon(
-                painter = painterResource(id = R.drawable.ic_drop_dark),
-                contentDescription = "Dropdown",
-                modifier = Modifier.size(24.dp),
+                painter = painterResource(R.drawable.ic_drop_dark),
+                contentDescription = stringResource(R.string.cd_dropdown),
+                modifier = Modifier.size(DropdownIconSize),
                 tint = colorDarkText
             )
         }
@@ -84,7 +92,7 @@ fun GainzDropdown(
                         Text(
                             text = option,
                             color = colorDarkText,
-                            fontSize = 22.sp
+                            fontSize = DropdownFontSize
                         )
                     },
                     onClick = {
@@ -99,7 +107,7 @@ fun GainzDropdown(
 
 @Preview(showBackground = true)
 @Composable
-fun GainzDropdownPreview_Barbell() {
+fun GainzDropdownPreviewBarbell() {
     GainzDropdown(
         selectedValue = "Barbell",
         options = listOf("Barbell", "Dumbbell", "N/A"),
@@ -109,7 +117,7 @@ fun GainzDropdownPreview_Barbell() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzDropdownPreview_Dumbbell() {
+fun GainzDropdownPreviewDumbbell() {
     GainzDropdown(
         selectedValue = "Dumbbell",
         options = listOf("Barbell", "Dumbbell", "N/A"),
@@ -119,7 +127,7 @@ fun GainzDropdownPreview_Dumbbell() {
 
 @Preview(showBackground = true)
 @Composable
-fun GainzDropdownPreview_NA() {
+fun GainzDropdownPreviewNA() {
     GainzDropdown(
         selectedValue = "N/A",
         options = listOf("Barbell", "Dumbbell", "N/A"),
@@ -129,7 +137,7 @@ fun GainzDropdownPreview_NA() {
 
 @Preview(showBackground = true, widthDp = 150)
 @Composable
-fun GainzDropdownPreview_NarrowWidth() {
+fun GainzDropdownPreviewNarrowWidth() {
     GainzDropdown(
         selectedValue = "Barbell",
         options = listOf("Barbell", "Dumbbell", "N/A"),

@@ -2,8 +2,8 @@ package ca.gainzassist.data.repository
 
 import android.content.Context
 import ca.gainzassist.core.coroutines.DispatcherProvider
+import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.domain.repository.SessionPreferencesRepository
-import ca.gainzassist.util.Preferences
 import kotlinx.coroutines.withContext
 
 class SharedPreferencesSessionRepository(

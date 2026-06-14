@@ -22,75 +22,83 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.R
 
+data class HowToVideosTopBarState(
+    val title: String,
+    val isSearchExpanded: Boolean,
+    val searchQuery: String
+)
+
+data class HowToVideosTopBarActions(
+    val onSearchQueryChange: (String) -> Unit,
+    val onSearchSubmit: () -> Unit,
+    val onSearchClick: () -> Unit,
+    val onCloseSearchClick: () -> Unit,
+    val onBackClick: () -> Unit
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HowToVideosTopBar(
-    title: String,
-    isSearchExpanded: Boolean,
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onSearchSubmit: () -> Unit,
-    onSearchClick: () -> Unit,
-    onCloseSearchClick: () -> Unit,
-    onBackClick: () -> Unit
+    state: HowToVideosTopBarState,
+    actions: HowToVideosTopBarActions
 ) {
-    if (isSearchExpanded) {
+    if (state.isSearchExpanded) {
         TopAppBar(
             title = {
                 TextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
+                    value = state.searchQuery,
+                    onValueChange = actions.onSearchQueryChange,
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { androidx.compose.material3.Text("Search videos...", color = Color.Gray) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onSearchSubmit() }),
+                    keyboardActions = KeyboardActions(onSearch = { actions.onSearchSubmit() }),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
-                        focusedTextColor = colorResource(id = R.color.colorBg),
-                        unfocusedTextColor = colorResource(id = R.color.colorBg),
-                        cursorColor = colorResource(id = R.color.colorLightAccent),
+                        focusedTextColor = colorResource(R.color.colorBg),
+                        unfocusedTextColor = colorResource(R.color.colorBg),
+                        cursorColor = colorResource(R.color.colorLightAccent),
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     )
                 )
             },
             navigationIcon = {
-                IconButton(onClick = onCloseSearchClick) {
+                IconButton(onClick = actions.onCloseSearchClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Close search",
-                        tint = colorResource(id = R.color.colorBg)
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             },
             actions = {
-                if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { onSearchQueryChange("") }) {
+                if (state.searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { actions.onSearchQueryChange("") }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Clear search",
-                            tint = colorResource(id = R.color.colorBg)
+                            tint = colorResource(R.color.colorBg)
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = colorResource(id = R.color.colorLightBg)
+                containerColor = colorResource(R.color.colorLightBg)
             )
         )
     } else {
         GainzTopBar(
-            title = title,
+            title = state.title,
             showBack = true,
-            onBackClick = onBackClick,
+            onBackClick = actions.onBackClick,
             actions = {
-                IconButton(onClick = onSearchClick) {
+                IconButton(onClick = actions.onSearchClick) {
                     Icon(
                         imageVector = Icons.Filled.Search,
                         contentDescription = "Search",
-                        tint = colorResource(id = R.color.colorBg)
+                        tint = colorResource(R.color.colorBg)
                     )
                 }
             }
@@ -100,45 +108,57 @@ fun HowToVideosTopBar(
 
 @Preview
 @Composable
-fun HowToVideosTopBar_Normal() {
+fun HowToVideosTopBarNormal() {
     HowToVideosTopBar(
-        title = "How To Bench Press",
-        isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchSubmit = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onBackClick = {}
+        state = HowToVideosTopBarState(
+            title = "How To Bench Press",
+            isSearchExpanded = false,
+            searchQuery = ""
+        ),
+        actions = HowToVideosTopBarActions(
+            onSearchQueryChange = {},
+            onSearchSubmit = {},
+            onSearchClick = {},
+            onCloseSearchClick = {},
+            onBackClick = {}
+        )
     )
 }
 
 @Preview
 @Composable
-fun HowToVideosTopBar_SearchExpanded() {
+fun HowToVideosTopBarSearchExpanded() {
     HowToVideosTopBar(
-        title = "How To Bench Press",
-        isSearchExpanded = true,
-        searchQuery = "Squat",
-        onSearchQueryChange = {},
-        onSearchSubmit = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onBackClick = {}
+        state = HowToVideosTopBarState(
+            title = "How To Bench Press",
+            isSearchExpanded = true,
+            searchQuery = "Squat"
+        ),
+        actions = HowToVideosTopBarActions(
+            onSearchQueryChange = {},
+            onSearchSubmit = {},
+            onSearchClick = {},
+            onCloseSearchClick = {},
+            onBackClick = {}
+        )
     )
 }
 
 @Preview
 @Composable
-fun HowToVideosTopBar_LongTitle() {
+fun HowToVideosTopBarLongTitle() {
     HowToVideosTopBar(
-        title = "How To Incline Dumbbell Bench Press with a very very long name",
-        isSearchExpanded = false,
-        searchQuery = "",
-        onSearchQueryChange = {},
-        onSearchSubmit = {},
-        onSearchClick = {},
-        onCloseSearchClick = {},
-        onBackClick = {}
+        state = HowToVideosTopBarState(
+            title = "How To Incline Dumbbell Bench Press with a very very long name",
+            isSearchExpanded = false,
+            searchQuery = ""
+        ),
+        actions = HowToVideosTopBarActions(
+            onSearchQueryChange = {},
+            onSearchSubmit = {},
+            onSearchClick = {},
+            onCloseSearchClick = {},
+            onBackClick = {}
+        )
     )
 }

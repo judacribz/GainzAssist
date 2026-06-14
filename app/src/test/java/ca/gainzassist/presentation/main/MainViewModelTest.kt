@@ -1,11 +1,14 @@
 package ca.gainzassist.presentation.main
 
+import ca.gainzassist.activities.main.MainViewModel
+import ca.gainzassist.activities.main.MainViewModelEvent
+import ca.gainzassist.activities.main.view.MainTab
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.GetIncompleteWorkoutNamesUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteAllWorkoutsUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCase
 import ca.gainzassist.domain.usecase.workout.ObserveWorkoutsUseCase
-import ca.gainzassist.models.Workout
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule

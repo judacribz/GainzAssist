@@ -1,5 +1,8 @@
 package ca.gainzassist.models
 
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
+import ca.gainzassist.domain.model.Session
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -21,6 +24,6 @@ class SessionTest {
         session.addExercise(exercise)
         
         val recordedWeight = session.avgWeights.get(0, -1f)
-        assertEquals(105f, recordedWeight, 0.01f)
+        assertEquals(105f, recordedWeight!!, 0.01f)
     }
 }

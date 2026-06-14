@@ -1,8 +1,8 @@
 package ca.gainzassist.domain.usecase.workout
 
-import ca.gainzassist.constants.ExerciseConst.BARBELL
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.ExerciseSet
+import ca.gainzassist.core.constants.ExerciseConst.BARBELL
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
 import kotlin.math.max
 import kotlin.math.roundToInt
 

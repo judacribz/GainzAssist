@@ -1,5 +1,7 @@
 package ca.gainzassist.presentation.add_workout
 
+import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModel
+import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModelEvent
 import ca.gainzassist.test.rules.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList

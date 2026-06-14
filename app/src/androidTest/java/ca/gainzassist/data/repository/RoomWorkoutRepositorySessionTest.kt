@@ -3,13 +3,14 @@ package ca.gainzassist.data.repository
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import ca.gainzassist.constants.ExerciseConst.BARBELL
+import ca.gainzassist.core.constants.ExerciseConst.BARBELL
 import ca.gainzassist.core.coroutines.DispatcherProvider
-import ca.gainzassist.models.Exercise
-import ca.gainzassist.models.ExerciseSet
-import ca.gainzassist.models.Session
-import ca.gainzassist.models.Workout
-import ca.gainzassist.models.db.WorkoutDatabase
+import ca.gainzassist.data.local.database.WorkoutDatabase
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
+import ca.gainzassist.domain.model.Session
+import ca.gainzassist.domain.model.Workout
+import ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -38,7 +39,11 @@ class RoomWorkoutRepositorySessionTest {
             override val default: CoroutineDispatcher = Dispatchers.Unconfined
         }
 
-        repository = RoomWorkoutRepository(db, testDispatcherProvider)
+        repository = RoomWorkoutRepository(
+            CalculateNextExerciseWeightUseCase(),
+            testDispatcherProvider,
+            db
+        )
     }
 
     @After
@@ -52,7 +57,8 @@ class RoomWorkoutRepositorySessionTest {
         repository.insertWorkout(workout)
         val workoutId = workout.id
 
-        val exercise = Exercise(1, "Deadlift", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
+        val exercise =
+            Exercise(1, "Deadlift", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
         exercise.workoutId = workoutId
         repository.insertExercise(exercise)
         val exId = exercise.id
@@ -68,7 +74,7 @@ class RoomWorkoutRepositorySessionTest {
 
         repository.insertCompletedSession(session, syncToFirebase = false)
 
-        val updatedEx = assertNotNullValue(db.exerciseDao().get(exId))
+        val updatedEx = assertNotNullValue(db.exerciseDao().getName(exId))
         assertEquals(110f, updatedEx.weight, 0.1f)
         assertEquals(110f, session.avgWeights.get(exercise.exerciseNumber, -1f), 0.1f)
     }
@@ -79,7 +85,16 @@ class RoomWorkoutRepositorySessionTest {
         repository.insertWorkout(workout)
         val workoutId = workout.id
 
-        val exercise = Exercise(1, "Overhead Press", "Strength", BARBELL, 3, 10, 100f, Exercise.SetsType.MAIN_SET)
+        val exercise = Exercise(
+            1,
+            "Overhead Press",
+            "Strength",
+            BARBELL,
+            3,
+            10,
+            100f,
+            Exercise.SetsType.MAIN_SET
+        )
         exercise.workoutId = workoutId
         repository.insertExercise(exercise)
         val exId = exercise.id
@@ -95,7 +110,7 @@ class RoomWorkoutRepositorySessionTest {
 
         repository.insertCompletedSession(session, syncToFirebase = false)
 
-        val updatedEx = assertNotNullValue(db.exerciseDao().get(exId))
+        val updatedEx = assertNotNullValue(db.exerciseDao().getName(exId))
         assertEquals(130f, updatedEx.weight, 0.1f)
         assertEquals(130f, session.avgWeights.get(exercise.exerciseNumber, -1f), 0.1f)
     }

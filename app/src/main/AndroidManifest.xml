@@ -14,7 +14,7 @@
 
         <!-- Login Activity -->
         <activity
-            android:name=".activities.authentication.Login"
+            android:name=".activities.authentication.login.view.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,37 +56,37 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".activities.main.Main"
+            android:name=".activities.main.view.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- HowToVideos Activity -->
         <activity
-            android:name=".activities.how_to_videos.HowToVideos"
+            android:name=".activities.how_to_videos.view.HowToVideosActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
             android:exported="false" />
 
         <!-- StartWorkout Activity -->
         <activity
-            android:name=".activities.start_workout.StartWorkout"
+            android:name=".activities.start_workout.view.StartWorkoutActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- Summary Activity -->
         <activity
-            android:name=".activities.add_workout.Summary"
+            android:name=".activities.add_workout.summary.view.SummaryActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
-            android:name=".activities.add_workout.WorkoutEntry"
+            android:name=".activities.add_workout.workout_entry.view.WorkoutEntryActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.add_workout.ExercisesEntry"
+            android:name=".activities.add_workout.exercises_entry.view.ExercisesEntryActivity"
             android:exported="false" />
 
         <service
-            android:name=".background.FirebaseService"
+            android:name=".data.service.FirebaseService"
             android:exported="false" />
     </application>
 
