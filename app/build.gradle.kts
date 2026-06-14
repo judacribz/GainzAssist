@@ -30,8 +30,10 @@ val keyAliasValue: String? =
     keystoreProperties.getProperty("keyAlias") ?: System.getenv("KEY_ALIAS")
 val keyPasswordValue: String? =
     keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
-val hasReleaseSigningConfig =
-    storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
+val hasReleaseSigningConfig = storeFileValue != null &&
+        storePasswordValue != null &&
+        keyAliasValue != null &&
+        keyPasswordValue != null
 
 configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
@@ -56,7 +58,7 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
     signingConfigs {
         create("release") {
             if (hasReleaseSigningConfig) {
-                storeFile = file(storeFileValue!!)
+                storeFile = project.file(storeFileValue!!)
                 storePassword = storePasswordValue
                 keyAlias = keyAliasValue
                 keyPassword = keyPasswordValue
@@ -97,15 +99,15 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
-
     lint {
         abortOnError = false
         checkReleaseBuilds = false
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
@@ -121,9 +123,6 @@ tasks.configureEach {
 
 @Suppress("kotlin:S3416")
 dependencies {
-    // 1. Local files
-    implementation(fileTree(mapOf("include" to listOf("*.jar"), "dir" to "libs")))
-
     // BOMs
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
@@ -227,10 +226,7 @@ val validateReleaseSecrets by tasks.registering {
 }
 
 tasks.matching {
-    it.name in listOf(
-        "assembleRelease",
-        "bundleRelease"
-    )
+    it.name in listOf("assembleRelease", "bundleRelease")
 }.configureEach {
     dependsOn(validateReleaseSecrets)
 }
