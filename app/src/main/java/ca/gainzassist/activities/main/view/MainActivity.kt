@@ -3,8 +3,10 @@ package ca.gainzassist.activities.main.view
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,9 +44,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         UI.setInitTheme(this)
 
         setContent {
+        GainzEdgeToEdgeBox {
             val state by mainViewModel.state.collectAsStateWithLifecycle()
 
             LaunchedEffect(Unit) {
@@ -127,7 +131,8 @@ class MainActivity : AppCompatActivity() {
                     )
                 )
             }
-        }
+        
+        }}
     }
 
     override fun onResume() {

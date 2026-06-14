@@ -2,8 +2,10 @@ package ca.gainzassist.activities.add_workout.exercises_entry.view
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.view.View
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
@@ -58,6 +60,7 @@ class ExercisesEntryActivity : AppCompatActivity(), ExerciseEntryFragment.ExEntr
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setInitTheme(this)
 
         val workoutEntryIntent = intent
@@ -94,6 +97,7 @@ class ExercisesEntryActivity : AppCompatActivity(), ExerciseEntryFragment.ExEntr
         }
 
         setContent {
+        GainzEdgeToEdgeBox {
             val state by viewModel.state.collectAsStateWithLifecycle()
 
             val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
@@ -151,7 +155,8 @@ class ExercisesEntryActivity : AppCompatActivity(), ExerciseEntryFragment.ExEntr
                     }
                 )
             }
-        }
+        
+        }}
     }
 
     private fun getOrCreateFragment(index: Int, numExs: Int): ExerciseEntryFragment {

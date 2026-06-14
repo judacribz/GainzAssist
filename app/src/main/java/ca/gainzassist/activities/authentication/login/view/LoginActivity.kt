@@ -4,9 +4,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -90,6 +92,7 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         UI.setInitTheme(this)
 
         uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
@@ -100,6 +103,7 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
         val signUpBitmap = loadBitmapFromAssets(SIGN_UP_IMG)
 
         setContent {
+        GainzEdgeToEdgeBox {
             LoginScreen(
                 state = uiState,
                 loginImage = loginBitmap,
@@ -138,7 +142,8 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
                     }
                 }
             )
-        }
+        
+        }}
     }
 
     private fun loadBitmapFromAssets(fileName: String): Bitmap? {

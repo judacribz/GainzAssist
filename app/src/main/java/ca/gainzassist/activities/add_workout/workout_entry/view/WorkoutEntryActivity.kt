@@ -2,8 +2,10 @@ package ca.gainzassist.activities.add_workout.workout_entry.view
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.LaunchedEffect
@@ -34,9 +36,11 @@ class WorkoutEntryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         UI.setInitTheme(this)
 
         setContent {
+        GainzEdgeToEdgeBox {
             val viewModel: WorkoutEntryViewModel = koinViewModel()
             val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -73,7 +77,8 @@ class WorkoutEntryActivity : AppCompatActivity() {
                     onBack = { finish() }
                 )
             )
-        }
+        
+        }}
     }
 
     private fun enterWorkoutName(workoutName: String, numExercises: Int) {

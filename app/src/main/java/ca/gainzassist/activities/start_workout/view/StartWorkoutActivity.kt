@@ -2,8 +2,10 @@ package ca.gainzassist.activities.start_workout.view
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +52,7 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         val intent = intent
         workout = Parcels.unwrap(intent.getParcelableExtra(MainActivity.EXTRA_WORKOUT))
         val currentWorkout = workout ?: return
@@ -93,6 +96,7 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
         }
 
         setContent {
+        GainzEdgeToEdgeBox {
             val uiState by viewModel.state.collectAsStateWithLifecycle()
 
             Column(Modifier.fillMaxSize()) {
@@ -128,7 +132,8 @@ class StartWorkoutActivity : AppCompatActivity(), WorkoutController.WarmupsListe
                     }
                 }
             }
-        }
+        
+        }}
     }
 
     override fun onResume() {

@@ -4,9 +4,11 @@ import android.content.Intent
 import android.content.pm.Signature
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.util.Log
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -66,6 +68,7 @@ class HowToVideosActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         exerciseName = intent.getStringExtra(EXTRA_HOW_TO_VID)
         setInitTheme(this)
 
@@ -74,6 +77,7 @@ class HowToVideosActivity : AppCompatActivity() {
         }
 
         setContent {
+        GainzEdgeToEdgeBox {
             Column(Modifier.fillMaxSize()) {
                 HowToVideosTopBar(
                     state = HowToVideosTopBarState(
@@ -122,7 +126,8 @@ class HowToVideosActivity : AppCompatActivity() {
                     }
                 )
             }
-        }
+        
+        }}
 
         lifecycle.addObserver(youTubePlayerView)
 

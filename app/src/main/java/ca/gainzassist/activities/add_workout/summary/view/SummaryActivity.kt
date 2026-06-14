@@ -1,8 +1,10 @@
 package ca.gainzassist.activities.add_workout.summary.view
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import ca.gainzassist.ui.components.GainzEdgeToEdgeBox
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -106,6 +108,7 @@ class SummaryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         UI.setInitTheme(this)
 
         val sourceIntent = intent
@@ -164,8 +167,10 @@ class SummaryActivity : AppCompatActivity() {
         }
 
         setContent {
+        GainzEdgeToEdgeBox {
             SummaryActivityContent(initialWorkoutName, initialMainButtonText, isUpdateMode, workout)
-        }
+        
+        }}
     }
 
     @Composable
