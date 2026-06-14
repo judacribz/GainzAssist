@@ -1,4 +1,3 @@
-@file:Suppress("kotlin:S3416")
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -34,8 +33,9 @@ val keyPasswordValue: String? =
 val hasReleaseSigningConfig =
     storeFileValue != null && storePasswordValue != null && keyAliasValue != null && keyPasswordValue != null
 
-android {
+configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
+    //noinspection GradleDependency
     compileSdk = 35
 
     buildFeatures {
@@ -46,6 +46,7 @@ android {
     defaultConfig {
         applicationId = "ca.gainzassist"
         minSdk = 23
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 4
         versionName = "2606.0.0"
