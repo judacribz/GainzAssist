@@ -38,7 +38,7 @@ val hasReleaseSigningConfig = storeFileValue != null &&
 configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
     //noinspection GradleDependency
-    compileSdk = 35
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -49,7 +49,7 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
         applicationId = "ca.gainzassist"
         minSdk = 23
         //noinspection OldTargetApi
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 4
         versionName = "2606.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
