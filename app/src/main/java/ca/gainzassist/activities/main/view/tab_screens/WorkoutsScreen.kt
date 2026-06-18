@@ -1,19 +1,13 @@
 package ca.gainzassist.activities.main.view.tab_screens
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import ca.gainzassist.R
-import ca.gainzassist.ui.components.GainzButton
 
 data class WorkoutsScreenActions(
     val onWorkoutClick: (String) -> Unit = {},
@@ -41,11 +34,6 @@ data class WorkoutsScreenActions(
     val onDeleteWorkout: (String) -> Unit = {}
 )
 
-private val ContainerPadding = 15.dp
-private val TitleBottomPadding = 10.dp
-private val SubtitleFont = 16.sp
-private val ItemVerticalPadding = 5.dp
-private val ItemHeight = 120.dp
 private const val DialogWidthFraction = 0.9f
 private val DialogBorderWidth = 2.5.dp
 private val DialogCornerRadius = 20.dp
@@ -56,34 +44,18 @@ private const val DialogButtonWeight = 1f
 private val DialogButtonSpacing = 20.dp
 private const val LEG_DAY = "Leg Day"
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WorkoutsScreen(
     workoutNames: List<String>,
     selectedWorkoutName: String?,
     actions: WorkoutsScreenActions = WorkoutsScreenActions()
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(ContainerPadding)
-    ) {
-        item {
-            Text(
-                text = stringResource(R.string.workout_list),
-                fontSize = SubtitleFont,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = TitleBottomPadding)
-            )
-        }
-        items(workoutNames) { workoutName ->
-            WorkoutListItem(
-                workoutName = workoutName,
-                onClick = { actions.onWorkoutClick(workoutName) },
-                onLongClick = { actions.onWorkoutLongClick(workoutName) }
-            )
-        }
-    }
+    SharedWorkoutList(
+        titleResId = R.string.workout_list,
+        workoutNames = workoutNames,
+        onWorkoutClick = actions.onWorkoutClick,
+        onWorkoutLongClick = actions.onWorkoutLongClick
+    )
 
     if (selectedWorkoutName != null) {
         WorkoutOptionsDialog(
@@ -93,23 +65,6 @@ fun WorkoutsScreen(
             onDelete = { actions.onDeleteWorkout(selectedWorkoutName) }
         )
     }
-}
-
-@Composable
-fun WorkoutListItem(
-    workoutName: String,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit
-) {
-    GainzButton(
-        text = workoutName,
-        onClick = onClick,
-        onLongClick = onLongClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = ItemVerticalPadding)
-            .height(ItemHeight)
-    )
 }
 
 @Composable
