@@ -7,7 +7,6 @@ import android.widget.Toast
 import ca.gainzassist.R
 import ca.gainzassist.activities.authentication.login.view.LoginActivity
 import ca.gainzassist.data.service.FirebaseService
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.AuthCredential
@@ -74,9 +73,8 @@ object Authentication {
             }
     }
 
-    fun signOut(act: Activity, signInClient: GoogleSignInClient) {
+    fun signOut(act: Activity) {
         FirebaseAuth.getInstance().signOut()
-        signInClient.signOut().addOnCompleteListener(act) {}
         act.stopService(Intent(act, FirebaseService::class.java))
     }
 
