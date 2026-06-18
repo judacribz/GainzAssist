@@ -2,8 +2,8 @@ package ca.gainzassist.activities.main.view.tab_screens
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,15 +43,16 @@ data class WorkoutsScreenActions(
 
 private val ContainerPadding = 15.dp
 private val TitleBottomPadding = 10.dp
+private val SubtitleFont = 16.sp
 private val ItemVerticalPadding = 5.dp
 private val ItemHeight = 120.dp
-private val DialogWidthFraction = 0.9f
+private const val DialogWidthFraction = 0.9f
 private val DialogBorderWidth = 2.5.dp
 private val DialogCornerRadius = 20.dp
 private val DialogPadding = 20.dp
 private val DialogTitleFontSize = 30.sp
 private val DialogTitleBottomPadding = 20.dp
-private val DialogButtonWeight = 1f
+private const val DialogButtonWeight = 1f
 private val DialogButtonSpacing = 20.dp
 private const val LEG_DAY = "Leg Day"
 
@@ -62,42 +63,35 @@ fun WorkoutsScreen(
     selectedWorkoutName: String?,
     actions: WorkoutsScreenActions = WorkoutsScreenActions()
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(ContainerPadding)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(ContainerPadding)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        item {
             Text(
                 text = stringResource(R.string.workout_list),
+                fontSize = SubtitleFont,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = TitleBottomPadding)
             )
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(workoutNames) { workoutName ->
-                    WorkoutListItem(
-                        workoutName = workoutName,
-                        onClick = { actions.onWorkoutClick(workoutName) },
-                        onLongClick = { actions.onWorkoutLongClick(workoutName) }
-                    )
-                }
-            }
         }
-
-        if (selectedWorkoutName != null) {
-            WorkoutOptionsDialog(
-                workoutName = selectedWorkoutName,
-                onDismiss = actions.onDismissDialog,
-                onEdit = { actions.onEditWorkout(selectedWorkoutName) },
-                onDelete = { actions.onDeleteWorkout(selectedWorkoutName) }
+        items(workoutNames) { workoutName ->
+            WorkoutListItem(
+                workoutName = workoutName,
+                onClick = { actions.onWorkoutClick(workoutName) },
+                onLongClick = { actions.onWorkoutLongClick(workoutName) }
             )
         }
+    }
+
+    if (selectedWorkoutName != null) {
+        WorkoutOptionsDialog(
+            workoutName = selectedWorkoutName,
+            onDismiss = actions.onDismissDialog,
+            onEdit = { actions.onEditWorkout(selectedWorkoutName) },
+            onDelete = { actions.onDeleteWorkout(selectedWorkoutName) }
+        )
     }
 }
 

@@ -1,6 +1,8 @@
 package ca.gainzassist.activities.base
 
+import android.graphics.Color
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -12,11 +14,15 @@ abstract class GainzBaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                scrim = Color.TRANSPARENT,
+                darkScrim = Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.dark(Color.BLACK)
+        )
         UI.setInitTheme(this)
-
         onBeforeSetContent()
-
         setContent {
             GainzEdgeToEdgeBox {
                 InnerContent()
