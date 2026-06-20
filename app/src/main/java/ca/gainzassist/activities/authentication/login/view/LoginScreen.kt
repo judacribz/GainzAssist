@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -64,6 +65,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 
+data class LoginInputFieldState(
+    val value: String,
+    val hint: String,
+    val iconRes: Int,
+    val keyboardType: KeyboardType = KeyboardType.Text,
+    val isPassword: Boolean = false,
+    val error: String? = null
+)
+
 // Original Colors from resources
 private val ColorBg = Color(0xFF000000) // @color/colorPrimaryDark
 private val ColorAccent = Color(0xFF6B6B6B)
@@ -75,117 +85,227 @@ private val ColorGoogleWhite = Color(0xFFECEFF1)
 private val ColorSocialOuter = Color(0xFF215466)
 
 @Composable
+fun LoginScreen(
+    state: LoginUiState,
+    actions: LoginActions,
+    loginImage: Bitmap? = null,
+    signUpImage: Bitmap? = null
+) = Box(
+    modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFF2C3E50))
+) {
+    Image(
+        painter = painterResource(R.drawable.login_bg),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .fillMaxSize()
+            .then(if (state.isLoading) Modifier.blur(10.dp) else Modifier)
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .padding(15.dp)
+            .then(if (state.isLoading) Modifier.blur(10.dp) else Modifier),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(20.dp))
+        LoginSocialButtonsSection(state = state, actions = actions)
+        LoginMainImageSection(
+            state = state,
+            actions = actions,
+            loginImage = loginImage,
+            signUpImage = signUpImage,
+            modifier = Modifier.weight(1f)
+        )
+        LoginInputFieldsSection(state = state, actions = actions)
+        Spacer(modifier = Modifier.height(10.dp))
+        ActionButton(
+            text = stringResource(if (state.isLoginMode) R.string.login else R.string.sign_up),
+            onClick = { if (state.isLoginMode) actions.onLoginClick() else actions.onSignUpClick() }
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        LoginToggleTextSection(state = state, actions = actions)
+    }
+
+    if (state.isLoading) {
+        LoginLoadingOverlay()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() = LoginScreen(
+    state = LoginUiState(),
+    actions = object : LoginActions {
+        override fun onEmailChanged(email: String) = Unit
+
+        override fun onPasswordChanged(password: String) = Unit
+
+        override fun onToggleMode() = Unit
+
+        override fun onLoginClick() = Unit
+
+        override fun onSignUpClick() = Unit
+
+        override fun onGoogleSignInClick() = Unit
+
+        override fun onFacebookSignInClick() = Unit
+
+        override fun onImageBounceClick() = Unit
+    }
+)
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenSignUpModePreview() = LoginScreen(
+    state = LoginUiState(isLoginMode = false),
+    actions = object : LoginActions {
+        override fun onEmailChanged(email: String) = Unit
+
+        override fun onPasswordChanged(password: String) = Unit
+
+        override fun onToggleMode() = Unit
+
+        override fun onLoginClick() = Unit
+
+        override fun onSignUpClick() = Unit
+
+        override fun onGoogleSignInClick() = Unit
+
+        override fun onFacebookSignInClick() = Unit
+
+        override fun onImageBounceClick() = Unit
+    }
+)
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenLoadingPreview() {
+    LoginScreen(
+        state = LoginUiState(isLoading = true),
+        actions = object : LoginActions {
+            override fun onEmailChanged(email: String) = Unit
+
+            override fun onPasswordChanged(password: String) = Unit
+
+            override fun onToggleMode() = Unit
+
+            override fun onLoginClick() = Unit
+
+            override fun onSignUpClick() = Unit
+
+            override fun onGoogleSignInClick() = Unit
+
+            override fun onFacebookSignInClick() = Unit
+
+            override fun onImageBounceClick() = Unit
+        }
+    )
+}
+
+@Composable
 private fun SocialButton(
     imageRes: Int,
     innerColor: Color,
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
+) = Box(
+    modifier = modifier
+        .size(100.dp)
+        .padding(4.dp)
+        .shadow(2.dp, RoundedCornerShape(10.dp))
+        .background(ColorSocialOuter, RoundedCornerShape(10.dp))
+        .border(1.dp, ColorBg, RoundedCornerShape(10.dp))
+        .clip(RoundedCornerShape(10.dp))
+        .clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = ripple(color = ColorAccent),
+            onClick = onClick
+        ),
+    contentAlignment = Alignment.Center
 ) {
     Box(
-        modifier = modifier
-            .size(100.dp)
-            .padding(4.dp)
-            .shadow(2.dp, RoundedCornerShape(10.dp))
-            .background(ColorSocialOuter, RoundedCornerShape(10.dp))
-            .border(1.dp, ColorBg, RoundedCornerShape(10.dp))
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = ColorAccent),
-                onClick = onClick
-            ),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(3.dp)
+            .background(innerColor, RoundedCornerShape(10.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Box(
+        Image(
+            painter = painterResource(imageRes),
+            contentDescription = contentDescription,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(3.dp)
-                .background(innerColor, RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = contentDescription,
-                modifier = Modifier
-                    .size(50.dp)
-                    .padding(8.dp),
-                contentScale = ContentScale.Fit
-            )
-        }
+                .size(50.dp)
+                .padding(8.dp),
+            contentScale = ContentScale.Fit
+        )
     }
 }
-
-data class LoginInputFieldState(
-    val value: String,
-    val hint: String,
-    val iconRes: Int,
-    val keyboardType: KeyboardType = KeyboardType.Text,
-    val isPassword: Boolean = false,
-    val error: String? = null
-)
 
 @Composable
 private fun LoginInputField(
     state: LoginInputFieldState,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
-) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
-        BasicTextField(
-            value = state.value,
-            onValueChange = onValueChange,
-            modifier = Modifier
-                .width(275.dp)
-                .height(65.dp)
-                .background(ColorGrey, RoundedCornerShape(20.dp))
-                .border(2.5.dp, ColorBlue, RoundedCornerShape(20.dp))
-                .padding(horizontal = 20.dp),
-            textStyle = TextStyle(
-                color = Color.Black,
-                fontSize = 18.sp,
-                textAlign = TextAlign.Center
-            ),
-            cursorBrush = SolidColor(Color.Black),
-            visualTransformation = if (state.isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = state.keyboardType),
-            singleLine = true,
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (state.value.isEmpty()) {
-                        Text(
-                            text = state.hint,
-                            style = TextStyle(
-                                color = Color.Gray,
-                                fontStyle = FontStyle.Italic,
-                                fontSize = 18.sp,
-                                textAlign = TextAlign.Center
-                            )
+) = Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+    BasicTextField(
+        value = state.value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .width(275.dp)
+            .height(65.dp)
+            .background(ColorGrey, RoundedCornerShape(20.dp))
+            .border(2.5.dp, ColorBlue, RoundedCornerShape(20.dp))
+            .padding(horizontal = 20.dp),
+        textStyle = TextStyle(
+            color = Color.Black,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center
+        ),
+        cursorBrush = SolidColor(Color.Black),
+        visualTransformation = if (state.isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(keyboardType = state.keyboardType),
+        singleLine = true,
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (state.value.isEmpty()) {
+                    Text(
+                        text = state.hint,
+                        style = TextStyle(
+                            color = Color.Gray,
+                            fontStyle = FontStyle.Italic,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
                         )
-                    }
-                    innerTextField()
-                    
-                    Image(
-                        painter = painterResource(state.iconRes),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .size(24.dp)
                     )
                 }
+                innerTextField()
+
+                Image(
+                    painter = painterResource(state.iconRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(24.dp)
+                )
             }
-        )
-        if (state.error != null) {
-            Text(
-                text = state.error,
-                color = Color.Red,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(top = 4.dp)
-            )
         }
+    )
+    if (state.error != null) {
+        Text(
+            text = state.error,
+            color = Color.Red,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
 
@@ -194,96 +314,33 @@ private fun ActionButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .width(275.dp)
-            .height(50.dp)
-            .shadow(4.dp, RoundedCornerShape(20.dp))
-            .background(ColorBlue, RoundedCornerShape(20.dp))
-            .border(1.dp, ColorBg, RoundedCornerShape(20.dp))
-            .clip(RoundedCornerShape(20.dp))
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(ColorBlueDark, ColorBlue)
-                ),
-                shape = RoundedCornerShape(21.dp)
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = ripple(color = Color.White),
-                onClick = onClick
+) = Box(
+    modifier = modifier
+        .width(275.dp)
+        .height(50.dp)
+        .shadow(4.dp, RoundedCornerShape(20.dp))
+        .background(ColorBlue, RoundedCornerShape(20.dp))
+        .border(1.dp, ColorBg, RoundedCornerShape(20.dp))
+        .clip(RoundedCornerShape(20.dp))
+        .background(
+            brush = Brush.verticalGradient(
+                colors = listOf(ColorBlueDark, ColorBlue)
             ),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            shape = RoundedCornerShape(21.dp)
         )
-    }
-}
-
-@Composable
-fun LoginScreen(
-    state: LoginUiState,
-    actions: LoginActions,
-    loginImage: Bitmap? = null,
-    signUpImage: Bitmap? = null
+        .clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = ripple(color = Color.White),
+            onClick = onClick
+        ),
+    contentAlignment = Alignment.Center
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF2C3E50))
-    ) {
-        Image(
-            painter = painterResource(R.drawable.login_bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .then(if (state.isLoading) Modifier.blur(10.dp) else Modifier)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(15.dp)
-                .then(if (state.isLoading) Modifier.blur(10.dp) else Modifier),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            LoginSocialButtonsSection(state = state, actions = actions)
-
-            LoginMainImageSection(
-                state = state,
-                actions = actions,
-                loginImage = loginImage,
-                signUpImage = signUpImage,
-                modifier = Modifier.weight(1f)
-            )
-
-            LoginInputFieldsSection(state = state, actions = actions)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Action Button
-            ActionButton(
-                text = stringResource(if (state.isLoginMode) R.string.login else R.string.sign_up),
-                onClick = { if (state.isLoginMode) actions.onLoginClick() else actions.onSignUpClick() }
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            LoginToggleTextSection(state = state, actions = actions)
-        }
-
-        if (state.isLoading) {
-            LoginLoadingOverlay()
-        }
-    }
+    Text(
+        text = text,
+        color = Color.White,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 @Composable
@@ -295,7 +352,6 @@ private fun LoginMainImageSection(
     modifier: Modifier = Modifier
 ) {
     val scale = remember { Animatable(1f) }
-
     LaunchedEffect(state.imageBounceTrigger) {
         if (state.imageBounceTrigger > 0) {
             scale.animateTo(
@@ -314,7 +370,6 @@ private fun LoginMainImageSection(
             )
         }
     }
-
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -329,7 +384,7 @@ private fun LoginMainImageSection(
         Crossfade(targetState = state.isLoginMode, label = "MainImage") { isLogin ->
             val bitmap = if (isLogin) loginImage else signUpImage
             val cd = stringResource(if (isLogin) R.string.cd_login_img else R.string.cd_sign_up_img)
-            
+
             bitmap?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
@@ -343,50 +398,46 @@ private fun LoginMainImageSection(
 }
 
 @Composable
-private fun LoginLoadingOverlay() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.3f))
-            .pointerInput(Unit) {
-                // Consume all touch events
-                awaitPointerEventScope {
-                    while (true) {
-                        awaitPointerEvent()
-                    }
+private fun LoginLoadingOverlay() = Box(
+    modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Black.copy(alpha = 0.3f))
+        .pointerInput(Unit) {
+            // Consume all touch events
+            awaitPointerEventScope {
+                while (true) {
+                    awaitPointerEvent()
                 }
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(color = Color.White)
-    }
+            }
+        },
+    contentAlignment = Alignment.Center
+) {
+    CircularProgressIndicator(color = Color.White)
 }
 
 @Composable
-private fun LoginSocialButtonsSection(state: LoginUiState, actions: LoginActions) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        if (state.isFacebookEnabled) {
-            SocialButton(
-                imageRes = R.drawable.facebook,
-                innerColor = ColorFacebookBlue,
-                contentDescription = stringResource(R.string.cd_facebook_login),
-                onClick = actions::onFacebookSignInClick
-            )
-
-            Spacer(modifier = Modifier.width(30.dp))
-        }
-
+private fun LoginSocialButtonsSection(state: LoginUiState, actions: LoginActions) = Row(
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = Modifier.fillMaxWidth()
+) {
+    if (state.isFacebookEnabled) {
         SocialButton(
-            imageRes = R.drawable.google,
-            innerColor = ColorGoogleWhite,
-            contentDescription = stringResource(R.string.cd_google_login),
-            onClick = actions::onGoogleSignInClick
+            imageRes = R.drawable.facebook,
+            innerColor = ColorFacebookBlue,
+            contentDescription = stringResource(R.string.cd_facebook_login),
+            onClick = actions::onFacebookSignInClick
         )
+
+        Spacer(modifier = Modifier.width(30.dp))
     }
+
+    SocialButton(
+        imageRes = R.drawable.google,
+        innerColor = ColorGoogleWhite,
+        contentDescription = stringResource(R.string.cd_google_login),
+        onClick = actions::onGoogleSignInClick
+    )
 }
 
 @Composable
@@ -401,9 +452,7 @@ private fun LoginInputFieldsSection(state: LoginUiState, actions: LoginActions) 
         ),
         onValueChange = actions::onEmailChanged
     )
-
     Spacer(modifier = Modifier.height(10.dp))
-
     LoginInputField(
         state = LoginInputFieldState(
             value = state.password,
@@ -419,92 +468,49 @@ private fun LoginInputFieldsSection(state: LoginUiState, actions: LoginActions) 
 }
 
 @Composable
-private fun LoginToggleTextSection(state: LoginUiState, actions: LoginActions) {
-    AnimatedContent(
-        targetState = state.isLoginMode,
-        transitionSpec = {
-            if (targetState) {
-                slideInHorizontally(animationSpec = tween(300)) { -it } togetherWith slideOutHorizontally(animationSpec = tween(300)) { it }
-            } else {
-                slideInHorizontally(animationSpec = tween(300)) { it } togetherWith slideOutHorizontally(animationSpec = tween(300)) { -it }
-            }
-        },
-        label = "toggleTextAnimation"
-    ) { isLogin ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { actions.onToggleMode() }
-                .padding(vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = Color(0xFFD4D4D4), fontWeight = FontWeight.Bold)) {
-                        append(stringResource(if (isLogin) R.string.txt_no_account else R.string.txt_yes_account))
-                        append(" ")
-                    }
-                    withStyle(style = SpanStyle(color = Color.White, fontWeight = FontWeight.Bold)) {
-                        append(stringResource(if (isLogin) R.string.txt_sign_up_here else R.string.txt_login_here))
-                    }
-                },
-                fontSize = 18.sp
-            )
+private fun LoginToggleTextSection(state: LoginUiState, actions: LoginActions) = AnimatedContent(
+    targetState = state.isLoginMode,
+    transitionSpec = {
+        if (targetState) {
+            slideInHorizontally(animationSpec = tween(300)) { -it } togetherWith slideOutHorizontally(
+                animationSpec = tween(300)
+            ) { it }
+        } else {
+            slideInHorizontally(animationSpec = tween(300)) { it } togetherWith slideOutHorizontally(
+                animationSpec = tween(300)
+            ) { -it }
         }
+    },
+    label = "toggleTextAnimation"
+) { isLogin ->
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { actions.onToggleMode() }
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = Color(0xFFD4D4D4),
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append(stringResource(if (isLogin) R.string.txt_no_account else R.string.txt_yes_account))
+                    append(" ")
+                }
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append(stringResource(if (isLogin) R.string.txt_sign_up_here else R.string.txt_login_here))
+                }
+            },
+            fontSize = 18.sp
+        )
     }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(
-        state = LoginUiState(),
-        actions = object : LoginActions {
-            override fun onEmailChanged(email: String) { /* no-op */ }
-            override fun onPasswordChanged(password: String) { /* no-op */ }
-            override fun onToggleMode() { /* no-op */ }
-            override fun onLoginClick() { /* no-op */ }
-            override fun onSignUpClick() { /* no-op */ }
-            override fun onGoogleSignInClick() { /* no-op */ }
-            override fun onFacebookSignInClick() { /* no-op */ }
-            override fun onImageBounceClick() { /* no-op */ }
-        }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenSignUpModePreview() {
-    LoginScreen(
-        state = LoginUiState(isLoginMode = false),
-        actions = object : LoginActions {
-            override fun onEmailChanged(email: String) { /* no-op */ }
-            override fun onPasswordChanged(password: String) { /* no-op */ }
-            override fun onToggleMode() { /* no-op */ }
-            override fun onLoginClick() { /* no-op */ }
-            override fun onSignUpClick() { /* no-op */ }
-            override fun onGoogleSignInClick() { /* no-op */ }
-            override fun onFacebookSignInClick() { /* no-op */ }
-            override fun onImageBounceClick() { /* no-op */ }
-        }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenLoadingPreview() {
-    LoginScreen(
-        state = LoginUiState(isLoading = true),
-        actions = object : LoginActions {
-            override fun onEmailChanged(email: String) { /* no-op */ }
-            override fun onPasswordChanged(password: String) { /* no-op */ }
-            override fun onToggleMode() { /* no-op */ }
-            override fun onLoginClick() { /* no-op */ }
-            override fun onSignUpClick() { /* no-op */ }
-            override fun onGoogleSignInClick() { /* no-op */ }
-            override fun onFacebookSignInClick() { /* no-op */ }
-            override fun onImageBounceClick() { /* no-op */ }
-        }
-    )
 }

@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.activities.add_workout.exercises_entry.ExercisesEntryViewModel
 import ca.gainzassist.activities.add_workout.exercises_entry.ExercisesEntryViewModelEvent
+import ca.gainzassist.activities.add_workout.summary.view.CallingActivity
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity.Companion.EXTRA_WORKOUT
@@ -36,15 +37,9 @@ import org.parceler.Parcels
 
 class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntryDataListener {
 
-    companion object {
-        const val TAB_LABEL = "Exercise %s"
-    }
-
     private val viewModel: ExercisesEntryViewModel by viewModel()
-
     // Caching fragments to preserve state during recompositions/paging
     private val fragments = mutableMapOf<Int, ExerciseEntryFragment>()
-
     private val summaryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -56,17 +51,19 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
 
     override fun onBeforeSetContent() {
         val workoutEntryIntent = intent
-        val workoutName =
-            workoutEntryIntent.getStringExtra(WorkoutEntryActivity.EXTRA_WORKOUT_NAME).orEmpty()
-        val numExs =
-            workoutEntryIntent.getIntExtra(WorkoutEntryActivity.EXTRA_NUM_EXERCISES, MIN_INT)
+        val workoutName = workoutEntryIntent.getStringExtra(
+            /* name = */ WorkoutEntryActivity.EXTRA_WORKOUT_NAME
+        ).orEmpty()
+        val numExs = workoutEntryIntent.getIntExtra(
+            /* name = */ WorkoutEntryActivity.EXTRA_NUM_EXERCISES,
+            /* defaultValue = */ MIN_INT
+        )
 
         viewModel.initialize(workoutName, numExs)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.events.collect { event ->
@@ -83,7 +80,7 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                             newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
                             newWorkoutSummaryIntent.putExtra(
                                 EXTRA_CALLING_ACTIVITY,
-                                SummaryActivity.CallingActivity.EXERCISES_ENTRY
+                                CallingActivity.EXERCISES_ENTRY
                             )
                             summaryLauncher.launch(newWorkoutSummaryIntent)
                         }
@@ -96,7 +93,6 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
     @Composable
     override fun InnerContent() {
         val state by viewModel.state.collectAsStateWithLifecycle()
-
         val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
             ExerciseEntryTab(
                 index = i,
@@ -104,7 +100,11 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                 id = i.toLong()
             )
         }.toMutableList()
-
+        val uiState = ExercisesEntryUiState(
+            selectedIndex = state.selectedIndex,
+            tabs = tabs,
+            numExercises = state.numberOfExercises
+        )
         tabs.add(
             ExerciseEntryTab(
                 index = state.numberOfExercises,
@@ -113,13 +113,6 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                 isAddTab = true
             )
         )
-
-        val uiState = ExercisesEntryUiState(
-            selectedIndex = state.selectedIndex,
-            tabs = tabs,
-            numExercises = state.numberOfExercises
-        )
-
         Column(Modifier.fillMaxSize()) {
             GainzTopBar(
                 title = "Exercises Entry",
@@ -184,7 +177,6 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
     ): Boolean {
         val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
         val names = viewModel.state.value.exerciseNames
-
         for ((i, name) in names.withIndex()) {
             if (i == skipIndex) continue
             if (name.equals(targetName, ignoreCase = true)) {
@@ -210,22 +202,22 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
             frag.setInd(newIdx)
             newFragments[newIdx] = frag
         }
-
         val deletedFrag = fragments[index]
         if (deletedFrag != null) {
             supportFragmentManager.commit {
                 remove(deletedFrag)
             }
         }
-
         fragments.clear()
         fragments.putAll(newFragments)
-
         if (viewModel.state.value.numberOfExercises <= 2) {
             fragments[0]?.hideDelete()
         }
-
         viewModel.onExerciseDeleted(index)
+    }
+
+    companion object {
+        const val TAB_LABEL = "Exercise %s"
     }
 }
 
