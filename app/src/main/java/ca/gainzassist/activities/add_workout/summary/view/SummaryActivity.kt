@@ -24,7 +24,6 @@ import ca.gainzassist.domain.model.Workout
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 import java.util.Locale
 import kotlin.math.max
 
@@ -46,7 +45,7 @@ class SummaryActivity : GainzBaseActivity() {
 
     override fun onBeforeSetContent() {
         val sourceIntent = intent
-        val w = Parcels.unwrap<Workout>(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
+        val w = sourceIntent.getParcelableExtra<Workout>(EXTRA_WORKOUT)
         workout = w
         val currentWorkout = w ?: return
         workoutId = currentWorkout.id

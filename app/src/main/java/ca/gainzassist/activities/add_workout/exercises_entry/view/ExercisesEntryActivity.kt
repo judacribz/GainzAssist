@@ -33,11 +33,11 @@ import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.ui.components.GainzTopBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 
 class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntryDataListener {
 
     private val viewModel: ExercisesEntryViewModel by viewModel()
+
     // Caching fragments to preserve state during recompositions/paging
     private val fragments = mutableMapOf<Int, ExerciseEntryFragment>()
     private val summaryLauncher = registerForActivityResult(
@@ -75,9 +75,11 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                                 this.exercises = ArrayList(event.exercises)
                             }
 
-                            val newWorkoutSummaryIntent =
-                                Intent(this@ExercisesEntryActivity, SummaryActivity::class.java)
-                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, Parcels.wrap(workout))
+                            val newWorkoutSummaryIntent = Intent(
+                                /* packageContext = */ this@ExercisesEntryActivity,
+                                /* cls = */ SummaryActivity::class.java
+                            )
+                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workout)
                             newWorkoutSummaryIntent.putExtra(
                                 EXTRA_CALLING_ACTIVITY,
                                 CallingActivity.EXERCISES_ENTRY

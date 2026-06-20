@@ -1,12 +1,13 @@
 package ca.gainzassist.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.core.constants.ExerciseConst.BARBELL
 import ca.gainzassist.core.constants.ExerciseConst.BB_MIN_WEIGHT
 import ca.gainzassist.core.constants.ExerciseConst.BB_WEIGHT_CHANGE
@@ -15,11 +16,8 @@ import ca.gainzassist.core.constants.ExerciseConst.DB_WEIGHT_CHANGE
 import ca.gainzassist.core.constants.ExerciseConst.DUMBBELL
 import ca.gainzassist.core.constants.ExerciseConst.MIN_WEIGHT
 import ca.gainzassist.core.constants.ExerciseConst.WEIGHT_CHANGE
-import org.parceler.Parcel
-import org.parceler.Parcel.Serialization
 import java.util.Date
 
-@Parcel(Serialization.BEAN)
 @Entity(
     tableName = "exercises",
     foreignKeys = [ForeignKey(
@@ -31,13 +29,14 @@ import java.util.Date
     )],
     indices = [Index(value = ["workout_id", "exercise_number"])]
 )
-class Exercise {
+class Exercise : Parcelable {
 
     @PrimaryKey
     var id: Long = -1
         set(value) {
             field = if (value == -1L) Date().time else value
         }
+
     @ColumnInfo(name = "workout_id")
     var workoutId: Long = -1
 
@@ -55,10 +54,12 @@ class Exercise {
                     minWeight = BB_MIN_WEIGHT
                     weightChange = BB_WEIGHT_CHANGE
                 }
+
                 DUMBBELL -> {
                     minWeight = DB_MIN_WEIGHT
                     weightChange = DB_WEIGHT_CHANGE
                 }
+
                 else -> {
                     minWeight = MIN_WEIGHT
                     weightChange = WEIGHT_CHANGE
@@ -72,13 +73,13 @@ class Exercise {
 
     @Ignore
     var weightChange: Float = 0f
-    
+
     @Ignore
     var minWeight: Float = 0f
 
     @Ignore
     var setsList = ArrayList<ExerciseSet>()
-    
+
     @Ignore
     var finSets = ArrayList<ExerciseSet>()
 
@@ -149,12 +150,6 @@ class Exercise {
     }
 
     fun getFinishedSetsList(): ArrayList<ExerciseSet> = finSets
-
-    fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
-
-    fun updateSet(set: ExerciseSet) {
-        finSets[set.setNumber] = set
-    }
 
     fun addSet(set: ExerciseSet, genId: Boolean) {
         if (genId) {
@@ -230,13 +225,44 @@ class Exercise {
         return exMap
     }
 
-    companion object {
-        @Ignore
-        @JvmField
-        val EQUIPMENT_TYPES = arrayListOf(ExerciseConst.BARBELL, ExerciseConst.DUMBBELL, ExerciseConst.NA)
+    constructor(parcel: Parcel) {
+        id = parcel.readLong()
+        workoutId = parcel.readLong()
+        exerciseNumber = parcel.readInt()
+        name = parcel.readString()
+        type = parcel.readString()
+        equipment = parcel.readString()
+        sets = parcel.readInt()
+        reps = parcel.readInt()
+        weight = parcel.readFloat()
+        weightChange = parcel.readFloat()
+        minWeight = parcel.readFloat()
+        setsList = parcel.createTypedArrayList(ExerciseSet.CREATOR) ?: ArrayList()
+        finSets = parcel.createTypedArrayList(ExerciseSet.CREATOR) ?: ArrayList()
+        setsType = SetsType.valueOf(parcel.readString() ?: SetsType.MAIN_SET.name)
+    }
 
-        @Ignore
-        @JvmField
-        val EXERCISE_TYPES = arrayListOf(ExerciseConst.STRENGTH, ExerciseConst.CARDIOVASCULAR, ExerciseConst.PLYOMETRICS)
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeLong(workoutId)
+        parcel.writeInt(exerciseNumber)
+        parcel.writeString(name)
+        parcel.writeString(type)
+        parcel.writeString(equipment)
+        parcel.writeInt(sets)
+        parcel.writeInt(reps)
+        parcel.writeFloat(weight)
+        parcel.writeFloat(weightChange)
+        parcel.writeFloat(minWeight)
+        parcel.writeTypedList(setsList)
+        parcel.writeTypedList(finSets)
+        parcel.writeString(setsType.name)
+    }
+
+    override fun describeContents(): Int = 0
+
+    companion object CREATOR : Parcelable.Creator<Exercise> {
+        override fun createFromParcel(parcel: Parcel): Exercise = Exercise(parcel)
+        override fun newArray(size: Int): Array<Exercise?> = arrayOfNulls(size)
     }
 }

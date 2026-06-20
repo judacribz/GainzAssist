@@ -28,7 +28,6 @@ import ca.gainzassist.ui.components.MainTopBar
 import ca.gainzassist.ui.components.MainTopBarActions
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 
 class MainActivity : GainzBaseActivity() {
 
@@ -50,7 +49,7 @@ class MainActivity : GainzBaseActivity() {
                                 )
                                 putExtra(
                                     SummaryActivity.EXTRA_WORKOUT,
-                                    Parcels.wrap(event.workout)
+                                    event.workout
                                 )
                             }
                         startActivity(editIntent)
@@ -75,7 +74,7 @@ class MainActivity : GainzBaseActivity() {
                             /* packageContext = */ this@MainActivity,
                             /* cls = */ StartWorkoutActivity::class.java
                         ).apply {
-                            putExtra(EXTRA_WORKOUT, Parcels.wrap(event.workout))
+                            putExtra(EXTRA_WORKOUT, event.workout)
                         }
                         startActivity(intent)
                     }

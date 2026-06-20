@@ -3,8 +3,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
@@ -158,11 +156,9 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.googleid)
     implementation(libs.guava)
-    implementation(libs.parceler.api)
 
     // KSP & Kapt
     ksp(libs.androidx.room.compiler)
-    kapt(libs.parceler)
 
     // Debug
     debugImplementation(libs.androidx.compose.ui.test.manifest)
@@ -191,7 +187,7 @@ val validateReleaseSecrets by tasks.registering {
         if (!secretsFile.exists()) {
             throw GradleException(
                 "Missing secrets.properties. Copy secrets.properties.template to secrets.properties " +
-                    "and fill required release values before building release."
+                        "and fill required release values before building release."
             )
         }
 
@@ -203,28 +199,30 @@ val validateReleaseSecrets by tasks.registering {
 
         val requiredKeys = mutableListOf("GOOGLE_API_KEY")
         if (isFacebookEnabled) {
-            requiredKeys.addAll(listOf(
-                "FACEBOOK_APP_ID",
-                "FACEBOOK_CLIENT_TOKEN",
-                "FB_LOGIN_PROTOCOL_SCHEME"
-            ))
+            requiredKeys.addAll(
+                listOf(
+                    "FACEBOOK_APP_ID",
+                    "FACEBOOK_CLIENT_TOKEN",
+                    "FB_LOGIN_PROTOCOL_SCHEME"
+                )
+            )
         }
 
         val missingOrInvalid = requiredKeys.filter { key ->
             val value = secrets.getProperty(key) ?: return@filter true
             val trimValue = value.trim()
             trimValue.isEmpty() ||
-                trimValue.contains("your_", ignoreCase = true) ||
-                trimValue.contains("YOUR_", ignoreCase = true) ||
-                trimValue.contains("template", ignoreCase = true) ||
-                trimValue.contains("placeholder", ignoreCase = true)
+                    trimValue.contains("your_", ignoreCase = true) ||
+                    trimValue.contains("YOUR_", ignoreCase = true) ||
+                    trimValue.contains("template", ignoreCase = true) ||
+                    trimValue.contains("placeholder", ignoreCase = true)
         }
 
         if (missingOrInvalid.isNotEmpty()) {
             throw GradleException(
                 "Invalid release secrets in secrets.properties. Missing or placeholder values for: " +
-                    missingOrInvalid.joinToString(", ") +
-                    (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
+                        missingOrInvalid.joinToString(", ") +
+                        (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
             )
         }
     }

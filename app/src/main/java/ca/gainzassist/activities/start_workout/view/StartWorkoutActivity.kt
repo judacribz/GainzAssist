@@ -34,7 +34,6 @@ import ca.gainzassist.ui.components.GainzTopBar
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 
 class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListener {
 
@@ -46,7 +45,7 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
 
     override fun onBeforeSetContent() {
         val intent = intent
-        val w = Parcels.unwrap<Workout>(intent.getParcelableExtra(MainActivity.EXTRA_WORKOUT))
+        val w = intent.getParcelableExtra<Workout>(MainActivity.EXTRA_WORKOUT)
         workout = w
         val currentWorkout = w ?: return
         exercises = currentWorkout.exercises
