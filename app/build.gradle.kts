@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
 }
 
@@ -156,11 +157,9 @@ dependencies {
     implementation(libs.android.youtube.player)
     implementation(libs.glide)
 
-    // kapt
-    kapt(libs.androidx.room.compiler)
-    kapt(libs.androidx.lifecycle.compiler)
+    // kapt & ksp
+    ksp(libs.androidx.room.compiler)
     kapt(libs.parceler)
-    kapt(libs.glide.compiler)
 
     // debugImplementation
     debugImplementation(libs.androidx.compose.ui.tooling)

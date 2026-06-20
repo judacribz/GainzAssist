@@ -1,16 +1,17 @@
 [versions]
-compose-bom = "2024.10.01"
-activity-compose = "1.9.3"
+compose-bom = "2026.06.00"
+activity-compose = "1.13.0"
 
 # Android / Kotlin / Google Plugins
 android-gradle-plugin = "9.2.1"
 google-services = "4.4.4"
 secrets-gradle-plugin = "2.0.1"
 kotlin = "2.2.10"
+ksp = "2.2.10-2.0.2"
 
 # AndroidX
 appcompat = "1.7.1"
-material = "1.12.0"
+material = "1.14.0"
 recyclerview = "1.4.0"
 constraintlayout = "2.2.1"
 cardview = "1.0.0"
@@ -21,28 +22,28 @@ fragment-ktx = "1.8.9"
 
 # Architecture Components (AndroidX)
 lifecycle = "2.10.0"
-room = "2.6.1"
+room = "2.8.4"
 
 # DI
-koin = "4.0.2"
+koin = "4.2.2"
 
 # Facebook
-facebook-android-sdk = "17.0.0"
+facebook-android-sdk = "18.2.3"
 facebook-rebound = "0.3.8"
 
 # Firebase (Modern versions)
-firebase-bom = "34.14.1"
+firebase-bom = "34.15.0"
 firebase-crashlytics-plugin = "3.0.7"
 
 # Google
-gms-play-services-auth = "20.7.0"
-credentials = "1.3.0"
-googleid = "1.1.1"
+gms-play-services-auth = "21.6.0"
+credentials = "1.6.0"
+googleid = "1.2.0"
 gson = "2.14.0"
 youtube-api = "v3-rev20260430-2.0.0"
 android-youtube-player = "13.0.0"
-glide = "4.16.0"
-guava = "33.2.1-android"
+glide = "5.0.7"
+guava = "33.6.0-android"
 
 # Jackson
 jackson-annotations = "2.22"
@@ -200,6 +201,7 @@ ui-logging = [
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
