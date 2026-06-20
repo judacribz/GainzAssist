@@ -150,29 +150,45 @@ logger = { module = "com.orhanobut:logger", version.ref = "logger" }
 
 # AndroidX
 androidx-core = [
-    "androidx-appcompat",
-    "androidx-core-ktx",
     "androidx-activity-ktx",
+    "androidx-appcompat",
+    "androidx-cardview",
+    "androidx-constraintlayout",
+    "androidx-core-ktx",
     "androidx-fragment-ktx",
     "androidx-recyclerview",
-    "androidx-constraintlayout",
-    "androidx-cardview",
     "androidx-viewpager",
     "material"
 ]
 
 # Architecture
 androidx-lifecycle = [
+    "androidx-lifecycle-livedata-ktx",
     "androidx-lifecycle-runtime-ktx",
-    "androidx-lifecycle-viewmodel-ktx",
-    "androidx-lifecycle-livedata-ktx"
+    "androidx-lifecycle-viewmodel-ktx"
+]
+
+# Compose
+compose = [
+    "androidx-activity-compose",
+    "androidx-compose-material-icons-core",
+    "androidx-compose-material-icons-extended",
+    "androidx-compose-material3",
+    "androidx-compose-ui",
+    "androidx-compose-ui-tooling-preview"
+]
+
+# Facebook
+facebook = [
+    "facebook-android-sdk",
+    "facebook-rebound"
 ]
 
 # Firebase
 firebase = [
+    "firebase-analytics",
     "firebase-auth",
-    "firebase-database",
-    "firebase-analytics"
+    "firebase-database"
 ]
 
 # Google
@@ -187,6 +203,18 @@ jackson = [
     "jackson-annotations",
     "jackson-core",
     "jackson-databind"
+]
+
+# Koin
+koin = [
+    "koin-android",
+    "koin-androidx-compose"
+]
+
+# Room
+room = [
+    "androidx-room-ktx",
+    "androidx-room-runtime"
 ]
 
 # UI / Logging

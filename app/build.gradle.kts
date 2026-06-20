@@ -125,57 +125,60 @@ tasks.configureEach {
 @Suppress("kotlin:S3416")
 dependencies {
     // BOMs
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
 
-    // implementation
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.bundles.androidx.lifecycle)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
+    // Constraints (API 36 compatibility)
+    constraints {
+        implementation("androidx.core:core-ktx:1.15.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.core:core:1.15.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0") { because("API 37 is not targeted yet") }
+    }
+
+    // Bundles
     implementation(libs.bundles.androidx.core)
-    implementation(libs.facebook.android.sdk)
-    implementation(libs.facebook.rebound)
-    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.androidx.lifecycle)
+    implementation(libs.bundles.compose)
+    implementation(libs.bundles.facebook)
+    implementation(libs.bundles.firebase)
     implementation(libs.bundles.google)
+    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.room)
+    implementation(libs.bundles.ui.logging)
+
+    // Individual Libraries
+    implementation(libs.android.youtube.player)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
-    implementation(libs.bundles.firebase)
     implementation(libs.firebase.crashlytics)
-    implementation(libs.parceler.api)
-    implementation(libs.guava)
-    implementation(libs.bundles.ui.logging)
-    implementation(libs.android.youtube.player)
     implementation(libs.glide)
+    implementation(libs.googleid)
+    implementation(libs.guava)
+    implementation(libs.parceler.api)
 
-    // kapt & ksp
+    // KSP & Kapt
     ksp(libs.androidx.room.compiler)
     kapt(libs.parceler)
 
-    // debugImplementation
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    // Debug
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
-    // testImplementation
+    // Test
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.koin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
 
-    // androidTestImplementation
-    androidTestImplementation(composeBom)
+    // Android Test
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.espresso.core)
 }
 
 val validateReleaseSecrets by tasks.registering {
