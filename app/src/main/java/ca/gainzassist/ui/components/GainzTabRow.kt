@@ -10,19 +10,17 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.SecondaryScrollableTabRow
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -35,12 +33,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
 private val EdgePadding = 0.dp
@@ -74,7 +70,7 @@ fun GainzTabRow(
     val coroutineScope = rememberCoroutineScope()
 
     if (scrollable) {
-        ScrollableTabRow(
+        SecondaryScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
             edgePadding = EdgePadding,
             modifier = modifier
@@ -90,8 +86,12 @@ fun GainzTabRow(
                 ),
             containerColor = Color.Transparent,
             contentColor = Color.White,
-            indicator = { tabPositions ->
-                GainzTabIndicator(pagerState, tabPositions)
+            indicator = {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
+                    color = colorResource(R.color.blue),
+                    height = IndicatorHeight
+                )
             },
             divider = {
                 androidx.compose.material3.HorizontalDivider(color = Color.Black)
@@ -106,7 +106,7 @@ fun GainzTabRow(
             )
         }
     } else {
-        TabRow(
+        SecondaryTabRow(
             selectedTabIndex = pagerState.currentPage,
             modifier = modifier
                 .fillMaxWidth()
@@ -121,8 +121,12 @@ fun GainzTabRow(
                 ),
             containerColor = Color.Transparent,
             contentColor = Color.White,
-            indicator = { tabPositions ->
-                GainzTabIndicator(pagerState, tabPositions)
+            indicator = {
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(pagerState.currentPage),
+                    color = colorResource(R.color.blue),
+                    height = IndicatorHeight
+                )
             },
             divider = {
                 androidx.compose.material3.HorizontalDivider(color = Color.Black)
@@ -141,40 +145,6 @@ fun GainzTabRow(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun GainzTabIndicator(
-    pagerState: PagerState,
-    tabPositions: List<androidx.compose.material3.TabPosition>
-) {
-    val page = pagerState.currentPage
-    val fraction = pagerState.currentPageOffsetFraction
-    val targetPage = if (fraction > 0) page + 1 else page - 1
-
-    val currentTab = tabPositions.getOrNull(page)
-    val targetTab = tabPositions.getOrNull(targetPage)
-
-    if (currentTab != null) {
-        val indicatorWidth = if (targetTab != null) {
-            lerp(currentTab.width, targetTab.width, abs(fraction))
-        } else currentTab.width
-
-        val indicatorOffset = if (targetTab != null) {
-            lerp(currentTab.left, targetTab.left, abs(fraction))
-        } else currentTab.left
-
-        TabRowDefaults.SecondaryIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(Alignment.BottomStart)
-                .offset(x = indicatorOffset)
-                .width(indicatorWidth),
-            color = colorResource(R.color.blue),
-            height = IndicatorHeight
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
 private fun GainzTabItems(
     tabs: List<GainzTabItem>,
     pagerState: PagerState,
@@ -183,18 +153,22 @@ private fun GainzTabItems(
     scrollable: Boolean
 ) {
     tabs.forEachIndexed { index, tab ->
-        val pageOffset = ((pagerState.currentPage - index) + pagerState.currentPageOffsetFraction)
-        val distance = abs(pageOffset).coerceIn(ColorLerpMin, ColorLerpMax)
-        val color = androidx.compose.ui.graphics.lerp(
-            colorResource(R.color.blue),
-            Color.White,
-            distance
+        val isSelected = pagerState.currentPage == index
+        val color by androidx.compose.animation.animateColorAsState(
+            targetValue = if (isSelected) colorResource(R.color.blue) else Color.White,
+            label = "tabColorAnim"
+        )
+        val distance by androidx.compose.animation.core.animateFloatAsState(
+            targetValue = if (isSelected) 0f else 1f,
+            label = "tabDistanceAnim"
         )
 
         val isPlusTab = tab.iconResId != null && tab.title.isBlank()
         val tabWidthModifier = if (scrollable) {
             if (isPlusTab) {
-                Modifier.wrapContentWidth(Alignment.Start).padding(start = TabPaddingStart)
+                Modifier
+                    .wrapContentWidth(Alignment.Start)
+                    .padding(start = TabPaddingStart)
             } else {
                 Modifier.wrapContentWidth()
             }

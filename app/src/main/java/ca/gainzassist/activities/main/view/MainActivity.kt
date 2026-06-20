@@ -3,6 +3,7 @@ package ca.gainzassist.activities.main.view
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -130,7 +131,11 @@ class MainActivity : GainzBaseActivity() {
         mainViewModel.refreshResumeWorkouts()
     }
 
-    override fun onBackPressed() = UI.handleBackButton(this)
+    override fun onBeforeSetContent() {
+        onBackPressedDispatcher.addCallback(this) {
+            UI.handleBackButton(this@MainActivity)
+        }
+    }
 
     private fun openWorkoutEntry() = startActivity(Intent(this, WorkoutEntryActivity::class.java))
 

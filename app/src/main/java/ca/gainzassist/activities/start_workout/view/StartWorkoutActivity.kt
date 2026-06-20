@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +46,11 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
 
     override fun onBeforeSetContent() {
         val intent = intent
-        val w = intent.getParcelableExtra<Workout>(MainActivity.EXTRA_WORKOUT)
+        val w = IntentCompat.getParcelableExtra(
+            /* in = */ intent,
+            /* name = */ MainActivity.EXTRA_WORKOUT,
+            /* clazz = */ Workout::class.java
+        )
         workout = w
         val currentWorkout = w ?: return
         exercises = currentWorkout.exercises

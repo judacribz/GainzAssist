@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -45,12 +46,20 @@ class SummaryActivity : GainzBaseActivity() {
 
     override fun onBeforeSetContent() {
         val sourceIntent = intent
-        val w = sourceIntent.getParcelableExtra<Workout>(EXTRA_WORKOUT)
+        val w = IntentCompat.getParcelableExtra(
+            /* in = */ sourceIntent,
+            /* name = */EXTRA_WORKOUT,
+            /* clazz = */Workout::class.java
+        )
         workout = w
         val currentWorkout = w ?: return
         workoutId = currentWorkout.id
         initialMainButtonText = getString(R.string.add_workout)
-        when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CallingActivity) {
+        when (IntentCompat.getSerializableExtra(
+            /* in = */ sourceIntent,
+            /* key = */ EXTRA_CALLING_ACTIVITY,
+            /* clazz = */ CallingActivity::class.java
+        )) {
             CallingActivity.WORKOUTS_LIST -> {
                 initialMainButtonText = getString(R.string.update_workout)
                 isUpdateMode = true
