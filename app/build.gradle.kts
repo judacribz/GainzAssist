@@ -3,11 +3,10 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
 }
 
@@ -124,59 +123,58 @@ tasks.configureEach {
 @Suppress("kotlin:S3416")
 dependencies {
     // BOMs
-    val composeBom = platform(libs.androidx.compose.bom)
-    implementation(composeBom)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(platform(libs.firebase.bom))
 
-    // implementation
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.core)
-    implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.bundles.androidx.lifecycle)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
+    // Constraints (API 36 compatibility)
+    constraints {
+        implementation("androidx.core:core-ktx:1.15.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.core:core:1.15.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0") { because("API 37 is not targeted yet") }
+    }
+
+    // Bundles
     implementation(libs.bundles.androidx.core)
-    implementation(libs.facebook.android.sdk)
-    implementation(libs.facebook.rebound)
-    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.androidx.lifecycle)
+    implementation(libs.bundles.compose)
+    implementation(libs.bundles.facebook)
+    implementation(libs.bundles.firebase)
     implementation(libs.bundles.google)
+    implementation(libs.bundles.jackson)
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.room)
+    implementation(libs.bundles.ui.logging)
+
+    // Individual Libraries
+    implementation(libs.android.youtube.player)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
-    implementation(libs.googleid)
-    implementation(libs.bundles.firebase)
     implementation(libs.firebase.crashlytics)
-    implementation(libs.parceler.api)
-    implementation(libs.guava)
-    implementation(libs.bundles.ui.logging)
-    implementation(libs.android.youtube.player)
     implementation(libs.glide)
+    implementation(libs.googleid)
+    implementation(libs.guava)
 
-    // kapt
-    kapt(libs.androidx.room.compiler)
-    kapt(libs.androidx.lifecycle.compiler)
-    kapt(libs.parceler)
-    kapt(libs.glide.compiler)
+    // KSP & Kapt
+    ksp(libs.androidx.room.compiler)
 
-    // debugImplementation
-    debugImplementation(libs.androidx.compose.ui.tooling)
+    // Debug
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 
-    // testImplementation
+    // Test
     testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.koin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
 
-    // androidTestImplementation
-    androidTestImplementation(composeBom)
+    // Android Test
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.espresso.core)
 }
 
 val validateReleaseSecrets by tasks.registering {
@@ -189,7 +187,7 @@ val validateReleaseSecrets by tasks.registering {
         if (!secretsFile.exists()) {
             throw GradleException(
                 "Missing secrets.properties. Copy secrets.properties.template to secrets.properties " +
-                    "and fill required release values before building release."
+                        "and fill required release values before building release."
             )
         }
 
@@ -201,28 +199,30 @@ val validateReleaseSecrets by tasks.registering {
 
         val requiredKeys = mutableListOf("GOOGLE_API_KEY")
         if (isFacebookEnabled) {
-            requiredKeys.addAll(listOf(
-                "FACEBOOK_APP_ID",
-                "FACEBOOK_CLIENT_TOKEN",
-                "FB_LOGIN_PROTOCOL_SCHEME"
-            ))
+            requiredKeys.addAll(
+                listOf(
+                    "FACEBOOK_APP_ID",
+                    "FACEBOOK_CLIENT_TOKEN",
+                    "FB_LOGIN_PROTOCOL_SCHEME"
+                )
+            )
         }
 
         val missingOrInvalid = requiredKeys.filter { key ->
             val value = secrets.getProperty(key) ?: return@filter true
             val trimValue = value.trim()
             trimValue.isEmpty() ||
-                trimValue.contains("your_", ignoreCase = true) ||
-                trimValue.contains("YOUR_", ignoreCase = true) ||
-                trimValue.contains("template", ignoreCase = true) ||
-                trimValue.contains("placeholder", ignoreCase = true)
+                    trimValue.contains("your_", ignoreCase = true) ||
+                    trimValue.contains("YOUR_", ignoreCase = true) ||
+                    trimValue.contains("template", ignoreCase = true) ||
+                    trimValue.contains("placeholder", ignoreCase = true)
         }
 
         if (missingOrInvalid.isNotEmpty()) {
             throw GradleException(
                 "Invalid release secrets in secrets.properties. Missing or placeholder values for: " +
-                    missingOrInvalid.joinToString(", ") +
-                    (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
+                        missingOrInvalid.joinToString(", ") +
+                        (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
             )
         }
     }

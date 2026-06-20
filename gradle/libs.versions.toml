@@ -1,48 +1,49 @@
 [versions]
-compose-bom = "2024.10.01"
-activity-compose = "1.9.3"
+compose-bom = "2026.06.00"
+activity-compose = "1.13.0"
 
 # Android / Kotlin / Google Plugins
 android-gradle-plugin = "9.2.1"
-google-services = "4.4.4"
+google-services = "4.5.0"
 secrets-gradle-plugin = "2.0.1"
-kotlin = "2.2.10"
+kotlin = "2.4.0"
+ksp = "2.3.6"
 
 # AndroidX
 appcompat = "1.7.1"
-material = "1.12.0"
+material = "1.14.0"
 recyclerview = "1.4.0"
 constraintlayout = "2.2.1"
 cardview = "1.0.0"
 viewpager = "1.1.0"
 core-ktx = "1.15.0"
-activity-ktx = "1.9.3"
+activity-ktx = "1.13.0"
 fragment-ktx = "1.8.9"
 
 # Architecture Components (AndroidX)
 lifecycle = "2.10.0"
-room = "2.6.1"
+room = "2.8.4"
 
 # DI
-koin = "4.0.2"
+koin = "4.2.2"
 
 # Facebook
-facebook-android-sdk = "17.0.0"
+facebook-android-sdk = "18.2.3"
 facebook-rebound = "0.3.8"
 
 # Firebase (Modern versions)
-firebase-bom = "34.14.1"
+firebase-bom = "34.15.0"
 firebase-crashlytics-plugin = "3.0.7"
 
 # Google
-gms-play-services-auth = "20.7.0"
-credentials = "1.3.0"
-googleid = "1.1.1"
+gms-play-services-auth = "21.6.0"
+credentials = "1.6.0"
+googleid = "1.2.0"
 gson = "2.14.0"
 youtube-api = "v3-rev20260430-2.0.0"
 android-youtube-player = "13.0.0"
-glide = "4.16.0"
-guava = "33.2.1-android"
+glide = "5.0.7"
+guava = "33.6.0-android"
 
 # Jackson
 jackson-annotations = "2.22"
@@ -59,7 +60,7 @@ logger = "2.2.0"
 
 # Testing
 junit = "4.13.2"
-androidx-junit = "1.1.5"
+androidx-junit = "1.3.0"
 espresso-core = "3.7.0"
 kotlinx-coroutines-test = "1.11.0"
 
@@ -91,7 +92,6 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
-androidx-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "lifecycle" }
 
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -123,7 +123,6 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 youtube-api = { module = "com.google.apis:google-api-services-youtube", version.ref = "youtube-api" }
 android-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "android-youtube-player" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
-glide-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 # Jackson
@@ -151,29 +150,45 @@ logger = { module = "com.orhanobut:logger", version.ref = "logger" }
 
 # AndroidX
 androidx-core = [
-    "androidx-appcompat",
-    "androidx-core-ktx",
     "androidx-activity-ktx",
+    "androidx-appcompat",
+    "androidx-cardview",
+    "androidx-constraintlayout",
+    "androidx-core-ktx",
     "androidx-fragment-ktx",
     "androidx-recyclerview",
-    "androidx-constraintlayout",
-    "androidx-cardview",
     "androidx-viewpager",
     "material"
 ]
 
 # Architecture
 androidx-lifecycle = [
+    "androidx-lifecycle-livedata-ktx",
     "androidx-lifecycle-runtime-ktx",
-    "androidx-lifecycle-viewmodel-ktx",
-    "androidx-lifecycle-livedata-ktx"
+    "androidx-lifecycle-viewmodel-ktx"
+]
+
+# Compose
+compose = [
+    "androidx-activity-compose",
+    "androidx-compose-material-icons-core",
+    "androidx-compose-material-icons-extended",
+    "androidx-compose-material3",
+    "androidx-compose-ui",
+    "androidx-compose-ui-tooling-preview"
+]
+
+# Facebook
+facebook = [
+    "facebook-android-sdk",
+    "facebook-rebound"
 ]
 
 # Firebase
 firebase = [
+    "firebase-analytics",
     "firebase-auth",
-    "firebase-database",
-    "firebase-analytics"
+    "firebase-database"
 ]
 
 # Google
@@ -190,6 +205,18 @@ jackson = [
     "jackson-databind"
 ]
 
+# Koin
+koin = [
+    "koin-android",
+    "koin-androidx-compose"
+]
+
+# Room
+room = [
+    "androidx-room-ktx",
+    "androidx-room-runtime"
+]
+
 # UI / Logging
 ui-logging = [
     "autofittextview",
@@ -200,6 +227,7 @@ ui-logging = [
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

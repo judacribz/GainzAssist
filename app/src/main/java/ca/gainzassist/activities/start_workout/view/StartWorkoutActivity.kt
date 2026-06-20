@@ -34,28 +34,22 @@ import ca.gainzassist.ui.components.GainzTopBar
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 
 class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListener {
 
-    companion object {
-        const val EXTRA_HOW_TO_VID = "ca.gainzassist.activities.start_workout.EXTRA_HOW_TO_VID"
-    }
-
     private val viewModel: StartWorkoutViewModel by viewModel()
     private val workoutController = WorkoutController
+    private var sessionSet = false
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
 
     override fun onBeforeSetContent() {
         val intent = intent
-        val w = Parcels.unwrap<Workout>(intent.getParcelableExtra(MainActivity.EXTRA_WORKOUT))
+        val w = intent.getParcelableExtra<Workout>(MainActivity.EXTRA_WORKOUT)
         workout = w
         val currentWorkout = w ?: return
         exercises = currentWorkout.exercises
-
         viewModel.initializeFromWorkout(currentWorkout)
-
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 workoutController.unsetTimer()
@@ -100,7 +94,6 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
     override fun InnerContent() {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         val currentWorkout = workout ?: return
-
         Column(Modifier.fillMaxSize()) {
             GainzTopBar(
                 title = currentWorkout.name.orEmpty(),
@@ -147,17 +140,31 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
         }
     }
 
-    private var sessionSet = false
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressedDispatcher.onBackPressed()
+        return super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        workoutController.resetIndices()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        handleLeavingScreen()
+    }
+
+    override fun warmupsGenerated(
+        warmups: ArrayList<Exercise>
+    ) = viewModel.onWarmupsGenerated(warmups)
 
     fun setCurrSession() {
         workoutController.setDataListener(this)
-
         val currentWorkout = workout ?: return
         val workoutName = currentWorkout.name ?: return
-
         lifecycleScope.launch {
-            val decision = viewModel.prepareSessionRestore(workoutName)
-            when (decision) {
+            when (val decision = viewModel.prepareSessionRestore(workoutName)) {
                 is StartWorkoutRestoreDecision.StartFresh -> {
                     workoutController.setCurrWorkout(currentWorkout)
                 }
@@ -178,31 +185,15 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return super.onSupportNavigateUp()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        workoutController.resetIndices()
-    }
-
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        handleLeavingScreen()
-    }
-
     fun handleLeavingScreen() {
         val currentWorkout = workout ?: return
         val workoutName = currentWorkout.name ?: return
-
         val jsonStr = workoutController.saveSessionState()
         viewModel.saveLeavingSession(workoutName, jsonStr)
         workoutController.resetLocks()
     }
 
-    override fun warmupsGenerated(warmups: ArrayList<Exercise>) {
-        viewModel.onWarmupsGenerated(warmups)
+    companion object {
+        const val EXTRA_HOW_TO_VID = "ca.gainzassist.activities.start_workout.EXTRA_HOW_TO_VID"
     }
 }

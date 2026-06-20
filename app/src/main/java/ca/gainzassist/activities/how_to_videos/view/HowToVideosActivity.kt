@@ -42,11 +42,6 @@ import java.security.MessageDigest
 
 class HowToVideosActivity : GainzBaseActivity() {
 
-    companion object {
-        private const val ERR_YOUTUBE_LOAD =
-            "Unable to load YouTube videos. Check API key or network."
-    }
-
     private var videos by mutableStateOf<List<HowToVideoUiItem>>(emptyList())
     private var isPlayerVisible by mutableStateOf(false)
 
@@ -111,55 +106,53 @@ class HowToVideosActivity : GainzBaseActivity() {
     }
 
     @Composable
-    override fun InnerContent() {
-        Column(Modifier.fillMaxSize()) {
-            HowToVideosTopBar(
-                state = HowToVideosTopBarState(
-                    title = "How To ${exerciseName ?: ""}",
-                    isSearchExpanded = isSearchExpanded,
-                    searchQuery = searchQuery
-                ),
-                actions = HowToVideosTopBarActions(
-                    onSearchQueryChange = { searchQuery = it },
-                    onSearchSubmit = {
-                        val query = searchQuery.trim()
-                        if (query.isNotEmpty()) {
-                            isSearchExpanded = false
-                            executeSearch(query)
-                        } else {
-                            Snackbar.make(
-                                findViewById(android.R.id.content),
-                                "Please enter a search term",
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    onSearchClick = {
-                        isSearchExpanded = true
-                    },
-                    onCloseSearchClick = {
+    override fun InnerContent() = Column(Modifier.fillMaxSize()) {
+        HowToVideosTopBar(
+            state = HowToVideosTopBarState(
+                title = "How To ${exerciseName ?: ""}",
+                isSearchExpanded = isSearchExpanded,
+                searchQuery = searchQuery
+            ),
+            actions = HowToVideosTopBarActions(
+                onSearchQueryChange = { searchQuery = it },
+                onSearchSubmit = {
+                    val query = searchQuery.trim()
+                    if (query.isNotEmpty()) {
                         isSearchExpanded = false
-                        searchQuery = ""
-                        executeSearch(exerciseName ?: "")
-                    },
-                    onBackClick = { navigateBack() }
-                )
+                        executeSearch(query)
+                    } else {
+                        Snackbar.make(
+                            findViewById(android.R.id.content),
+                            "Please enter a search term",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                onSearchClick = {
+                    isSearchExpanded = true
+                },
+                onCloseSearchClick = {
+                    isSearchExpanded = false
+                    searchQuery = ""
+                    executeSearch(exerciseName ?: "")
+                },
+                onBackClick = { navigateBack() }
             )
+        )
 
-            HowToVideosScreen(
-                uiState = HowToVideosUiState(
-                    videos = videos,
-                    isPlayerVisible = isPlayerVisible
-                ),
-                onVideoClick = { onVideoClick(it) },
-                playerContent = {
-                    AndroidView(
-                        modifier = Modifier.fillMaxSize(),
-                        factory = { youTubePlayerView }
-                    )
-                }
-            )
-        }
+        HowToVideosScreen(
+            uiState = HowToVideosUiState(
+                videos = videos,
+                isPlayerVisible = isPlayerVisible
+            ),
+            onVideoClick = { onVideoClick(it) },
+            playerContent = {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { youTubePlayerView }
+                )
+            }
+        )
     }
 
     private fun navigateBack() {
@@ -320,34 +313,32 @@ class HowToVideosActivity : GainzBaseActivity() {
         }
     }
 
-    private fun parseYouTubeResponse(jsonString: String): Pair<List<String>, List<String>> {
-        try {
-            val jsonObject = JSONObject(jsonString)
-            val items = jsonObject.optJSONArray("items")
+    private fun parseYouTubeResponse(jsonString: String): Pair<List<String>, List<String>> = try {
+        val jsonObject = JSONObject(jsonString)
+        val items = jsonObject.optJSONArray("items")
 
-            val videoIds = mutableListOf<String>()
-            val videoTitles = mutableListOf<String>()
+        val videoIds = mutableListOf<String>()
+        val videoTitles = mutableListOf<String>()
 
-            if (items != null) {
-                for (i in 0 until items.length()) {
-                    val item = items.optJSONObject(i) ?: continue
-                    val id = item.optJSONObject("id") ?: continue
-                    val snippet = item.optJSONObject("snippet") ?: continue
+        if (items != null) {
+            for (i in 0 until items.length()) {
+                val item = items.optJSONObject(i) ?: continue
+                val id = item.optJSONObject("id") ?: continue
+                val snippet = item.optJSONObject("snippet") ?: continue
 
-                    val videoId = id.optString("videoId")
-                    val title = snippet.optString("title")
+                val videoId = id.optString("videoId")
+                val title = snippet.optString("title")
 
-                    if (videoId.isNotEmpty()) {
-                        videoIds.add(videoId)
-                        videoTitles.add(title)
-                    }
+                if (videoId.isNotEmpty()) {
+                    videoIds.add(videoId)
+                    videoTitles.add(title)
                 }
             }
-            return Pair(videoIds, videoTitles)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-            throw Exception("Error parsing response")
         }
+        return Pair(videoIds, videoTitles)
+    } catch (e: JSONException) {
+        e.printStackTrace()
+        throw Exception("Error parsing response")
     }
 
     private fun videoSearchDataReceived(
@@ -357,7 +348,6 @@ class HowToVideosActivity : GainzBaseActivity() {
     ) {
         queryCache[queryKey] = Pair(videoIds, videoTitles)
         if (activeQuery == queryKey) activeQuery = null
-
         displaySearchResults(videoIds, videoTitles)
     }
 
@@ -370,8 +360,8 @@ class HowToVideosActivity : GainzBaseActivity() {
     private fun displaySearchResults(videoIds: List<String>, videoTitles: List<String>) {
         if (videoIds.isNotEmpty()) {
             val newList = mutableListOf<HowToVideoUiItem>()
-            for (i in 0 until videoIds.size) {
-                newList.add(HowToVideoUiItem(videoIds[i], videoTitles[i]))
+            for ((i, element) in videoIds.withIndex()) {
+                newList.add(HowToVideoUiItem(element, videoTitles[i]))
             }
             videos = newList
         } else {
@@ -379,5 +369,10 @@ class HowToVideosActivity : GainzBaseActivity() {
             Snackbar.make(v, "No video results", Snackbar.LENGTH_SHORT).show()
             videos = emptyList()
         }
+    }
+
+    companion object {
+        private const val ERR_YOUTUBE_LOAD =
+            "Unable to load YouTube videos. Check API key or network."
     }
 }

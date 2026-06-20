@@ -1,16 +1,15 @@
 package ca.gainzassist.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import org.parceler.Parcel
-import org.parceler.Parcel.Serialization
 import java.util.Date
 
-@Parcel(Serialization.BEAN)
 @Entity(tableName = "exercise_sets")
-class ExerciseSet {
+class ExerciseSet : Parcelable {
 
     @PrimaryKey
     var id: Long = -1
@@ -54,13 +53,38 @@ class ExerciseSet {
         this.weight = weight
     }
 
-    fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
-
     fun toMap(): Map<String, Any?> {
         val exerciseSetMap = HashMap<String, Any?>()
         exerciseSetMap["id"] = id
         exerciseSetMap["reps"] = reps
         exerciseSetMap["weight"] = weight
         return exerciseSetMap
+    }
+
+    constructor(parcel: Parcel) {
+        id = parcel.readLong()
+        sessionId = parcel.readLong()
+        exerciseId = parcel.readLong()
+        setNumber = parcel.readInt()
+        reps = parcel.readInt()
+        weight = parcel.readFloat()
+        exerciseName = parcel.readString()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeLong(sessionId)
+        parcel.writeLong(exerciseId)
+        parcel.writeInt(setNumber)
+        parcel.writeInt(reps)
+        parcel.writeFloat(weight)
+        parcel.writeString(exerciseName)
+    }
+
+    override fun describeContents(): Int = 0
+
+    companion object CREATOR : Parcelable.Creator<ExerciseSet> {
+        override fun createFromParcel(parcel: Parcel): ExerciseSet = ExerciseSet(parcel)
+        override fun newArray(size: Int): Array<ExerciseSet?> = arrayOfNulls(size)
     }
 }

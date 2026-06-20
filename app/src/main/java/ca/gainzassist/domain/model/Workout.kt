@@ -1,20 +1,19 @@
 package ca.gainzassist.domain.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import ca.gainzassist.core.util.Misc.exerciseToMap
-import org.parceler.Parcel
-import org.parceler.Parcel.Serialization
 import java.util.Date
 
-@Parcel(Serialization.BEAN)
 @Entity(
     tableName = "workouts",
     indices = [Index(value = ["name"], unique = true)]
 )
-class Workout {
+class Workout : Parcelable {
 
     @PrimaryKey
     var id: Long = -1
@@ -37,8 +36,6 @@ class Workout {
         }
     }
 
-    fun initId(id: Long) { this.id = if (id == -1L) Date().time else id }
-
     fun addExercise(exercise: Exercise?) {
         if (exercise != null) {
             if (id != -1L) {
@@ -46,28 +43,6 @@ class Workout {
             }
             exercises.add(exercise)
         }
-    }
-
-    fun removeExercise(exercise: Exercise) {
-        exercises.remove(exercise)
-        exercises.trimToSize()
-        for (ex in exercises) {
-            ex.exerciseNumber = exercises.indexOf(ex)
-        }
-    }
-
-    fun getExerciseNumber(exerciseName: String): Int {
-        val ex = getExerciseFromName(exerciseName)
-        return ex?.exerciseNumber ?: -1
-    }
-
-    fun getExerciseFromName(exName: String): Exercise? {
-        for (exercise in exercises) {
-            if (exercise.name == exName) {
-                return exercise
-            }
-        }
-        return null
     }
 
     fun getExerciseFromIndex(exIndex: Int): Exercise {
@@ -82,24 +57,25 @@ class Workout {
         return workout
     }
 
-    fun containsExercise(exerciseName: String): Boolean {
-        for (exercise in exercises) {
-            if (exercise.name.equals(exerciseName, ignoreCase = true)) {
-                return true
-            }
-        }
-        return false
-    }
-
-    val exerciseNames: ArrayList<String>
-        get() {
-            val names = ArrayList<String>()
-            for (exercise in exercises) {
-                exercise.name?.let(names::add)
-            }
-            return names
-        }
-
     val numExercises: Int
         get() = exercises.size
+
+    constructor(parcel: Parcel) {
+        id = parcel.readLong()
+        name = parcel.readString()
+        exercises = parcel.createTypedArrayList(Exercise.CREATOR) ?: ArrayList()
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeLong(id)
+        parcel.writeString(name)
+        parcel.writeTypedList(exercises)
+    }
+
+    override fun describeContents(): Int = 0
+
+    companion object CREATOR : Parcelable.Creator<Workout> {
+        override fun createFromParcel(parcel: Parcel): Workout = Workout(parcel)
+        override fun newArray(size: Int): Array<Workout?> = arrayOfNulls(size)
+    }
 }

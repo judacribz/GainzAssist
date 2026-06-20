@@ -24,95 +24,31 @@ import ca.gainzassist.domain.model.Workout
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 import java.util.Locale
 import kotlin.math.max
 
+enum class CallingActivity {
+    WORKOUTS_LIST,
+    EXERCISES_ENTRY
+}
+
 class SummaryActivity : GainzBaseActivity() {
 
-    enum class CallingActivity {
-        WORKOUTS_LIST,
-        EXERCISES_ENTRY
-    }
-
     private var workoutId: Long = -1
-
     var workout: Workout? = null
     var exercises: ArrayList<Exercise>? = null
     val summaryViewModel: SummaryViewModel by viewModel()
     var ex: Exercise? = null
-
-    companion object {
-        const val EXTRA_WORKOUT = "ca.gainzassist.activities.add_workout.EXTRA_WORKOUT"
-        const val EXTRA_CALLING_ACTIVITY =
-            "ca.gainzassist.activities.add_workout.EXTRA_CALLING_ACTIVITY"
-
-        private const val MIN_INT = 1
-        private const val MIN_FLOAT = 5.0f
-    }
-
-    private fun sanitizeReps(value: String): Int =
-        max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
-
-    private fun sanitizeSets(value: String): Int =
-        max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
-
-    private fun sanitizeWeight(value: String, minWeight: Float): Float =
-        max(value.toFloatOrNull() ?: minWeight, minWeight)
-
-    private fun formatWeight(value: Float): String {
-        return String.format(Locale.US, "%.1f", value)
-    }
-
-    private fun equipmentDisplayToModel(display: String): String {
-        return when (display.trim().lowercase()) {
-            "barbell" -> ExerciseConst.BARBELL
-            "dumbbell" -> ExerciseConst.DUMBBELL
-            "n/a", "na", "other" -> ExerciseConst.NA
-            else -> ExerciseConst.NA
-        }
-    }
-
-    private fun equipmentModelToDisplay(model: String?, options: List<String>): String {
-        val fallback = options.firstOrNull() ?: "Barbell"
-        return when (model?.trim()?.lowercase()) {
-            ExerciseConst.BARBELL -> options.firstOrNull { it.equals("Barbell", ignoreCase = true) }
-                ?: fallback
-
-            ExerciseConst.DUMBBELL -> options.firstOrNull {
-                it.equals(
-                    "Dumbbell",
-                    ignoreCase = true
-                )
-            } ?: fallback
-
-            "n/a", "na" -> options.firstOrNull { it.equals("N/A", ignoreCase = true) } ?: fallback
-            else -> fallback
-        }
-    }
-
-    private fun exerciseNameExistsForOtherExercise(
-        exercises: List<Exercise>,
-        name: String,
-        selectedExerciseNumber: Int?
-    ): Boolean {
-        return exercises.any { exercise ->
-            exercise.exerciseNumber != selectedExerciseNumber &&
-                    exercise.name.equals(name, ignoreCase = true)
-        }
-    }
-
     private var isUpdateMode = false
     private var initialMainButtonText = ""
     private var initialWorkoutName = ""
 
     override fun onBeforeSetContent() {
         val sourceIntent = intent
-        val w = Parcels.unwrap<Workout>(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
+        val w = sourceIntent.getParcelableExtra<Workout>(EXTRA_WORKOUT)
         workout = w
         val currentWorkout = w ?: return
         workoutId = currentWorkout.id
-
         initialMainButtonText = getString(R.string.add_workout)
         when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CallingActivity) {
             CallingActivity.WORKOUTS_LIST -> {
@@ -124,10 +60,8 @@ class SummaryActivity : GainzBaseActivity() {
                 // Keep default
             }
         }
-
         initialWorkoutName = currentWorkout.name.orEmpty()
         exercises = currentWorkout.exercises
-
         summaryViewModel.initialize(currentWorkout, initialWorkoutName, exercises ?: emptyList())
     }
 
@@ -167,8 +101,60 @@ class SummaryActivity : GainzBaseActivity() {
     }
 
     @Composable
-    override fun InnerContent() {
-        SummaryActivityContent(initialWorkoutName, initialMainButtonText, isUpdateMode, workout)
+    override fun InnerContent() = SummaryActivityContent(
+        initialWorkoutName = initialWorkoutName,
+        initialMainButtonText = initialMainButtonText,
+        isUpdateMode = isUpdateMode,
+        workout = workout
+    )
+
+    private fun sanitizeReps(value: String): Int = max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
+
+    private fun sanitizeSets(value: String): Int = max(value.toIntOrNull() ?: MIN_INT, MIN_INT)
+
+    private fun sanitizeWeight(
+        value: String,
+        minWeight: Float
+    ): Float = max(value.toFloatOrNull() ?: minWeight, minWeight)
+
+    private fun formatWeight(value: Float): String = String.format(Locale.US, "%.1f", value)
+
+    private fun equipmentDisplayToModel(
+        display: String
+    ): String = when (display.trim().lowercase()) {
+        "barbell" -> ExerciseConst.BARBELL
+        "dumbbell" -> ExerciseConst.DUMBBELL
+        "n/a", "na", "other" -> ExerciseConst.NA
+        else -> ExerciseConst.NA
+    }
+
+    private fun equipmentModelToDisplay(model: String?, options: List<String>): String {
+        val fallback = options.firstOrNull() ?: "Barbell"
+        return when (model?.trim()?.lowercase()) {
+            ExerciseConst.BARBELL -> options.firstOrNull { it.equals("Barbell", ignoreCase = true) }
+                ?: fallback
+
+            ExerciseConst.DUMBBELL -> options.firstOrNull {
+                it.equals(
+                    "Dumbbell",
+                    ignoreCase = true
+                )
+            } ?: fallback
+
+            "n/a", "na" -> options.firstOrNull { it.equals("N/A", ignoreCase = true) } ?: fallback
+            else -> fallback
+        }
+    }
+
+    private fun exerciseNameExistsForOtherExercise(
+        exercises: List<Exercise>,
+        name: String,
+        selectedExerciseNumber: Int?
+    ): Boolean {
+        return exercises.any { exercise ->
+            exercise.exerciseNumber != selectedExerciseNumber &&
+                    exercise.name.equals(name, ignoreCase = true)
+        }
     }
 
     @Composable
@@ -470,5 +456,13 @@ class SummaryActivity : GainzBaseActivity() {
                 }
             )
         )
+    }
+
+    companion object {
+        const val EXTRA_WORKOUT = "ca.gainzassist.activities.add_workout.EXTRA_WORKOUT"
+        const val EXTRA_CALLING_ACTIVITY =
+            "ca.gainzassist.activities.add_workout.EXTRA_CALLING_ACTIVITY"
+        private const val MIN_INT = 1
+        private const val MIN_FLOAT = 5.0f
     }
 }

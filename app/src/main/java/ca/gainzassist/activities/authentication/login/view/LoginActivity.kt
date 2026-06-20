@@ -3,9 +3,11 @@ package ca.gainzassist.activities.authentication.login.view
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Bundle
+import android.graphics.Color
 import android.util.Patterns
 import android.widget.Toast
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,12 +47,6 @@ import java.util.UUID
 class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
     FirebaseAuth.AuthStateListener {
 
-    companion object {
-        private const val MIN_PASSWORD_LEN = 6
-        private const val LOGIN_IMG = "squat.png"
-        private const val SIGN_UP_IMG = "fatman.png"
-    }
-
     private var auth: FirebaseAuth? = null
     private var credential: AuthCredential? = null
     private var googleCred: AuthCredential? = null
@@ -66,6 +62,10 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
     private val isFacebookEnabled: Boolean
         get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
 
+    override fun configureEdgeToEdge() = enableEdgeToEdge(
+        navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
+    )
+
     override fun onBeforeSetContent() {
         uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
         setupSignInMethods()
@@ -73,61 +73,40 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
         signUpBitmap = loadBitmapFromAssets(SIGN_UP_IMG)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    @Composable
+    override fun AppContent() = InnerContent()
 
     @Composable
-    override fun InnerContent() {
-        LoginScreen(
-            state = uiState,
-            loginImage = loginBitmap,
-            signUpImage = signUpBitmap,
-            actions = object : LoginActions {
-                override fun onEmailChanged(email: String) {
-                    uiState = uiState.copy(email = email, emailError = null)
-                }
-
-                override fun onPasswordChanged(password: String) {
-                    uiState = uiState.copy(password = password, passwordError = null)
-                }
-
-                override fun onToggleMode() {
-                    uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
-                }
-
-                override fun onLoginClick() = login()
-
-                override fun onSignUpClick() = signUp()
-
-                override fun onGoogleSignInClick() = googleLogin()
-
-                override fun onFacebookSignInClick() = facebookLogin()
-
-                override fun onImageBounceClick() {
-                    uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
-                }
+    override fun InnerContent() = LoginScreen(
+        state = uiState,
+        loginImage = loginBitmap,
+        signUpImage = signUpBitmap,
+        actions = object : LoginActions {
+            override fun onEmailChanged(email: String) {
+                uiState = uiState.copy(email = email, emailError = null)
             }
-        )
-    }
 
-    private fun loadBitmapFromAssets(fileName: String): Bitmap? {
-        return try {
-            BitmapFactory.decodeStream(assets.open(fileName))
-        } catch (ioe: IOException) {
-            ioe.printStackTrace()
-            null
+            override fun onPasswordChanged(password: String) {
+                uiState = uiState.copy(password = password, passwordError = null)
+            }
+
+            override fun onToggleMode() {
+                uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
+            }
+
+            override fun onLoginClick() = login()
+
+            override fun onSignUpClick() = signUp()
+
+            override fun onGoogleSignInClick() = googleLogin()
+
+            override fun onFacebookSignInClick() = facebookLogin()
+
+            override fun onImageBounceClick() {
+                uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
+            }
         }
-    }
-
-    private fun setupSignInMethods() {
-        auth = FirebaseAuth.getInstance()
-
-        if (isFacebookEnabled) {
-            callbackManager = CallbackManager.Factory.create()
-            LoginManager.getInstance().registerCallback(callbackManager, this)
-        }
-    }
+    )
 
     override fun onStart() {
         super.onStart()
@@ -198,17 +177,10 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
         Toast.makeText(this, "Facebook Login failed", Toast.LENGTH_SHORT).show()
     }
 
-    private fun authError(message: String) {
-        Logger.e(message)
-        uiState = uiState.copy(isLoading = false)
-        Toast.makeText(this, "Authentication failed. Please try again.", Toast.LENGTH_SHORT).show()
-    }
-
     fun validateForm(email: String, password: String): Boolean {
         var emailError: String? = null
         var passwordError: String? = null
         var isValid = true
-
         if (email.isEmpty()) {
             emailError = getString(R.string.err_required)
             isValid = false
@@ -216,7 +188,6 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
             emailError = getString(R.string.err_required_email_format)
             isValid = false
         }
-
         if (password.isEmpty()) {
             passwordError = getString(R.string.err_required)
             isValid = false
@@ -224,7 +195,6 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
             passwordError = getString(R.string.err_required_password_min)
             isValid = false
         }
-
         uiState = uiState.copy(emailError = emailError, passwordError = passwordError)
         return isValid
     }
@@ -253,7 +223,9 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
                 )
                 val credential = result.credential
                 if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(
+                        data = credential.data
+                    )
                     val token = googleIdTokenCredential.idToken
                     googleCred = GoogleAuthProvider.getCredential(token, null)
                     val cred = googleCred
@@ -268,7 +240,11 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
             } catch (e: GetCredentialException) {
                 e.printStackTrace()
                 uiState = uiState.copy(isLoading = false)
-                Toast.makeText(this@LoginActivity, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    /* context = */ this@LoginActivity,
+                    /* text = */"Google Sign-In failed",
+                    /* duration = */Toast.LENGTH_SHORT
+                ).show()
             } catch (e: GoogleIdTokenParsingException) {
                 e.printStackTrace()
                 authError("Google authentication failed: Parsing exception")
@@ -311,4 +287,32 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
     fun loginFail() {
         uiState = uiState.copy(isLoading = false)
     }
+
+    private fun loadBitmapFromAssets(fileName: String): Bitmap? = try {
+        BitmapFactory.decodeStream(assets.open(fileName))
+    } catch (ioe: IOException) {
+        ioe.printStackTrace()
+        null
+    }
+
+    private fun setupSignInMethods() {
+        auth = FirebaseAuth.getInstance()
+        if (isFacebookEnabled) {
+            callbackManager = CallbackManager.Factory.create()
+            LoginManager.getInstance().registerCallback(callbackManager, this)
+        }
+    }
+
+    private fun authError(message: String) {
+        Logger.e(message)
+        uiState = uiState.copy(isLoading = false)
+        Toast.makeText(this, "Authentication failed. Please try again.", Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        private const val MIN_PASSWORD_LEN = 6
+        private const val LOGIN_IMG = "squat.png"
+        private const val SIGN_UP_IMG = "fatman.png"
+    }
+
 }

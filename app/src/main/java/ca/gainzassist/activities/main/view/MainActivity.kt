@@ -2,7 +2,6 @@ package ca.gainzassist.activities.main.view
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +13,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.R
+import ca.gainzassist.activities.add_workout.summary.view.CallingActivity
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity
 import ca.gainzassist.activities.add_workout.workout_entry.view.WorkoutEntryActivity
 import ca.gainzassist.activities.authentication.login.view.LoginActivity
@@ -28,26 +28,14 @@ import ca.gainzassist.ui.components.MainTopBar
 import ca.gainzassist.ui.components.MainTopBarActions
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.parceler.Parcels
 
 class MainActivity : GainzBaseActivity() {
 
-    companion object {
-        const val EXTRA_LOGOUT_USER = "ca.gainzassist.EXTRA_LOGOUT_USER"
-        const val EXTRA_WORKOUT = "ca.gainzassist.activities.main.Main.EXTRA_WORKOUT"
-        private const val MAIL_TO = "mailto:"
-    }
-
     private val mainViewModel: MainViewModel by viewModel()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     @Composable
     override fun InnerContent() {
         val state by mainViewModel.state.collectAsStateWithLifecycle()
-
         LaunchedEffect(Unit) {
             mainViewModel.events.collect { event ->
                 when (event) {
@@ -57,11 +45,11 @@ class MainActivity : GainzBaseActivity() {
                             Intent(this@MainActivity, SummaryActivity::class.java).apply {
                                 putExtra(
                                     SummaryActivity.EXTRA_CALLING_ACTIVITY,
-                                    SummaryActivity.CallingActivity.WORKOUTS_LIST
+                                    CallingActivity.WORKOUTS_LIST
                                 )
                                 putExtra(
                                     SummaryActivity.EXTRA_WORKOUT,
-                                    Parcels.wrap(event.workout)
+                                    event.workout
                                 )
                             }
                         startActivity(editIntent)
@@ -86,14 +74,13 @@ class MainActivity : GainzBaseActivity() {
                             /* packageContext = */ this@MainActivity,
                             /* cls = */ StartWorkoutActivity::class.java
                         ).apply {
-                            putExtra(EXTRA_WORKOUT, Parcels.wrap(event.workout))
+                            putExtra(EXTRA_WORKOUT, event.workout)
                         }
                         startActivity(intent)
                     }
                 }
             }
         }
-
         Column(Modifier.fillMaxSize()) {
             MainTopBar(
                 selectedTab = state.selectedTab,
@@ -107,7 +94,6 @@ class MainActivity : GainzBaseActivity() {
                     onLogoutClick = { mainViewModel.onLogoutClicked() }
                 )
             )
-
             MainScreen(
                 uiState = MainUiState(
                     selectedTab = state.selectedTab,
@@ -144,33 +130,23 @@ class MainActivity : GainzBaseActivity() {
         mainViewModel.refreshResumeWorkouts()
     }
 
-    private fun openWorkoutEntry() {
-        startActivity(Intent(this, WorkoutEntryActivity::class.java))
-    }
+    override fun onBackPressed() = UI.handleBackButton(this)
 
-    override fun onBackPressed() {
-        UI.handleBackButton(this)
-    }
+    private fun openWorkoutEntry() = startActivity(Intent(this, WorkoutEntryActivity::class.java))
 
     private fun getSettingsUiState(): SettingsUiState {
-        val email = FirebaseAuth.getInstance().currentUser?.email
-            ?: Preferences.getEmailPref(this)
-
-        val signedInText = if (email != null) {
-            getString(R.string.settings_signed_in_as, email)
-        } else {
-            getString(R.string.settings_email_unavailable)
-        }
-
-        val versionText = getString(
-            R.string.settings_version,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE
-        )
-
+        val email = FirebaseAuth.getInstance().currentUser?.email ?: Preferences.getEmailPref(this)
         return SettingsUiState(
-            signedInText = signedInText,
-            versionText = versionText
+            signedInText = if (email != null) {
+                getString(R.string.settings_signed_in_as, email)
+            } else {
+                getString(R.string.settings_email_unavailable)
+            },
+            versionText = getString(
+                R.string.settings_version,
+                BuildConfig.VERSION_NAME,
+                BuildConfig.VERSION_CODE
+            )
         )
     }
 
@@ -219,5 +195,11 @@ class MainActivity : GainzBaseActivity() {
                 /* duration = */ Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    companion object {
+        const val EXTRA_LOGOUT_USER = "ca.gainzassist.EXTRA_LOGOUT_USER"
+        const val EXTRA_WORKOUT = "ca.gainzassist.activities.main.Main.EXTRA_WORKOUT"
+        private const val MAIL_TO = "mailto:"
     }
 }
