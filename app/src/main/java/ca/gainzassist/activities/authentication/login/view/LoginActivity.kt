@@ -6,17 +6,20 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.R
-import ca.gainzassist.activities.authentication.login.view.LoginActions
-import ca.gainzassist.activities.authentication.login.view.LoginUiState
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.activities.main.view.MainActivity
-import ca.gainzassist.core.util.UI
 import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.data.remote.firebase.Authentication
 import ca.gainzassist.data.remote.firebase.Database
@@ -25,20 +28,22 @@ import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.launch
 import java.io.IOException
+import java.security.MessageDigest
+import java.util.UUID
 
-import androidx.activity.result.contract.ActivityResultContracts
-class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, FirebaseAuth.AuthStateListener {
+class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
+    FirebaseAuth.AuthStateListener {
 
     companion object {
         private const val MIN_PASSWORD_LEN = 6
@@ -49,8 +54,9 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     private var auth: FirebaseAuth? = null
     private var credential: AuthCredential? = null
     private var googleCred: AuthCredential? = null
-    private var signInClient: GoogleSignInClient? = null
     private var callbackManager: CallbackManager? = null
+    private var loginBitmap: Bitmap? = null
+    private var signUpBitmap: Bitmap? = null
 
     var linkGoogle = false
 
@@ -60,85 +66,49 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     private val isFacebookEnabled: Boolean
         get() = BuildConfig.ENABLE_FACEBOOK_LOGIN.toBooleanStrictOrNull() ?: false
 
-    private val googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            uiState = uiState.copy(isLoading = true)
-            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                val token = account?.idToken
-                if (token != null) {
-                    googleCred = GoogleAuthProvider.getCredential(token, null)
-                    val cred = googleCred
-                    if (cred != null) {
-                        Authentication.signIn(this, cred)
-                    } else {
-                        authError("Google authentication failed: credential null")
-                    }
-                } else {
-                    authError("Google authentication failed: account or ID token null")
-                }
-            } catch (ex: ApiException) {
-                ex.printStackTrace()
-                uiState = uiState.copy(isLoading = false)
-                Toast.makeText(this, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            uiState = uiState.copy(isLoading = false)
-        }
+    override fun onBeforeSetContent() {
+        uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
+        setupSignInMethods()
+        loginBitmap = loadBitmapFromAssets(LOGIN_IMG)
+        signUpBitmap = loadBitmapFromAssets(SIGN_UP_IMG)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        UI.setInitTheme(this)
+    }
 
-        uiState = uiState.copy(isFacebookEnabled = isFacebookEnabled)
-
-        setupSignInMethods()
-
-        val loginBitmap = loadBitmapFromAssets(LOGIN_IMG)
-        val signUpBitmap = loadBitmapFromAssets(SIGN_UP_IMG)
-
-        setContent {
-            LoginScreen(
-                state = uiState,
-                loginImage = loginBitmap,
-                signUpImage = signUpBitmap,
-                actions = object : LoginActions {
-                    override fun onEmailChanged(email: String) {
-                        uiState = uiState.copy(email = email, emailError = null)
-                    }
-
-                    override fun onPasswordChanged(password: String) {
-                        uiState = uiState.copy(password = password, passwordError = null)
-                    }
-
-                    override fun onToggleMode() {
-                        uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
-                    }
-
-                    override fun onLoginClick() {
-                        login()
-                    }
-
-                    override fun onSignUpClick() {
-                        signUp()
-                    }
-
-                    override fun onGoogleSignInClick() {
-                        googleLogin()
-                    }
-
-                    override fun onFacebookSignInClick() {
-                        facebookLogin()
-                    }
-
-                    override fun onImageBounceClick() {
-                        uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
-                    }
+    @Composable
+    override fun InnerContent() {
+        LoginScreen(
+            state = uiState,
+            loginImage = loginBitmap,
+            signUpImage = signUpBitmap,
+            actions = object : LoginActions {
+                override fun onEmailChanged(email: String) {
+                    uiState = uiState.copy(email = email, emailError = null)
                 }
-            )
-        }
+
+                override fun onPasswordChanged(password: String) {
+                    uiState = uiState.copy(password = password, passwordError = null)
+                }
+
+                override fun onToggleMode() {
+                    uiState = uiState.copy(isLoginMode = !uiState.isLoginMode)
+                }
+
+                override fun onLoginClick() = login()
+
+                override fun onSignUpClick() = signUp()
+
+                override fun onGoogleSignInClick() = googleLogin()
+
+                override fun onFacebookSignInClick() = facebookLogin()
+
+                override fun onImageBounceClick() {
+                    uiState = uiState.copy(imageBounceTrigger = uiState.imageBounceTrigger + 1)
+                }
+            }
+        )
     }
 
     private fun loadBitmapFromAssets(fileName: String): Bitmap? {
@@ -152,11 +122,6 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
 
     private fun setupSignInMethods() {
         auth = FirebaseAuth.getInstance()
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
-        signInClient = GoogleSignIn.getClient(this, gso)
 
         if (isFacebookEnabled) {
             callbackManager = CallbackManager.Factory.create()
@@ -167,7 +132,16 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     override fun onStart() {
         super.onStart()
         if (intent.getBooleanExtra(MainActivity.EXTRA_LOGOUT_USER, false)) {
-            signInClient?.let { Authentication.signOut(this, it) }
+            Authentication.signOut(this)
+            lifecycleScope.launch {
+                try {
+                    CredentialManager
+                        .create(this@LoginActivity)
+                        .clearCredentialState(ClearCredentialStateRequest())
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
             if (isFacebookEnabled) {
                 LoginManager.getInstance().logOut()
             }
@@ -256,18 +230,56 @@ class LoginActivity : AppCompatActivity(), FacebookCallback<LoginResult>, Fireba
     }
 
     fun googleLogin() {
-        val client = signInClient
-        val signInIntent = client?.signInIntent
-        if (client != null && signInIntent != null) {
-            googleSignInLauncher.launch(signInIntent)
-        } else {
-            authError("Google Login unavailable: client uninitialized")
+        uiState = uiState.copy(isLoading = true)
+        val credentialManager = CredentialManager.create(this)
+        val rawNonce = UUID.randomUUID().toString()
+        val bytes = rawNonce.toByteArray()
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        val hashedNonce = digest.joinToString("") { "%02x".format(it) }
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(getString(R.string.default_web_client_id))
+            .setNonce(hashedNonce)
+            .build()
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+        lifecycleScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = this@LoginActivity
+                )
+                val credential = result.credential
+                if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    val token = googleIdTokenCredential.idToken
+                    googleCred = GoogleAuthProvider.getCredential(token, null)
+                    val cred = googleCred
+                    if (cred != null) {
+                        Authentication.signIn(this@LoginActivity, cred)
+                    } else {
+                        authError("Google authentication failed: credential null")
+                    }
+                } else {
+                    authError("Google authentication failed: Unexpected credential type")
+                }
+            } catch (e: GetCredentialException) {
+                e.printStackTrace()
+                uiState = uiState.copy(isLoading = false)
+                Toast.makeText(this@LoginActivity, "Google Sign-In failed", Toast.LENGTH_SHORT).show()
+            } catch (e: GoogleIdTokenParsingException) {
+                e.printStackTrace()
+                authError("Google authentication failed: Parsing exception")
+            }
         }
     }
 
     fun facebookLogin() {
         if (isFacebookEnabled) {
-            LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
+            LoginManager.getInstance()
+                .logInWithReadPermissions(this, listOf("public_profile", "email"))
         }
     }
 

@@ -6,10 +6,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.addCallback
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,8 +18,8 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.BuildConfig
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.activities.start_workout.view.StartWorkoutActivity.Companion.EXTRA_HOW_TO_VID
-import ca.gainzassist.core.util.UI.setInitTheme
 import ca.gainzassist.ui.components.HowToVideosTopBar
 import ca.gainzassist.ui.components.HowToVideosTopBarActions
 import ca.gainzassist.ui.components.HowToVideosTopBarState
@@ -41,10 +40,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 
-class HowToVideosActivity : AppCompatActivity() {
+class HowToVideosActivity : GainzBaseActivity() {
 
     companion object {
-        private const val ERR_YOUTUBE_LOAD = "Unable to load YouTube videos. Check API key or network."
+        private const val ERR_YOUTUBE_LOAD =
+            "Unable to load YouTube videos. Check API key or network."
     }
 
     private var videos by mutableStateOf<List<HowToVideoUiItem>>(emptyList())
@@ -64,75 +64,22 @@ class HowToVideosActivity : AppCompatActivity() {
     // Create the YouTubePlayerView once to pass to AndroidView
     private val youTubePlayerView by lazy { YouTubePlayerView(this) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onBeforeSetContent() {
         exerciseName = intent.getStringExtra(EXTRA_HOW_TO_VID)
-        setInitTheme(this)
-
         onBackPressedDispatcher.addCallback(this) {
             navigateBack()
         }
+    }
 
-        setContent {
-            Column(Modifier.fillMaxSize()) {
-                HowToVideosTopBar(
-                    state = HowToVideosTopBarState(
-                        title = "How To ${exerciseName ?: ""}",
-                        isSearchExpanded = isSearchExpanded,
-                        searchQuery = searchQuery
-                    ),
-                    actions = HowToVideosTopBarActions(
-                        onSearchQueryChange = { searchQuery = it },
-                        onSearchSubmit = {
-                            val query = searchQuery.trim()
-                            if (query.isNotEmpty()) {
-                                isSearchExpanded = false
-                                executeSearch(query)
-                            } else {
-                                Snackbar.make(
-                                    findViewById(android.R.id.content),
-                                    "Please enter a search term",
-                                    Snackbar.LENGTH_SHORT
-                                ).show()
-                            }
-                        },
-                        onSearchClick = {
-                            isSearchExpanded = true
-                        },
-                        onCloseSearchClick = {
-                            isSearchExpanded = false
-                            searchQuery = ""
-                            executeSearch(exerciseName ?: "")
-                        },
-                        onBackClick = { navigateBack() }
-                    )
-                )
-
-                HowToVideosScreen(
-                    uiState = HowToVideosUiState(
-                        videos = videos,
-                        isPlayerVisible = isPlayerVisible
-                    ),
-                    onVideoClick = { onVideoClick(it) },
-                    playerContent = {
-                        AndroidView(
-                            modifier = Modifier.fillMaxSize(),
-                            factory = { youTubePlayerView }
-                        )
-                    }
-                )
-            }
-        }
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         lifecycle.addObserver(youTubePlayerView)
-
         if (exerciseName.isNullOrBlank()) {
             val v = window.decorView.rootView
             Snackbar.make(v, "Search for an exercise video.", Snackbar.LENGTH_LONG).show()
         } else {
             executeSearch("how to $exerciseName")
         }
-
         youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 this@HowToVideosActivity.youTubePlayer = youTubePlayer
@@ -149,8 +96,10 @@ class HowToVideosActivity : AppCompatActivity() {
                 if (currentVideoId != null) {
                     Snackbar.make(v, "Unable to play this video", Snackbar.LENGTH_LONG)
                         .setAction("Open in YouTube") {
-                            val intent = Intent(Intent.ACTION_VIEW,
-                                "https://www.youtube.com/watch?v=$currentVideoId".toUri())
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                "https://www.youtube.com/watch?v=$currentVideoId".toUri()
+                            )
                             startActivity(intent)
                         }
                         .show()
@@ -159,6 +108,58 @@ class HowToVideosActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    @Composable
+    override fun InnerContent() {
+        Column(Modifier.fillMaxSize()) {
+            HowToVideosTopBar(
+                state = HowToVideosTopBarState(
+                    title = "How To ${exerciseName ?: ""}",
+                    isSearchExpanded = isSearchExpanded,
+                    searchQuery = searchQuery
+                ),
+                actions = HowToVideosTopBarActions(
+                    onSearchQueryChange = { searchQuery = it },
+                    onSearchSubmit = {
+                        val query = searchQuery.trim()
+                        if (query.isNotEmpty()) {
+                            isSearchExpanded = false
+                            executeSearch(query)
+                        } else {
+                            Snackbar.make(
+                                findViewById(android.R.id.content),
+                                "Please enter a search term",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    onSearchClick = {
+                        isSearchExpanded = true
+                    },
+                    onCloseSearchClick = {
+                        isSearchExpanded = false
+                        searchQuery = ""
+                        executeSearch(exerciseName ?: "")
+                    },
+                    onBackClick = { navigateBack() }
+                )
+            )
+
+            HowToVideosScreen(
+                uiState = HowToVideosUiState(
+                    videos = videos,
+                    isPlayerVisible = isPlayerVisible
+                ),
+                onVideoClick = { onVideoClick(it) },
+                playerContent = {
+                    AndroidView(
+                        modifier = Modifier.fillMaxSize(),
+                        factory = { youTubePlayerView }
+                    )
+                }
+            )
+        }
     }
 
     private fun navigateBack() {
@@ -228,7 +229,7 @@ class HowToVideosActivity : AppCompatActivity() {
 
     private fun getAppSha1(): String {
         try {
-            val signatures :List<Signature> = PackageInfoCompat.getSignatures(
+            val signatures: List<Signature> = PackageInfoCompat.getSignatures(
                 /* packageManager = */ packageManager,
                 /* packageName = */ packageName
             )
@@ -280,7 +281,8 @@ class HowToVideosActivity : AppCompatActivity() {
             connection.connect()
 
             val responseCode = connection.responseCode
-            val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
+            val stream =
+                if (responseCode in 200..299) connection.inputStream else connection.errorStream
 
             if (stream == null) {
                 throw Exception(ERR_YOUTUBE_LOAD)
@@ -298,7 +300,9 @@ class HowToVideosActivity : AppCompatActivity() {
                 val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
                 Log.e("HowToVideos", "Error $responseCode for $sanitizedUrl\nBody: $errorBody")
 
-                val msg = if (errorBody.contains("quotaExceeded") || errorBody.contains("dailyLimitExceeded")) {
+                val msg = if (errorBody.contains("quotaExceeded") ||
+                    errorBody.contains("dailyLimitExceeded")
+                ) {
                     "YouTube video search quota exceeded. Please try again later."
                 } else {
                     ERR_YOUTUBE_LOAD

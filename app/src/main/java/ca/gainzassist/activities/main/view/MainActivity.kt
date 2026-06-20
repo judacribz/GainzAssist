@@ -4,10 +4,9 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,6 +17,7 @@ import ca.gainzassist.R
 import ca.gainzassist.activities.add_workout.summary.view.SummaryActivity
 import ca.gainzassist.activities.add_workout.workout_entry.view.WorkoutEntryActivity
 import ca.gainzassist.activities.authentication.login.view.LoginActivity
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.activities.main.MainViewModel
 import ca.gainzassist.activities.main.MainViewModelEvent
 import ca.gainzassist.activities.main.view.tab_screens.SettingsUiState
@@ -30,7 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.parceler.Parcels
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : GainzBaseActivity() {
 
     companion object {
         const val EXTRA_LOGOUT_USER = "ca.gainzassist.EXTRA_LOGOUT_USER"
@@ -42,91 +42,100 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        UI.setInitTheme(this)
+    }
 
-        setContent {
-            val state by mainViewModel.state.collectAsStateWithLifecycle()
+    @Composable
+    override fun InnerContent() {
+        val state by mainViewModel.state.collectAsStateWithLifecycle()
 
-            LaunchedEffect(Unit) {
-                mainViewModel.events.collect { event ->
-                    when (event) {
-                        is MainViewModelEvent.AddWorkout -> openWorkoutEntry()
-                        is MainViewModelEvent.EditWorkout -> {
-                            val editIntent =
-                                Intent(this@MainActivity, SummaryActivity::class.java).apply {
-                                    putExtra(
-                                        SummaryActivity.EXTRA_CALLING_ACTIVITY,
-                                        SummaryActivity.CallingActivity.WORKOUTS_LIST
-                                    )
-                                    putExtra(
-                                        SummaryActivity.EXTRA_WORKOUT,
-                                        Parcels.wrap(event.workout)
-                                    )
-                                }
-                            startActivity(editIntent)
-                        }
-
-                        is MainViewModelEvent.Error -> {
-                            Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
-
-                        MainViewModelEvent.LoggedOut -> {
-                            val logoutIntent =
-                                Intent(this@MainActivity, LoginActivity::class.java).apply {
-                                    putExtra(EXTRA_LOGOUT_USER, true)
-                                }
-                            startActivity(logoutIntent)
-                            finish()
-                        }
-
-                        is MainViewModelEvent.StartWorkout -> {
-                            val intent = Intent(this@MainActivity, StartWorkoutActivity::class.java).apply {
-                                putExtra(EXTRA_WORKOUT, Parcels.wrap(event.workout))
+        LaunchedEffect(Unit) {
+            mainViewModel.events.collect { event ->
+                when (event) {
+                    is MainViewModelEvent.AddWorkout -> openWorkoutEntry()
+                    is MainViewModelEvent.EditWorkout -> {
+                        val editIntent =
+                            Intent(this@MainActivity, SummaryActivity::class.java).apply {
+                                putExtra(
+                                    SummaryActivity.EXTRA_CALLING_ACTIVITY,
+                                    SummaryActivity.CallingActivity.WORKOUTS_LIST
+                                )
+                                putExtra(
+                                    SummaryActivity.EXTRA_WORKOUT,
+                                    Parcels.wrap(event.workout)
+                                )
                             }
-                            startActivity(intent)
+                        startActivity(editIntent)
+                    }
+
+                    is MainViewModelEvent.Error -> {
+                        Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+
+                    MainViewModelEvent.LoggedOut -> {
+                        val logoutIntent =
+                            Intent(this@MainActivity, LoginActivity::class.java).apply {
+                                putExtra(EXTRA_LOGOUT_USER, true)
+                            }
+                        startActivity(logoutIntent)
+                        finish()
+                    }
+
+                    is MainViewModelEvent.StartWorkout -> {
+                        val intent = Intent(
+                            /* packageContext = */ this@MainActivity,
+                            /* cls = */ StartWorkoutActivity::class.java
+                        ).apply {
+                            putExtra(EXTRA_WORKOUT, Parcels.wrap(event.workout))
                         }
+                        startActivity(intent)
                     }
                 }
             }
+        }
 
-            Column(Modifier.fillMaxSize()) {
-                MainTopBar(
+        Column(Modifier.fillMaxSize()) {
+            MainTopBar(
+                selectedTab = state.selectedTab,
+                isSearchExpanded = state.isSearchExpanded,
+                searchQuery = state.searchQuery,
+                actions = MainTopBarActions(
+                    onSearchQueryChange = { mainViewModel.onSearchQueryChanged(it) },
+                    onSearchClick = { mainViewModel.onSearchExpanded() },
+                    onCloseSearchClick = { mainViewModel.onSearchClosed() },
+                    onAddWorkoutClick = { mainViewModel.onAddWorkoutClicked() },
+                    onLogoutClick = { mainViewModel.onLogoutClicked() }
+                )
+            )
+
+            MainScreen(
+                uiState = MainUiState(
                     selectedTab = state.selectedTab,
-                    isSearchExpanded = state.isSearchExpanded,
-                    searchQuery = state.searchQuery,
-                    actions = MainTopBarActions(
-                        onSearchQueryChange = { mainViewModel.onSearchQueryChanged(it) },
-                        onSearchClick = { mainViewModel.onSearchExpanded() },
-                        onCloseSearchClick = { mainViewModel.onSearchClosed() },
-                        onAddWorkoutClick = { mainViewModel.onAddWorkoutClicked() },
-                        onLogoutClick = { mainViewModel.onLogoutClicked() }
-                    )
+                    resumeWorkoutNames = state.resumeWorkoutNames,
+                    workoutNames = state.filteredWorkoutNames,
+                    selectedWorkoutName = state.selectedWorkoutName,
+                    settingsUiState = getSettingsUiState()
+                ),
+                actions = MainScreenActions(
+                    onTabSelected = { tab -> mainViewModel.onTabSelected(tab) },
+                    onResumeWorkoutClick = { workoutName ->
+                        mainViewModel.onResumeWorkoutClicked(workoutName)
+                    },
+                    onWorkoutClick = { workoutName -> mainViewModel.onWorkoutClicked(workoutName) },
+                    onWorkoutLongClick = { workoutName ->
+                        mainViewModel.onWorkoutLongClicked(workoutName)
+                    },
+                    onDismissWorkoutDialog = { mainViewModel.onDismissWorkoutDialog() },
+                    onEditWorkout = { workoutName -> mainViewModel.onEditWorkoutClicked(workoutName) },
+                    onDeleteWorkout = { workoutName ->
+                        mainViewModel.onDeleteWorkoutClicked(workoutName)
+                    },
+                    onSettingsSignOutClick = { mainViewModel.onLogoutClicked() },
+                    onPrivacyPolicyClick = { openPrivacyPolicy() },
+                    onAccountDeletionClick = { openAccountDeletion() },
+                    onContactSupportClick = { contactSupport() }
                 )
-
-                MainScreen(
-                    uiState = MainUiState(
-                        selectedTab = state.selectedTab,
-                        resumeWorkoutNames = state.resumeWorkoutNames,
-                        workoutNames = state.filteredWorkoutNames,
-                        selectedWorkoutName = state.selectedWorkoutName,
-                        settingsUiState = getSettingsUiState()
-                    ),
-                    actions = MainScreenActions(
-                        onTabSelected = { tab -> mainViewModel.onTabSelected(tab) },
-                        onResumeWorkoutClick = { workoutName -> mainViewModel.onResumeWorkoutClicked(workoutName) },
-                        onWorkoutClick = { workoutName -> mainViewModel.onWorkoutClicked(workoutName) },
-                        onWorkoutLongClick = { workoutName -> mainViewModel.onWorkoutLongClicked(workoutName) },
-                        onDismissWorkoutDialog = { mainViewModel.onDismissWorkoutDialog() },
-                        onEditWorkout = { workoutName -> mainViewModel.onEditWorkoutClicked(workoutName) },
-                        onDeleteWorkout = { workoutName -> mainViewModel.onDeleteWorkoutClicked(workoutName) },
-                        onSettingsSignOutClick = { mainViewModel.onLogoutClicked() },
-                        onPrivacyPolicyClick = { openPrivacyPolicy() },
-                        onAccountDeletionClick = { openAccountDeletion() },
-                        onContactSupportClick = { contactSupport() }
-                    )
-                )
-            }
+            )
         }
     }
 
@@ -171,7 +180,11 @@ class MainActivity : AppCompatActivity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, getString(R.string.err_browser_unavailable), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                /* context = */ this,
+                /* text = */ getString(R.string.err_browser_unavailable),
+                /* duration = */ Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -181,7 +194,11 @@ class MainActivity : AppCompatActivity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, getString(R.string.err_browser_unavailable), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                /* context = */ this,
+                /* text = */ getString(R.string.err_browser_unavailable),
+                /* duration = */ Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -196,7 +213,11 @@ class MainActivity : AppCompatActivity() {
         try {
             startActivity(intent)
         } catch (_: ActivityNotFoundException) {
-            Toast.makeText(this, getString(R.string.err_mail_unavailable), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                /* context = */ this,
+                /* text = */ getString(R.string.err_mail_unavailable),
+                /* duration = */ Toast.LENGTH_SHORT
+            ).show()
         }
     }
 }

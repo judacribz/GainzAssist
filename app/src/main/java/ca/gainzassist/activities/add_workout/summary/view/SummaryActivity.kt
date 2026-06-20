@@ -2,8 +2,6 @@ package ca.gainzassist.activities.add_workout.summary.view
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -18,8 +16,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
 import ca.gainzassist.activities.add_workout.summary.SummaryViewModel
 import ca.gainzassist.activities.add_workout.summary.SummaryViewModelEvent
+import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.core.constants.ExerciseConst
-import ca.gainzassist.core.util.UI
 import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
@@ -30,7 +28,7 @@ import org.parceler.Parcels
 import java.util.Locale
 import kotlin.math.max
 
-class SummaryActivity : AppCompatActivity() {
+class SummaryActivity : GainzBaseActivity() {
 
     enum class CallingActivity {
         WORKOUTS_LIST,
@@ -104,17 +102,18 @@ class SummaryActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        UI.setInitTheme(this)
+    private var isUpdateMode = false
+    private var initialMainButtonText = ""
+    private var initialWorkoutName = ""
 
+    override fun onBeforeSetContent() {
         val sourceIntent = intent
-        workout = Parcels.unwrap(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
-        val currentWorkout = workout ?: return
+        val w = Parcels.unwrap<Workout>(sourceIntent.getParcelableExtra(EXTRA_WORKOUT))
+        workout = w
+        val currentWorkout = w ?: return
         workoutId = currentWorkout.id
 
-        var isUpdateMode = false
-        var initialMainButtonText = getString(R.string.add_workout)
+        initialMainButtonText = getString(R.string.add_workout)
         when (sourceIntent.getSerializableExtra(EXTRA_CALLING_ACTIVITY) as? CallingActivity) {
             CallingActivity.WORKOUTS_LIST -> {
                 initialMainButtonText = getString(R.string.update_workout)
@@ -126,11 +125,14 @@ class SummaryActivity : AppCompatActivity() {
             }
         }
 
-        val initialWorkoutName = currentWorkout.name.orEmpty()
+        initialWorkoutName = currentWorkout.name.orEmpty()
         exercises = currentWorkout.exercises
 
         summaryViewModel.initialize(currentWorkout, initialWorkoutName, exercises ?: emptyList())
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 summaryViewModel.events.collectLatest { event ->
@@ -162,10 +164,11 @@ class SummaryActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
-        setContent {
-            SummaryActivityContent(initialWorkoutName, initialMainButtonText, isUpdateMode, workout)
-        }
+    @Composable
+    override fun InnerContent() {
+        SummaryActivityContent(initialWorkoutName, initialMainButtonText, isUpdateMode, workout)
     }
 
     @Composable
