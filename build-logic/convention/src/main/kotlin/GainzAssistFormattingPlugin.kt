@@ -6,6 +6,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
+@Suppress("unused")
 class GainzAssistFormattingPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         with(project) {

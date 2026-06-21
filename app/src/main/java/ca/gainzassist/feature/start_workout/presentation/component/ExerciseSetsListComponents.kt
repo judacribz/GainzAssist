@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -184,9 +185,10 @@ fun ExerciseSetChip(
     exerciseSet: ExerciseSet,
     modifier: Modifier = Modifier
 ) {
+    val locale = LocalLocale.current
     val setText = (exerciseSet.setNumber + 1).toString()
     val repsText = exerciseSet.reps.toString()
-    val weightText = String.format("%.0f", exerciseSet.weight)
+    val weightText = String.format(locale.platformLocale, "%.0f", exerciseSet.weight)
 
     val columnWidth = numberColumnWidthDp(setText, repsText, weightText)
 
