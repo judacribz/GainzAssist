@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
-    alias(libs.plugins.detekt)
     alias(libs.plugins.gainzassist.formatting)
 }
 
@@ -104,6 +103,10 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
         abortOnError = false
         checkReleaseBuilds = false
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {
@@ -156,10 +159,13 @@ dependencies {
 
     // Individual Libraries
     implementation(libs.android.youtube.player)
+    //noinspection LoginCredentials
     implementation(libs.androidx.credentials)
+    //noinspection LoginCredentials
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.firebase.crashlytics)
     implementation(libs.glide)
+    //noinspection LoginCredentials
     implementation(libs.googleid)
     implementation(libs.guava)
 

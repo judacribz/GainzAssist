@@ -1,6 +1,5 @@
 package ca.gainzassist.domain.model
 
-import android.util.SparseArray
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -31,7 +30,7 @@ class Session {
     var sessionExs = ArrayList<Exercise>()
 
     @Ignore
-    var avgWeights = SparseArray<Float>()
+    var avgWeights = HashMap<Int, Float>()
 
     constructor()
 

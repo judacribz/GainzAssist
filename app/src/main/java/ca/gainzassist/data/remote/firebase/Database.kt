@@ -2,8 +2,6 @@ package ca.gainzassist.data.remote.firebase
 
 import android.app.Activity
 import android.content.Intent
-import android.util.SparseArray
-import androidx.core.util.size
 import ca.gainzassist.data.service.FirebaseService
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
@@ -100,16 +98,16 @@ object Database {
         updateWorkoutWeights(session.workoutName!!, session.avgWeights)
     }
 
-    fun updateWorkoutWeights(workoutName: String, newWeights: SparseArray<Float>) {
+    fun updateWorkoutWeights(workoutName: String, newWeights: HashMap<Int, Float>) {
         userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
             val workoutRef = userWorkoutsRef?.child(workoutName)
-            for (i in 0 until newWeights.size) {
+            for ((key, value) in newWeights) {
                 workoutRef
                     ?.child("exercises")
-                    ?.child(i.toString())
+                    ?.child(key.toString())
                     ?.child("weight")
-                    ?.setValue(newWeights[i])
+                    ?.setValue(value)
             }
         }
     }

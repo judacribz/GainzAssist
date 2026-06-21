@@ -31,9 +31,9 @@ import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
 import ca.gainzassist.ui.ProgressStatus.UNSELECTED
 import com.orhanobut.logger.Logger
+import java.util.Locale
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Locale
 
 class WorkoutFragment : Fragment() {
 

@@ -76,7 +76,7 @@ class RoomWorkoutRepositorySessionTest {
 
         val updatedEx = assertNotNullValue(db.exerciseDao().getName(exId))
         assertEquals(110f, updatedEx.weight, 0.1f)
-        assertEquals(110f, session.avgWeights.get(exercise.exerciseNumber, -1f), 0.1f)
+        assertEquals(110f, session.avgWeights.getOrDefault(exercise.exerciseNumber, -1f), 0.1f)
     }
 
     @Test
@@ -112,7 +112,7 @@ class RoomWorkoutRepositorySessionTest {
 
         val updatedEx = assertNotNullValue(db.exerciseDao().getName(exId))
         assertEquals(130f, updatedEx.weight, 0.1f)
-        assertEquals(130f, session.avgWeights.get(exercise.exerciseNumber, -1f), 0.1f)
+        assertEquals(130f, session.avgWeights.getOrDefault(exercise.exerciseNumber, -1f), 0.1f)
     }
 
     private fun <T> assertNotNullValue(value: T?): T {

@@ -12,6 +12,8 @@ import ca.gainzassist.feature.start_workout.domain.usecase.FinishWorkoutSessionU
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -21,6 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class WorkoutScreenViewModelTest {
 
     @get:Rule
@@ -65,6 +68,7 @@ class WorkoutScreenViewModelTest {
         viewModel.getSessionProgress("My Workout") {
             loadedSnapshot = it
         }
+        advanceUntilIdle()
         assertNull(loadedSnapshot)
     }
 
@@ -77,6 +81,7 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
+        advanceUntilIdle()
 
         val savedJsonNullable = sessionPreferencesRepository.getSessionProgress(workoutName)
         val savedJson = assertNotNullValue(savedJsonNullable)
@@ -95,11 +100,13 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
+        advanceUntilIdle()
 
         var loadedSnapshotNullable: SessionProgressSnapshot? = null
         viewModel.getSessionProgress(workoutName) {
             loadedSnapshotNullable = it
         }
+        advanceUntilIdle()
 
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
@@ -117,6 +124,7 @@ class WorkoutScreenViewModelTest {
         viewModel.getSessionProgress(workoutName) {
             loadedSnapshotNullable = it
         }
+        advanceUntilIdle()
 
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
@@ -135,11 +143,13 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Null Test"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
+        advanceUntilIdle()
 
         var loadedSnapshotNullable: SessionProgressSnapshot? = null
         viewModel.getSessionProgress(workoutName) {
             loadedSnapshotNullable = it
         }
+        advanceUntilIdle()
 
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
@@ -155,6 +165,7 @@ class WorkoutScreenViewModelTest {
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
 
         viewModel.finishWorkoutSession(workoutName, Session())
+        advanceUntilIdle()
 
         assertFalse(sessionPreferencesRepository.getIncompleteWorkoutNames().contains(workoutName))
         assertEquals(null, sessionPreferencesRepository.getIncompleteSession(workoutName))
@@ -168,6 +179,7 @@ class WorkoutScreenViewModelTest {
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
 
         viewModel.finishWorkoutSession(workoutName, Session())
+        advanceUntilIdle()
 
         assertEquals(null, sessionPreferencesRepository.getSessionProgress(workoutName))
         assertEquals("{\"session\":true}", sessionPreferencesRepository.getIncompleteSession(workoutName))
@@ -177,6 +189,7 @@ class WorkoutScreenViewModelTest {
     fun insertCompletedSession_delegatesToUseCase() = runTest {
         val session = Session().apply { workoutName = "Chest Day" }
         viewModel.finishWorkoutSession("Chest Day", session)
+        advanceUntilIdle()
 
         assertEquals(1, fakeWorkoutRepository.insertedSessions.size)
         assertEquals(session, fakeWorkoutRepository.insertedSessions.first())
@@ -187,6 +200,7 @@ class WorkoutScreenViewModelTest {
     fun insertCompletedSession_doesNotModifySessionWhenRepositoryFakeOnlyRecords() = runTest {
         val session = Session().apply { workoutName = "Leg Day" }
         viewModel.finishWorkoutSession("Leg Day", session)
+        advanceUntilIdle()
 
         val recorded = fakeWorkoutRepository.insertedSessions.first()
         assertEquals("Leg Day", recorded.workoutName)

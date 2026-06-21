@@ -29,7 +29,7 @@ class SessionTest {
 
         session.addExercise(exercise)
 
-        val recordedWeight = session.avgWeights.get(0, -1f)
+        val recordedWeight = session.avgWeights.getOrDefault(0, -1f)
         assertEquals(105f, recordedWeight, 0.01f)
     }
 }
