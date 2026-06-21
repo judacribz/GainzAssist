@@ -18,16 +18,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
-import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutController
-import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutProgressMapper
-import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutScreenViewModel
-import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
 import ca.gainzassist.core.constants.ExerciseConst.MIN_REPS
 import ca.gainzassist.core.constants.UIConst.PROGRESS_CODE_MAP
 import ca.gainzassist.core.constants.UIConst.PROGRESS_STATUS_MAP
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.session.SessionProgressSnapshot
+import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
+import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutController
+import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutProgressMapper
+import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutScreenViewModel
 import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
@@ -94,7 +94,10 @@ class WorkoutFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
         setNum = "%s " + getString(R.string.set_num)
 
@@ -104,6 +107,7 @@ class WorkoutFragment : Fragment() {
                     when (event) {
                         is WorkoutController.WorkoutControllerEvent.StartTimer -> startTimer(event.timeInMillis)
                         is WorkoutController.WorkoutControllerEvent.UpdateProgressSets -> updateProgressSets(event.numSets)
+                        else -> {}
                     }
                 }
             }
@@ -123,7 +127,7 @@ class WorkoutFragment : Fragment() {
     private fun refreshFromResume() {
         lifecycleScope.launch {
             val snapshot = viewModel.getSessionProgress(workoutController.workoutName)
-            if (setProgress == null && snapshot != null) {
+            if ((setProgress == null) && (snapshot != null)) {
                 exProgress = SparseArray<ProgressStatus>().apply {
                     snapshot.exerciseProgress.forEach { (key, value) ->
                         value?.let { put(key, PROGRESS_STATUS_MAP[it]) }
@@ -265,7 +269,7 @@ class WorkoutFragment : Fragment() {
 
     private fun onRepsTextChanged(repStr: String) {
         val reps = repStr.toIntOrNull() ?: MIN_REPS
-        workoutController.setCurrReps(reps, false)
+        workoutController.setCurrReps(reps, setTimer = false)
         uiState = uiState.copy(
             repsText = repStr,
             isMinReps = workoutController.isMinReps()
@@ -285,7 +289,7 @@ class WorkoutFragment : Fragment() {
 
     private fun onRepsFocusLost() {
         if (uiState.repsText.isEmpty() || uiState.repsText.toIntOrNull() == null) {
-            workoutController.setCurrReps(workoutController.currReps, false)
+            workoutController.setCurrReps(workoutController.currReps, setTimer = false)
             setReps()
         }
     }
@@ -337,8 +341,7 @@ class WorkoutFragment : Fragment() {
             countDownTimer = null
 
             lifecycleScope.launch {
-                val session = workoutController.currSession
-                if (session != null) {
+                workoutController.currSession?.let { session ->
                     viewModel.finishWorkoutSession(workoutController.workoutName, session)
                 }
                 activity?.finish()
@@ -350,9 +353,9 @@ class WorkoutFragment : Fragment() {
         val setType = if (workoutController.getIsWarmup()) {
             countDownTimer?.onFinish()
             countDownTimer = null
-            "Warmup"
+            getString(R.string.warmups)
         } else {
-            "Main"
+            getString(R.string.workout)
         }
 
         if (!workoutController.lockReps) {
@@ -465,7 +468,7 @@ class WorkoutFragment : Fragment() {
         val setList = updateEx.getFinishedSetsList()
         if (setInd >= 0 && setInd < setList.size) {
             val set = setList[setInd]
-            val setLabel = setNum?.let { String.format(it, "Main") } ?: ""
+            val setLabel = setNum?.let { String.format(it, getString(R.string.workout)) } ?: ""
 
             uiState = uiState.copy(
                 exerciseTitle = updateEx.name ?: "",

@@ -2,6 +2,8 @@ package ca.gainzassist.feature.summary.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ca.gainzassist.R
+import ca.gainzassist.core.util.UiText
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.summary.domain.usecase.SaveWorkoutUseCase
@@ -18,12 +20,12 @@ data class SummaryViewModelState(
     val workoutName: String = "",
     val exercises: List<Exercise> = emptyList(),
     val isSaving: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: UiText? = null
 )
 
 sealed interface SummaryViewModelEvent {
     data object Saved : SummaryViewModelEvent
-    data class Error(val message: String) : SummaryViewModelEvent
+    data class Error(val message: UiText) : SummaryViewModelEvent
 }
 
 class SummaryViewModel(
@@ -56,12 +58,16 @@ class SummaryViewModel(
         val currentState = _state.value
 
         if (currentState.workoutName.isBlank()) {
-            _state.update { it.copy(errorMessage = "Workout name is required.") }
+            _state.update {
+                it.copy(errorMessage = UiText.StringResource(R.string.err_workout_name_required))
+            }
             return
         }
 
         if (currentState.exercises.isEmpty()) {
-            _state.update { it.copy(errorMessage = "No exercises added.") }
+            _state.update {
+                it.copy(errorMessage = UiText.StringResource(R.string.err_no_exercises))
+            }
             return
         }
 
@@ -76,7 +82,11 @@ class SummaryViewModel(
                 saveWorkoutUseCase(currentWorkout, isUpdate)
                 _events.emit(SummaryViewModelEvent.Saved)
             } catch (e: Exception) {
-                _events.emit(SummaryViewModelEvent.Error(e.message ?: "Unknown error occurred"))
+                _events.emit(
+                    SummaryViewModelEvent.Error(
+                        UiText.DynamicString(e.message.orEmpty())
+                    )
+                )
             } finally {
                 _state.update { it.copy(isSaving = false) }
             }

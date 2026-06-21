@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -21,14 +20,13 @@ import androidx.lifecycle.lifecycleScope
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.R
 import ca.gainzassist.activities.base.GainzBaseActivity
-import ca.gainzassist.feature.main.presentation.screen.MainActivity
 import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.data.remote.firebase.Authentication
 import ca.gainzassist.data.remote.firebase.Database
 import ca.gainzassist.feature.login.presentation.event.LoginActions
-import ca.gainzassist.feature.login.presentation.state.LoginUiState
 import ca.gainzassist.feature.login.presentation.viewmodel.LoginViewModel
 import ca.gainzassist.feature.login.presentation.viewmodel.LoginViewModelEvent
+import ca.gainzassist.feature.main.presentation.screen.MainActivity
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -90,17 +88,27 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
                         startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
                     }
-                    is LoginViewModelEvent.ShowToast -> {
-                        Toast.makeText(this@LoginActivity, event.message, Toast.LENGTH_SHORT).show()
+
+                    is LoginViewModelEvent.ShowToast, is LoginViewModelEvent.AuthError -> {
+                        val message = when (event) {
+                            is LoginViewModelEvent.ShowToast -> event.message
+                            is LoginViewModelEvent.AuthError -> event.message
+                        }
+                        message.let {
+                            Toast.makeText(
+                                /* context = */ this@LoginActivity,
+                                /* text = */ it.asString(this@LoginActivity),
+                                /* duration = */ Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
+
                     is LoginViewModelEvent.StartGoogleLogin -> {
                         googleLogin()
                     }
+
                     is LoginViewModelEvent.StartFacebookLogin -> {
                         facebookLogin()
-                    }
-                    is LoginViewModelEvent.AuthError -> {
-                        Toast.makeText(this@LoginActivity, event.message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -189,7 +197,11 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
     override fun onError(error: FacebookException) {
         error.printStackTrace()
         loginViewModel.setLoading(false)
-        Toast.makeText(this, "Facebook Login failed", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            /* context = */ this,
+            /* text = */ getString(R.string.err_facebook_login_failed),
+            /* duration = */ Toast.LENGTH_SHORT
+        ).show()
     }
 
     fun googleLogin() {
@@ -234,7 +246,7 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
                 loginViewModel.setLoading(false)
                 Toast.makeText(
                     /* context = */ this@LoginActivity,
-                    /* text = */"Google Sign-In failed",
+                    /* text = */getString(R.string.err_google_login_failed),
                     /* duration = */Toast.LENGTH_SHORT
                 ).show()
             } catch (e: GoogleIdTokenParsingException) {
@@ -273,7 +285,7 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
     private fun authError(message: String) {
         Logger.e(message)
         loginViewModel.setLoading(false)
-        Toast.makeText(this, "Authentication failed. Please try again.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.err_auth_failed), Toast.LENGTH_SHORT).show()
     }
 
     companion object {

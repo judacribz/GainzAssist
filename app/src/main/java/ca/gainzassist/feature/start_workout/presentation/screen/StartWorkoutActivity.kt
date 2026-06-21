@@ -22,21 +22,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
 import ca.gainzassist.activities.base.GainzBaseActivity
+import ca.gainzassist.core.util.Misc
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.how_to_videos.presentation.screen.HowToVideosActivity
 import ca.gainzassist.feature.main.presentation.screen.MainActivity
 import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.StartWorkoutViewModel
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.StartWorkoutViewModelEvent
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutController
-import ca.gainzassist.core.util.Misc
-import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.ui.components.GainzTopBar
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListener {
+class StartWorkoutActivity : GainzBaseActivity() {
 
     private val viewModel: StartWorkoutViewModel by viewModel()
     private val workoutController = WorkoutController
@@ -55,38 +55,57 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
         val currentWorkout = w ?: return
         exercises = currentWorkout.exercises
         viewModel.initializeFromWorkout(currentWorkout)
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                handleLeavingScreen()
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(enabled = true) {
+                override fun handleOnBackPressed() {
+                    handleLeavingScreen()
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
             }
-        })
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.events.collect { event ->
-                    when (event) {
-                        is StartWorkoutViewModelEvent.OpenHowToVideos -> {
-                            val vidIntent =
-                                Intent(this@StartWorkoutActivity, HowToVideosActivity::class.java)
-                            vidIntent.putExtra(EXTRA_HOW_TO_VID, workoutController.currExName)
-                            startActivity(vidIntent)
-                        }
+                launch {
+                    viewModel.events.collect { event ->
+                        when (event) {
+                            is StartWorkoutViewModelEvent.OpenHowToVideos -> {
+                                val vidIntent =
+                                    Intent(
+                                        this@StartWorkoutActivity,
+                                        HowToVideosActivity::class.java
+                                    )
+                                vidIntent.putExtra(EXTRA_HOW_TO_VID, workoutController.currExName)
+                                startActivity(vidIntent)
+                            }
 
-                        is StartWorkoutViewModelEvent.ExitWorkout -> {
-                            onBackPressedDispatcher.onBackPressed()
-                        }
+                            is StartWorkoutViewModelEvent.ExitWorkout -> {
+                                onBackPressedDispatcher.onBackPressed()
+                            }
 
-                        is StartWorkoutViewModelEvent.FinishWorkout -> {
-                            // Handled later
-                        }
+                            is StartWorkoutViewModelEvent.FinishWorkout -> {
+                                // Handled later
+                            }
 
-                        is StartWorkoutViewModelEvent.Error -> {
-                            // Handle error
+                            is StartWorkoutViewModelEvent.Error -> {
+                                // Handle error
+                            }
+                        }
+                    }
+                }
+                launch {
+                    workoutController.events.collect { event ->
+                        when (event) {
+                            is WorkoutController.WorkoutControllerEvent.WarmupsGenerated -> {
+                                viewModel.onWarmupsGenerated(event.warmups)
+                            }
+
+                            else -> {}
                         }
                     }
                 }
@@ -121,9 +140,7 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
             if (uiState.isSessionReady) {
                 StartWorkoutScreen(
                     uiState = uiState,
-                    onTabSelected = { tab ->
-                        viewModel.onTabSelected(tab)
-                    }
+                    onTabSelected = { viewModel.onTabSelected(it) }
                 )
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -138,7 +155,7 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
         // Initialize session if not already set. We check if uiState's tabs match a fresh load.
         // But since we removed the pager adapter check, we can use a boolean flag.
         val currentState = viewModel.state.value
-        if (currentState.warmups.isEmpty() && currentState.availableTabs.size == 2 && !sessionSet) {
+        if ((currentState.warmups.isEmpty() && currentState.availableTabs.size == 2) && !sessionSet) {
             setCurrSession()
             sessionSet = true
         }
@@ -158,10 +175,6 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
         super.onUserLeaveHint()
         handleLeavingScreen()
     }
-
-    override fun warmupsGenerated(
-        warmups: ArrayList<Exercise>
-    ) = viewModel.onWarmupsGenerated(warmups)
 
     fun setCurrSession() {
         val currentWorkout = workout ?: return

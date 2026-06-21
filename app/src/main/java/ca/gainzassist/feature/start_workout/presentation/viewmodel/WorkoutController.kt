@@ -13,9 +13,6 @@ import ca.gainzassist.core.constants.ExerciseConst.SET_INDEX
 import ca.gainzassist.core.constants.ExerciseConst.SET_LIST
 import ca.gainzassist.core.constants.ExerciseConst.WEIGHT
 import ca.gainzassist.core.constants.ExerciseConst.WEIGHT_CHANGE
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import ca.gainzassist.core.util.Misc.enablePrettyMapper
 import ca.gainzassist.core.util.Misc.readValue
 import ca.gainzassist.core.util.Misc.writeValueAsString
@@ -26,12 +23,14 @@ import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
 import com.orhanobut.logger.Logger
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.math.max
 import kotlin.math.min
 
 object WorkoutController {
 
-    private var warmupsListener: WarmupsListener? = null
     private var currWorkout: Workout? = null
     private var currExercise: Exercise? = null
     private var currExerciseSet: ExerciseSet? = null
@@ -69,18 +68,11 @@ object WorkoutController {
     sealed interface WorkoutControllerEvent {
         data class StartTimer(val timeInMillis: Long) : WorkoutControllerEvent
         data class UpdateProgressSets(val numSets: Int) : WorkoutControllerEvent
+        data class WarmupsGenerated(val warmups: List<Exercise>) : WorkoutControllerEvent
     }
 
     private val _events = MutableSharedFlow<WorkoutControllerEvent>(extraBufferCapacity = 8)
     val events: SharedFlow<WorkoutControllerEvent> = _events.asSharedFlow()
-
-    fun interface WarmupsListener {
-        fun warmupsGenerated(warmups: ArrayList<Exercise>)
-    }
-
-    fun setDataListener(warmupsListener: WarmupsListener) {
-        this.warmupsListener = warmupsListener
-    }
 
     fun setRetrievedWorkout(map: Map<String, Any?>, workout: Workout) {
         resetIndices()
@@ -104,12 +96,13 @@ object WorkoutController {
             for ((setKey, setValue) in setsMap) {
                 val setMap = readValue(setValue)
                 exercise.addSet(
-                    ExerciseSet(
+                    set = ExerciseSet(
                         exercise,
                         setKey.toInt(),
                         setMap[REPS]?.toString()?.toInt() ?: 0,
                         setMap[WEIGHT]?.toString()?.toFloat() ?: 0f
-                    ), false
+                    ),
+                    genId = false
                 )
             }
             this.currSession!!.addExercise(exercise)
@@ -167,58 +160,75 @@ object WorkoutController {
         currMainInd = allExs[exIndex].exerciseNumber
     }
 
+    private data class BBWarmupState(
+        var setNum: Int = 0,
+        var reps: Int = 0,
+        var newWeight: Float = 0f,
+        var weightInc: Float = 0f
+    )
+
     private fun genBBWarmups(ex: Exercise): ArrayList<ExerciseSet> {
         val exerciseSets = ArrayList<ExerciseSet>()
-        var setNum = 0
-        var reps = ex.getAvgReps()
-        val minWeight = ex.minWeight
-        val weightChange = ex.weightChange
         val weight = ex.getAvgWeight()
-        var weightInc: Float
-        var newWeight = minWeight
+        val state = BBWarmupState(
+            reps = ex.getAvgReps(),
+            newWeight = ex.minWeight
+        )
 
-        exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
-        exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
+        exerciseSets.add(ExerciseSet(ex, state.setNum++, state.reps, state.newWeight))
+        exerciseSets.add(ExerciseSet(ex, state.setNum++, state.reps, state.newWeight))
 
         if (weight >= 405f) {
-            weightInc = 90f
-            newWeight += 90f
-            while (newWeight <= 0.85f * weight) {
-                if (newWeight >= 0.75f * weight) {
-                    reps = ex.reps / 4 + 1
-                } else if (newWeight > 0.65f * weight) {
-                    reps = ex.reps / 2 + 1
-                }
-                exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
-                newWeight += weightInc
-            }
+            state.weightInc = 90f
+            state.newWeight += 90f
         } else {
-            newWeight += 50f
-            weightInc = 40f
-            while (newWeight <= 0.85f * weight) {
-                if (newWeight >= 0.75f * weight) {
-                    reps = ex.reps / 4 + 1
-                } else if (newWeight > 0.65f * weight) {
-                    reps = ex.reps / 2 + 1
-                }
-                exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
-                newWeight += weightInc
-            }
+            state.newWeight += 50f
+            state.weightInc = 40f
         }
-        reps = reps / 2 + 1
-        while (true) {
-            if (weightInc <= weightChange * 2) {
-                return exerciseSets
+
+        addBBIncrementSets(ex, exerciseSets, state, weight)
+        addBBRefinementSets(ex, exerciseSets, state, weight)
+        
+        return exerciseSets
+    }
+
+    private fun addBBIncrementSets(
+        ex: Exercise,
+        exerciseSets: ArrayList<ExerciseSet>,
+        state: BBWarmupState,
+        weight: Float
+    ) {
+        while (state.newWeight <= (0.85f * weight)) {
+            if (state.newWeight >= (0.75f * weight)) {
+                state.reps = ex.reps / 4 + 1
+            } else if (state.newWeight > (0.65f * weight)) {
+                state.reps = ex.reps / 2 + 1
             }
-            if (newWeight < 0.91f * weight) {
-                newWeight -= newWeight % weightChange
-                exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
-                newWeight += weightInc
-                reps = max(reps / 2, 1)
+            exerciseSets.add(ExerciseSet(ex, state.setNum++, state.reps, state.newWeight))
+            state.newWeight += state.weightInc
+        }
+    }
+
+    private fun addBBRefinementSets(
+        ex: Exercise,
+        exerciseSets: ArrayList<ExerciseSet>,
+        state: BBWarmupState,
+        weight: Float
+    ) {
+        state.reps = state.reps / 2 + 1
+        while (true) {
+            if (state.weightInc <= (ex.weightChange * 2)) {
+                return
+            }
+            if (state.newWeight < (0.91f * weight)) {
+                state.newWeight -= state.newWeight % ex.weightChange
+                exerciseSets.add(ExerciseSet(ex, state.setNum++, state.reps, state.newWeight))
+                state.newWeight += state.weightInc
+                state.reps = max(state.reps / 2, 1)
             } else {
-                newWeight -= weightInc
-                weightInc /= 2f
-                newWeight += weightInc
+                state.newWeight -= state.weightInc
+                state.weightInc /= 2f
+                state.newWeight += state.weightInc
             }
         }
     }
@@ -245,7 +255,7 @@ object WorkoutController {
         repeat(setsCount) {
             newWeight = perc * weight
             newWeight -= newWeight % (weightChange * 2)
-            if (newWeight >= 0.65f * weight) {
+            if (newWeight >= (0.65f * weight)) {
                 reps = reps / 2 + 1
             }
             exerciseSets.add(ExerciseSet(ex, setNum++, reps, newWeight))
@@ -262,7 +272,7 @@ object WorkoutController {
     private fun setCurrWarmupExercises(warmups: ArrayList<Exercise>) {
         this.currWarmups = warmups
         this.numWarmups = warmups.size
-        warmupsListener?.warmupsGenerated(warmups)
+        _events.tryEmit(WorkoutControllerEvent.WarmupsGenerated(warmups))
     }
 
     private fun setAllCurrExercises(allExercises: ArrayList<Exercise>) {
@@ -278,6 +288,23 @@ object WorkoutController {
     var lastExSuccess = true
 
     fun finishCurrSet(): Boolean {
+        checkSetSuccess()
+        this.setIndex++
+        
+        if (!isWarmup) {
+            addCurrSet()
+        }
+
+        if (atEndOfSets()) {
+            return handleEndOfExercises()
+        } else {
+            updateLocks()
+            setCurrExerciseSet(this.currExercise!!.getSet(this.setIndex))
+        }
+        return true
+    }
+
+    private fun checkSetSuccess() {
         if (isWarmup) {
             setSuccess = true
         } else if (this.currReps >= this.currExercise!!.reps && this.currWeight >= this.currExercise!!.weight) {
@@ -286,40 +313,39 @@ object WorkoutController {
             setSuccess = false
             exSuccess = false
         }
+    }
 
-        this.setIndex++
+    private fun handleEndOfExercises(): Boolean {
+        resetLocks()
+        this.setIndex = 0
+        this.exIndex++
+        
         if (!isWarmup) {
-            addCurrSet()
+            this.currSession!!.addExercise(this.currExercise!!)
         }
-        if (atEndOfSets()) {
-            resetLocks()
-            this.setIndex = 0
-            this.exIndex++
-            if (!isWarmup) {
-                this.currSession!!.addExercise(this.currExercise!!)
-            }
-            if (atEndOfExercises()) {
-                resetIndices()
-                return false
-            } else {
-                lastExSuccess = exSuccess
-                if (isWarmup) {
-                    exSuccess = true
-                }
-                setCurrExercise(this.currWorkout!!.getExerciseFromIndex(this.exIndex))
-            }
+        
+        if (atEndOfExercises()) {
+            resetIndices()
+            return false
         } else {
-            if (!isWarmup) {
-                if (this.currReps != this.currExercise!!.reps) {
-                    lockReps = true
-                }
-                if (this.currWeight != this.currExercise!!.weight) {
-                    lockWeight = true
-                }
+            lastExSuccess = exSuccess
+            if (isWarmup) {
+                exSuccess = true
             }
-            setCurrExerciseSet(this.currExercise!!.getSet(this.setIndex))
+            setCurrExercise(this.currWorkout!!.getExerciseFromIndex(this.exIndex))
         }
         return true
+    }
+
+    private fun updateLocks() {
+        if (!isWarmup) {
+            if (this.currReps != this.currExercise!!.reps) {
+                lockReps = true
+            }
+            if (this.currWeight != this.currExercise!!.weight) {
+                lockWeight = true
+            }
+        }
     }
 
     fun resetLocks() {
@@ -330,7 +356,7 @@ object WorkoutController {
     fun addCurrSet() {
         this.currExerciseSet!!.reps = this.currReps
         this.currExerciseSet!!.weight = this.currWeight
-        this.currExercise!!.addSet(this.currExerciseSet!!, true)
+        this.currExercise!!.addSet(this.currExerciseSet!!, genId = true)
     }
 
     fun atEndOfSets(): Boolean {
@@ -366,7 +392,7 @@ object WorkoutController {
 
     private fun setCurrExerciseSet(exerciseSet: ExerciseSet) {
         this.currExerciseSet = exerciseSet
-        setCurrReps(this.currExerciseSet!!.reps, true)
+        setCurrReps(this.currExerciseSet!!.reps, setTimer = true)
         if (!lockWeight) this.currWeight = this.currExerciseSet!!.weight
     }
 

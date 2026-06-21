@@ -3,6 +3,7 @@ package ca.gainzassist.feature.login.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ca.gainzassist.R
+import ca.gainzassist.core.util.UiText
 import ca.gainzassist.feature.login.domain.usecase.EmailErrorType
 import ca.gainzassist.feature.login.domain.usecase.LoginValidationResult
 import ca.gainzassist.feature.login.domain.usecase.LoginWithEmailUseCase
@@ -20,10 +21,10 @@ import kotlinx.coroutines.launch
 
 sealed interface LoginViewModelEvent {
     object NavigateToMain : LoginViewModelEvent
-    data class ShowToast(val message: String) : LoginViewModelEvent
+    data class ShowToast(val message: UiText) : LoginViewModelEvent
     object StartGoogleLogin : LoginViewModelEvent
     object StartFacebookLogin : LoginViewModelEvent
-    data class AuthError(val message: String) : LoginViewModelEvent
+    data class AuthError(val message: UiText) : LoginViewModelEvent
 }
 
 class LoginViewModel(
@@ -87,10 +88,18 @@ class LoginViewModel(
                     } else {
                         _uiState.update { it.copy(isLoading = false) }
                         val errorMsg = result.exceptionOrNull()?.message ?: "Login failed"
-                        _events.emit(LoginViewModelEvent.AuthError(errorMsg))
+                        _events.emit(
+                            LoginViewModelEvent.AuthError(
+                                if (result.exceptionOrNull()?.message != null) UiText.DynamicString(
+                                    errorMsg
+                                )
+                                else UiText.StringResource(R.string.err_login_failed)
+                            )
+                        )
                     }
                 }
             }
+
             is LoginValidationResult.Failure -> {
                 val emailErrRes = when (validation.emailErrorType) {
                     EmailErrorType.EMPTY -> R.string.err_required
@@ -126,10 +135,18 @@ class LoginViewModel(
                     } else {
                         _uiState.update { it.copy(isLoading = false) }
                         val errorMsg = result.exceptionOrNull()?.message ?: "Sign up failed"
-                        _events.emit(LoginViewModelEvent.AuthError(errorMsg))
+                        _events.emit(
+                            LoginViewModelEvent.AuthError(
+                                if (result.exceptionOrNull()?.message != null) UiText.DynamicString(
+                                    errorMsg
+                                )
+                                else UiText.StringResource(R.string.err_signup_failed)
+                            )
+                        )
                     }
                 }
             }
+
             is LoginValidationResult.Failure -> {
                 val emailErrRes = when (validation.emailErrorType) {
                     EmailErrorType.EMPTY -> R.string.err_required

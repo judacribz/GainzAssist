@@ -1,5 +1,6 @@
 package ca.gainzassist.feature.summary.presentation.viewmodel
 
+import ca.gainzassist.core.util.UiText
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.summary.domain.usecase.SaveWorkoutUseCase
@@ -95,7 +96,8 @@ class SummaryViewModelTest {
 
         viewModel.onSaveClicked(isUpdate = false)
 
-        assertEquals("Workout name is required.", viewModel.state.value.errorMessage)
+        val error = viewModel.state.value.errorMessage as? UiText.StringResource
+        assertEquals(ca.gainzassist.R.string.err_workout_name_required, error?.resId)
     }
 
     @Test
@@ -108,6 +110,7 @@ class SummaryViewModelTest {
 
         viewModel.onSaveClicked(isUpdate = false)
 
-        assertEquals("No exercises added.", viewModel.state.value.errorMessage)
+        val error = viewModel.state.value.errorMessage as? UiText.StringResource
+        assertEquals(ca.gainzassist.R.string.err_no_exercises, error?.resId)
     }
 }
