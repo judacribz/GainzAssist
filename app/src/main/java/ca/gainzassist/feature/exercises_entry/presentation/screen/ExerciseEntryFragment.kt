@@ -4,15 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ca.gainzassist.R
-import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExerciseEntryInputState
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -21,12 +18,8 @@ class ExerciseEntryFragment : Fragment() {
 
     private val viewModel: ExercisesEntryViewModel by activityViewModel()
 
-    private var exIndexState = mutableStateOf(0)
-    var exIndex: Int
-        get() = exIndexState.value
-        set(value) {
-            exIndexState.value = value
-        }
+    private val exerciseIndex: Int
+        get() = requireArguments().getInt(ARG_EXERCISE_INDEX)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +30,7 @@ class ExerciseEntryFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                val inputState = state.exerciseInputs.getOrNull(exIndex) ?: ExerciseEntryInputState()
+                val inputState = state.exerciseInputs.getOrNull(exerciseIndex) ?: ExerciseEntryInputState()
 
                 val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
                 val uiState = ExEntryUiState(
@@ -66,59 +59,59 @@ class ExerciseEntryFragment : Fragment() {
                     uiState = uiState,
                     actions = object : ExEntryActions {
                         override fun onExerciseNameChanged(name: String) {
-                            viewModel.onExerciseNameChanged(exIndex, name)
+                            viewModel.onExerciseNameChanged(exerciseIndex, name)
                         }
 
                         override fun onEquipmentSelected(equipment: String) {
-                            viewModel.onEquipmentSelected(exIndex, equipment)
+                            viewModel.onEquipmentSelected(exerciseIndex, equipment)
                         }
 
                         override fun onWeightChanged(weight: String) {
-                            viewModel.onWeightChanged(exIndex, weight)
+                            viewModel.onWeightChanged(exerciseIndex, weight)
                         }
 
                         override fun onRepsChanged(reps: String) {
-                            viewModel.onRepsChanged(exIndex, reps)
+                            viewModel.onRepsChanged(exerciseIndex, reps)
                         }
 
                         override fun onSetsChanged(sets: String) {
-                            viewModel.onSetsChanged(exIndex, sets)
+                            viewModel.onSetsChanged(exerciseIndex, sets)
                         }
 
                         override fun onIncrementWeight() {
-                            viewModel.onIncrementWeight(exIndex)
+                            viewModel.onIncrementWeight(exerciseIndex)
                         }
 
                         override fun onDecrementWeight() {
-                            viewModel.onDecrementWeight(exIndex)
+                            viewModel.onDecrementWeight(exerciseIndex)
                         }
 
                         override fun onIncrementReps() {
-                            viewModel.onIncrementReps(exIndex)
+                            viewModel.onIncrementReps(exerciseIndex)
                         }
 
                         override fun onDecrementReps() {
-                            viewModel.onDecrementReps(exIndex)
+                            viewModel.onDecrementReps(exerciseIndex)
                         }
 
                         override fun onIncrementSets() {
-                            viewModel.onIncrementSets(exIndex)
+                            viewModel.onIncrementSets(exerciseIndex)
                         }
 
                         override fun onDecrementSets() {
-                            viewModel.onDecrementSets(exIndex)
+                            viewModel.onDecrementSets(exerciseIndex)
                         }
 
                         override fun onEnter() {
-                            viewModel.onExerciseSubmitted(exIndex)
+                            viewModel.onExerciseSubmitted(exerciseIndex)
                         }
 
                         override fun onUpdate() {
-                            viewModel.onExerciseSubmitted(exIndex)
+                            viewModel.onExerciseSubmitted(exerciseIndex)
                         }
 
                         override fun onDelete() {
-                            viewModel.onExerciseDeleted(exIndex)
+                            viewModel.onExerciseDeleted(exerciseIndex)
                         }
                     }
                 )
@@ -126,23 +119,15 @@ class ExerciseEntryFragment : Fragment() {
         }
     }
 
-    fun setInd(index: Int) {
-        this.exIndex = index
-    }
+    companion object {
+        private const val ARG_EXERCISE_INDEX = "exercise_index"
 
-    fun updateExFields(exercise: Exercise) {
-        viewModel.updateExFields(exIndex, exercise)
-    }
-
-    fun hideDelete() {
-        // Transitional/Dumb: Managed by ViewModel state
-    }
-
-    fun showDelete() {
-        // Transitional/Dumb: Managed by ViewModel state
-    }
-
-    fun setExerciseExists() {
-        // Transitional/Dumb: Managed by ViewModel state
+        fun newInstance(index: Int): ExerciseEntryFragment {
+            return ExerciseEntryFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_EXERCISE_INDEX, index)
+                }
+            }
+        }
     }
 }

@@ -2,7 +2,6 @@ package ca.gainzassist.feature.exercises_entry.presentation.screen
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,16 +12,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import ca.gainzassist.R
 import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.core.constants.ExerciseConst.MIN_INT
-import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModel
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModelEvent
 import ca.gainzassist.feature.summary.presentation.screen.CallingActivity
@@ -37,7 +34,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ExercisesEntryActivity : GainzBaseActivity() {
 
     private val viewModel: ExercisesEntryViewModel by viewModel()
-
     private val fragments = mutableMapOf<Int, ExerciseEntryFragment>()
     private val summaryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -58,7 +54,14 @@ class ExercisesEntryActivity : GainzBaseActivity() {
             /* defaultValue = */ MIN_INT
         )
 
-        viewModel.initialize(workoutName, numExs)
+        viewModel.initialize(
+            workoutName = workoutName,
+            numberOfExercises = numExs,
+            defaultReps = getString(R.string.starting_reps),
+            defaultSets = getString(R.string.starting_sets),
+            defaultWeight = getString(R.string.starting_weight),
+            defaultEquipment = resources.getStringArray(R.array.exerciseEquipment).first()
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,21 +84,9 @@ class ExercisesEntryActivity : GainzBaseActivity() {
                         }
 
                         is ExercisesEntryViewModelEvent.ExerciseDeleted -> {
-                            val index = event.index
-                            val newFragments = mutableMapOf<Int, ExerciseEntryFragment>()
-                            fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
-                                val newIdx = if (oldIdx > index) oldIdx - 1 else oldIdx
-                                frag.setInd(newIdx)
-                                newFragments[newIdx] = frag
-                            }
-                            val deletedFrag = fragments[index]
-                            if (deletedFrag != null) {
-                                supportFragmentManager.commit {
-                                    remove(deletedFrag)
-                                }
-                            }
+                            // Clear cached fragments so they are recreated with proper arguments
+                            // next time they are requested
                             fragments.clear()
-                            fragments.putAll(newFragments)
                         }
                     }
                 }
@@ -157,9 +148,7 @@ class ExercisesEntryActivity : GainzBaseActivity() {
     private fun getOrCreateFragment(index: Int): ExerciseEntryFragment {
         var fragment = fragments[index]
         if (fragment == null) {
-            fragment = ExerciseEntryFragment().apply {
-                setInd(index)
-            }
+            fragment = ExerciseEntryFragment.newInstance(index)
             fragments[index] = fragment
         }
         return fragment
@@ -185,7 +174,8 @@ fun ExEntryFragmentContainer(
         modifier = Modifier.fillMaxSize(),
         factory = { ctx ->
             FragmentContainerView(ctx).apply {
-                id = View.generateViewId()
+                // Use a stable ID derived from the pageIndex to prevent crashes on recomposition
+                id = 100000 + pageIndex
             }
         },
         update = { view ->

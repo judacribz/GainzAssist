@@ -57,7 +57,6 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
         viewModel.initializeFromWorkout(currentWorkout)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                workoutController.unsetTimer()
                 handleLeavingScreen()
                 isEnabled = false
                 onBackPressedDispatcher.onBackPressed()
@@ -165,7 +164,6 @@ class StartWorkoutActivity : GainzBaseActivity(), WorkoutController.WarmupsListe
     ) = viewModel.onWarmupsGenerated(warmups)
 
     fun setCurrSession() {
-        workoutController.setDataListener(this)
         val currentWorkout = workout ?: return
         val workoutName = currentWorkout.name ?: return
         lifecycleScope.launch {

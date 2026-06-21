@@ -49,7 +49,7 @@ class ExercisesEntryViewModelTest {
 
     @Test
     fun initialSelectedIndex_isFirstTab() {
-        viewModel.initialize("Leg Day", 3)
+        viewModel.initialize("Leg Day", 3, "10", "3", "45.0", "Barbell")
 
         assertEquals(0, viewModel.state.value.selectedIndex)
         assertEquals(3, viewModel.state.value.numberOfExercises)
@@ -59,7 +59,7 @@ class ExercisesEntryViewModelTest {
 
     @Test
     fun submittingExercise_storesItAndUpdatesEnteredCount() {
-        viewModel.initialize("Leg Day", 3)
+        viewModel.initialize("Leg Day", 3, "10", "3", "45.0", "Barbell")
 
         viewModel.onExerciseNameChanged(0, "Squats")
         viewModel.onWeightChanged(0, "135.0")
@@ -73,7 +73,7 @@ class ExercisesEntryViewModelTest {
 
     @Test
     fun whenAllExercisesEntered_goToSummaryEventIsEmitted() = runTest {
-        viewModel.initialize("Leg Day", 2)
+        viewModel.initialize("Leg Day", 2, "10", "3", "45.0", "Barbell")
         
         val events = mutableListOf<ExercisesEntryViewModelEvent>()
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -105,7 +105,7 @@ class ExercisesEntryViewModelTest {
 
     @Test
     fun onExerciseDeleted_removesExerciseAndUpdatesCounts() {
-        viewModel.initialize("Leg Day", 3)
+        viewModel.initialize("Leg Day", 3, "10", "3", "45.0", "Barbell")
         viewModel.onExerciseNameChanged(0, "Squat")
         viewModel.onWeightChanged(0, "135.0")
         viewModel.onRepsChanged(0, "10")
@@ -124,7 +124,7 @@ class ExercisesEntryViewModelTest {
 
     @Test
     fun submittingExercise_advancesToNextEmptyTab() {
-        viewModel.initialize("Leg Day", 3)
+        viewModel.initialize("Leg Day", 3, "10", "3", "45.0", "Barbell")
         
         assertEquals(0, viewModel.state.value.selectedIndex)
 
@@ -148,7 +148,7 @@ class ExercisesEntryViewModelTest {
 
     @Test
     fun submittingDuplicateExercise_showsDuplicateErrorAndDoesNotSubmit() {
-        viewModel.initialize("Leg Day", 3)
+        viewModel.initialize("Leg Day", 3, "10", "3", "45.0", "Barbell")
 
         // Submit first exercise
         viewModel.onExerciseNameChanged(0, "Squats")

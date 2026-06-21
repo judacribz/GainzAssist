@@ -2,6 +2,8 @@ package ca.gainzassist.feature.exercises_entry.domain.usecase
 
 import ca.gainzassist.domain.model.Exercise
 
+import ca.gainzassist.core.constants.ExerciseConst
+
 class BuildExerciseUseCase {
     operator fun invoke(
         index: Int,
@@ -14,7 +16,7 @@ class BuildExerciseUseCase {
         return Exercise(
             index,
             name,
-            "Strength",
+            ExerciseConst.STRENGTH,
             equipment,
             sets,
             reps,

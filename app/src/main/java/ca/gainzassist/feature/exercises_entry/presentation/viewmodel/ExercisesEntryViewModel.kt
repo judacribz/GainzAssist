@@ -24,10 +24,10 @@ import java.util.Locale
 
 data class ExerciseEntryInputState(
     val exerciseName: String = "",
-    val selectedEquipment: String = "Barbell",
-    val weight: String = "45.0",
-    val reps: String = "10",
-    val sets: String = "3",
+    val selectedEquipment: String = "",
+    val weight: String = "",
+    val reps: String = "",
+    val sets: String = "",
     val showEnter: Boolean = true,
     val showUpdate: Boolean = false,
     val showDelete: Boolean = true,
@@ -48,7 +48,11 @@ data class ExercisesEntryViewModelState(
     val exerciseNames: List<String> = emptyList(),
     val exercises: List<Exercise> = emptyList(),
     val enteredExerciseCount: Int = 0,
-    val exerciseInputs: List<ExerciseEntryInputState> = emptyList()
+    val exerciseInputs: List<ExerciseEntryInputState> = emptyList(),
+    val defaultReps: String = "",
+    val defaultSets: String = "",
+    val defaultWeight: String = "",
+    val defaultEquipment: String = ""
 )
 
 sealed interface ExercisesEntryViewModelEvent {
@@ -73,13 +77,24 @@ class ExercisesEntryViewModel(
 
     private val exercises = mutableListOf<Exercise>()
 
-    fun initialize(workoutName: String, numberOfExercises: Int) {
+    fun initialize(
+        workoutName: String,
+        numberOfExercises: Int,
+        defaultReps: String,
+        defaultSets: String,
+        defaultWeight: String,
+        defaultEquipment: String
+    ) {
         exercises.clear()
         val inputsList = mutableListOf<ExerciseEntryInputState>()
         for (i in 0 until numberOfExercises) {
             exercises.add(Exercise().apply { exerciseNumber = i })
             inputsList.add(
                 ExerciseEntryInputState(
+                    selectedEquipment = defaultEquipment,
+                    weight = defaultWeight,
+                    reps = defaultReps,
+                    sets = defaultSets,
                     showDelete = numberOfExercises > 1
                 )
             )
@@ -93,7 +108,11 @@ class ExercisesEntryViewModel(
                 exerciseNames = exercises.map { ex -> ex.name ?: "" },
                 exercises = exercises.toList(),
                 enteredExerciseCount = 0,
-                exerciseInputs = inputsList
+                exerciseInputs = inputsList,
+                defaultReps = defaultReps,
+                defaultSets = defaultSets,
+                defaultWeight = defaultWeight,
+                defaultEquipment = defaultEquipment
             )
         }
     }
@@ -101,28 +120,6 @@ class ExercisesEntryViewModel(
     fun onTabSelected(index: Int) {
         _state.update {
             it.copy(selectedIndex = index)
-        }
-    }
-
-    private fun getEquipmentConfig(equipment: String): Pair<Float, Float> {
-        return when (equipment) {
-            "Barbell" -> Pair(ExerciseConst.BB_MIN_WEIGHT, ExerciseConst.BB_WEIGHT_CHANGE)
-            "Dumbbell" -> Pair(ExerciseConst.DB_MIN_WEIGHT, ExerciseConst.DB_WEIGHT_CHANGE)
-            else -> Pair(ExerciseConst.MIN_WEIGHT, ExerciseConst.WEIGHT_CHANGE)
-        }
-    }
-
-    private fun formatWeight(value: Float): String {
-        return String.format(Locale.getDefault(), "%.1f", value)
-    }
-
-    private fun updateInputState(index: Int, block: (ExerciseEntryInputState) -> ExerciseEntryInputState) {
-        _state.update { currentState ->
-            val inputs = currentState.exerciseInputs.toMutableList()
-            if (index in 0 until inputs.size) {
-                inputs[index] = block(inputs[index])
-            }
-            currentState.copy(exerciseInputs = inputs)
         }
     }
 
@@ -150,7 +147,7 @@ class ExercisesEntryViewModel(
     }
 
     fun onWeightChanged(index: Int, weightStr: String) {
-        val (minWeight, _) = getEquipmentConfig(_state.value.exerciseInputs.getOrNull(index)?.selectedEquipment ?: "Barbell")
+        val (minWeight, _) = getEquipmentConfig(_state.value.exerciseInputs.getOrNull(index)?.selectedEquipment ?: ExerciseConst.BARBELL)
         updateInputState(index) { current ->
             val parsedWeight = weightStr.toFloatOrNull()
             val canDec = parsedWeight != null && parsedWeight > minWeight
@@ -214,7 +211,7 @@ class ExercisesEntryViewModel(
 
     fun onIncrementReps(index: Int) {
         val input = _state.value.exerciseInputs.getOrNull(index) ?: return
-        val currentReps = input.reps.toIntOrNull() ?: 10
+        val currentReps = input.reps.toIntOrNull() ?: _state.value.defaultReps.toIntOrNull() ?: 10
         val newReps = currentReps + 1
         updateInputState(index) {
             it.copy(
@@ -226,7 +223,7 @@ class ExercisesEntryViewModel(
 
     fun onDecrementReps(index: Int) {
         val input = _state.value.exerciseInputs.getOrNull(index) ?: return
-        val currentReps = input.reps.toIntOrNull() ?: 10
+        val currentReps = input.reps.toIntOrNull() ?: _state.value.defaultReps.toIntOrNull() ?: 10
         val newReps = maxOf(currentReps - 1, 1)
         updateInputState(index) {
             it.copy(
@@ -238,7 +235,7 @@ class ExercisesEntryViewModel(
 
     fun onIncrementSets(index: Int) {
         val input = _state.value.exerciseInputs.getOrNull(index) ?: return
-        val currentSets = input.sets.toIntOrNull() ?: 3
+        val currentSets = input.sets.toIntOrNull() ?: _state.value.defaultSets.toIntOrNull() ?: 3
         val newSets = currentSets + 1
         updateInputState(index) {
             it.copy(
@@ -250,7 +247,7 @@ class ExercisesEntryViewModel(
 
     fun onDecrementSets(index: Int) {
         val input = _state.value.exerciseInputs.getOrNull(index) ?: return
-        val currentSets = input.sets.toIntOrNull() ?: 3
+        val currentSets = input.sets.toIntOrNull() ?: _state.value.defaultSets.toIntOrNull() ?: 3
         val newSets = maxOf(currentSets - 1, 1)
         updateInputState(index) {
             it.copy(
@@ -425,7 +422,15 @@ class ExercisesEntryViewModel(
 
         val inputsList = currentState.exerciseInputs.toMutableList()
         val updatedInputs = inputsList.map { it.copy(showDelete = true) }.toMutableList()
-        updatedInputs.add(ExerciseEntryInputState(showDelete = true))
+        updatedInputs.add(
+            ExerciseEntryInputState(
+                selectedEquipment = currentState.defaultEquipment,
+                weight = currentState.defaultWeight,
+                reps = currentState.defaultReps,
+                sets = currentState.defaultSets,
+                showDelete = true
+            )
+        )
 
         _state.update {
             it.copy(
@@ -438,21 +443,25 @@ class ExercisesEntryViewModel(
         }
     }
 
-    fun updateExFields(index: Int, exercise: Exercise) {
-        val (minWeight, _) = getEquipmentConfig(exercise.equipment.orEmpty())
-        updateInputState(index) {
-            it.copy(
-                exerciseName = exercise.name.orEmpty(),
-                selectedEquipment = exercise.equipment ?: "Barbell",
-                weight = formatWeight(exercise.weight),
-                reps = exercise.reps.toString(),
-                sets = exercise.sets.toString(),
-                showEnter = false,
-                showUpdate = true,
-                canDecrementWeight = exercise.weight > minWeight,
-                canDecrementReps = exercise.reps > 1,
-                canDecrementSets = exercise.sets > 1
-            )
+    private fun getEquipmentConfig(equipment: String): Pair<Float, Float> {
+        return when (equipment.lowercase()) {
+            ExerciseConst.BARBELL -> Pair(ExerciseConst.BB_MIN_WEIGHT, ExerciseConst.BB_WEIGHT_CHANGE)
+            ExerciseConst.DUMBBELL -> Pair(ExerciseConst.DB_MIN_WEIGHT, ExerciseConst.DB_WEIGHT_CHANGE)
+            else -> Pair(ExerciseConst.MIN_WEIGHT, ExerciseConst.WEIGHT_CHANGE)
+        }
+    }
+
+    private fun formatWeight(value: Float): String {
+        return String.format(Locale.getDefault(), "%.1f", value)
+    }
+
+    private fun updateInputState(index: Int, block: (ExerciseEntryInputState) -> ExerciseEntryInputState) {
+        _state.update { currentState ->
+            val inputs = currentState.exerciseInputs.toMutableList()
+            if (index in 0 until inputs.size) {
+                inputs[index] = block(inputs[index])
+            }
+            currentState.copy(exerciseInputs = inputs)
         }
     }
 }
