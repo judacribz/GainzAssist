@@ -12,18 +12,4 @@ class SparseArray<E> : Cloneable {
     fun get(key: Int): E? = map[key]
 
     fun get(key: Int, valueIfKeyNotFound: E): E = map.getOrDefault(key, valueIfKeyNotFound)
-
-    fun size(): Int = map.size
-
-    fun keyAt(index: Int): Int = map.keys.elementAt(index)
-
-    fun valueAt(index: Int): E = map.values.elementAt(index)
-
-    fun remove(key: Int) {
-        map.remove(key)
-    }
-
-    fun clear() {
-        map.clear()
-    }
 }

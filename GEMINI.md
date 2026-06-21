@@ -192,6 +192,8 @@ Prefer named constants for:
 
 Private functions should be placed near the bottom of the file, after public/override lifecycle functions.
 
+Companion objects must be the absolute bottom-most section of the class.
+
 Override functions should be near the top of the class, directly under properties/global variables.
 
 Preview composables must be private.

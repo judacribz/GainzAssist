@@ -32,9 +32,9 @@ import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
 import com.orhanobut.logger.Logger
-import java.util.Locale
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.Locale
 
 class WorkoutFragment : Fragment() {
 
@@ -126,8 +126,7 @@ class WorkoutFragment : Fragment() {
     }
 
     private fun refreshFromResume() {
-        lifecycleScope.launch {
-            val snapshot = viewModel.getSessionProgress(workoutController.workoutName)
+        viewModel.getSessionProgress(workoutController.workoutName) { snapshot ->
             if ((setProgress == null) && (snapshot != null)) {
                 exProgress = SparseArray<ProgressStatus>().apply {
                     snapshot.exerciseProgress.forEach { (key, value) ->
@@ -191,12 +190,8 @@ class WorkoutFragment : Fragment() {
                 setMap[i] = PROGRESS_CODE_MAP[it[i]]
             }
         }
-
         val snapshot = SessionProgressSnapshot(exMap, setMap)
-
-        lifecycleScope.launch {
-            viewModel.saveSessionProgress(workoutController.workoutName, snapshot)
-        }
+        viewModel.saveSessionProgress(workoutController.workoutName, snapshot)
     }
 
     private fun startTimer(timeInMillis: Long) {

@@ -32,29 +32,7 @@ class ExerciseEntryFragment : Fragment() {
             val inputState = state.exerciseInputs.getOrNull(exerciseIndex) ?: ExerciseEntryInputState()
 
             val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
-            val uiState = ExEntryUiState(
-                exerciseName = inputState.exerciseName,
-                selectedEquipment = inputState.selectedEquipment,
-                equipmentOptions = equipmentOptions,
-                weight = inputState.weight,
-                reps = inputState.reps,
-                sets = inputState.sets,
-                showEnter = inputState.showEnter,
-                showUpdate = inputState.showUpdate,
-                showDelete = inputState.showDelete,
-                duplicateExerciseError = if (inputState.hasDuplicateError) {
-                    String.format(getString(R.string.err_exercise_exists), inputState.exerciseName)
-                } else {
-                    null
-                },
-                canDecrementWeight = inputState.canDecrementWeight,
-                canDecrementReps = inputState.canDecrementReps,
-                canDecrementSets = inputState.canDecrementSets,
-                exerciseNameError = if (inputState.hasNameError) getString(R.string.err_required) else null,
-                weightError = if (inputState.hasWeightError) getString(R.string.err_required) else null,
-                repsError = if (inputState.hasRepsError) getString(R.string.err_required) else null,
-                setsError = if (inputState.hasSetsError) getString(R.string.err_required) else null
-            )
+            val uiState = mapToUiState(inputState, equipmentOptions)
 
             ExEntryScreen(
                 uiState = uiState,
@@ -117,6 +95,32 @@ class ExerciseEntryFragment : Fragment() {
                 }
             )
         }
+    }
+
+    private fun mapToUiState(inputState: ExerciseEntryInputState, equipmentOptions: List<String>): ExEntryUiState {
+        return ExEntryUiState(
+            exerciseName = inputState.exerciseName,
+            selectedEquipment = inputState.selectedEquipment,
+            equipmentOptions = equipmentOptions,
+            weight = inputState.weight,
+            reps = inputState.reps,
+            sets = inputState.sets,
+            showEnter = inputState.showEnter,
+            showUpdate = inputState.showUpdate,
+            showDelete = inputState.showDelete,
+            duplicateExerciseError = if (inputState.hasDuplicateError) {
+                String.format(getString(R.string.err_exercise_exists), inputState.exerciseName)
+            } else {
+                null
+            },
+            canDecrementWeight = inputState.canDecrementWeight,
+            canDecrementReps = inputState.canDecrementReps,
+            canDecrementSets = inputState.canDecrementSets,
+            exerciseNameError = if (inputState.hasNameError) getString(R.string.err_required) else null,
+            weightError = if (inputState.hasWeightError) getString(R.string.err_required) else null,
+            repsError = if (inputState.hasRepsError) getString(R.string.err_required) else null,
+            setsError = if (inputState.hasSetsError) getString(R.string.err_required) else null
+        )
     }
 
     companion object {

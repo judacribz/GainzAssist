@@ -1,9 +1,6 @@
 package ca.gainzassist.feature.start_workout.presentation.screen
 
-import android.graphics.Paint
-import android.graphics.Typeface
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,18 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -56,10 +45,6 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
 import ca.gainzassist.ui.ProgressStatus
-import java.util.Locale
-import kotlin.math.min
-
-private const val PLATE_WIDTH = 22f
 
 data class WorkoutUiState(
     val exerciseTitle: String = "",
@@ -95,6 +80,19 @@ data class WorkoutUiActions(
     val onSetProgressClick: (Int) -> Unit = {}
 )
 
+data class WorkoutNumberControlState(
+    val value: String,
+    val isMin: Boolean,
+    val isDecimal: Boolean = false
+)
+
+data class WorkoutNumberControlActions(
+    val onValueChanged: (String) -> Unit,
+    val onFocusLost: () -> Unit,
+    val onIncrease: () -> Unit,
+    val onDecrease: () -> Unit
+)
+
 @Composable
 fun WorkoutComposeScreen(
     uiState: WorkoutUiState,
@@ -107,7 +105,9 @@ fun WorkoutComposeScreen(
             .padding(3.dp)
             .background(colorResource(R.color.colorLightBg))
     ) {
-        WorkoutCard(modifier = Modifier.weight(5f).fillMaxWidth()) {
+        WorkoutCard(modifier = Modifier
+            .weight(5f)
+            .fillMaxWidth()) {
             WorkoutProgressHeader(
                 title = uiState.exerciseTitle,
                 setNumText = uiState.setNumText,
@@ -143,7 +143,7 @@ fun WorkoutComposeScreen(
 }
 
 @Composable
-fun WorkoutProgressHeader(
+private fun WorkoutProgressHeader(
     title: String,
     setNumText: String,
     exerciseProgress: List<WorkoutProgressUiItem>,
@@ -186,7 +186,7 @@ fun WorkoutProgressHeader(
 }
 
 @Composable
-fun WorkoutProgressRow(
+private fun WorkoutProgressRow(
     items: List<WorkoutProgressUiItem>,
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -205,7 +205,7 @@ fun WorkoutProgressRow(
 }
 
 @Composable
-fun WorkoutProgressItem(
+private fun WorkoutProgressItem(
     item: WorkoutProgressUiItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -283,7 +283,7 @@ fun WorkoutProgressItem(
 }
 
 @Composable
-fun WorkoutEquipmentTimer(
+private fun WorkoutEquipmentTimer(
     weight: Float,
     equipment: String,
     timerText: String,
@@ -324,130 +324,7 @@ fun WorkoutEquipmentTimer(
 }
 
 @Composable
-fun WorkoutEquipmentCanvas(
-    weight: Float,
-    equipment: String,
-    modifier: Modifier = Modifier
-) {
-    val barbellName = stringResource(R.string.barbell).lowercase(Locale.getDefault())
-    val eqLower = equipment.lowercase(Locale.getDefault())
-
-    Canvas(modifier = modifier.padding(8.dp)) {
-        val width = size.width
-        val height = size.height
-
-        // Prevent drawing crash during layout phase when size is too small
-        if (width <= 0f || height <= 40f) return@Canvas
-
-        if (eqLower == barbellName) {
-            drawBarbell(weight, width, height)
-        }
-    }
-}
-
-private fun DrawScope.drawBarbell(
-    weight: Float,
-    width: Float,
-    height: Float
-) {
-    val barbellWeight = ((weight - 45f) / 2f * 10f).toInt()
-    val diam45 = height - 20f
-
-    val weights = intArrayOf(450, 250, 100, 50, 25)
-    val numWeights = IntArray(5)
-
-    val sleeveWidth = calculateSleeveWidth(barbellWeight, weights)
-    val sleeveHeight = 16f
-
-    drawSleeve(height, sleeveWidth, sleeveHeight)
-    drawPlates(barbellWeight, weights, numWeights, diam45, height)
-    drawBarbellText(numWeights, weights, width, height)
-}
-
-private fun calculateSleeveWidth(barbellWeight: Int, weights: IntArray): Float {
-    var totalPlates = 0
-    var tempWeight = barbellWeight
-    for (j in weights.indices) {
-        val qty = tempWeight / weights[j]
-        val limit = if (j == 0) min(qty, 5) else qty
-        totalPlates += limit
-        tempWeight -= weights[j] * qty
-    }
-    return 20f + (totalPlates * PLATE_WIDTH) + 15f
-}
-
-private fun DrawScope.drawSleeve(height: Float, sleeveWidth: Float, sleeveHeight: Float) {
-    val topLeft = Offset(0f, (height - sleeveHeight) / 2f)
-    val size = Size(sleeveWidth, sleeveHeight)
-    drawRect(color = Color.DarkGray, topLeft = topLeft, size = size, style = Fill)
-    drawRect(color = Color.Black, topLeft = topLeft, size = size, style = Stroke(width = 2f))
-}
-
-private fun DrawScope.drawPlates(
-    barbellWeight: Int,
-    weights: IntArray,
-    numWeights: IntArray,
-    diam45: Float,
-    height: Float
-) {
-    var startX = 20f
-    var newWeight = barbellWeight
-    for (j in weights.indices) {
-        numWeights[j] = newWeight / weights[j]
-        for (i in 0 until numWeights[j]) {
-            if (j == 0 && i > 4) continue // Max 5 x 45 plates
-
-            val ratio = weights[j] / 450f
-            val r = diam45 * (0.4f + 0.6f * ratio)
-            val startY = (height - r) / 2f
-
-            drawRect(color = Color.Gray, topLeft = Offset(startX, startY), size = Size(PLATE_WIDTH, r))
-            drawRect(
-                color = Color.Black,
-                topLeft = Offset(startX, startY),
-                size = Size(PLATE_WIDTH, r),
-                style = Stroke(width = 2f)
-            )
-            startX += PLATE_WIDTH
-        }
-        newWeight -= weights[j] * numWeights[j]
-    }
-}
-
-private fun DrawScope.drawBarbellText(
-    numWeights: IntArray,
-    weights: IntArray,
-    width: Float,
-    height: Float
-) {
-    val distinctWeights = numWeights.count { it > 0 }
-    if (distinctWeights == 0) return
-
-    val textPaint = Paint().apply {
-        color = android.graphics.Color.DKGRAY
-        textSize = 45f
-        textAlign = Paint.Align.RIGHT
-        isAntiAlias = true
-        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-    }
-
-    val textSpacing = 60f
-    var textY = (height - (distinctWeights * textSpacing)) / 2f + 45f
-
-    for (j in numWeights.indices) {
-        if (numWeights[j] > 0) {
-            val lbs = weights[j] / 10f
-            val label = "${numWeights[j]} x ${if (lbs % 1 == 0f) lbs.toInt().toString() else lbs.toString()} lbs"
-            drawIntoCanvas { canvas ->
-                canvas.nativeCanvas.drawText(label, width - 10f, textY, textPaint)
-            }
-            textY += textSpacing
-        }
-    }
-}
-
-@Composable
-fun WorkoutRepsWeightControls(
+private fun WorkoutRepsWeightControls(
     uiState: WorkoutUiState,
     actions: WorkoutUiActions,
     modifier: Modifier = Modifier
@@ -455,7 +332,9 @@ fun WorkoutRepsWeightControls(
     Row(
         modifier = modifier.fillMaxWidth()
     ) {
-        WorkoutCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
+        WorkoutCard(modifier = Modifier
+            .weight(1f)
+            .fillMaxHeight()) {
             WorkoutNumberControl(
                 state = WorkoutNumberControlState(
                     value = uiState.repsText,
@@ -470,7 +349,9 @@ fun WorkoutRepsWeightControls(
                 modifier = Modifier.fillMaxSize()
             )
         }
-        WorkoutCard(modifier = Modifier.weight(1f).fillMaxHeight()) {
+        WorkoutCard(modifier = Modifier
+            .weight(1f)
+            .fillMaxHeight()) {
             WorkoutNumberControl(
                 state = WorkoutNumberControlState(
                     value = uiState.weightText,
@@ -489,21 +370,8 @@ fun WorkoutRepsWeightControls(
     }
 }
 
-data class WorkoutNumberControlState(
-    val value: String,
-    val isMin: Boolean,
-    val isDecimal: Boolean = false
-)
-
-data class WorkoutNumberControlActions(
-    val onValueChanged: (String) -> Unit,
-    val onFocusLost: () -> Unit,
-    val onIncrease: () -> Unit,
-    val onDecrease: () -> Unit
-)
-
 @Composable
-fun WorkoutNumberControl(
+private fun WorkoutNumberControl(
     state: WorkoutNumberControlState,
     actions: WorkoutNumberControlActions,
     modifier: Modifier = Modifier
@@ -536,15 +404,7 @@ fun WorkoutNumberControl(
             BasicTextField(
                 value = state.value,
                 onValueChange = { newText ->
-                    if (state.isDecimal) {
-                        if (newText.length <= 7 && newText.count { it == '.' } <= 1) {
-                            actions.onValueChanged(newText)
-                        }
-                    } else {
-                        if (newText.length <= 4 && newText.all { it.isDigit() }) {
-                            actions.onValueChanged(newText)
-                        }
-                    }
+                    handleValueChange(newText, state.isDecimal, actions.onValueChanged)
                 },
                 textStyle = TextStyle(
                     color = colorResource(R.color.colorAccent),
@@ -579,8 +439,24 @@ fun WorkoutNumberControl(
     }
 }
 
+private fun handleValueChange(
+    newText: String,
+    isDecimal: Boolean,
+    onValueChanged: (String) -> Unit
+) {
+    if (isDecimal) {
+        if (newText.length <= 7 && newText.count { it == '.' } <= 1) {
+            onValueChanged(newText)
+        }
+    } else {
+        if (newText.length <= 4 && newText.all { it.isDigit() }) {
+            onValueChanged(newText)
+        }
+    }
+}
+
 @Composable
-fun WorkoutFooterControls(
+private fun WorkoutFooterControls(
     isFinishSetVisible: Boolean,
     isUpdateSetVisible: Boolean,
     isResumeWorkoutVisible: Boolean,
@@ -684,6 +560,22 @@ fun WorkoutFooterControls(
     }
 }
 
+@Composable
+private fun WorkoutCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = modifier.padding(3.dp),
+        shape = RoundedCornerShape(5.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        border = BorderStroke(0.5.dp, colorResource(R.color.colorBg))
+    ) {
+        content()
+    }
+}
+
 // Previews
 @Preview(showBackground = true)
 @Composable
@@ -763,20 +655,4 @@ private fun WorkoutComposeScreenPreviewLargeWeight() {
         ),
         actions = WorkoutUiActions()
     )
-}
-
-@Composable
-fun WorkoutCard(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Card(
-        modifier = modifier.padding(3.dp),
-        shape = RoundedCornerShape(5.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = BorderStroke(0.5.dp, colorResource(R.color.colorBg))
-    ) {
-        content()
-    }
 }

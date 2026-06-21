@@ -37,6 +37,9 @@ data class HowToVideoUiItem(
     val title: String
 )
 
+private const val HOW_TO_SQUAT = "How to Squat Properly"
+private const val SQUAT_MISTAKES = "Squat Mistakes to Avoid"
+
 @Composable
 fun HowToVideosScreen(
     uiState: HowToVideosUiState,
@@ -136,8 +139,8 @@ private fun HowToVideosScreenPreviewWithResults() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly"),
-                HowToVideoUiItem("2", "Squat Mistakes to Avoid"),
+                HowToVideoUiItem("1", HOW_TO_SQUAT),
+                HowToVideoUiItem("2", SQUAT_MISTAKES),
                 HowToVideoUiItem("3", "Advanced Squat Techniques")
             )
         ),
@@ -153,8 +156,8 @@ private fun HowToVideosScreenPreviewPlayerVisible() {
         uiState = HowToVideosUiState(
             isPlayerVisible = true,
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly"),
-                HowToVideoUiItem("2", "Squat Mistakes to Avoid")
+                HowToVideoUiItem("1", HOW_TO_SQUAT),
+                HowToVideoUiItem("2", SQUAT_MISTAKES)
             )
         ),
         onVideoClick = {},
@@ -194,8 +197,8 @@ private fun HowToVideosScreenPreviewSmallPhone() {
         uiState = HowToVideosUiState(
             isPlayerVisible = true,
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly"),
-                HowToVideoUiItem("2", "Squat Mistakes to Avoid")
+                HowToVideoUiItem("1", HOW_TO_SQUAT),
+                HowToVideoUiItem("2", SQUAT_MISTAKES)
             )
         ),
         onVideoClick = {},
@@ -211,7 +214,7 @@ private fun HowToVideosScreenPreviewLargeFont() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly")
+                HowToVideoUiItem("1", HOW_TO_SQUAT)
             )
         ),
         onVideoClick = {},

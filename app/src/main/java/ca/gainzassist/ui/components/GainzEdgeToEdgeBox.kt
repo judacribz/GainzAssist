@@ -25,9 +25,7 @@ fun GainzEdgeToEdgeBox(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         // The main content is padded by safeDrawing, inheriting the Activity's default background
         Box(
             modifier = Modifier

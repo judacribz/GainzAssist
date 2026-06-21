@@ -35,6 +35,8 @@ data class ExerciseEntryTab(
 )
 
 private const val WeightFull = 1f
+private const val EXERCISE_1 = "Exercise 1"
+private const val EXERCISE_2 = "Exercise 2"
 
 @Composable
 fun ExercisesEntryScreen(
@@ -110,7 +112,7 @@ fun ExercisesEntryScreenPreviewOneExercise() {
             uiState = ExercisesEntryUiState(
                 selectedIndex = 0,
                 tabs = listOf(
-                    ExerciseEntryTab(0, "Exercise 1", 1L),
+                    ExerciseEntryTab(0, EXERCISE_1, 1L),
                     ExerciseEntryTab(1, "", 2L, isAddTab = true)
                 ),
                 numExercises = 1
@@ -129,8 +131,8 @@ fun ExercisesEntryScreenPreviewMultipleExercises() {
             uiState = ExercisesEntryUiState(
                 selectedIndex = 1,
                 tabs = listOf(
-                    ExerciseEntryTab(0, "Exercise 1", 1L),
-                    ExerciseEntryTab(1, "Exercise 2", 2L),
+                    ExerciseEntryTab(0, EXERCISE_1, 1L),
+                    ExerciseEntryTab(1, EXERCISE_2, 2L),
                     ExerciseEntryTab(2, "Exercise 3", 3L),
                     ExerciseEntryTab(3, "", 4L, isAddTab = true)
                 ),
@@ -150,7 +152,7 @@ fun ExercisesEntryScreenPreviewWithPlusTab() {
             uiState = ExercisesEntryUiState(
                 selectedIndex = 0,
                 tabs = listOf(
-                    ExerciseEntryTab(0, "Exercise 1", 1L),
+                    ExerciseEntryTab(0, EXERCISE_1, 1L),
                     ExerciseEntryTab(1, "", 2L, isAddTab = true)
                 ),
                 numExercises = 1
@@ -169,8 +171,8 @@ fun ExercisesEntryScreenPreviewSelectedLastExercise() {
             uiState = ExercisesEntryUiState(
                 selectedIndex = 2,
                 tabs = listOf(
-                    ExerciseEntryTab(0, "Exercise 1", 1L),
-                    ExerciseEntryTab(1, "Exercise 2", 2L),
+                    ExerciseEntryTab(0, EXERCISE_1, 1L),
+                    ExerciseEntryTab(1, EXERCISE_2, 2L),
                     ExerciseEntryTab(2, "Exercise 3", 3L),
                     ExerciseEntryTab(3, "", 4L, isAddTab = true)
                 ),
@@ -190,8 +192,8 @@ fun ExercisesEntryScreenPreviewSmallPhone() {
             uiState = ExercisesEntryUiState(
                 selectedIndex = 0,
                 tabs = listOf(
-                    ExerciseEntryTab(0, "Exercise 1", 1L),
-                    ExerciseEntryTab(1, "Exercise 2", 2L),
+                    ExerciseEntryTab(0, EXERCISE_1, 1L),
+                    ExerciseEntryTab(1, EXERCISE_2, 2L),
                     ExerciseEntryTab(2, "", 3L, isAddTab = true)
                 ),
                 numExercises = 2
@@ -210,8 +212,8 @@ fun ExercisesEntryScreenPreviewLargeFont() {
             uiState = ExercisesEntryUiState(
                 selectedIndex = 0,
                 tabs = listOf(
-                    ExerciseEntryTab(0, "Exercise 1", 1L),
-                    ExerciseEntryTab(1, "Exercise 2", 2L),
+                    ExerciseEntryTab(0, EXERCISE_1, 1L),
+                    ExerciseEntryTab(1, EXERCISE_2, 2L),
                     ExerciseEntryTab(2, "", 3L, isAddTab = true)
                 ),
                 numExercises = 2

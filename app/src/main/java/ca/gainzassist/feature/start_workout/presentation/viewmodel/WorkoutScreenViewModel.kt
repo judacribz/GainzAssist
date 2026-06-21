@@ -31,48 +31,24 @@ class WorkoutScreenViewModel(
     private val _events = MutableSharedFlow<WorkoutScreenEvent>()
     val events: SharedFlow<WorkoutScreenEvent> = _events.asSharedFlow()
 
-    fun initialize() {
-        // TODO: load initial session data
+    fun getSessionProgress(workoutName: String, onResult: (SessionProgressSnapshot?) -> Unit) {
+        viewModelScope.launch {
+            val json = getSessionProgressUseCase(workoutName)
+            if (json == null) {
+                onResult(null)
+                return@launch
+            }
+            val map = Misc.readValue(json)
+            onResult(SessionProgressMapper.fromLegacyMap(map))
+        }
     }
 
-    fun onTimerClicked() {
-        // TODO: toggle timer
-    }
-
-    fun onRepsChanged(value: String) {
-        _uiState.value = _uiState.value.copy(repsText = value)
-    }
-
-    fun onWeightChanged(value: String) {
-        _uiState.value = _uiState.value.copy(weightText = value)
-    }
-
-    fun onFinishSetClicked() {
-        // TODO: complete current set
-    }
-
-    fun onResumeWorkoutClicked() {
-        // TODO: handle resuming
-    }
-
-    fun onExerciseProgressClicked(index: Int) {
-        // TODO: navigate to exercise progress
-    }
-
-    fun onSetProgressClicked(index: Int) {
-        // TODO: navigate to set progress
-    }
-
-    suspend fun getSessionProgress(workoutName: String): SessionProgressSnapshot? {
-        val json = getSessionProgressUseCase(workoutName) ?: return null
-        val map = Misc.readValue(json)
-        return SessionProgressMapper.fromLegacyMap(map)
-    }
-
-    suspend fun saveSessionProgress(workoutName: String, snapshot: SessionProgressSnapshot) {
-        val map = SessionProgressMapper.toLegacyMap(snapshot)
-        val json = Misc.writeValueAsString(map)
-        saveSessionProgressUseCase(workoutName, json)
+    fun saveSessionProgress(workoutName: String, snapshot: SessionProgressSnapshot) {
+        viewModelScope.launch {
+            val map = SessionProgressMapper.toLegacyMap(snapshot)
+            val json = Misc.writeValueAsString(map)
+            saveSessionProgressUseCase(workoutName, json)
+        }
     }
 
     fun finishWorkoutSession(workoutName: String, session: Session) {

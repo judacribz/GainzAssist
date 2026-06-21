@@ -2,12 +2,14 @@ package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ca.gainzassist.core.util.Misc
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 import ca.gainzassist.feature.start_workout.domain.usecase.SaveIncompleteWorkoutUseCase
 import ca.gainzassist.feature.start_workout.domain.usecase.StartWorkoutSessionUseCase
 import ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutTab
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -60,9 +62,28 @@ class StartWorkoutViewModel(
         }
     }
 
-    suspend fun prepareSessionRestore(workoutName: String): StartWorkoutRestoreDecision = startWorkoutSessionUseCase(
-        workoutName
-    )
+    fun prepareSessionRestore(currentWorkout: Workout) {
+        val workoutName = currentWorkout.name ?: return
+        viewModelScope.launch {
+            when (val decision = startWorkoutSessionUseCase(workoutName)) {
+                is StartWorkoutRestoreDecision.StartFresh -> {
+                    WorkoutController.setCurrWorkout(currentWorkout)
+                }
+                is StartWorkoutRestoreDecision.RestoreFromJson -> {
+                    try {
+                        WorkoutController.setRetrievedWorkout(
+                            Misc.readValue(decision.sessionJson),
+                            currentWorkout
+                        )
+                    } catch (ex: Exception) {
+                        Logger.e(ex, "Failed to restore incomplete workout. Starting fresh.")
+                        WorkoutController.setCurrWorkout(currentWorkout)
+                    }
+                }
+            }
+            onSessionReady()
+        }
+    }
 
     fun saveLeavingSession(workoutName: String, sessionJson: String) {
         viewModelScope.launch {
