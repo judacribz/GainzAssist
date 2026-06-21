@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.secrets) apply false
+    alias(libs.plugins.detekt) apply false
 }
 
 buildscript {

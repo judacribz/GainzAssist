@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
+    alias(libs.plugins.detekt)
 }
 
 secrets {
@@ -110,6 +111,14 @@ kotlin {
     }
 }
 
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
+    baseline = file("$projectDir/detekt-baseline.xml")
+    basePath = rootDir.absolutePath
+}
+
 tasks.configureEach {
     if (name == "assembleRelease" || name == "bundleRelease") {
         doFirst {
@@ -175,6 +184,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.espresso.core)
+
+    detektPlugins(libs.detekt.compose)
 }
 
 val validateReleaseSecrets by tasks.registering {
