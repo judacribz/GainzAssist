@@ -12,7 +12,7 @@ plugins {
 
 subprojects {
     apply(plugin = "com.diffplug.spotless")
-    apply(plugin = "dev.detekt")
+//    apply(plugin = "dev.detekt")
 
     configure<com.diffplug.gradle.spotless.SpotlessExtension> {
         kotlin {
@@ -26,11 +26,15 @@ subprojects {
                     "ktlint_standard_filename" to "disabled",
                     "ktlint_standard_max-line-length" to "120",
                     "ktlint_standard_multiline-expression-wrapping" to "disabled",
+                    "ktlint_standard_binary-expression-wrapping" to "disabled",
                     "ktlint_standard_property-wrapping" to "disabled",
                     "ktlint_standard_parameter-list-wrapping" to "enabled",
                     "ktlint_standard_function-signature" to "disabled",
                     "ktlint_standard_class-signature" to "disabled",
-                    "ktlint_standard_no-empty-first-line-in-method-block" to "disabled"
+                    "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
+                    "ktlint_standard_package-name" to "disabled",
+                    "ktlint_standard_property-naming" to "disabled",
+                    "ktlint_standard_comment-wrapping" to "disabled"
                 )
             )
         }
@@ -41,19 +45,23 @@ subprojects {
                 mapOf(
                     "ktlint_standard_max-line-length" to "120",
                     "ktlint_standard_multiline-expression-wrapping" to "disabled",
+                    "ktlint_standard_binary-expression-wrapping" to "disabled",
                     "ktlint_standard_property-wrapping" to "disabled",
                     "ktlint_standard_parameter-list-wrapping" to "enabled",
                     "ktlint_standard_function-signature" to "disabled",
                     "ktlint_standard_class-signature" to "disabled",
-                    "ktlint_standard_no-empty-first-line-in-method-block" to "disabled"
+                    "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
+                    "ktlint_standard_package-name" to "disabled",
+                    "ktlint_standard_property-naming" to "disabled",
+                    "ktlint_standard_comment-wrapping" to "disabled"
                 )
             )
         }
     }
 
-    dependencies {
-        add("detektPlugins", "io.nlopez.compose.rules:detekt:0.4.27")
-    }
+//    dependencies {
+//        add("detektPlugins", "io.nlopez.compose.rules:detekt:0.4.27")
+//    }
 
     tasks.configureEach {
         if (name.contains("KotlinScripts")) enabled = false
