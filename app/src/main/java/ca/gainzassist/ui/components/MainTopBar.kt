@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.R
-import ca.gainzassist.activities.main.view.MainTab
+import ca.gainzassist.feature.main.presentation.screen.MainTab
 
 data class MainTopBarActions(
     val onSearchQueryChange: (String) -> Unit = {},
@@ -162,7 +162,7 @@ fun MainTopBar(
 
 @Preview
 @Composable
-fun MainTopBarPreviewWorkouts() {
+private fun MainTopBarPreviewWorkouts() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = false,
@@ -172,7 +172,7 @@ fun MainTopBarPreviewWorkouts() {
 
 @Preview
 @Composable
-fun MainTopBarPreviewResume() {
+private fun MainTopBarPreviewResume() {
     MainTopBar(
         selectedTab = MainTab.RESUME,
         isSearchExpanded = false,
@@ -182,7 +182,7 @@ fun MainTopBarPreviewResume() {
 
 @Preview
 @Composable
-fun MainTopBarPreviewSettings() {
+private fun MainTopBarPreviewSettings() {
     MainTopBar(
         selectedTab = MainTab.SETTINGS,
         isSearchExpanded = false,
@@ -192,7 +192,7 @@ fun MainTopBarPreviewSettings() {
 
 @Preview
 @Composable
-fun MainTopBarPreviewSearchExpanded() {
+private fun MainTopBarPreviewSearchExpanded() {
     MainTopBar(
         selectedTab = MainTab.WORKOUTS,
         isSearchExpanded = true,

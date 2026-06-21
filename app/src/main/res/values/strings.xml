@@ -1,6 +1,8 @@
 <resources>
     <!-- Titles -->
     <string name="app_name">Gainz Assist</string>
+    <string name="title_exercises_entry">Exercises Entry</string>
+    <string name="tab_exercise_label">Exercise %d</string>
     <string name="title_new_workout_summary">New Workout Summary</string>
     <string name="no_workouts_to_resume">No workouts to resume</string>
     <!-- Content Descriptions -->
@@ -8,8 +10,6 @@
     <string name="cd_sign_up_img">Main image in the sign up screen</string>
     <string name="cd_facebook_login">Facebook Login</string>
     <string name="cd_google_login">Google Login</string>
-    <!-- Menu Items -->
-    <!--TODO remove-->
     <!-- Error Msgs -->
     <string name="err_invalid_email">Invalid Email</string>
     <string name="err_invalid_password">Invalid Password</string>
@@ -17,6 +17,7 @@
     <string name="err_required_email_format">Email Format Required</string>
     <string name="err_required_password_min">Minimum 6 Characters Required</string>
     <string name="err_exercise_exists">%s exists</string>
+    <string name="err_must_be_positive_number">Must be a positive number</string>
     <!-- Success Msgs -->
     <string name="sign_up_success">Sign Up Success!</string>
     <!-- EditText Hints -->
@@ -49,7 +50,6 @@
     <string name="weight_lbs">Weight (lbs)</string>
     <string name="add_workout">Add Workout</string>
     <string name="add_exercise">Add Exercise</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="clear">Clear</string>
     <string name="discard">Discard</string>
     <string name="reps">Reps</string>
@@ -58,7 +58,7 @@
     <string name="edit">Edit</string>
     <string name="start_next_set">Start Next Set</string>
     <string name="enter">enter</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="skip">skip</string>
     <string name="num_of_exercises"># of exercises</string>
     <string name="starting_reps">10</string>
@@ -106,4 +106,18 @@
     <string name="cd_add_workout">Add workout</string>
     <string name="cd_more_actions">More actions</string>
     <string name="logout">Logout</string>
+    <string name="err_no_exercises">Error: No exercises added.</string>
+    <string name="err_facebook_login_failed">Facebook Login failed</string>
+    <string name="err_google_login_failed">Google Sign-In failed</string>
+    <string name="err_auth_failed">Authentication failed. Please try again.</string>
+    <string name="msg_search_exercise_video">Search for an exercise video.</string>
+    <string name="msg_no_video_results">No video results</string>
+    <string name="err_youtube_load_failed">Unable to load YouTube videos. Check API key or network.</string>
+    <string name="err_login_failed">Login failed</string>
+    <string name="err_signup_failed">Sign up failed</string>
+    <string name="err_workout_name_required">Workout name is required.</string>
+    <string name="title_how_to">How To %s</string>
+    <string name="err_enter_search_term">Please enter a search term</string>
+    <string name="err_unable_to_play_video">Unable to play this video</string>
+    <string name="action_open_in_youtube">Open in YouTube</string>
 </resources>

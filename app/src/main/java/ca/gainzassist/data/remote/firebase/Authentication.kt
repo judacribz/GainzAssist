@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import ca.gainzassist.R
-import ca.gainzassist.activities.authentication.login.view.LoginActivity
+import ca.gainzassist.feature.login.presentation.screen.LoginActivity
 import ca.gainzassist.data.service.FirebaseService
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
