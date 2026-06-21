@@ -28,15 +28,14 @@ subprojects {
                     "ktlint_standard_multiline-expression-wrapping" to "disabled",
                     "ktlint_standard_binary-expression-wrapping" to "disabled",
                     "ktlint_standard_property-wrapping" to "disabled",
-                    "ktlint_standard_parameter-list-wrapping" to "enabled",
-                    "ktlint_standard_function-signature" to "enabled",
-                    "ktlint_standard_class-signature" to "enabled",
+                    "ktlint_standard_parameter-list-wrapping" to "disabled",
                     "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
                     "ktlint_standard_package-name" to "disabled",
                     "ktlint_standard_property-naming" to "disabled",
                     "ktlint_standard_comment-wrapping" to "disabled",
                     "ktlint_standard_wrapping" to "disabled",
-                    "ktlint_standard_function-signature" to "disabled"
+                    "ktlint_standard_function-signature" to "disabled",
+                    "ktlint_standard_class-signature" to "disabled"
                 )
             )
         }
@@ -49,15 +48,14 @@ subprojects {
                     "ktlint_standard_multiline-expression-wrapping" to "disabled",
                     "ktlint_standard_binary-expression-wrapping" to "disabled",
                     "ktlint_standard_property-wrapping" to "disabled",
-                    "ktlint_standard_parameter-list-wrapping" to "enabled",
-                    "ktlint_standard_function-signature" to "enabled",
-                    "ktlint_standard_class-signature" to "enabled",
+                    "ktlint_standard_parameter-list-wrapping" to "disabled",
                     "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
                     "ktlint_standard_package-name" to "disabled",
                     "ktlint_standard_property-naming" to "disabled",
                     "ktlint_standard_comment-wrapping" to "disabled",
                     "ktlint_standard_wrapping" to "disabled",
-                    "ktlint_standard_function-signature" to "disabled"
+                    "ktlint_standard_function-signature" to "disabled",
+                    "ktlint_standard_class-signature" to "disabled"
                 )
             )
         }
