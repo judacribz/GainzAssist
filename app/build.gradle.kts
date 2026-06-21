@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.gainzassist.formatting)
 }
 
 secrets {

@@ -10,4 +10,5 @@ plugins {
 }
 
 rootProject.name = "GainzAssist"
+includeBuild("build-logic")
 include(":app")
