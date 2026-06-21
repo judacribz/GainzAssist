@@ -40,7 +40,6 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
     private val viewModel: WorkoutScreenViewModel by viewModel()
 
     private val workoutController = WorkoutController
-    private var act: StartWorkoutActivity? = null
     private var countDownTimer: CountDownTimer? = null
 
     private var finExercises = ArrayList<Exercise>()
@@ -61,7 +60,6 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        act = context as StartWorkoutActivity?
         finExercises = ArrayList()
     }
 
@@ -334,15 +332,12 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
             countDownTimer?.cancel()
             countDownTimer = null
 
-            val a = act
-            if (a != null) {
-                lifecycleScope.launch {
-                    val session = workoutController.currSession
-                    if (session != null) {
-                        viewModel.finishWorkoutSession(workoutController.workoutName, session)
-                    }
-                    a.finish()
+            lifecycleScope.launch {
+                val session = workoutController.currSession
+                if (session != null) {
+                    viewModel.finishWorkoutSession(workoutController.workoutName, session)
                 }
+                activity?.finish()
             }
         }
     }

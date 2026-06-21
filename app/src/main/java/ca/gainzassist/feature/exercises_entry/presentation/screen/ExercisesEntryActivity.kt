@@ -19,6 +19,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import ca.gainzassist.activities.base.GainzBaseActivity
+import ca.gainzassist.core.constants.ExerciseConst.MIN_INT
+import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModel
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModelEvent
 import ca.gainzassist.feature.summary.presentation.screen.CallingActivity
@@ -26,19 +30,14 @@ import ca.gainzassist.feature.summary.presentation.screen.SummaryActivity
 import ca.gainzassist.feature.summary.presentation.screen.SummaryActivity.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.feature.summary.presentation.screen.SummaryActivity.Companion.EXTRA_WORKOUT
 import ca.gainzassist.feature.workout_entry.presentation.screen.WorkoutEntryActivity
-import ca.gainzassist.activities.base.GainzBaseActivity
-import ca.gainzassist.core.constants.ExerciseConst.MIN_INT
-import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.ui.components.GainzTopBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntryDataListener {
+class ExercisesEntryActivity : GainzBaseActivity() {
 
     private val viewModel: ExercisesEntryViewModel by viewModel()
 
-    // Caching fragments to preserve state during recompositions/paging
     private val fragments = mutableMapOf<Int, ExerciseEntryFragment>()
     private val summaryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -69,22 +68,34 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                 viewModel.events.collect { event ->
                     when (event) {
                         is ExercisesEntryViewModelEvent.GoToSummary -> {
-                            val workout = Workout().apply {
-                                this.id = -1
-                                this.name = event.workoutName
-                                this.exercises = ArrayList(event.exercises)
-                            }
-
                             val newWorkoutSummaryIntent = Intent(
                                 /* packageContext = */ this@ExercisesEntryActivity,
                                 /* cls = */ SummaryActivity::class.java
                             )
-                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workout)
+                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, event.workout)
                             newWorkoutSummaryIntent.putExtra(
                                 EXTRA_CALLING_ACTIVITY,
                                 CallingActivity.EXERCISES_ENTRY
                             )
                             summaryLauncher.launch(newWorkoutSummaryIntent)
+                        }
+
+                        is ExercisesEntryViewModelEvent.ExerciseDeleted -> {
+                            val index = event.index
+                            val newFragments = mutableMapOf<Int, ExerciseEntryFragment>()
+                            fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
+                                val newIdx = if (oldIdx > index) oldIdx - 1 else oldIdx
+                                frag.setInd(newIdx)
+                                newFragments[newIdx] = frag
+                            }
+                            val deletedFrag = fragments[index]
+                            if (deletedFrag != null) {
+                                supportFragmentManager.commit {
+                                    remove(deletedFrag)
+                                }
+                            }
+                            fragments.clear()
+                            fragments.putAll(newFragments)
                         }
                     }
                 }
@@ -126,9 +137,6 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                 onTabSelected = { index ->
                     if (index == state.numberOfExercises) {
                         viewModel.onAddExerciseClicked()
-                        if (state.numberOfExercises > 0) {
-                            fragments.values.forEach { it.showDelete() }
-                        }
                     } else {
                         viewModel.onTabSelected(index)
                     }
@@ -138,10 +146,7 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                         pageIndex = pageIndex,
                         fragmentManager = supportFragmentManager,
                         getFragment = { idx ->
-                            getOrCreateFragment(
-                                idx,
-                                state.numberOfExercises
-                            )
+                            getOrCreateFragment(idx)
                         }
                     )
                 }
@@ -149,18 +154,11 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
         }
     }
 
-    private fun getOrCreateFragment(index: Int, numExs: Int): ExerciseEntryFragment {
+    private fun getOrCreateFragment(index: Int): ExerciseEntryFragment {
         var fragment = fragments[index]
         if (fragment == null) {
             fragment = ExerciseEntryFragment().apply {
                 setInd(index)
-                if (numExs <= 1) {
-                    hideDelete()
-                }
-                val ex = viewModel.state.value.exercises.getOrNull(index)
-                if (ex != null && ex.name != null) {
-                    updateExFields(ex)
-                }
             }
             fragments[index] = fragment
         }
@@ -170,52 +168,6 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return super.onSupportNavigateUp()
-    }
-
-    override fun exerciseDoesNotExist(
-        fmt: ExerciseEntryFragment,
-        exerciseName: String?,
-        skipIndex: Int
-    ): Boolean {
-        val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
-        val names = viewModel.state.value.exerciseNames
-        for ((i, name) in names.withIndex()) {
-            if (i == skipIndex) continue
-            if (name.equals(targetName, ignoreCase = true)) {
-                fmt.setExerciseExists()
-                return false
-            }
-        }
-
-        return true
-    }
-
-    override fun exerciseDataReceived(exercise: Exercise?, update: Boolean) {
-        exercise ?: return
-        exercise.workoutId = -1
-        viewModel.onExerciseSubmitted(exercise)
-    }
-
-    override fun deleteExercise(exercise: Exercise?, index: Int) {
-        // Shift fragments down to match new indices
-        val newFragments = mutableMapOf<Int, ExerciseEntryFragment>()
-        fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
-            val newIdx = if (oldIdx > index) oldIdx - 1 else oldIdx
-            frag.setInd(newIdx)
-            newFragments[newIdx] = frag
-        }
-        val deletedFrag = fragments[index]
-        if (deletedFrag != null) {
-            supportFragmentManager.commit {
-                remove(deletedFrag)
-            }
-        }
-        fragments.clear()
-        fragments.putAll(newFragments)
-        if (viewModel.state.value.numberOfExercises <= 2) {
-            fragments[0]?.hideDelete()
-        }
-        viewModel.onExerciseDeleted(index)
     }
 
     companion object {

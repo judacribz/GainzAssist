@@ -12,6 +12,11 @@ import ca.gainzassist.domain.usecase.workout.ObserveUniqueExerciseNamesUseCase
 import ca.gainzassist.domain.usecase.workout.ObserveWorkoutsUseCase
 import ca.gainzassist.feature.summary.domain.usecase.SaveWorkoutUseCase
 import ca.gainzassist.feature.summary.domain.usecase.UpdateWorkoutUseCase
+import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildExerciseUseCase
+import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildWorkoutFromExerciseEntriesUseCase
+import ca.gainzassist.feature.exercises_entry.domain.usecase.CheckDuplicateExerciseUseCase
+import ca.gainzassist.feature.exercises_entry.domain.usecase.DeleteExerciseUseCase
+import ca.gainzassist.feature.exercises_entry.domain.usecase.ValidateExerciseInputUseCase
 import org.koin.dsl.module
 
 val workoutUseCaseModule = module {
@@ -27,4 +32,9 @@ val workoutUseCaseModule = module {
     factory { InsertCompletedSessionUseCase(workoutRepository = get()) }
     factory { ExerciseExistsUseCase() }
     factory { CalculateNextExerciseWeightUseCase() }
+    factory { ValidateExerciseInputUseCase() }
+    factory { CheckDuplicateExerciseUseCase() }
+    factory { BuildExerciseUseCase() }
+    factory { DeleteExerciseUseCase() }
+    factory { BuildWorkoutFromExerciseEntriesUseCase() }
 }

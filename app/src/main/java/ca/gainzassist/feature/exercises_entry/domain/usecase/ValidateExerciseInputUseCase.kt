@@ -1,13 +1,23 @@
 package ca.gainzassist.feature.exercises_entry.domain.usecase
 
-sealed interface ExerciseInputValidationResult {
-    object Success : ExerciseInputValidationResult
-    data class Failure(
-        val isNameBlank: Boolean,
-        val isWeightInvalid: Boolean,
-        val isRepsInvalid: Boolean,
-        val isSetsInvalid: Boolean
-    ) : ExerciseInputValidationResult
+enum class ValidationError {
+    REQUIRED
+}
+
+sealed interface ValidateExerciseResult {
+    data class Success(
+        val name: String,
+        val weight: Float,
+        val reps: Int,
+        val sets: Int
+    ) : ValidateExerciseResult
+
+    data class Error(
+        val nameError: ValidationError? = null,
+        val weightError: ValidationError? = null,
+        val repsError: ValidationError? = null,
+        val setsError: ValidationError? = null
+    ) : ValidateExerciseResult
 }
 
 class ValidateExerciseInputUseCase {
@@ -15,20 +25,54 @@ class ValidateExerciseInputUseCase {
         name: String,
         weightStr: String,
         repsStr: String,
-        setsStr: String
-    ): ExerciseInputValidationResult {
-        val isNameBlank = name.trim().isEmpty()
-        val weight = weightStr.toFloatOrNull()
-        val isWeightInvalid = weight == null || weightStr.trim().isEmpty()
-        val reps = repsStr.toIntOrNull()
-        val isRepsInvalid = reps == null || repsStr.trim().isEmpty()
-        val sets = setsStr.toIntOrNull()
-        val isSetsInvalid = sets == null || setsStr.trim().isEmpty()
+        setsStr: String,
+        minWeight: Float,
+        minInt: Int = 1
+    ): ValidateExerciseResult {
+        var isValid = true
+        var nameErr: ValidationError? = null
+        var weightErr: ValidationError? = null
+        var repsErr: ValidationError? = null
+        var setsErr: ValidationError? = null
 
-        return if (!isNameBlank && !isWeightInvalid && !isRepsInvalid && !isSetsInvalid) {
-            ExerciseInputValidationResult.Success
+        val trimmedName = name.trim()
+        if (trimmedName.isEmpty()) {
+            nameErr = ValidationError.REQUIRED
+            isValid = false
+        }
+
+        val parsedWeight = weightStr.toFloatOrNull()
+        if (parsedWeight == null || weightStr.trim().isEmpty()) {
+            weightErr = ValidationError.REQUIRED
+            isValid = false
+        }
+
+        val parsedReps = repsStr.toIntOrNull()
+        if (parsedReps == null || repsStr.trim().isEmpty()) {
+            repsErr = ValidationError.REQUIRED
+            isValid = false
+        }
+
+        val parsedSets = setsStr.toIntOrNull()
+        if (parsedSets == null || setsStr.trim().isEmpty()) {
+            setsErr = ValidationError.REQUIRED
+            isValid = false
+        }
+
+        return if (isValid && parsedWeight != null && parsedReps != null && parsedSets != null) {
+            ValidateExerciseResult.Success(
+                name = trimmedName,
+                weight = maxOf(parsedWeight, minWeight),
+                reps = maxOf(parsedReps, minInt),
+                sets = maxOf(parsedSets, minInt)
+            )
         } else {
-            ExerciseInputValidationResult.Failure(isNameBlank, isWeightInvalid, isRepsInvalid, isSetsInvalid)
+            ValidateExerciseResult.Error(
+                nameError = nameErr,
+                weightError = weightErr,
+                repsError = repsErr,
+                setsError = setsErr
+            )
         }
     }
 }
