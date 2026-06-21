@@ -2,7 +2,6 @@ package ca.gainzassist.feature.exercises_entry.presentation.screen
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,12 +12,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.commit
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import ca.gainzassist.R
+import ca.gainzassist.activities.base.GainzBaseActivity
+import ca.gainzassist.core.constants.ExerciseConst.MIN_INT
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModel
 import ca.gainzassist.feature.exercises_entry.presentation.viewmodel.ExercisesEntryViewModelEvent
 import ca.gainzassist.feature.summary.presentation.screen.CallingActivity
@@ -26,19 +27,13 @@ import ca.gainzassist.feature.summary.presentation.screen.SummaryActivity
 import ca.gainzassist.feature.summary.presentation.screen.SummaryActivity.Companion.EXTRA_CALLING_ACTIVITY
 import ca.gainzassist.feature.summary.presentation.screen.SummaryActivity.Companion.EXTRA_WORKOUT
 import ca.gainzassist.feature.workout_entry.presentation.screen.WorkoutEntryActivity
-import ca.gainzassist.activities.base.GainzBaseActivity
-import ca.gainzassist.core.constants.ExerciseConst.MIN_INT
-import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.ui.components.GainzTopBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntryDataListener {
+class ExercisesEntryActivity : GainzBaseActivity() {
 
     private val viewModel: ExercisesEntryViewModel by viewModel()
-
-    // Caching fragments to preserve state during recompositions/paging
     private val fragments = mutableMapOf<Int, ExerciseEntryFragment>()
     private val summaryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -59,7 +54,14 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
             /* defaultValue = */ MIN_INT
         )
 
-        viewModel.initialize(workoutName, numExs)
+        viewModel.initialize(
+            workoutName = workoutName,
+            numberOfExercises = numExs,
+            defaultReps = getString(R.string.starting_reps),
+            defaultSets = getString(R.string.starting_sets),
+            defaultWeight = getString(R.string.starting_weight),
+            defaultEquipment = resources.getStringArray(R.array.exerciseEquipment).first()
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,22 +71,22 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                 viewModel.events.collect { event ->
                     when (event) {
                         is ExercisesEntryViewModelEvent.GoToSummary -> {
-                            val workout = Workout().apply {
-                                this.id = -1
-                                this.name = event.workoutName
-                                this.exercises = ArrayList(event.exercises)
-                            }
-
                             val newWorkoutSummaryIntent = Intent(
                                 /* packageContext = */ this@ExercisesEntryActivity,
                                 /* cls = */ SummaryActivity::class.java
                             )
-                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, workout)
+                            newWorkoutSummaryIntent.putExtra(EXTRA_WORKOUT, event.workout)
                             newWorkoutSummaryIntent.putExtra(
                                 EXTRA_CALLING_ACTIVITY,
                                 CallingActivity.EXERCISES_ENTRY
                             )
                             summaryLauncher.launch(newWorkoutSummaryIntent)
+                        }
+
+                        is ExercisesEntryViewModelEvent.ExerciseDeleted -> {
+                            // Clear cached fragments so they are recreated with proper arguments
+                            // next time they are requested
+                            fragments.clear()
                         }
                     }
                 }
@@ -95,11 +97,11 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
     @Composable
     override fun InnerContent() {
         val state by viewModel.state.collectAsStateWithLifecycle()
-        val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
+        val tabs = List(state.exerciseNames.take(state.numberOfExercises).size) { index ->
             ExerciseEntryTab(
-                index = i,
-                title = String.format(TAB_LABEL, i + 1),
-                id = i.toLong()
+                index = index,
+                title = String.format(getString(R.string.tab_exercise_label), index.inc()),
+                id = index.toLong()
             )
         }.toMutableList()
         val uiState = ExercisesEntryUiState(
@@ -117,7 +119,7 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
         )
         Column(Modifier.fillMaxSize()) {
             GainzTopBar(
-                title = "Exercises Entry",
+                title = getString(R.string.title_exercises_entry),
                 showBack = true,
                 onBackClick = { finish() }
             )
@@ -126,9 +128,6 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                 onTabSelected = { index ->
                     if (index == state.numberOfExercises) {
                         viewModel.onAddExerciseClicked()
-                        if (state.numberOfExercises > 0) {
-                            fragments.values.forEach { it.showDelete() }
-                        }
                     } else {
                         viewModel.onTabSelected(index)
                     }
@@ -138,10 +137,7 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
                         pageIndex = pageIndex,
                         fragmentManager = supportFragmentManager,
                         getFragment = { idx ->
-                            getOrCreateFragment(
-                                idx,
-                                state.numberOfExercises
-                            )
+                            getOrCreateFragment(idx)
                         }
                     )
                 }
@@ -149,19 +145,10 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
         }
     }
 
-    private fun getOrCreateFragment(index: Int, numExs: Int): ExerciseEntryFragment {
+    private fun getOrCreateFragment(index: Int): ExerciseEntryFragment {
         var fragment = fragments[index]
         if (fragment == null) {
-            fragment = ExerciseEntryFragment().apply {
-                setInd(index)
-                if (numExs <= 1) {
-                    hideDelete()
-                }
-                val ex = viewModel.state.value.exercises.getOrNull(index)
-                if (ex != null && ex.name != null) {
-                    updateExFields(ex)
-                }
-            }
+            fragment = ExerciseEntryFragment.newInstance(index)
             fragments[index] = fragment
         }
         return fragment
@@ -171,57 +158,9 @@ class ExercisesEntryActivity : GainzBaseActivity(), ExerciseEntryFragment.ExEntr
         finish()
         return super.onSupportNavigateUp()
     }
-
-    override fun exerciseDoesNotExist(
-        fmt: ExerciseEntryFragment,
-        exerciseName: String?,
-        skipIndex: Int
-    ): Boolean {
-        val targetName = exerciseName?.trim().takeUnless(String?::isNullOrEmpty) ?: return false
-        val names = viewModel.state.value.exerciseNames
-        for ((i, name) in names.withIndex()) {
-            if (i == skipIndex) continue
-            if (name.equals(targetName, ignoreCase = true)) {
-                fmt.setExerciseExists()
-                return false
-            }
-        }
-
-        return true
-    }
-
-    override fun exerciseDataReceived(exercise: Exercise?, update: Boolean) {
-        exercise ?: return
-        exercise.workoutId = -1
-        viewModel.onExerciseSubmitted(exercise)
-    }
-
-    override fun deleteExercise(exercise: Exercise?, index: Int) {
-        // Shift fragments down to match new indices
-        val newFragments = mutableMapOf<Int, ExerciseEntryFragment>()
-        fragments.filterKeys { it != index }.forEach { (oldIdx, frag) ->
-            val newIdx = if (oldIdx > index) oldIdx - 1 else oldIdx
-            frag.setInd(newIdx)
-            newFragments[newIdx] = frag
-        }
-        val deletedFrag = fragments[index]
-        if (deletedFrag != null) {
-            supportFragmentManager.commit {
-                remove(deletedFrag)
-            }
-        }
-        fragments.clear()
-        fragments.putAll(newFragments)
-        if (viewModel.state.value.numberOfExercises <= 2) {
-            fragments[0]?.hideDelete()
-        }
-        viewModel.onExerciseDeleted(index)
-    }
-
-    companion object {
-        const val TAB_LABEL = "Exercise %s"
-    }
 }
+
+private const val FRAGMENT_CONTAINER_ID_OFFSET = 100_000
 
 @Composable
 fun ExEntryFragmentContainer(
@@ -233,7 +172,8 @@ fun ExEntryFragmentContainer(
         modifier = Modifier.fillMaxSize(),
         factory = { ctx ->
             FragmentContainerView(ctx).apply {
-                id = View.generateViewId()
+                // Use a stable ID derived from the pageIndex to prevent crashes on recomposition
+                id = FRAGMENT_CONTAINER_ID_OFFSET + pageIndex
             }
         },
         update = { view ->

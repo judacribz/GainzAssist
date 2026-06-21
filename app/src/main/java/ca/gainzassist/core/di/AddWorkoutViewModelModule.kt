@@ -8,7 +8,16 @@ import org.koin.dsl.module
 
 val addWorkoutViewModelModule = module {
     viewModel { WorkoutEntryViewModel(validateWorkoutEntryUseCase = get()) }
-    viewModel { ExercisesEntryViewModel(exerciseExistsUseCase = get()) }
+    viewModel {
+        ExercisesEntryViewModel(
+            exerciseExistsUseCase = get(),
+            validateExerciseInputUseCase = get(),
+            checkDuplicateExerciseUseCase = get(),
+            buildExerciseUseCase = get(),
+            deleteExerciseUseCase = get(),
+            buildWorkoutFromExerciseEntriesUseCase = get()
+        )
+    }
     viewModel {
         SummaryViewModel(
             saveWorkoutUseCase = get()

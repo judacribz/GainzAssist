@@ -1,6 +1,8 @@
 <resources>
     <!-- Titles -->
     <string name="app_name">Gainz Assist</string>
+    <string name="title_exercises_entry">Exercises Entry</string>
+    <string name="tab_exercise_label">Exercise %d</string>
     <string name="title_new_workout_summary">New Workout Summary</string>
     <string name="no_workouts_to_resume">No workouts to resume</string>
     <!-- Content Descriptions -->
@@ -8,8 +10,6 @@
     <string name="cd_sign_up_img">Main image in the sign up screen</string>
     <string name="cd_facebook_login">Facebook Login</string>
     <string name="cd_google_login">Google Login</string>
-    <!-- Menu Items -->
-    <!--TODO remove-->
     <!-- Error Msgs -->
     <string name="err_invalid_email">Invalid Email</string>
     <string name="err_invalid_password">Invalid Password</string>
@@ -50,7 +50,6 @@
     <string name="weight_lbs">Weight (lbs)</string>
     <string name="add_workout">Add Workout</string>
     <string name="add_exercise">Add Exercise</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="clear">Clear</string>
     <string name="discard">Discard</string>
     <string name="reps">Reps</string>
@@ -59,7 +58,7 @@
     <string name="edit">Edit</string>
     <string name="start_next_set">Start Next Set</string>
     <string name="enter">enter</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="skip">skip</string>
     <string name="num_of_exercises"># of exercises</string>
     <string name="starting_reps">10</string>

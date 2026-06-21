@@ -13,6 +13,9 @@ import ca.gainzassist.core.constants.ExerciseConst.SET_INDEX
 import ca.gainzassist.core.constants.ExerciseConst.SET_LIST
 import ca.gainzassist.core.constants.ExerciseConst.WEIGHT
 import ca.gainzassist.core.constants.ExerciseConst.WEIGHT_CHANGE
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import ca.gainzassist.core.util.Misc.enablePrettyMapper
 import ca.gainzassist.core.util.Misc.readValue
 import ca.gainzassist.core.util.Misc.writeValueAsString
@@ -53,8 +56,6 @@ object WorkoutController {
     var currRestTime: Long = 0
         private set
         
-    private var timerSet = false
-    
     var lockReps = false
         private set
     var lockWeight = false
@@ -65,19 +66,13 @@ object WorkoutController {
 
     var retrievedWorkout: Map<String, Any?>? = null
 
-    interface DataListener {
-        fun startTimer(timeInMillis: Long)
-        fun updateProgressSets(numSets: Int)
+    sealed interface WorkoutControllerEvent {
+        data class StartTimer(val timeInMillis: Long) : WorkoutControllerEvent
+        data class UpdateProgressSets(val numSets: Int) : WorkoutControllerEvent
     }
 
-    private var dataListener: DataListener? = null
-
-    fun setDataListener(dataListener: DataListener?) {
-        this.dataListener = dataListener
-        if (!timerSet) {
-            setTimer()
-        }
-    }
+    private val _events = MutableSharedFlow<WorkoutControllerEvent>(extraBufferCapacity = 8)
+    val events: SharedFlow<WorkoutControllerEvent> = _events.asSharedFlow()
 
     fun interface WarmupsListener {
         fun warmupsGenerated(warmups: ArrayList<Exercise>)
@@ -363,7 +358,7 @@ object WorkoutController {
             this.setIndex = 0
         }
 
-        dataListener?.updateProgressSets(numSets)
+        _events.tryEmit(WorkoutControllerEvent.UpdateProgressSets(numSets))
         this.currMinWeight = exercise.minWeight
         this.currWeightChange = exercise.weightChange
         setCurrExerciseSet(this.currExercise!!.getSet(this.setIndex))
@@ -430,12 +425,7 @@ object WorkoutController {
     }
 
     private fun setTimer() {
-        if (dataListener != null) {
-            dataListener!!.startTimer(this.currRestTime)
-            timerSet = true
-        } else {
-            timerSet = false
-        }
+        _events.tryEmit(WorkoutControllerEvent.StartTimer(this.currRestTime))
     }
 
     fun incWeight() {
@@ -486,10 +476,6 @@ object WorkoutController {
             exercise = this.currSession!!.sessionExs[exIndex - 1]
         }
         return exercise
-    }
-
-    fun unsetTimer() {
-        timerSet = false
     }
 
 }

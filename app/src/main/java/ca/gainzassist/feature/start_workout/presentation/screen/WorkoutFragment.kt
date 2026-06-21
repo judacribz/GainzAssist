@@ -16,6 +16,7 @@ import androidx.core.util.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutController
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutProgressMapper
@@ -35,12 +36,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Locale
 
-class WorkoutFragment : Fragment(), WorkoutController.DataListener {
+class WorkoutFragment : Fragment() {
 
     private val viewModel: WorkoutScreenViewModel by viewModel()
 
     private val workoutController = WorkoutController
-    private var act: StartWorkoutActivity? = null
     private var countDownTimer: CountDownTimer? = null
 
     private var finExercises = ArrayList<Exercise>()
@@ -61,7 +61,6 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        act = context as StartWorkoutActivity?
         finExercises = ArrayList()
     }
 
@@ -99,6 +98,17 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
         super.onViewCreated(view, savedInstanceState)
         setNum = "%s " + getString(R.string.set_num)
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                workoutController.events.collect { event ->
+                    when (event) {
+                        is WorkoutController.WorkoutControllerEvent.StartTimer -> startTimer(event.timeInMillis)
+                        is WorkoutController.WorkoutControllerEvent.UpdateProgressSets -> updateProgressSets(event.numSets)
+                    }
+                }
+            }
+        }
+
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             refreshFromResume()
         }
@@ -111,27 +121,20 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
     }
 
     private fun refreshFromResume() {
-        workoutController.setDataListener(this)
-
         lifecycleScope.launch {
-            if (setProgress == null) {
-                val snapshot = viewModel.getSessionProgress(workoutController.workoutName)
-                if (snapshot != null) {
-                    exProgress = SparseArray()
-                    for ((key, value) in snapshot.exerciseProgress) {
-                        if (value != null) {
-                            exProgress?.put(key, PROGRESS_STATUS_MAP[value])
-                        }
+            val snapshot = viewModel.getSessionProgress(workoutController.workoutName)
+            if (setProgress == null && snapshot != null) {
+                exProgress = SparseArray<ProgressStatus>().apply {
+                    snapshot.exerciseProgress.forEach { (key, value) ->
+                        value?.let { put(key, PROGRESS_STATUS_MAP[it]) }
                     }
-                    setProgress = SparseArray()
-                    for ((key, value) in snapshot.setProgress) {
-                        if (value != null) {
-                            setProgress?.put(key, PROGRESS_STATUS_MAP[value])
-                        }
+                }
+                setProgress = SparseArray<ProgressStatus>().apply {
+                    snapshot.setProgress.forEach { (key, value) ->
+                        value?.let { put(key, PROGRESS_STATUS_MAP[it]) }
                     }
                 }
             }
-
             updateProgressExs(workoutController.currNumExs)
             updateProgSets(workoutController.currNumSets)
             updateUI()
@@ -160,7 +163,6 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
         if (!workoutFinished) {
             saveProgressMap()
         }
-        workoutController.setDataListener(null as WorkoutController.DataListener?)
     }
 
     override fun onDestroy() {
@@ -192,7 +194,7 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
         }
     }
 
-    override fun startTimer(timeInMillis: Long) {
+    private fun startTimer(timeInMillis: Long) {
         countDownTimer?.cancel()
         countDownTimer = getCountDownTimer(timeInMillis)
         countDownTimer?.start()
@@ -218,7 +220,7 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
         }
     }
 
-    override fun updateProgressSets(numSets: Int) {
+    private fun updateProgressSets(numSets: Int) {
         setProgress = setupProgress(numSets, workoutController.currSetNum)
         uiState = uiState.copy(setProgress = setProgress?.toProgressUiItems(numSets) ?: emptyList())
     }
@@ -334,15 +336,12 @@ class WorkoutFragment : Fragment(), WorkoutController.DataListener {
             countDownTimer?.cancel()
             countDownTimer = null
 
-            val a = act
-            if (a != null) {
-                lifecycleScope.launch {
-                    val session = workoutController.currSession
-                    if (session != null) {
-                        viewModel.finishWorkoutSession(workoutController.workoutName, session)
-                    }
-                    a.finish()
+            lifecycleScope.launch {
+                val session = workoutController.currSession
+                if (session != null) {
+                    viewModel.finishWorkoutSession(workoutController.workoutName, session)
                 }
+                activity?.finish()
             }
         }
     }
