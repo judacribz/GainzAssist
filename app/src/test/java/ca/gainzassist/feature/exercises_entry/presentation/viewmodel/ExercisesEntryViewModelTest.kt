@@ -1,7 +1,5 @@
-package ca.gainzassist.presentation.add_workout
+package ca.gainzassist.feature.exercises_entry.presentation.viewmodel
 
-import ca.gainzassist.activities.add_workout.exercises_entry.ExercisesEntryViewModel
-import ca.gainzassist.activities.add_workout.exercises_entry.ExercisesEntryViewModelEvent
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.usecase.workout.ExerciseExistsUseCase
 import ca.gainzassist.test.rules.MainDispatcherRule

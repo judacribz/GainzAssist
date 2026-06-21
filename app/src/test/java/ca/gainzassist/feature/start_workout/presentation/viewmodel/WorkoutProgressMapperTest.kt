@@ -1,7 +1,6 @@
-package ca.gainzassist.presentation.start_workout.workout
+package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
 import android.util.SparseArray
-import ca.gainzassist.activities.start_workout.workout_screen.WorkoutProgressMapper
 import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.FAIL_SELECTED

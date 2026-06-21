@@ -1,7 +1,6 @@
-package ca.gainzassist.presentation.add_workout
+package ca.gainzassist.feature.workout_entry.presentation.viewmodel
 
-import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModel
-import ca.gainzassist.activities.add_workout.workout_entry.WorkoutEntryViewModelEvent
+import ca.gainzassist.feature.workout_entry.domain.usecase.ValidateWorkoutEntryUseCase
 import ca.gainzassist.test.rules.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -26,7 +25,7 @@ class WorkoutEntryViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = WorkoutEntryViewModel()
+        viewModel = WorkoutEntryViewModel(ValidateWorkoutEntryUseCase())
     }
 
     @Test
@@ -48,8 +47,8 @@ class WorkoutEntryViewModelTest {
         assertNotNull(event)
         assertEquals("", event?.workoutName) // Trimmed
         assertEquals(3, event?.numberOfExercises)
-        assertNull(viewModel.state.value.workoutNameError)
-        assertNull(viewModel.state.value.numberOfExercisesError)
+        assertNull(viewModel.state.value.workoutNameErrorResId)
+        assertNull(viewModel.state.value.numberOfExercisesErrorResId)
         
         job.cancel()
     }
@@ -84,7 +83,7 @@ class WorkoutEntryViewModelTest {
         viewModel.onContinueClicked()
 
         assertTrue(events.isEmpty())
-        assertNotNull(viewModel.state.value.numberOfExercisesError)
+        assertNotNull(viewModel.state.value.numberOfExercisesErrorResId)
         
         job.cancel()
     }

@@ -2,6 +2,8 @@ package ca.gainzassist.domain.usecase.workout
 
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
+import ca.gainzassist.feature.summary.domain.usecase.SaveWorkoutUseCase
+import ca.gainzassist.feature.summary.domain.usecase.UpdateWorkoutUseCase
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

@@ -1,8 +1,6 @@
-package ca.gainzassist.presentation.main
+package ca.gainzassist.feature.main.presentation.viewmodel
 
-import ca.gainzassist.activities.main.MainViewModel
-import ca.gainzassist.activities.main.MainViewModelEvent
-import ca.gainzassist.activities.main.view.MainTab
+import ca.gainzassist.feature.main.presentation.screen.MainTab
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.GetIncompleteWorkoutNamesUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteAllWorkoutsUseCase

@@ -1,22 +1,20 @@
-package ca.gainzassist.presentation.start_workout
+package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
-import ca.gainzassist.activities.start_workout.StartWorkoutRestoreDecision
-import ca.gainzassist.activities.start_workout.StartWorkoutViewModel
-import ca.gainzassist.activities.start_workout.StartWorkoutViewModelEvent
-import ca.gainzassist.activities.start_workout.view.StartWorkoutTab
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.AddIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
-import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveIncompleteSessionUseCase
-import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
-import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCase
+import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
+import ca.gainzassist.feature.start_workout.domain.usecase.SaveIncompleteWorkoutUseCase
+import ca.gainzassist.feature.start_workout.domain.usecase.StartWorkoutSessionUseCase
+import ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutTab
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -28,6 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StartWorkoutViewModelTest {
 
     @get:Rule
@@ -41,21 +40,21 @@ class StartWorkoutViewModelTest {
     fun setup() {
         workoutRepository = FakeWorkoutRepository()
         sessionPreferencesRepository = FakeSessionPreferencesRepository()
-        viewModel = StartWorkoutViewModel(
-            getWorkoutWithExercisesByNameUseCase = GetWorkoutWithExercisesByNameUseCase(
-                workoutRepository
-            ),
-            addIncompleteWorkoutUseCase = AddIncompleteWorkoutUseCase(sessionPreferencesRepository),
-            saveIncompleteSessionUseCase = SaveIncompleteSessionUseCase(sessionPreferencesRepository),
+
+        val startWorkoutSessionUseCase = StartWorkoutSessionUseCase(
+            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(sessionPreferencesRepository),
             getIncompleteSessionUseCase = GetIncompleteSessionUseCase(sessionPreferencesRepository),
-            saveSessionProgressUseCase = SaveSessionProgressUseCase(sessionPreferencesRepository),
-            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(
-                sessionPreferencesRepository
-            ),
-            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(
-                sessionPreferencesRepository
-            ),
-            removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository)
+            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(sessionPreferencesRepository)
+        )
+
+        val saveIncompleteWorkoutUseCase = SaveIncompleteWorkoutUseCase(
+            saveIncompleteSessionUseCase = SaveIncompleteSessionUseCase(sessionPreferencesRepository),
+            addIncompleteWorkoutUseCase = AddIncompleteWorkoutUseCase(sessionPreferencesRepository)
+        )
+
+        viewModel = StartWorkoutViewModel(
+            startWorkoutSessionUseCase = startWorkoutSessionUseCase,
+            saveIncompleteWorkoutUseCase = saveIncompleteWorkoutUseCase
         )
     }
 

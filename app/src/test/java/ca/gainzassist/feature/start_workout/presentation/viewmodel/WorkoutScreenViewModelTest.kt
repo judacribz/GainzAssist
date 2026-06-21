@@ -1,6 +1,5 @@
-package ca.gainzassist.presentation.start_workout.workout
+package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
-import ca.gainzassist.activities.start_workout.workout_screen.WorkoutScreenViewModel
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.session.SessionProgressSnapshot
 import ca.gainzassist.domain.usecase.session.GetSessionProgressUseCase
@@ -9,6 +8,7 @@ import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.RemoveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
 import ca.gainzassist.domain.usecase.workout.InsertCompletedSessionUseCase
+import ca.gainzassist.feature.start_workout.domain.usecase.FinishWorkoutSessionUseCase
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
@@ -39,17 +39,23 @@ class WorkoutScreenViewModelTest {
     fun setup() {
         sessionPreferencesRepository = FakeSessionPreferencesRepository()
         fakeWorkoutRepository = FakeWorkoutRepository()
+
+        val insertCompletedSessionUseCase = InsertCompletedSessionUseCase(fakeWorkoutRepository)
+        val removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(sessionPreferencesRepository)
+        val removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(sessionPreferencesRepository)
+        val removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository)
+
+        val finishWorkoutSessionUseCase = FinishWorkoutSessionUseCase(
+            insertCompletedSessionUseCase = insertCompletedSessionUseCase,
+            removeIncompleteWorkoutUseCase = removeIncompleteWorkoutUseCase,
+            removeIncompleteSessionUseCase = removeIncompleteSessionUseCase,
+            removeSessionProgressUseCase = removeSessionProgressUseCase
+        )
+
         viewModel = WorkoutScreenViewModel(
             getSessionProgressUseCase = GetSessionProgressUseCase(sessionPreferencesRepository),
             saveSessionProgressUseCase = SaveSessionProgressUseCase(sessionPreferencesRepository),
-            removeIncompleteWorkoutUseCase = RemoveIncompleteWorkoutUseCase(
-                sessionPreferencesRepository
-            ),
-            removeIncompleteSessionUseCase = RemoveIncompleteSessionUseCase(
-                sessionPreferencesRepository
-            ),
-            removeSessionProgressUseCase = RemoveSessionProgressUseCase(sessionPreferencesRepository),
-            insertCompletedSessionUseCase = InsertCompletedSessionUseCase(fakeWorkoutRepository)
+            finishWorkoutSessionUseCase = finishWorkoutSessionUseCase
         )
     }
 
@@ -131,7 +137,7 @@ class WorkoutScreenViewModelTest {
         sessionPreferencesRepository.saveIncompleteSession(workoutName, "{\"session\":true}")
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
 
-        viewModel.clearFinishedWorkoutState(workoutName)
+        viewModel.finishWorkoutSession(workoutName, Session())
 
         assertFalse(sessionPreferencesRepository.getIncompleteWorkoutNames().contains(workoutName))
         assertEquals(null, sessionPreferencesRepository.getIncompleteSession(workoutName))
@@ -144,7 +150,7 @@ class WorkoutScreenViewModelTest {
         sessionPreferencesRepository.saveIncompleteSession(workoutName, "{\"session\":true}")
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
 
-        viewModel.clearFinishedWorkoutState(workoutName)
+        viewModel.finishWorkoutSession(workoutName, Session())
 
         assertEquals(null, sessionPreferencesRepository.getSessionProgress(workoutName))
         assertEquals("{\"session\":true}", sessionPreferencesRepository.getIncompleteSession(workoutName))
@@ -153,7 +159,7 @@ class WorkoutScreenViewModelTest {
     @Test
     fun insertCompletedSession_delegatesToUseCase() = runTest {
         val session = Session().apply { workoutName = "Chest Day" }
-        viewModel.insertCompletedSession(session)
+        viewModel.finishWorkoutSession("Chest Day", session)
 
         assertEquals(1, fakeWorkoutRepository.insertedSessions.size)
         assertEquals(session, fakeWorkoutRepository.insertedSessions.first())
@@ -163,10 +169,9 @@ class WorkoutScreenViewModelTest {
     @Test
     fun insertCompletedSession_doesNotModifySessionWhenRepositoryFakeOnlyRecords() = runTest {
         val session = Session().apply { workoutName = "Leg Day" }
-        viewModel.insertCompletedSession(session)
+        viewModel.finishWorkoutSession("Leg Day", session)
 
         val recorded = fakeWorkoutRepository.insertedSessions.first()
         assertEquals("Leg Day", recorded.workoutName)
     }
-
 }
