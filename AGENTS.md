@@ -273,3 +273,35 @@ Manual smoke test:
 * rotate/portrait behavior if locked
 
 If behavior changes, document it in the PR.
+
+## Fragment Communication Rules
+
+Avoid Fragment-to-Activity listener interfaces.
+
+Do not make a Fragment require its hosting Activity to implement an interface through `onAttach()`.
+
+Avoid patterns like:
+
+- `context as SomeListener`
+- `activity as SomeListener`
+- `requireActivity() as SomeListener`
+- `parentFragment as SomeListener`
+- listener interfaces inside Fragment classes
+- Activity directly calling public Fragment mutation methods for screen state
+- Fragment calling Activity methods for validation, business logic, add/update/delete actions, or navigation decisions
+
+Preferred communication:
+
+1. For fragments/screens inside the same feature, use a shared feature ViewModel.
+2. Fragments/composables dispatch actions to the ViewModel.
+3. ViewModel owns screen state and business decisions.
+4. Activity observes one-time navigation/events from the ViewModel.
+5. Activity should only handle platform work such as navigation, ActivityResult APIs, lifecycle setup, and Android SDK callbacks.
+6. For truly independent fragments where a shared feature ViewModel is not appropriate, use Fragment Result API, not direct Activity listener interfaces.
+7. Long-term, Compose screens should avoid Fragment wrappers where possible.
+
+Fragments should not own business state if it can live in a ViewModel.
+
+Activities should not act as business-logic mediators between fragments.
+
+Use cases should be introduced for reusable business rules such as validation, duplicate checks, building models, saving, deleting, and navigation decisions.
