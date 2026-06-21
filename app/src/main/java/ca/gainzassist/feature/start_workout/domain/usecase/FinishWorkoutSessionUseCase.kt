@@ -14,7 +14,7 @@ class FinishWorkoutSessionUseCase(
 ) {
     suspend operator fun invoke(workoutName: String, session: Session) {
         insertCompletedSessionUseCase(session, syncToFirebase = true)
-        
+
         if (workoutName.isNotBlank()) {
             if (removeIncompleteWorkoutUseCase(workoutName)) {
                 removeIncompleteSessionUseCase(workoutName)

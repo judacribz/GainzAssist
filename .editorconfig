@@ -1,0 +1,26 @@
+root = true
+
+# noinspection EditorConfigKeyCorrectness
+[*.{kt,kts}]
+charset = utf-8
+end_of_line = lf
+ktlint_code_style = android_studio
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+# Disable trailing comma enforcement (user preference: no trailing commas)
+ij_kotlin_allow_trailing_comma = false
+ij_kotlin_allow_trailing_comma_on_call_site = false
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+
+# Allow PascalCase composable function names (handled by detekt configuration)
+ktlint_standard_function-naming = disabled
+
+# Keep other defaults
+ktlint_standard_no-wildcard-imports = enabled
+
+# Disable Compose UnstableCollections rule globally
+ktlint_compose_unstable-collections = disabled
+ktlint_standard_filename = disabled

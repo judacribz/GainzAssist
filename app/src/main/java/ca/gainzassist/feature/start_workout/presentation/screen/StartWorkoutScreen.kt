@@ -22,10 +22,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.commit
 import ca.gainzassist.R
-import ca.gainzassist.feature.start_workout.presentation.viewmodel.StartWorkoutViewModelState
 import ca.gainzassist.feature.start_workout.presentation.component.ExerciseSetsListScreen
-import ca.gainzassist.feature.start_workout.presentation.screen.WarmupsListScreen
-import ca.gainzassist.feature.start_workout.presentation.screen.WorkoutFragment
+import ca.gainzassist.feature.start_workout.presentation.viewmodel.StartWorkoutViewModelState
 import ca.gainzassist.ui.components.GainzTabItem
 import ca.gainzassist.ui.components.GainzTabRow
 
@@ -89,7 +87,7 @@ fun StartWorkoutScreen(
                 iconResId = tab.iconResId
             )
         }
-        
+
         GainzTabRow(
             pagerState = pagerState,
             tabs = tabs
@@ -200,5 +198,3 @@ private fun StartWorkoutScreenPreviewLargeFont() {
         )
     }
 }
-
-

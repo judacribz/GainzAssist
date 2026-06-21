@@ -1,8 +1,5 @@
 package ca.gainzassist.feature.login.presentation.screen
 
-import ca.gainzassist.feature.login.presentation.state.LoginUiState
-import ca.gainzassist.feature.login.presentation.event.LoginActions
-
 import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
@@ -67,6 +64,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+import ca.gainzassist.feature.login.presentation.event.LoginActions
+import ca.gainzassist.feature.login.presentation.state.LoginUiState
 
 data class LoginInputFieldState(
     val value: String,

@@ -90,10 +90,11 @@ class LoginViewModel(
                         val errorMsg = result.exceptionOrNull()?.message ?: "Login failed"
                         _events.emit(
                             LoginViewModelEvent.AuthError(
-                                if (result.exceptionOrNull()?.message != null) UiText.DynamicString(
-                                    errorMsg
-                                )
-                                else UiText.StringResource(R.string.err_login_failed)
+                                if (result.exceptionOrNull()?.message != null) {
+                                    UiText.DynamicString(errorMsg)
+                                } else {
+                                    UiText.StringResource(R.string.err_login_failed)
+                                }
                             )
                         )
                     }
@@ -137,10 +138,11 @@ class LoginViewModel(
                         val errorMsg = result.exceptionOrNull()?.message ?: "Sign up failed"
                         _events.emit(
                             LoginViewModelEvent.AuthError(
-                                if (result.exceptionOrNull()?.message != null) UiText.DynamicString(
-                                    errorMsg
-                                )
-                                else UiText.StringResource(R.string.err_signup_failed)
+                                if (result.exceptionOrNull()?.message != null) {
+                                    UiText.DynamicString(errorMsg)
+                                } else {
+                                    UiText.StringResource(R.string.err_signup_failed)
+                                }
                             )
                         )
                     }

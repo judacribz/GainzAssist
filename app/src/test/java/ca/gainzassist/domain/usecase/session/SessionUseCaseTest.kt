@@ -41,7 +41,7 @@ class SessionUseCaseTest {
 
         addIncompleteWorkoutUseCase("Workout 1")
         addIncompleteWorkoutUseCase("Workout 2")
-        
+
         val names = getIncompleteWorkoutNamesUseCase()
         assertEquals(2, names.size)
         assertTrue(names.contains("Workout 1"))
@@ -50,7 +50,7 @@ class SessionUseCaseTest {
         val removed = removeIncompleteWorkoutUseCase("Workout 1")
         assertTrue(removed)
         assertFalse(getIncompleteWorkoutNamesUseCase().contains("Workout 1"))
-        
+
         val removedAgain = removeIncompleteWorkoutUseCase("Workout 1")
         assertFalse(removedAgain)
     }
@@ -59,10 +59,10 @@ class SessionUseCaseTest {
     fun `incomplete session use cases handle data correctly`() = runTest {
         val workoutName = "My Workout"
         val sessionJson = "{\"id\": 1}"
-        
+
         saveIncompleteSessionUseCase(workoutName, sessionJson)
         assertEquals(sessionJson, getIncompleteSessionUseCase(workoutName))
-        
+
         removeIncompleteSessionUseCase(workoutName)
         assertEquals(null, getIncompleteSessionUseCase(workoutName))
     }
@@ -71,10 +71,10 @@ class SessionUseCaseTest {
     fun `session progress use cases handle data correctly`() = runTest {
         val workoutName = "Progress Workout"
         val progressJson = "{\"progress\": 50}"
-        
+
         saveSessionProgressUseCase(workoutName, progressJson)
         assertEquals(progressJson, getSessionProgressUseCase(workoutName))
-        
+
         removeSessionProgressUseCase(workoutName)
         assertEquals(null, getSessionProgressUseCase(workoutName))
     }
@@ -83,10 +83,10 @@ class SessionUseCaseTest {
     fun `use cases ignore blank workout names`() = runTest {
         addIncompleteWorkoutUseCase(" ")
         assertTrue(getIncompleteWorkoutNamesUseCase().isEmpty())
-        
+
         saveIncompleteSessionUseCase("", "{}")
         assertEquals(null, getIncompleteSessionUseCase(""))
-        
+
         saveSessionProgressUseCase("   ", "{}")
         assertEquals(null, getSessionProgressUseCase("   "))
     }

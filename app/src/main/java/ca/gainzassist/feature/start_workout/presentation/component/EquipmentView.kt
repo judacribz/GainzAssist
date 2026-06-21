@@ -10,15 +10,11 @@ import android.view.View
 import ca.gainzassist.R
 import java.util.Locale
 
-class EquipmentView @JvmOverloads constructor(
+class EquipmentView(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
-
-    private val TEXT_SIZE = 50
-    private val PLATE_WIDTH = 40
-    private val WEIGHTS = intArrayOf(450, 250, 100, 50, 25)
 
     private val numWeights = intArrayOf(0, 0, 0, 0, 0)
     var viewHeight = 0
@@ -112,5 +108,11 @@ class EquipmentView @JvmOverloads constructor(
             this.weight = weight
         }
         invalidate()
+    }
+
+    companion object {
+        private const val TEXT_SIZE = 50
+        private const val PLATE_WIDTH = 40
+        private val WEIGHTS = intArrayOf(450, 250, 100, 50, 25)
     }
 }

@@ -16,6 +16,7 @@ class ExerciseSet : Parcelable {
         set(value) {
             field = if (value == -1L) Date().time else value
         }
+
     @ColumnInfo(name = "session_id")
     var sessionId: Long = 0
 
@@ -24,9 +25,9 @@ class ExerciseSet : Parcelable {
 
     @ColumnInfo(name = "set_number")
     var setNumber: Int = 0
-    
+
     var reps: Int = 0
-    
+
     var weight: Float = 0f
 
     @ColumnInfo(name = "exercise_name")

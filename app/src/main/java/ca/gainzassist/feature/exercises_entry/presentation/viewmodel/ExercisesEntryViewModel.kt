@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
-import ca.gainzassist.domain.usecase.workout.ExerciseExistsUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildExerciseUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildWorkoutFromExerciseEntriesUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.CheckDuplicateExerciseUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.DeleteExerciseUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.ValidateExerciseInputUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.ValidateExerciseResult
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 data class ExerciseEntryInputState(
     val exerciseName: String = "",
@@ -61,7 +60,6 @@ sealed interface ExercisesEntryViewModelEvent {
 }
 
 class ExercisesEntryViewModel(
-    private val exerciseExistsUseCase: ExerciseExistsUseCase,
     private val validateExerciseInputUseCase: ValidateExerciseInputUseCase,
     private val checkDuplicateExerciseUseCase: CheckDuplicateExerciseUseCase,
     private val buildExerciseUseCase: BuildExerciseUseCase,
@@ -147,7 +145,9 @@ class ExercisesEntryViewModel(
     }
 
     fun onWeightChanged(index: Int, weightStr: String) {
-        val (minWeight, _) = getEquipmentConfig(_state.value.exerciseInputs.getOrNull(index)?.selectedEquipment ?: ExerciseConst.BARBELL)
+        val (minWeight, _) = getEquipmentConfig(
+            _state.value.exerciseInputs.getOrNull(index)?.selectedEquipment ?: ExerciseConst.BARBELL
+        )
         updateInputState(index) { current ->
             val parsedWeight = weightStr.toFloatOrNull()
             val canDec = parsedWeight != null && parsedWeight > minWeight
@@ -377,7 +377,11 @@ class ExercisesEntryViewModel(
 
         val newNumberOfExercises = currentState.numberOfExercises - 1
         val wasEntered = currentState.exercises.getOrNull(index)?.name != null
-        val newEnteredCount = if (wasEntered) currentState.enteredExerciseCount - 1 else currentState.enteredExerciseCount
+        val newEnteredCount = if (wasEntered) {
+            currentState.enteredExerciseCount - 1
+        } else {
+            currentState.enteredExerciseCount
+        }
 
         val newSelectedIndex = if (index >= newNumberOfExercises) {
             maxOf(0, newNumberOfExercises - 1)
@@ -385,7 +389,7 @@ class ExercisesEntryViewModel(
             index
         }
 
-        val finalInputs = inputsList.mapIndexed { i, input ->
+        val finalInputs = inputsList.map { input ->
             input.copy(
                 showDelete = newNumberOfExercises > 1
             )
@@ -420,7 +424,7 @@ class ExercisesEntryViewModel(
         val newEx = Exercise().apply { exerciseNumber = newIndex }
         exercises.add(newEx)
 
-        val inputsList = currentState.exerciseInputs.toMutableList()
+        val inputsList = currentState.exerciseInputs
         val updatedInputs = inputsList.map { it.copy(showDelete = true) }.toMutableList()
         updatedInputs.add(
             ExerciseEntryInputState(
@@ -443,17 +447,13 @@ class ExercisesEntryViewModel(
         }
     }
 
-    private fun getEquipmentConfig(equipment: String): Pair<Float, Float> {
-        return when (equipment.lowercase()) {
-            ExerciseConst.BARBELL -> Pair(ExerciseConst.BB_MIN_WEIGHT, ExerciseConst.BB_WEIGHT_CHANGE)
-            ExerciseConst.DUMBBELL -> Pair(ExerciseConst.DB_MIN_WEIGHT, ExerciseConst.DB_WEIGHT_CHANGE)
-            else -> Pair(ExerciseConst.MIN_WEIGHT, ExerciseConst.WEIGHT_CHANGE)
-        }
+    private fun getEquipmentConfig(equipment: String): Pair<Float, Float> = when (equipment.lowercase()) {
+        ExerciseConst.BARBELL -> Pair(ExerciseConst.BB_MIN_WEIGHT, ExerciseConst.BB_WEIGHT_CHANGE)
+        ExerciseConst.DUMBBELL -> Pair(ExerciseConst.DB_MIN_WEIGHT, ExerciseConst.DB_WEIGHT_CHANGE)
+        else -> Pair(ExerciseConst.MIN_WEIGHT, ExerciseConst.WEIGHT_CHANGE)
     }
 
-    private fun formatWeight(value: Float): String {
-        return String.format(Locale.getDefault(), "%.1f", value)
-    }
+    private fun formatWeight(value: Float): String = String.format(Locale.getDefault(), "%.1f", value)
 
     private fun updateInputState(index: Int, block: (ExerciseEntryInputState) -> ExerciseEntryInputState) {
         _state.update { currentState ->

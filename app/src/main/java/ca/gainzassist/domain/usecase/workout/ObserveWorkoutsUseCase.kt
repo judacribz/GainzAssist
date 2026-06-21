@@ -7,7 +7,5 @@ import kotlinx.coroutines.flow.Flow
 class ObserveWorkoutsUseCase(
     private val workoutRepository: WorkoutRepository
 ) {
-    operator fun invoke(): Flow<List<Workout>> {
-        return workoutRepository.observeWorkouts()
-    }
+    operator fun invoke(): Flow<List<Workout>> = workoutRepository.observeWorkouts()
 }

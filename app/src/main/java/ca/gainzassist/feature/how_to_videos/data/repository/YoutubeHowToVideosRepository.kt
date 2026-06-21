@@ -7,16 +7,16 @@ import androidx.core.content.pm.PackageInfoCompat
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.feature.how_to_videos.domain.model.HowToVideo
 import ca.gainzassist.feature.how_to_videos.domain.repository.HowToVideosRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONException
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
 
 class YoutubeHowToVideosRepository(
     private val context: Context
@@ -34,14 +34,14 @@ class YoutubeHowToVideosRepository(
 
         val encodedQuery = java.net.URLEncoder.encode(queryKey, "UTF-8")
         val urlString = "https://www.googleapis.com/youtube/v3/search" +
-                "?part=snippet" +
-                "&fields=items(id/videoId,snippet/title)" +
-                "&maxResults=10" +
-                "&q=$encodedQuery" +
-                "&type=video" +
-                "&videoEmbeddable=true" +
-                "&safeSearch=moderate" +
-                "&key=${BuildConfig.GOOGLE_API_KEY}"
+            "?part=snippet" +
+            "&fields=items(id/videoId,snippet/title)" +
+            "&maxResults=10" +
+            "&q=$encodedQuery" +
+            "&type=video" +
+            "&videoEmbeddable=true" +
+            "&safeSearch=moderate" +
+            "&key=${BuildConfig.GOOGLE_API_KEY}"
 
         val jsonResponse = fetchYouTubeResponse(urlString)
         parseYouTubeResponse(jsonResponse)

@@ -2,13 +2,13 @@ package ca.gainzassist.feature.main.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ca.gainzassist.feature.main.presentation.screen.MainTab
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.GetIncompleteWorkoutNamesUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteAllWorkoutsUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCase
 import ca.gainzassist.domain.usecase.workout.ObserveWorkoutsUseCase
+import ca.gainzassist.feature.main.presentation.screen.MainTab
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

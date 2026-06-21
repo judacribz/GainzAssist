@@ -37,7 +37,7 @@ class UserUseCaseTest {
 
         setThemeUseCase("Dark")
         assertEquals("Dark", getThemeUseCase())
-        
+
         setThemeUseCase(null)
         assertEquals(null, getThemeUseCase())
     }

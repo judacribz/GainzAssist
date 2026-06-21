@@ -5,8 +5,8 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import ca.gainzassist.R
-import ca.gainzassist.feature.login.presentation.screen.LoginActivity
 import ca.gainzassist.data.service.FirebaseService
+import ca.gainzassist.feature.login.presentation.screen.LoginActivity
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.AuthCredential
@@ -20,20 +20,29 @@ import com.google.firebase.auth.FirebaseUser
 object Authentication {
 
     private val mAuth = FirebaseAuth.getInstance()
-    const val RC_SIGN_IN = 9001
     private var userCreated = false
 
-    @JvmStatic
-    fun createUser(act: Activity, email: String, password: String) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(act) { task -> handleOnComplete(act, task) }
-    }
-
-    @JvmStatic
     fun signIn(act: Activity, cred: AuthCredential) {
         mAuth.signInWithCredential(cred)
-            .addOnCompleteListener(act) { task -> handleOnComplete(act, task)
-        }
+            .addOnCompleteListener(act) { task ->
+                handleOnComplete(act, task)
+            }
+    }
+
+    fun linkUser(act: Activity, cred: AuthCredential, currUser: FirebaseUser) {
+        currUser.linkWithCredential(cred)
+            .addOnCompleteListener(act) { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(act, "Linked!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(act, "linkWithCredential:failure" + task.exception, Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    fun signOut(act: Activity) {
+        FirebaseAuth.getInstance().signOut()
+        act.stopService(Intent(act, FirebaseService::class.java))
     }
 
     private fun handleOnComplete(
@@ -60,41 +69,24 @@ object Authentication {
         }
         Toast.makeText(act, msg, Toast.LENGTH_SHORT).show()
     }
+}
 
-    @JvmStatic
-    fun linkUser(act: Activity, cred: AuthCredential, currUser: FirebaseUser) {
-        currUser.linkWithCredential(cred)
-            .addOnCompleteListener(act) { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(act, "Linked!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(act, "linkWithCredential:failure" + task.exception, Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    fun signOut(act: Activity) {
-        FirebaseAuth.getInstance().signOut()
-        act.stopService(Intent(act, FirebaseService::class.java))
-    }
-
-    private fun getExceptionMsg(act: Activity, taskEx: Exception?): String {
-        var msg = ""
-        if (taskEx != null) {
-            msg = try {
-                throw taskEx
-            } catch (_: FirebaseNetworkException) {
-                act.getString(R.string.txt_network_needed)
-            } catch (_: FirebaseAuthWeakPasswordException) {
-                act.getString(R.string.err_invalid_password)
-            } catch (_: FirebaseAuthUserCollisionException) {
-                act.getString(R.string.txt_email_registered)
-            } catch (_: FirebaseAuthInvalidCredentialsException) {
-                act.getString(R.string.err_invalid_email)
-            } catch (_: Exception) {
-                "Login failed. Check Firebase configuration."
-            }
+private fun getExceptionMsg(act: Activity, taskEx: Exception?): String {
+    var msg = ""
+    if (taskEx != null) {
+        msg = try {
+            throw taskEx
+        } catch (_: FirebaseNetworkException) {
+            act.getString(R.string.txt_network_needed)
+        } catch (_: FirebaseAuthWeakPasswordException) {
+            act.getString(R.string.err_invalid_password)
+        } catch (_: FirebaseAuthUserCollisionException) {
+            act.getString(R.string.txt_email_registered)
+        } catch (_: FirebaseAuthInvalidCredentialsException) {
+            act.getString(R.string.err_invalid_email)
+        } catch (_: Exception) {
+            "Login failed. Check Firebase configuration."
         }
-        return msg
     }
+    return msg
 }

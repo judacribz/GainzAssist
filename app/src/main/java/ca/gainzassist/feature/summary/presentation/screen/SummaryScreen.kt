@@ -1,5 +1,6 @@
 package ca.gainzassist.feature.summary.presentation.screen
 
+import androidx.appcompat.R as appCompatR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,7 +50,6 @@ import ca.gainzassist.ui.components.GainzButton
 import ca.gainzassist.ui.components.GainzDropdown
 import ca.gainzassist.ui.components.GainzOutlinedTextField
 import ca.gainzassist.ui.components.GainzTextFieldState
-import androidx.appcompat.R as appCompatR
 
 val StaatlichesFont = FontFamily(Font(R.font.staatliches))
 

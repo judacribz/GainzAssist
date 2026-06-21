@@ -6,7 +6,5 @@ import ca.gainzassist.feature.how_to_videos.domain.repository.HowToVideosReposit
 class SearchHowToVideosUseCase(
     private val repository: HowToVideosRepository
 ) {
-    suspend operator fun invoke(query: String): List<HowToVideo> {
-        return repository.searchVideos(query)
-    }
+    suspend operator fun invoke(query: String): List<HowToVideo> = repository.searchVideos(query)
 }

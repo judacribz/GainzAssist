@@ -1,12 +1,12 @@
 package ca.gainzassist.feature.main.presentation.viewmodel
 
-import ca.gainzassist.feature.main.presentation.screen.MainTab
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.GetIncompleteWorkoutNamesUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteAllWorkoutsUseCase
 import ca.gainzassist.domain.usecase.workout.DeleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCase
 import ca.gainzassist.domain.usecase.workout.ObserveWorkoutsUseCase
+import ca.gainzassist.feature.main.presentation.screen.MainTab
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
@@ -121,7 +121,7 @@ class MainViewModelTest {
     @Test
     fun logout_emitsLoggedOutEvent() = runTest {
         fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Chest Day" })
-        
+
         val events = mutableListOf<MainViewModelEvent>()
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
@@ -149,13 +149,13 @@ class MainViewModelTest {
     fun refreshResumeWorkouts_removesCompletedWorkoutFromState() = runTest {
         fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Push Day" })
         fakeSessionPreferencesRepository.addIncompleteWorkout("Push Day")
-        
+
         viewModel.refreshResumeWorkouts()
         assertTrue(viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
-        
+
         fakeSessionPreferencesRepository.removeIncompleteWorkout("Push Day")
         viewModel.refreshResumeWorkouts()
-        
+
         assertTrue(!viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
     }
 
@@ -173,15 +173,15 @@ class MainViewModelTest {
     fun onResumeStyleRefresh_doesNotAffectSearchOrWorkoutList() = runTest {
         fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Push Day" })
         fakeWorkoutRepository.insertWorkout(Workout().apply { name = "Pull Day" })
-        
+
         viewModel.onSearchQueryChanged("pull")
-        
+
         assertEquals(listOf("Pull Day"), viewModel.state.value.filteredWorkoutNames)
         assertEquals("pull", viewModel.state.value.searchQuery)
-        
+
         fakeSessionPreferencesRepository.addIncompleteWorkout("Push Day")
         viewModel.refreshResumeWorkouts()
-        
+
         assertTrue(viewModel.state.value.resumeWorkoutNames.contains("Push Day"))
         assertEquals(listOf("Pull Day"), viewModel.state.value.filteredWorkoutNames)
         assertEquals("pull", viewModel.state.value.searchQuery)

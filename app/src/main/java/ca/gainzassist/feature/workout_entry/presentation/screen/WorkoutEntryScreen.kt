@@ -293,7 +293,7 @@ fun NumExercisesSection(
                 .fillMaxSize()
                 .padding(ContentPadding)
         ) {
-                Text(
+            Text(
                 text = stringResource(R.string.num_of_exercises).uppercase(),
                 style = TextStyle(
                     fontFamily = state.fontFamily,

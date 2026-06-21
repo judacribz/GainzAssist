@@ -1,7 +1,5 @@
 package ca.gainzassist.feature.exercises_entry.presentation.viewmodel
 
-import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.usecase.workout.ExerciseExistsUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildExerciseUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildWorkoutFromExerciseEntriesUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.CheckDuplicateExerciseUseCase
@@ -30,7 +28,6 @@ class ExercisesEntryViewModelTest {
 
     @Before
     fun setup() {
-        val exerciseExistsUseCase = ExerciseExistsUseCase()
         val validateExerciseInputUseCase = ValidateExerciseInputUseCase()
         val checkDuplicateExerciseUseCase = CheckDuplicateExerciseUseCase()
         val buildExerciseUseCase = BuildExerciseUseCase()
@@ -38,7 +35,6 @@ class ExercisesEntryViewModelTest {
         val buildWorkoutFromExerciseEntriesUseCase = BuildWorkoutFromExerciseEntriesUseCase()
 
         viewModel = ExercisesEntryViewModel(
-            exerciseExistsUseCase = exerciseExistsUseCase,
             validateExerciseInputUseCase = validateExerciseInputUseCase,
             checkDuplicateExerciseUseCase = checkDuplicateExerciseUseCase,
             buildExerciseUseCase = buildExerciseUseCase,
@@ -74,7 +70,7 @@ class ExercisesEntryViewModelTest {
     @Test
     fun whenAllExercisesEntered_goToSummaryEventIsEmitted() = runTest {
         viewModel.initialize("Leg Day", 2, "10", "3", "45.0", "Barbell")
-        
+
         val events = mutableListOf<ExercisesEntryViewModelEvent>()
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
@@ -94,12 +90,12 @@ class ExercisesEntryViewModelTest {
         viewModel.onRepsChanged(1, "10")
         viewModel.onSetsChanged(1, "3")
         viewModel.onExerciseSubmitted(1)
-        
+
         val event = events.firstOrNull() as? ExercisesEntryViewModelEvent.GoToSummary
         assertNotNull(event)
         assertEquals("Leg Day", event?.workout?.name)
         assertEquals(2, event?.workout?.exercises?.size)
-        
+
         job.cancel()
     }
 
@@ -111,7 +107,7 @@ class ExercisesEntryViewModelTest {
         viewModel.onRepsChanged(0, "10")
         viewModel.onSetsChanged(0, "3")
         viewModel.onExerciseSubmitted(0)
-        
+
         assertEquals(1, viewModel.state.value.enteredExerciseCount)
         assertEquals(3, viewModel.state.value.numberOfExercises)
 
@@ -125,7 +121,7 @@ class ExercisesEntryViewModelTest {
     @Test
     fun submittingExercise_advancesToNextEmptyTab() {
         viewModel.initialize("Leg Day", 3, "10", "3", "45.0", "Barbell")
-        
+
         assertEquals(0, viewModel.state.value.selectedIndex)
 
         viewModel.onExerciseNameChanged(0, "Squat")
@@ -133,16 +129,16 @@ class ExercisesEntryViewModelTest {
         viewModel.onRepsChanged(0, "10")
         viewModel.onSetsChanged(0, "3")
         viewModel.onExerciseSubmitted(0)
-        
+
         assertEquals(1, viewModel.state.value.selectedIndex)
-        
+
         viewModel.onTabSelected(2)
         viewModel.onExerciseNameChanged(2, "Lunge")
         viewModel.onWeightChanged(2, "135.0")
         viewModel.onRepsChanged(2, "10")
         viewModel.onSetsChanged(2, "3")
         viewModel.onExerciseSubmitted(2)
-        
+
         assertEquals(1, viewModel.state.value.selectedIndex)
     }
 

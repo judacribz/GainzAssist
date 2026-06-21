@@ -35,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 private val EdgePadding = 0.dp
 private val IndicatorHeight = 2.dp
@@ -49,14 +49,9 @@ private val TabIconPaddingBottom = 4.dp
 private val TabFontSize = 10.sp
 private val PlusIconSize = 16.dp
 private const val RippleDelayMs = 100L
-private const val ColorLerpMin = 0f
-private const val ColorLerpMax = 1f
 private const val FontWeightThreshold = 0.5f
 
-data class GainzTabItem(
-    val title: String,
-    val iconResId: Int? = null
-)
+data class GainzTabItem(val title: String, val iconResId: Int? = null)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -154,44 +149,67 @@ private fun GainzTabItems(
 ) {
     tabs.forEachIndexed { index, tab ->
         val isSelected = pagerState.currentPage == index
-        val color by androidx.compose.animation.animateColorAsState(
-            targetValue = if (isSelected) colorResource(R.color.blue) else Color.White,
-            label = "tabColorAnim"
-        )
-        val distance by androidx.compose.animation.core.animateFloatAsState(
-            targetValue = if (isSelected) 0f else 1f,
-            label = "tabDistanceAnim"
-        )
-
-        val isPlusTab = tab.iconResId != null && tab.title.isBlank()
-        val tabWidthModifier = if (scrollable) {
-            if (isPlusTab) {
-                Modifier
-                    .wrapContentWidth(Alignment.Start)
-                    .padding(start = TabPaddingStart)
-            } else {
-                Modifier.wrapContentWidth()
-            }
-        } else {
-            Modifier.fillMaxWidth()
-        }
-
-        Box(
-            modifier = tabWidthModifier
-                .instantClickable {
-                    if (onTabClick != null) {
-                        onTabClick(index)
-                    } else {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
+        GainzTabItemView(
+            tab = tab,
+            index = index,
+            isSelected = isSelected,
+            scrollable = scrollable,
+            onTabClick = { clickedIndex ->
+                if (onTabClick != null) {
+                    onTabClick(clickedIndex)
+                } else {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(clickedIndex)
                     }
                 }
-                .padding(vertical = if (tab.iconResId != null && tab.title.isNotBlank()) TabPaddingVerticalIcon else TabPaddingVerticalNoIcon),
-            contentAlignment = Alignment.Center
-        ) {
-            GainzTabItemContent(tab, distance, color)
+            }
+        )
+    }
+}
+
+@Composable
+private fun GainzTabItemView(
+    tab: GainzTabItem,
+    index: Int,
+    isSelected: Boolean,
+    scrollable: Boolean,
+    onTabClick: (Int) -> Unit
+) {
+    val color by androidx.compose.animation.animateColorAsState(
+        targetValue = if (isSelected) colorResource(R.color.blue) else Color.White,
+        label = "tabColorAnim"
+    )
+    val distance by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isSelected) 0f else 1f,
+        label = "tabDistanceAnim"
+    )
+
+    val isPlusTab = tab.iconResId != null && tab.title.isBlank()
+    val tabWidthModifier = if (scrollable) {
+        if (isPlusTab) {
+            Modifier
+                .wrapContentWidth(Alignment.Start)
+                .padding(start = TabPaddingStart)
+        } else {
+            Modifier.wrapContentWidth()
         }
+    } else {
+        Modifier.fillMaxWidth()
+    }
+
+    val verticalPadding = if (tab.iconResId != null && tab.title.isNotBlank()) {
+        TabPaddingVerticalIcon
+    } else {
+        TabPaddingVerticalNoIcon
+    }
+
+    Box(
+        modifier = tabWidthModifier
+            .instantClickable { onTabClick(index) }
+            .padding(vertical = verticalPadding),
+        contentAlignment = Alignment.Center
+    ) {
+        GainzTabItemContent(tab, distance, color)
     }
 }
 
@@ -230,7 +248,7 @@ private fun GainzTabItemContent(tab: GainzTabItem, distance: Float, color: Color
 }
 
 @Composable
-fun Modifier.instantClickable(onClick: () -> Unit): Modifier {
+private fun Modifier.instantClickable(onClick: () -> Unit): Modifier {
     val interactionSource = remember { MutableInteractionSource() }
     val indication = LocalIndication.current
     val coroutineScope = rememberCoroutineScope()

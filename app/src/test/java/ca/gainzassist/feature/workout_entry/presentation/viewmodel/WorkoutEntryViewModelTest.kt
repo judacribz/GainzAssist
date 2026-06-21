@@ -49,7 +49,7 @@ class WorkoutEntryViewModelTest {
         assertEquals(3, event?.numberOfExercises)
         assertNull(viewModel.state.value.workoutNameErrorResId)
         assertNull(viewModel.state.value.numberOfExercisesErrorResId)
-        
+
         job.cancel()
     }
 
@@ -68,7 +68,7 @@ class WorkoutEntryViewModelTest {
         assertNotNull(event)
         assertEquals("Leg Day", event?.workoutName)
         assertEquals(5, event?.numberOfExercises)
-        
+
         job.cancel()
     }
 
@@ -84,7 +84,7 @@ class WorkoutEntryViewModelTest {
 
         assertTrue(events.isEmpty())
         assertNotNull(viewModel.state.value.numberOfExercisesErrorResId)
-        
+
         job.cancel()
     }
 }

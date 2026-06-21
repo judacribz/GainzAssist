@@ -15,6 +15,8 @@ import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.feature.start_workout.presentation.component.ExerciseSetsListScreen
 
+private const val JUMPING_JACKS = "Jumping Jacks"
+
 @Composable
 fun WarmupsListScreen(warmups: List<Exercise>?) {
     if (warmups.isNullOrEmpty()) {
@@ -39,8 +41,8 @@ private fun WarmupsListScreenPreviewEmpty() {
 @Composable
 private fun WarmupsListScreenPreviewOneWarmup() {
     val exercise = Exercise()
-    exercise.name = "Jumping Jacks"
-    exercise.setsList = arrayListOf(ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f))
+    exercise.name = JUMPING_JACKS
+    exercise.setsList = arrayListOf(ExerciseSet(0L, JUMPING_JACKS, 0, 10, 0f))
     WarmupsListScreen(warmups = listOf(exercise))
 }
 
@@ -48,10 +50,10 @@ private fun WarmupsListScreenPreviewOneWarmup() {
 @Composable
 private fun WarmupsListScreenPreviewMultipleWarmups() {
     val ex1 = Exercise()
-    ex1.name = "Jumping Jacks"
+    ex1.name = JUMPING_JACKS
     ex1.setsList = arrayListOf(
-        ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f),
-        ExerciseSet(0L, "Jumping Jacks", 1, 15, 0f)
+        ExerciseSet(0L, JUMPING_JACKS, 0, 10, 0f),
+        ExerciseSet(0L, JUMPING_JACKS, 1, 15, 0f)
     )
 
     val ex2 = Exercise()
@@ -82,8 +84,8 @@ private fun WarmupsListScreenPreviewLongWarmupName() {
 @Composable
 private fun WarmupsListScreenPreviewSmallPhone360x800() {
     val ex = Exercise()
-    ex.name = "Jumping Jacks"
-    ex.setsList = arrayListOf(ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f))
+    ex.name = JUMPING_JACKS
+    ex.setsList = arrayListOf(ExerciseSet(0L, JUMPING_JACKS, 0, 10, 0f))
     WarmupsListScreen(warmups = listOf(ex))
 }
 
@@ -91,7 +93,7 @@ private fun WarmupsListScreenPreviewSmallPhone360x800() {
 @Composable
 private fun WarmupsListScreenPreviewFontScaleLarge() {
     val ex = Exercise()
-    ex.name = "Jumping Jacks"
-    ex.setsList = arrayListOf(ExerciseSet(0L, "Jumping Jacks", 0, 10, 0f))
+    ex.name = JUMPING_JACKS
+    ex.setsList = arrayListOf(ExerciseSet(0L, JUMPING_JACKS, 0, 10, 0f))
     WarmupsListScreen(warmups = listOf(ex))
 }

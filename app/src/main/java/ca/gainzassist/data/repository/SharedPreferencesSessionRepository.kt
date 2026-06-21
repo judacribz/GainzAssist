@@ -25,7 +25,9 @@ class SharedPreferencesSessionRepository(
         Preferences.removeIncompleteWorkoutPref(appContext, workoutName)
     }
 
-    override suspend fun saveIncompleteSession(workoutName: String, sessionJson: String?) = withContext(dispatcherProvider.io) {
+    override suspend fun saveIncompleteSession(workoutName: String, sessionJson: String?) = withContext(
+        dispatcherProvider.io
+    ) {
         Preferences.addIncompleteSessionPref(appContext, workoutName, sessionJson)
     }
 
@@ -37,7 +39,9 @@ class SharedPreferencesSessionRepository(
         Preferences.removeIncompleteSessionPref(appContext, workoutName)
     }
 
-    override suspend fun saveSessionProgress(workoutName: String, progressJson: String?) = withContext(dispatcherProvider.io) {
+    override suspend fun saveSessionProgress(workoutName: String, progressJson: String?) = withContext(
+        dispatcherProvider.io
+    ) {
         Preferences.addSessionProgressPref(appContext, workoutName, progressJson)
     }
 

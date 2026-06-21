@@ -37,6 +37,9 @@ data class HowToVideoUiItem(
     val title: String
 )
 
+private const val HOW_TO_SQUAT = "How to Squat Properly"
+private const val SQUAT_MISTAKES = "Squat Mistakes to Avoid"
+
 @Composable
 fun HowToVideosScreen(
     uiState: HowToVideosUiState,
@@ -44,13 +47,17 @@ fun HowToVideosScreen(
     playerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier
-        .fillMaxSize()
-        .background(Color.Black)) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
         if (uiState.isPlayerVisible) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+            ) {
                 playerContent()
             }
         }
@@ -132,8 +139,8 @@ private fun HowToVideosScreenPreviewWithResults() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly"),
-                HowToVideoUiItem("2", "Squat Mistakes to Avoid"),
+                HowToVideoUiItem("1", HOW_TO_SQUAT),
+                HowToVideoUiItem("2", SQUAT_MISTAKES),
                 HowToVideoUiItem("3", "Advanced Squat Techniques")
             )
         ),
@@ -149,8 +156,8 @@ private fun HowToVideosScreenPreviewPlayerVisible() {
         uiState = HowToVideosUiState(
             isPlayerVisible = true,
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly"),
-                HowToVideoUiItem("2", "Squat Mistakes to Avoid")
+                HowToVideoUiItem("1", HOW_TO_SQUAT),
+                HowToVideoUiItem("2", SQUAT_MISTAKES)
             )
         ),
         onVideoClick = {},
@@ -172,7 +179,11 @@ private fun HowToVideosScreenPreviewLongTitles() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
-                HowToVideoUiItem("1", "This is an extremely long title that should wrap to the next line or be handled gracefully in the UI without cutting off awkwardly."),
+                HowToVideoUiItem(
+                    "1",
+                    "This is an extremely long title that should wrap to the next line or " +
+                        "be handled gracefully in the UI without cutting off awkwardly."
+                ),
             )
         ),
         onVideoClick = {},
@@ -187,8 +198,8 @@ private fun HowToVideosScreenPreviewSmallPhone() {
         uiState = HowToVideosUiState(
             isPlayerVisible = true,
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly"),
-                HowToVideoUiItem("2", "Squat Mistakes to Avoid")
+                HowToVideoUiItem("1", HOW_TO_SQUAT),
+                HowToVideoUiItem("2", SQUAT_MISTAKES)
             )
         ),
         onVideoClick = {},
@@ -204,7 +215,7 @@ private fun HowToVideosScreenPreviewLargeFont() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
-                HowToVideoUiItem("1", "How to Squat Properly")
+                HowToVideoUiItem("1", HOW_TO_SQUAT)
             )
         ),
         onVideoClick = {},

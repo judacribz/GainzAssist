@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.secrets)
-    alias(libs.plugins.detekt)
+    alias(libs.plugins.gainzassist.formatting)
 }
 
 secrets {
@@ -31,9 +31,9 @@ val keyAliasValue: String? =
 val keyPasswordValue: String? =
     keystoreProperties.getProperty("keyPassword") ?: System.getenv("KEY_PASSWORD")
 val hasReleaseSigningConfig = storeFileValue != null &&
-        storePasswordValue != null &&
-        keyAliasValue != null &&
-        keyPasswordValue != null
+    storePasswordValue != null &&
+    keyAliasValue != null &&
+    keyPasswordValue != null
 
 configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
@@ -103,6 +103,10 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
         abortOnError = false
         checkReleaseBuilds = false
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {
@@ -111,19 +115,13 @@ kotlin {
     }
 }
 
-detekt {
-    buildUponDefaultConfig = true
-    allRules = false
-    config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
-    baseline = file("$projectDir/detekt-baseline.xml")
-    basePath = rootDir.absolutePath
-}
-
 tasks.configureEach {
     if (name == "assembleRelease" || name == "bundleRelease") {
         doFirst {
             if (!hasReleaseSigningConfig) {
-                throw GradleException("Release signing properties missing. Please provide storeFile, storePassword, keyAlias, and keyPassword in keystore.properties or via environment variables (STORE_FILE, STORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD).")
+                throw GradleException(
+                    "Release signing properties missing. Please provide storeFile, storePassword, keyAlias, and keyPassword in keystore.properties or via environment variables (STORE_FILE, STORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD)."
+                )
             }
         }
     }
@@ -140,7 +138,9 @@ dependencies {
         implementation("androidx.core:core-ktx:1.15.0") { because("API 37 is not targeted yet") }
         implementation("androidx.core:core:1.15.0") { because("API 37 is not targeted yet") }
         implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0") { because("API 37 is not targeted yet") }
-        implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0") { because("API 37 is not targeted yet") }
+        implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0") {
+            because("API 37 is not targeted yet")
+        }
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0") { because("API 37 is not targeted yet") }
         implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0") { because("API 37 is not targeted yet") }
     }
@@ -159,10 +159,13 @@ dependencies {
 
     // Individual Libraries
     implementation(libs.android.youtube.player)
+    //noinspection LoginCredentials
     implementation(libs.androidx.credentials)
+    //noinspection LoginCredentials
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.firebase.crashlytics)
     implementation(libs.glide)
+    //noinspection LoginCredentials
     implementation(libs.googleid)
     implementation(libs.guava)
 
@@ -184,8 +187,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.espresso.core)
-
-    detektPlugins(libs.detekt.compose)
 }
 
 val validateReleaseSecrets by tasks.registering {
@@ -198,7 +199,7 @@ val validateReleaseSecrets by tasks.registering {
         if (!secretsFile.exists()) {
             throw GradleException(
                 "Missing secrets.properties. Copy secrets.properties.template to secrets.properties " +
-                        "and fill required release values before building release."
+                    "and fill required release values before building release."
             )
         }
 
@@ -223,17 +224,17 @@ val validateReleaseSecrets by tasks.registering {
             val value = secrets.getProperty(key) ?: return@filter true
             val trimValue = value.trim()
             trimValue.isEmpty() ||
-                    trimValue.contains("your_", ignoreCase = true) ||
-                    trimValue.contains("YOUR_", ignoreCase = true) ||
-                    trimValue.contains("template", ignoreCase = true) ||
-                    trimValue.contains("placeholder", ignoreCase = true)
+                trimValue.contains("your_", ignoreCase = true) ||
+                trimValue.contains("YOUR_", ignoreCase = true) ||
+                trimValue.contains("template", ignoreCase = true) ||
+                trimValue.contains("placeholder", ignoreCase = true)
         }
 
         if (missingOrInvalid.isNotEmpty()) {
             throw GradleException(
                 "Invalid release secrets in secrets.properties. Missing or placeholder values for: " +
-                        missingOrInvalid.joinToString(", ") +
-                        (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
+                    missingOrInvalid.joinToString(", ") +
+                    (if (isFacebookEnabled) " (Note: Facebook login is ENABLED)" else "")
             )
         }
     }

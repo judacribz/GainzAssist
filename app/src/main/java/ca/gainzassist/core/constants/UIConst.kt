@@ -10,7 +10,7 @@ import ca.gainzassist.ui.ProgressStatus.SUCCESS_SELECTED
 import ca.gainzassist.ui.ProgressStatus.UNSELECTED
 
 object UIConst {
-    @JvmField
+
     val PROGRESS_STATUS_MAP = object : SparseArray<ProgressStatus>() {
         init {
             put(0, UNSELECTED)
@@ -22,7 +22,6 @@ object UIConst {
         }
     }
 
-    @JvmField
     val PROGRESS_CODE_MAP = object : HashMap<ProgressStatus, Int>() {
         init {
             put(UNSELECTED, 0)

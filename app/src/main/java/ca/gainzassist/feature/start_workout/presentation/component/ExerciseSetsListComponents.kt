@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
-import java.util.Locale
 
 private const val BENCH_PRESS = "Bench Press"
 
@@ -185,9 +185,10 @@ fun ExerciseSetChip(
     exerciseSet: ExerciseSet,
     modifier: Modifier = Modifier
 ) {
+    val locale = LocalLocale.current
     val setText = (exerciseSet.setNumber + 1).toString()
     val repsText = exerciseSet.reps.toString()
-    val weightText = String.format(Locale.getDefault(), "%.0f", exerciseSet.weight)
+    val weightText = String.format(locale.platformLocale, "%.0f", exerciseSet.weight)
 
     val columnWidth = numberColumnWidthDp(setText, repsText, weightText)
 
@@ -218,9 +219,21 @@ private fun ExercisesListScreenPreviewEmpty() {
 private fun ExercisesListScreenPreviewOneExercise() {
     val exercise = Exercise().apply {
         name = BENCH_PRESS
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
-        setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 155f })
-        setsList.add(ExerciseSet().apply { setNumber = 2; reps = 6; weight = 185f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 10
+            weight = 135f
+        })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 1
+            reps = 8
+            weight = 155f
+        })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 2
+            reps = 6
+            weight = 185f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
@@ -232,12 +245,24 @@ private fun ExercisesListScreenPreviewOneExercise() {
 private fun ExercisesListScreenPreviewMultipleExercises() {
     val exercise1 = Exercise().apply {
         name = "Squat"
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 225f })
-        setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 275f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 10
+            weight = 225f
+        })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 1
+            reps = 8
+            weight = 275f
+        })
     }
     val exercise2 = Exercise().apply {
         name = "Deadlift"
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 5; weight = 315f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 5
+            weight = 315f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise1, exercise2))
@@ -249,7 +274,11 @@ private fun ExercisesListScreenPreviewMultipleExercises() {
 private fun ExercisesListScreenPreviewLongExerciseName() {
     val exercise = Exercise().apply {
         name = "Standing Overhead Barbell Shoulder Press"
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 95f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 10
+            weight = 95f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
@@ -261,9 +290,21 @@ private fun ExercisesListScreenPreviewLongExerciseName() {
 private fun ExercisesListScreenPreviewSmallPhone360x800() {
     val exercise = Exercise().apply {
         name = BENCH_PRESS
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
-        setsList.add(ExerciseSet().apply { setNumber = 1; reps = 8; weight = 155f })
-        setsList.add(ExerciseSet().apply { setNumber = 2; reps = 6; weight = 185f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 10
+            weight = 135f
+        })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 1
+            reps = 8
+            weight = 155f
+        })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 2
+            reps = 6
+            weight = 185f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
@@ -275,7 +316,11 @@ private fun ExercisesListScreenPreviewSmallPhone360x800() {
 private fun ExercisesListScreenPreviewFontScaleLarge() {
     val exercise = Exercise().apply {
         name = BENCH_PRESS
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 135f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 10
+            weight = 135f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
@@ -287,7 +332,11 @@ private fun ExercisesListScreenPreviewFontScaleLarge() {
 private fun ExercisesListScreenPreviewThreeDigitWeights() {
     val exercise = Exercise().apply {
         name = BENCH_PRESS
-        setsList.add(ExerciseSet().apply { setNumber = 0; reps = 10; weight = 130f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 0
+            reps = 10
+            weight = 130f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
@@ -299,7 +348,11 @@ private fun ExercisesListScreenPreviewThreeDigitWeights() {
 private fun ExercisesListScreenPreviewLargeWeights() {
     val exercise = Exercise().apply {
         name = "Leg Press"
-        setsList.add(ExerciseSet().apply { setNumber = 12; reps = 100; weight = 315f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 12
+            reps = 100
+            weight = 315f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))
@@ -311,7 +364,11 @@ private fun ExercisesListScreenPreviewLargeWeights() {
 private fun ExercisesListScreenPreviewMixedDigitWidths() {
     val exercise = Exercise().apply {
         name = "Heavy Lifting"
-        setsList.add(ExerciseSet().apply { setNumber = 123; reps = 1000; weight = 10000f })
+        setsList.add(ExerciseSet().apply {
+            setNumber = 123
+            reps = 1000
+            weight = 10000f
+        })
     }
     Surface {
         ExerciseSetsListScreen(exercises = listOf(exercise))

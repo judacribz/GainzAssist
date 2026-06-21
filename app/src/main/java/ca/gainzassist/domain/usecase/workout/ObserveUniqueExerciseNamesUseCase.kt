@@ -6,7 +6,5 @@ import kotlinx.coroutines.flow.Flow
 class ObserveUniqueExerciseNamesUseCase(
     private val workoutRepository: WorkoutRepository
 ) {
-    operator fun invoke(): Flow<List<String>> {
-        return workoutRepository.observeUniqueExerciseNames()
-    }
+    operator fun invoke(): Flow<List<String>> = workoutRepository.observeUniqueExerciseNames()
 }

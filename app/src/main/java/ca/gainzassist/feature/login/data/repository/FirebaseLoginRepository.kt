@@ -2,8 +2,8 @@ package ca.gainzassist.feature.login.data.repository
 
 import ca.gainzassist.feature.login.domain.repository.LoginRepository
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 class FirebaseLoginRepository : LoginRepository {
 
@@ -17,7 +17,11 @@ class FirebaseLoginRepository : LoginRepository {
                     if (task.isSuccessful) {
                         if (continuation.isActive) continuation.resume(Result.success(Unit))
                     } else {
-                        if (continuation.isActive) continuation.resume(Result.failure(task.exception ?: Exception("Authentication failed")))
+                        if (continuation.isActive) {
+                            continuation.resume(
+                                Result.failure(task.exception ?: Exception("Authentication failed"))
+                            )
+                        }
                     }
                 }
         }
@@ -29,7 +33,11 @@ class FirebaseLoginRepository : LoginRepository {
                     if (task.isSuccessful) {
                         if (continuation.isActive) continuation.resume(Result.success(Unit))
                     } else {
-                        if (continuation.isActive) continuation.resume(Result.failure(task.exception ?: Exception("Registration failed")))
+                        if (continuation.isActive) {
+                            continuation.resume(
+                                Result.failure(task.exception ?: Exception("Registration failed"))
+                            )
+                        }
                     }
                 }
         }

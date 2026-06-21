@@ -9,11 +9,13 @@ sealed interface LoginValidationResult {
 }
 
 enum class EmailErrorType {
-    EMPTY, INVALID_FORMAT
+    EMPTY,
+    INVALID_FORMAT
 }
 
 enum class PasswordErrorType {
-    EMPTY, TOO_SHORT
+    EMPTY,
+    TOO_SHORT
 }
 
 class ValidateLoginInputUseCase {

@@ -194,7 +194,6 @@ private fun GainzTextFieldDecorationBox(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun GainzOutlinedTextFieldPreview() {

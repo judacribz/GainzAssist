@@ -2,7 +2,6 @@ package ca.gainzassist.data.remote.firebase
 
 import android.app.Activity
 import android.content.Intent
-import android.util.SparseArray
 import ca.gainzassist.data.service.FirebaseService
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
@@ -14,7 +13,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.orhanobut.logger.Logger
-import androidx.core.util.size
 
 object Database {
 
@@ -33,22 +31,21 @@ object Database {
         firebaseUser = FirebaseAuth.getInstance().currentUser
         return if (firebaseUser != null) {
             firebaseDatabase.getReference(String.format(USER_PATH, firebaseUser!!.uid))
-        } else null
+        } else {
+            null
+        }
     }
 
-    @JvmStatic
     fun getWorkoutsRef(): DatabaseReference? {
         userRef = getUserRef()
         return userRef?.child(WORKOUTS)
     }
 
-    @JvmStatic
     fun getWorkoutSessionsRef(): DatabaseReference? {
         userRef = getUserRef()
         return userRef?.child(SESSIONS)
     }
 
-    @JvmStatic
     fun setUserInfo(act: Activity) {
         firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {
@@ -83,7 +80,6 @@ object Database {
         }
     }
 
-    @JvmStatic
     fun addWorkoutFirebase(workout: Workout) {
         userWorkoutsRef = getWorkoutsRef()
         val workoutName = workout.name
@@ -96,29 +92,26 @@ object Database {
         }
     }
 
-    @JvmStatic
     fun addWorkoutSessionFirebase(session: Session) {
         val userWorkoutSessionsRef = getWorkoutSessionsRef()
         userWorkoutSessionsRef?.child(session.timestamp.toString())?.setValue(session.toMap())
         updateWorkoutWeights(session.workoutName!!, session.avgWeights)
     }
 
-    @JvmStatic
-    fun updateWorkoutWeights(workoutName: String, newWeights: SparseArray<Float>) {
+    fun updateWorkoutWeights(workoutName: String, newWeights: HashMap<Int, Float>) {
         userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
             val workoutRef = userWorkoutsRef?.child(workoutName)
-            for (i in 0 until newWeights.size) {
+            for ((key, value) in newWeights) {
                 workoutRef
                     ?.child("exercises")
-                    ?.child(i.toString())
+                    ?.child(key.toString())
                     ?.child("weight")
-                    ?.setValue(newWeights[i])
+                    ?.setValue(value)
             }
         }
     }
 
-    @JvmStatic
     fun deleteWorkoutFirebase(workoutName: String?) {
         userWorkoutsRef = getWorkoutsRef()
         if (workoutName != null) {

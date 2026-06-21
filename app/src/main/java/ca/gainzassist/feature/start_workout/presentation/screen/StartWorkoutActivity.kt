@@ -22,17 +22,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
 import ca.gainzassist.activities.base.GainzBaseActivity
-import ca.gainzassist.core.util.Misc
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.how_to_videos.presentation.screen.HowToVideosActivity
 import ca.gainzassist.feature.main.presentation.screen.MainActivity
-import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.StartWorkoutViewModel
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.StartWorkoutViewModelEvent
 import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutController
 import ca.gainzassist.ui.components.GainzTopBar
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -178,27 +175,7 @@ class StartWorkoutActivity : GainzBaseActivity() {
 
     fun setCurrSession() {
         val currentWorkout = workout ?: return
-        val workoutName = currentWorkout.name ?: return
-        lifecycleScope.launch {
-            when (val decision = viewModel.prepareSessionRestore(workoutName)) {
-                is StartWorkoutRestoreDecision.StartFresh -> {
-                    workoutController.setCurrWorkout(currentWorkout)
-                }
-
-                is StartWorkoutRestoreDecision.RestoreFromJson -> {
-                    try {
-                        workoutController.setRetrievedWorkout(
-                            Misc.readValue(decision.sessionJson),
-                            currentWorkout
-                        )
-                    } catch (ex: Exception) {
-                        Logger.e(ex, "Failed to restore incomplete workout. Starting fresh.")
-                        workoutController.setCurrWorkout(currentWorkout)
-                    }
-                }
-            }
-            viewModel.onSessionReady()
-        }
+        viewModel.prepareSessionRestore(currentWorkout)
     }
 
     fun handleLeavingScreen() {

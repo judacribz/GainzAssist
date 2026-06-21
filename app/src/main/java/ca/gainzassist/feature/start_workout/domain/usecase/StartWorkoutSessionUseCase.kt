@@ -1,9 +1,9 @@
 package ca.gainzassist.feature.start_workout.domain.usecase
 
-import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
+import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 
 class StartWorkoutSessionUseCase(
     private val removeIncompleteWorkoutUseCase: RemoveIncompleteWorkoutUseCase,

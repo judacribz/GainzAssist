@@ -12,6 +12,8 @@ import ca.gainzassist.feature.start_workout.domain.usecase.FinishWorkoutSessionU
 import ca.gainzassist.test.fakes.FakeSessionPreferencesRepository
 import ca.gainzassist.test.fakes.FakeWorkoutRepository
 import ca.gainzassist.test.rules.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -21,6 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class WorkoutScreenViewModelTest {
 
     @get:Rule
@@ -61,8 +64,12 @@ class WorkoutScreenViewModelTest {
 
     @Test
     fun getSessionProgress_returnsNullWhenNoProgressSaved() = runTest {
-        val progress = viewModel.getSessionProgress("My Workout")
-        assertNull(progress)
+        var loadedSnapshot: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress("My Workout") {
+            loadedSnapshot = it
+        }
+        advanceUntilIdle()
+        assertNull(loadedSnapshot)
     }
 
     @Test
@@ -74,10 +81,11 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
+        advanceUntilIdle()
 
         val savedJsonNullable = sessionPreferencesRepository.getSessionProgress(workoutName)
         val savedJson = assertNotNullValue(savedJsonNullable)
-        
+
         // Assert it contains expected legacy keys
         assertTrue(savedJson.contains("\"exercise progress\""))
         assertTrue(savedJson.contains("\"set progress\""))
@@ -92,7 +100,14 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        advanceUntilIdle()
+
+        var loadedSnapshotNullable: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress(workoutName) {
+            loadedSnapshotNullable = it
+        }
+        advanceUntilIdle()
+
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)
@@ -105,9 +120,14 @@ class WorkoutScreenViewModelTest {
         // Force invalid JSON string using the repository directly
         sessionPreferencesRepository.saveSessionProgress(workoutName, "invalid json string")
 
-        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        var loadedSnapshotNullable: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress(workoutName) {
+            loadedSnapshotNullable = it
+        }
+        advanceUntilIdle()
+
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
-        
+
         // Misc.readValue catches the exception and returns an empty map.
         // SessionProgressMapper.fromLegacyMap(emptyMap) should return empty snapshot.
         assertTrue(loadedSnapshot.exerciseProgress.isEmpty())
@@ -123,7 +143,14 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Null Test"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        advanceUntilIdle()
+
+        var loadedSnapshotNullable: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress(workoutName) {
+            loadedSnapshotNullable = it
+        }
+        advanceUntilIdle()
+
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)
@@ -138,6 +165,7 @@ class WorkoutScreenViewModelTest {
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
 
         viewModel.finishWorkoutSession(workoutName, Session())
+        advanceUntilIdle()
 
         assertFalse(sessionPreferencesRepository.getIncompleteWorkoutNames().contains(workoutName))
         assertEquals(null, sessionPreferencesRepository.getIncompleteSession(workoutName))
@@ -151,6 +179,7 @@ class WorkoutScreenViewModelTest {
         sessionPreferencesRepository.saveSessionProgress(workoutName, "{\"progress\":true}")
 
         viewModel.finishWorkoutSession(workoutName, Session())
+        advanceUntilIdle()
 
         assertEquals(null, sessionPreferencesRepository.getSessionProgress(workoutName))
         assertEquals("{\"session\":true}", sessionPreferencesRepository.getIncompleteSession(workoutName))
@@ -160,6 +189,7 @@ class WorkoutScreenViewModelTest {
     fun insertCompletedSession_delegatesToUseCase() = runTest {
         val session = Session().apply { workoutName = "Chest Day" }
         viewModel.finishWorkoutSession("Chest Day", session)
+        advanceUntilIdle()
 
         assertEquals(1, fakeWorkoutRepository.insertedSessions.size)
         assertEquals(session, fakeWorkoutRepository.insertedSessions.first())
@@ -170,6 +200,7 @@ class WorkoutScreenViewModelTest {
     fun insertCompletedSession_doesNotModifySessionWhenRepositoryFakeOnlyRecords() = runTest {
         val session = Session().apply { workoutName = "Leg Day" }
         viewModel.finishWorkoutSession("Leg Day", session)
+        advanceUntilIdle()
 
         val recorded = fakeWorkoutRepository.insertedSessions.first()
         assertEquals("Leg Day", recorded.workoutName)

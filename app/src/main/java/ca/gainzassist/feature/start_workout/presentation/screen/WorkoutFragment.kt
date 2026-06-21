@@ -3,7 +3,6 @@ package ca.gainzassist.feature.start_workout.presentation.screen
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.core.util.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,10 +29,11 @@ import ca.gainzassist.feature.start_workout.presentation.viewmodel.WorkoutScreen
 import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
+import ca.gainzassist.ui.ProgressStatus.UNSELECTED
 import com.orhanobut.logger.Logger
+import java.util.Locale
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Locale
 
 class WorkoutFragment : Fragment() {
 
@@ -50,8 +49,8 @@ class WorkoutFragment : Fragment() {
     private var currTime: Long = 0
     private var weightVal = 0f
 
-    private var exProgress: SparseArray<ProgressStatus>? = null
-    private var setProgress: SparseArray<ProgressStatus>? = null
+    private var exProgress: MutableMap<Int, ProgressStatus>? = null
+    private var setProgress: MutableMap<Int, ProgressStatus>? = null
 
     private var setNum: String? = null
     private var updateProgress = true
@@ -106,7 +105,8 @@ class WorkoutFragment : Fragment() {
                 workoutController.events.collect { event ->
                     when (event) {
                         is WorkoutController.WorkoutControllerEvent.StartTimer -> startTimer(event.timeInMillis)
-                        is WorkoutController.WorkoutControllerEvent.UpdateProgressSets -> updateProgressSets(event.numSets)
+                        is WorkoutController.WorkoutControllerEvent.UpdateProgressSets ->
+                            updateProgressSets(event.numSets)
                         else -> {}
                     }
                 }
@@ -125,17 +125,16 @@ class WorkoutFragment : Fragment() {
     }
 
     private fun refreshFromResume() {
-        lifecycleScope.launch {
-            val snapshot = viewModel.getSessionProgress(workoutController.workoutName)
+        viewModel.getSessionProgress(workoutController.workoutName) { snapshot ->
             if ((setProgress == null) && (snapshot != null)) {
-                exProgress = SparseArray<ProgressStatus>().apply {
+                exProgress = mutableMapOf<Int, ProgressStatus>().apply {
                     snapshot.exerciseProgress.forEach { (key, value) ->
-                        value?.let { put(key, PROGRESS_STATUS_MAP[it]) }
+                        value?.let { put(key, PROGRESS_STATUS_MAP[it] ?: UNSELECTED) }
                     }
                 }
-                setProgress = SparseArray<ProgressStatus>().apply {
+                setProgress = mutableMapOf<Int, ProgressStatus>().apply {
                     snapshot.setProgress.forEach { (key, value) ->
-                        value?.let { put(key, PROGRESS_STATUS_MAP[it]) }
+                        value?.let { put(key, PROGRESS_STATUS_MAP[it] ?: UNSELECTED) }
                     }
                 }
             }
@@ -190,12 +189,8 @@ class WorkoutFragment : Fragment() {
                 setMap[i] = PROGRESS_CODE_MAP[it[i]]
             }
         }
-
         val snapshot = SessionProgressSnapshot(exMap, setMap)
-
-        lifecycleScope.launch {
-            viewModel.saveSessionProgress(workoutController.workoutName, snapshot)
-        }
+        viewModel.saveSessionProgress(workoutController.workoutName, snapshot)
     }
 
     private fun startTimer(timeInMillis: Long) {
@@ -232,7 +227,7 @@ class WorkoutFragment : Fragment() {
     private fun setupProgress(
         numItems: Int,
         itemInd: Int
-    ): SparseArray<ProgressStatus> {
+    ): MutableMap<Int, ProgressStatus> {
         return WorkoutProgressMapper.setupProgress(numItems, itemInd)
     }
 
@@ -410,7 +405,7 @@ class WorkoutFragment : Fragment() {
         val ex = updateEx
         Logger.d("OHH $ind")
         if (ex != null) {
-            val setStatus = SparseArray<ProgressStatus>()
+            val setStatus = mutableMapOf<Int, ProgressStatus>()
             updateSetMode = true
 
             uiState = uiState.copy(
@@ -458,7 +453,9 @@ class WorkoutFragment : Fragment() {
             saveProgressMap()
             setProgress?.selectOneBased(ind)
             uiState = uiState.copy(
-                setProgress = setProgress?.toProgressUiItems(updateEx?.getNumSets() ?: workoutController.currNumSets) ?: emptyList()
+                setProgress = setProgress?.toProgressUiItems(
+                    updateEx?.getNumSets() ?: workoutController.currNumSets
+                ) ?: emptyList()
             )
             updateEx?.let { updateUI(it, ind - 1) }
         }
@@ -483,21 +480,20 @@ class WorkoutFragment : Fragment() {
     }
 
     companion object {
-        @JvmStatic
         fun getInstance(): WorkoutFragment {
             return WorkoutFragment()
         }
     }
 }
 
-private fun SparseArray<ProgressStatus>.selectOneBased(index: Int) {
+private fun MutableMap<Int, ProgressStatus>.selectOneBased(index: Int) {
     WorkoutProgressMapper.selectOneBased(this, index)
 }
 
-private fun SparseArray<ProgressStatus>.setCurrentOneBased(index: Int, success: Boolean) {
+private fun MutableMap<Int, ProgressStatus>.setCurrentOneBased(index: Int, success: Boolean) {
     WorkoutProgressMapper.setCurrentOneBased(this, index, success)
 }
 
-private fun SparseArray<ProgressStatus>.toProgressUiItems(count: Int): List<WorkoutProgressUiItem> {
+private fun Map<Int, ProgressStatus>.toProgressUiItems(count: Int): List<WorkoutProgressUiItem> {
     return WorkoutProgressMapper.toProgressUiItems(this, count)
 }

@@ -20,27 +20,23 @@ class CalculateNextExerciseWeightUseCaseTest {
     private fun createExercise(
         equipment: String,
         weight: Float,
-        reps: Int,
-        sets: Int,
+        @Suppress("SameParameterValue") reps: Int,
+        @Suppress("SameParameterValue") sets: Int,
         minWeight: Float
-    ): Exercise {
-        return Exercise().apply {
-            this.equipment = equipment
-            this.weight = weight
-            this.reps = reps
-            this.sets = sets
-            // The setter for equipment overrides minWeight, so we set it directly if needed or use the side-effect
-            // To ensure minWeight is set for the test, we'll manually override it again
-            this.minWeight = minWeight
-        }
+    ): Exercise = Exercise().apply {
+        this.equipment = equipment
+        this.weight = weight
+        this.reps = reps
+        this.sets = sets
+        // The setter for equipment overrides minWeight, so we set it directly if needed or use the side-effect
+        // To ensure minWeight is set for the test, we'll manually override it again
+        this.minWeight = minWeight
     }
 
-    private fun createFinishedSets(count: Int, reps: Int, weight: Float): List<ExerciseSet> {
-        return List(count) {
-            ExerciseSet().apply {
-                this.reps = reps
-                this.weight = weight
-            }
+    private fun createFinishedSets(count: Int, reps: Int, weight: Float): List<ExerciseSet> = List(count) {
+        ExerciseSet().apply {
+            this.reps = reps
+            this.weight = weight
         }
     }
 
@@ -66,7 +62,8 @@ class CalculateNextExerciseWeightUseCaseTest {
 
     @Test
     fun testBarbellHigherRepsCappedAt1_25() {
-        // Barbell target 100 x 10 x 3, actual all 100 x 15 → capped rep ratio 1.25, average 125, +10 = 135, rounded nearest 10 = 140.
+        // Barbell target 100 x 10 x 3, actual all 100 x 15 → capped rep ratio 1.25, average 125,
+        // +10 = 135, rounded nearest 10 = 140.
         val exercise = createExercise(BARBELL, 100f, 10, 3, 45f)
         val finishedSets = createFinishedSets(3, 15, 100f)
 

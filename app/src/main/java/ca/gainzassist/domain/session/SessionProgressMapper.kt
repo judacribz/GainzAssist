@@ -39,7 +39,7 @@ object SessionProgressMapper {
         for ((key, value) in rawMap) {
             val stringKey = key?.toString() ?: continue
             val intKey = stringKey.toIntOrNull() ?: continue
-            
+
             val intValue = when (value) {
                 null -> null
                 is Number -> value.toInt()

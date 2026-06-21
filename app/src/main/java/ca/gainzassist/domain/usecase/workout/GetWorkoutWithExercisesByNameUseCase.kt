@@ -6,7 +6,5 @@ import ca.gainzassist.domain.repository.WorkoutRepository
 class GetWorkoutWithExercisesByNameUseCase(
     private val workoutRepository: WorkoutRepository
 ) {
-    suspend operator fun invoke(name: String): Workout? {
-        return workoutRepository.getWorkoutWithExercisesByName(name)
-    }
+    suspend operator fun invoke(name: String): Workout? = workoutRepository.getWorkoutWithExercisesByName(name)
 }

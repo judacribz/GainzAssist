@@ -1,6 +1,5 @@
 package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
-import android.util.SparseArray
 import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
 import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
@@ -9,24 +8,23 @@ import ca.gainzassist.ui.ProgressStatus.SELECTED
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
 import ca.gainzassist.ui.ProgressStatus.SUCCESS_SELECTED
 import ca.gainzassist.ui.ProgressStatus.UNSELECTED
-import androidx.core.util.size
 
 object WorkoutProgressMapper {
 
     fun setupProgress(
         numItems: Int,
         selectedOneBasedIndex: Int
-    ): SparseArray<ProgressStatus> {
-        val progressStatus = SparseArray<ProgressStatus>()
+    ): MutableMap<Int, ProgressStatus> {
+        val progressStatus = mutableMapOf<Int, ProgressStatus>()
         for (i in 0 until numItems) {
-            progressStatus.put(i, UNSELECTED)
+            progressStatus[i] = UNSELECTED
         }
-        progressStatus.put(selectedOneBasedIndex - 1, SELECTED)
+        progressStatus[selectedOneBasedIndex - 1] = SELECTED
         return progressStatus
     }
 
     fun toProgressUiItems(
-        progress: SparseArray<ProgressStatus>?,
+        progress: Map<Int, ProgressStatus>?,
         count: Int
     ): List<WorkoutProgressUiItem> {
         if (progress == null) return emptyList()
@@ -43,37 +41,36 @@ object WorkoutProgressMapper {
     }
 
     fun selectOneBased(
-        progress: SparseArray<ProgressStatus>,
+        progress: MutableMap<Int, ProgressStatus>,
         selectedOneBasedIndex: Int
     ) {
         deselectCurrent(progress)
         val zeroBased = selectedOneBasedIndex - 1
         val status = progress[zeroBased]
         when (status) {
-            SUCCESS -> progress.put(zeroBased, SUCCESS_SELECTED)
-            FAIL -> progress.put(zeroBased, FAIL_SELECTED)
-            else -> progress.put(zeroBased, SELECTED)
+            SUCCESS -> progress[zeroBased] = SUCCESS_SELECTED
+            FAIL -> progress[zeroBased] = FAIL_SELECTED
+            else -> progress[zeroBased] = SELECTED
         }
     }
 
     fun setCurrentOneBased(
-        progress: SparseArray<ProgressStatus>,
+        progress: MutableMap<Int, ProgressStatus>,
         selectedOneBasedIndex: Int,
         success: Boolean
     ) {
         selectOneBased(progress, selectedOneBasedIndex)
         if (selectedOneBasedIndex > 1) {
-            progress.put(selectedOneBasedIndex - 2, if (success) SUCCESS else FAIL)
+            progress[selectedOneBasedIndex - 2] = if (success) SUCCESS else FAIL
         }
     }
 
-    private fun deselectCurrent(progress: SparseArray<ProgressStatus>) {
-        for (i in 0 until progress.size) {
-            val key = progress.keyAt(i)
-            when (progress[key]) {
-                SELECTED -> progress.put(key, UNSELECTED)
-                SUCCESS_SELECTED -> progress.put(key, SUCCESS)
-                FAIL_SELECTED -> progress.put(key, FAIL)
+    private fun deselectCurrent(progress: MutableMap<Int, ProgressStatus>) {
+        for ((key, value) in progress) {
+            when (value) {
+                SELECTED -> progress[key] = UNSELECTED
+                SUCCESS_SELECTED -> progress[key] = SUCCESS
+                FAIL_SELECTED -> progress[key] = FAIL
                 else -> Unit
             }
         }

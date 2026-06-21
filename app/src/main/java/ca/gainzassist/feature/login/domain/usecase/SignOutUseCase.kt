@@ -5,7 +5,5 @@ import ca.gainzassist.feature.login.domain.repository.LoginRepository
 class SignOutUseCase(
     private val loginRepository: LoginRepository
 ) {
-    suspend operator fun invoke(): Result<Unit> {
-        return loginRepository.signOut()
-    }
+    suspend operator fun invoke(): Result<Unit> = loginRepository.signOut()
 }

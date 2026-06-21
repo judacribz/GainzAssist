@@ -40,9 +40,9 @@ class SessionProgressMapperTest {
     @Test
     fun `fromLegacyMap returns empty maps when input maps are missing`() {
         val legacyMap = mapOf<String, Any>() // Missing both keys
-        
+
         val snapshot = SessionProgressMapper.fromLegacyMap(legacyMap)
-        
+
         assertEquals(emptyMap<Int, Int?>(), snapshot.exerciseProgress)
         assertEquals(emptyMap<Int, Int?>(), snapshot.setProgress)
     }

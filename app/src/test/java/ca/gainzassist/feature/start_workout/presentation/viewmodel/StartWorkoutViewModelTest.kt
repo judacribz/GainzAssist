@@ -7,7 +7,6 @@ import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.SaveIncompleteSessionUseCase
-import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 import ca.gainzassist.feature.start_workout.domain.usecase.SaveIncompleteWorkoutUseCase
 import ca.gainzassist.feature.start_workout.domain.usecase.StartWorkoutSessionUseCase
 import ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutTab
@@ -18,6 +17,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -63,9 +63,9 @@ class StartWorkoutViewModelTest {
         val exercise = Exercise()
         exercise.name = "Squat"
         val workout = Workout("Leg Day", arrayListOf(exercise))
-        
+
         viewModel.initializeFromWorkout(workout)
-        
+
         val state = viewModel.state.value
         assertEquals("Leg Day", state.workoutName)
         assertEquals(StartWorkoutTab.WORKOUT, state.selectedTab)
@@ -89,47 +89,73 @@ class StartWorkoutViewModelTest {
         val warmups = listOf(stretching)
         viewModel.onWarmupsGenerated(warmups)
         val state = viewModel.state.value
-        assertEquals(listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES), state.availableTabs)
+        assertEquals(
+            listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+            state.availableTabs
+        )
         assertEquals(StartWorkoutTab.WORKOUT, state.selectedTab)
         assertEquals(warmups, state.warmups)
     }
 
     @Test
     fun prepareSessionRestore_blankWorkoutName_returnsStartFresh() = runTest {
-        val result = viewModel.prepareSessionRestore("  ")
-        assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
+        val workout = Workout("  ", arrayListOf(exercise))
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.isSessionReady)
     }
 
     @Test
     fun prepareSessionRestore_noIncompleteWorkout_returnsStartFresh() = runTest {
-        val result = viewModel.prepareSessionRestore("Push Day")
-        assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
+        val workout = Workout("Push Day", arrayListOf(exercise))
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.isSessionReady)
     }
 
     @Test
     fun prepareSessionRestore_incompleteWorkoutNoSession_removesAndStartsFresh() = runTest {
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
+        val workout = Workout("Push Day", arrayListOf(exercise))
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
-        
-        val result = viewModel.prepareSessionRestore("Push Day")
-        
-        assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
+
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.isSessionReady)
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertFalse(incompleteWorkouts.contains("Push Day"))
     }
 
     @Test
     fun prepareSessionRestore_withSessionJson_returnsRestoreFromJsonAndCleansSession() = runTest {
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
+        val workout = Workout("Push Day", arrayListOf(exercise))
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
         sessionPreferencesRepository.saveIncompleteSession("Push Day", "{\"key\":\"val\"}")
-        
-        val result = viewModel.prepareSessionRestore("Push Day")
-        
-        assertTrue(result is StartWorkoutRestoreDecision.RestoreFromJson)
-        assertEquals("{\"key\":\"val\"}", (result as StartWorkoutRestoreDecision.RestoreFromJson).sessionJson)
-        
+
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.state.value.isSessionReady)
+
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertFalse(incompleteWorkouts.contains("Push Day"))
-        
+
         val savedSession = sessionPreferencesRepository.getIncompleteSession("Push Day")
         assertEquals(null, savedSession)
     }
@@ -137,10 +163,10 @@ class StartWorkoutViewModelTest {
     @Test
     fun saveLeavingSession_nonEmptyJson_savesSessionAndIncompleteWorkout() = runTest {
         viewModel.saveLeavingSession("Push Day", "{\"key\":\"val\"}")
-        
+
         val savedSession = sessionPreferencesRepository.getIncompleteSession("Push Day")
         assertEquals("{\"key\":\"val\"}", savedSession)
-        
+
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertTrue(incompleteWorkouts.contains("Push Day"))
     }
@@ -148,10 +174,10 @@ class StartWorkoutViewModelTest {
     @Test
     fun saveLeavingSession_emptyJson_addsIncompleteWorkoutOnly() = runTest {
         viewModel.saveLeavingSession("Push Day", "")
-        
+
         val savedSession = sessionPreferencesRepository.getIncompleteSession("Push Day")
         assertEquals(null, savedSession)
-        
+
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertTrue(incompleteWorkouts.contains("Push Day"))
     }
@@ -162,12 +188,12 @@ class StartWorkoutViewModelTest {
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
         }
-        
+
         viewModel.onHowToVideosClicked()
-        
+
         assertEquals(1, events.size)
         assertTrue(events[0] is StartWorkoutViewModelEvent.OpenHowToVideos)
-        
+
         job.cancel()
     }
 
@@ -177,12 +203,12 @@ class StartWorkoutViewModelTest {
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
         }
-        
+
         viewModel.onBackClicked()
-        
+
         assertEquals(1, events.size)
         assertTrue(events[0] is StartWorkoutViewModelEvent.ExitWorkout)
-        
+
         job.cancel()
     }
 
@@ -192,12 +218,12 @@ class StartWorkoutViewModelTest {
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
         }
-        
+
         viewModel.onFinishWorkoutClicked()
-        
+
         assertEquals(1, events.size)
         assertTrue(events[0] is StartWorkoutViewModelEvent.FinishWorkout)
-        
+
         job.cancel()
     }
 

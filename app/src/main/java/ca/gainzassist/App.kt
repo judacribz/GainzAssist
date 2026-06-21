@@ -2,22 +2,21 @@ package ca.gainzassist
 
 import android.app.Application
 import android.widget.Toast
+import ca.gainzassist.core.di.addWorkoutViewModelModule
+import ca.gainzassist.core.di.coreModule
+import ca.gainzassist.core.di.dataModule
+import ca.gainzassist.core.di.domainModule
+import ca.gainzassist.core.di.loginModule
+import ca.gainzassist.core.di.mainViewModelModule
+import ca.gainzassist.core.di.preferencesDataModule
+import ca.gainzassist.core.di.presentationModule
+import ca.gainzassist.core.di.sessionSettingsUseCaseModule
+import ca.gainzassist.core.di.startWorkoutViewModelModule
+import ca.gainzassist.core.di.workoutScreenViewModelModule
+import ca.gainzassist.core.di.workoutUseCaseModule
 import com.facebook.appevents.AppEventsLogger
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-
-import ca.gainzassist.core.di.coreModule
-import ca.gainzassist.core.di.dataModule
-import ca.gainzassist.core.di.preferencesDataModule
-import ca.gainzassist.core.di.domainModule
-import ca.gainzassist.core.di.workoutUseCaseModule
-import ca.gainzassist.core.di.sessionSettingsUseCaseModule
-import ca.gainzassist.core.di.presentationModule
-import ca.gainzassist.core.di.mainViewModelModule
-import ca.gainzassist.core.di.addWorkoutViewModelModule
-import ca.gainzassist.core.di.startWorkoutViewModelModule
-import ca.gainzassist.core.di.workoutScreenViewModelModule
-import ca.gainzassist.core.di.loginModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -25,7 +24,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Logger.addLogAdapter(AndroidLogAdapter())
-        
+
         startKoin {
             androidContext(this@App)
             modules(
@@ -57,25 +56,26 @@ class App : Application() {
      * @throws IllegalStateException if secrets are invalid in release
      */
     private fun validateSecrets(isFacebookEnabled: Boolean): Boolean {
-        val missingFacebook = isFacebookEnabled && (BuildConfig.FACEBOOK_APP_ID.isBlank() ||
+        val missingFacebook = isFacebookEnabled &&
+            (BuildConfig.FACEBOOK_APP_ID.isBlank() ||
                 BuildConfig.FACEBOOK_CLIENT_TOKEN.isBlank() ||
                 BuildConfig.FB_LOGIN_PROTOCOL_SCHEME.isBlank())
-        
+
         val missingGoogle = BuildConfig.GOOGLE_API_KEY.isBlank()
-        
+
         if (missingFacebook || missingGoogle) {
             val errorMsg = "CRITICAL: Missing configuration in secrets.properties. Please ensure " +
-                    "all required keys are provided for auth and video search to work."
-            
+                "all required keys are provided for auth and video search to work."
+
             if (BuildConfig.DEBUG) {
                 // Show a toast or log loudly in debug
                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show()
                 Logger.e(errorMsg)
-                
+
                 if (missingFacebook) {
                     Logger.w("Facebook configuration missing. Skipping Facebook App events activation.")
                 }
-                
+
                 return !missingFacebook
             } else {
                 // Fail loudly in release

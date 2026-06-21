@@ -5,11 +5,12 @@ activity-compose = "1.13.0"
 # Android / Kotlin / Google Plugins
 android-gradle-plugin = "9.2.1"
 google-services = "4.5.0"
+spotless = "8.7.0"
 secrets-gradle-plugin = "2.0.1"
 kotlin = "2.4.0"
 ksp = "2.3.6"
-detekt = "1.23.6"
-detekt-compose = "0.4.27"
+detekt = "1.23.8"
+detekt-compose = "0.6.2"
 
 # AndroidX
 appcompat = "1.7.1"
@@ -149,6 +150,8 @@ logger = { module = "com.orhanobut:logger", version.ref = "logger" }
 
 # Detekt Plugins
 detekt-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose" }
+detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
 
 
 [bundles]
@@ -240,4 +243,6 @@ firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets-gradle-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+gainzassist-formatting = { id = "gainzassist.android.formatting" }

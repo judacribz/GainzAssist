@@ -67,7 +67,9 @@ fun MainTopBar(
                     },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { /* just dismiss keyboard or do nothing since filter is reactive */ }),
+                    keyboardActions = KeyboardActions(
+                        onSearch = { /* just dismiss keyboard or do nothing since filter is reactive */ }
+                    ),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,

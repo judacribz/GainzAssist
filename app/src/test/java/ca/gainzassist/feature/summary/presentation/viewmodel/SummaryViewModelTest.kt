@@ -57,7 +57,7 @@ class SummaryViewModelTest {
         assertEquals("Push Day", savedWorkout?.name)
 
         assertTrue(events.contains(SummaryViewModelEvent.Saved))
-        
+
         job.cancel()
     }
 
@@ -81,7 +81,7 @@ class SummaryViewModelTest {
         val updatedWorkout = fakeWorkoutRepository.getWorkoutByName("Push Day Updated")
         assertNotNull(updatedWorkout)
         assertEquals(1L, updatedWorkout?.id)
-        
+
         val oldWorkout = fakeWorkoutRepository.getWorkoutByName("Push Day")
         assertNull(oldWorkout)
     }
