@@ -97,11 +97,11 @@ class ExercisesEntryActivity : GainzBaseActivity() {
     @Composable
     override fun InnerContent() {
         val state by viewModel.state.collectAsStateWithLifecycle()
-        val tabs = state.exerciseNames.take(state.numberOfExercises).mapIndexed { i, _ ->
+        val tabs = List(state.exerciseNames.take(state.numberOfExercises).size) { index ->
             ExerciseEntryTab(
-                index = i,
-                title = String.format(TAB_LABEL, i + 1),
-                id = i.toLong()
+                index = index,
+                title = String.format(getString(R.string.tab_exercise_label), index.inc()),
+                id = index.toLong()
             )
         }.toMutableList()
         val uiState = ExercisesEntryUiState(
@@ -119,7 +119,7 @@ class ExercisesEntryActivity : GainzBaseActivity() {
         )
         Column(Modifier.fillMaxSize()) {
             GainzTopBar(
-                title = "Exercises Entry",
+                title = getString(R.string.title_exercises_entry),
                 showBack = true,
                 onBackClick = { finish() }
             )
@@ -158,11 +158,9 @@ class ExercisesEntryActivity : GainzBaseActivity() {
         finish()
         return super.onSupportNavigateUp()
     }
-
-    companion object {
-        const val TAB_LABEL = "Exercise %s"
-    }
 }
+
+private const val FRAGMENT_CONTAINER_ID_OFFSET = 100_000
 
 @Composable
 fun ExEntryFragmentContainer(
@@ -175,7 +173,7 @@ fun ExEntryFragmentContainer(
         factory = { ctx ->
             FragmentContainerView(ctx).apply {
                 // Use a stable ID derived from the pageIndex to prevent crashes on recomposition
-                id = 100000 + pageIndex
+                id = FRAGMENT_CONTAINER_ID_OFFSET + pageIndex
             }
         },
         update = { view ->
