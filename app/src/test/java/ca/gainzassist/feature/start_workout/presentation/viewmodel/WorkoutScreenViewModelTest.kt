@@ -64,7 +64,7 @@ class WorkoutScreenViewModelTest {
 
     @Test
     fun getSessionProgress_returnsNullWhenNoProgressSaved() = runTest {
-        var loadedSnapshot: SessionProgressSnapshot? = SessionProgressSnapshot(emptyMap(), emptyMap())
+        var loadedSnapshot: SessionProgressSnapshot? = null
         viewModel.getSessionProgress("My Workout") {
             loadedSnapshot = it
         }

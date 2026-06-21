@@ -10,7 +10,6 @@ val addWorkoutViewModelModule = module {
     viewModel { WorkoutEntryViewModel(validateWorkoutEntryUseCase = get()) }
     viewModel {
         ExercisesEntryViewModel(
-            exerciseExistsUseCase = get(),
             validateExerciseInputUseCase = get(),
             checkDuplicateExerciseUseCase = get(),
             buildExerciseUseCase = get(),

@@ -62,7 +62,8 @@ class CalculateNextExerciseWeightUseCaseTest {
 
     @Test
     fun testBarbellHigherRepsCappedAt1_25() {
-        // Barbell target 100 x 10 x 3, actual all 100 x 15 → capped rep ratio 1.25, average 125, +10 = 135, rounded nearest 10 = 140.
+        // Barbell target 100 x 10 x 3, actual all 100 x 15 → capped rep ratio 1.25, average 125,
+        // +10 = 135, rounded nearest 10 = 140.
         val exercise = createExercise(BARBELL, 100f, 10, 3, 45f)
         val finishedSets = createFinishedSets(3, 15, 100f)
 

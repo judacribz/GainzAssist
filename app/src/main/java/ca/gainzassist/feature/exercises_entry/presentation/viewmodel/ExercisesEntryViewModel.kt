@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
-import ca.gainzassist.domain.usecase.workout.ExerciseExistsUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildExerciseUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildWorkoutFromExerciseEntriesUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.CheckDuplicateExerciseUseCase
@@ -61,7 +60,6 @@ sealed interface ExercisesEntryViewModelEvent {
 }
 
 class ExercisesEntryViewModel(
-    private val exerciseExistsUseCase: ExerciseExistsUseCase,
     private val validateExerciseInputUseCase: ValidateExerciseInputUseCase,
     private val checkDuplicateExerciseUseCase: CheckDuplicateExerciseUseCase,
     private val buildExerciseUseCase: BuildExerciseUseCase,
@@ -391,7 +389,7 @@ class ExercisesEntryViewModel(
             index
         }
 
-        val finalInputs = inputsList.mapIndexed { i, input ->
+        val finalInputs = inputsList.map { input ->
             input.copy(
                 showDelete = newNumberOfExercises > 1
             )
@@ -426,7 +424,7 @@ class ExercisesEntryViewModel(
         val newEx = Exercise().apply { exerciseNumber = newIndex }
         exercises.add(newEx)
 
-        val inputsList = currentState.exerciseInputs.toMutableList()
+        val inputsList = currentState.exerciseInputs
         val updatedInputs = inputsList.map { it.copy(showDelete = true) }.toMutableList()
         updatedInputs.add(
             ExerciseEntryInputState(

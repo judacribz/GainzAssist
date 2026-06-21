@@ -373,7 +373,8 @@ object WorkoutController {
         val numSets = exercise.getNumSets()
 
         check(numSets > 0) {
-            "Exercise '${exercise.name}' has no sets. Cannot start workout. sets=${exercise.sets}, reps=${exercise.reps}, weight=${exercise.weight}, equipment=${exercise.equipment}"
+            "Exercise '${exercise.name}' has no sets. Cannot start workout. sets=${exercise.sets}, " +
+                "reps=${exercise.reps}, weight=${exercise.weight}, equipment=${exercise.equipment}"
         }
 
         if (this.setIndex >= numSets) {

@@ -183,7 +183,8 @@ class Exercise : Parcelable {
         initSetsList(null)
 
         check(!(setIndex < 0 || setIndex >= setsList.size)) {
-            "Exercise '$name' has invalid setIndex=$setIndex, sets=$sets, setsList.size=${setsList.size}, reps=$reps, weight=$weight, equipment=$equipment"
+            "Exercise '$name' has invalid setIndex=$setIndex, sets=$sets, " +
+                "setsList.size=${setsList.size}, reps=$reps, weight=$weight, equipment=$equipment"
         }
 
         return setsList[setIndex]

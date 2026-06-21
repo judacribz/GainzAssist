@@ -1,6 +1,5 @@
 package ca.gainzassist.feature.exercises_entry.presentation.viewmodel
 
-import ca.gainzassist.domain.usecase.workout.ExerciseExistsUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildExerciseUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.BuildWorkoutFromExerciseEntriesUseCase
 import ca.gainzassist.feature.exercises_entry.domain.usecase.CheckDuplicateExerciseUseCase
@@ -29,7 +28,6 @@ class ExercisesEntryViewModelTest {
 
     @Before
     fun setup() {
-        val exerciseExistsUseCase = ExerciseExistsUseCase()
         val validateExerciseInputUseCase = ValidateExerciseInputUseCase()
         val checkDuplicateExerciseUseCase = CheckDuplicateExerciseUseCase()
         val buildExerciseUseCase = BuildExerciseUseCase()
@@ -37,7 +35,6 @@ class ExercisesEntryViewModelTest {
         val buildWorkoutFromExerciseEntriesUseCase = BuildWorkoutFromExerciseEntriesUseCase()
 
         viewModel = ExercisesEntryViewModel(
-            exerciseExistsUseCase = exerciseExistsUseCase,
             validateExerciseInputUseCase = validateExerciseInputUseCase,
             checkDuplicateExerciseUseCase = checkDuplicateExerciseUseCase,
             buildExerciseUseCase = buildExerciseUseCase,

@@ -181,7 +181,8 @@ private fun HowToVideosScreenPreviewLongTitles() {
             videos = listOf(
                 HowToVideoUiItem(
                     "1",
-                    "This is an extremely long title that should wrap to the next line or be handled gracefully in the UI without cutting off awkwardly."
+                    "This is an extremely long title that should wrap to the next line or " +
+                        "be handled gracefully in the UI without cutting off awkwardly."
                 ),
             )
         ),
