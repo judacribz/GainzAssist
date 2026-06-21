@@ -1,13 +1,10 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
-  <ManuallySuppressedIssues />
+  <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>ComplexCondition:CalculateNextExerciseWeightUseCase.kt$CalculateNextExerciseWeightUseCase$targetWeight &lt;= 0f || targetReps &lt;= 0 || expectedSets &lt;= 0 || increment &lt;= 0f</ID>
     <ID>ComplexCondition:SummaryActivity.kt$SummaryActivity$nameErr != null || weightErr != null || repsErr != null || setsErr != null</ID>
     <ID>ComplexCondition:ValidateExerciseInputUseCase.kt$ValidateExerciseInputUseCase$isValid &amp;&amp; parsedWeight != null &amp;&amp; parsedReps != null &amp;&amp; parsedSets != null</ID>
-    <ID>ComposableParamOrder:SharedWorkoutList.kt$SharedWorkoutList</ID>
-    <ID>ComposableParamOrder:WorkoutEntryScreen.kt$FooterSection</ID>
-    <ID>ComposableParamOrder:WorkoutEntryScreen.kt$WorkoutNameSection</ID>
     <ID>CyclomaticComplexMethod:SummaryActivity.kt$SummaryActivity$@Composable private fun SummaryActivityContent( initialWorkoutName: String, initialMainButtonText: String, isUpdateMode: Boolean, workout: Workout? )</ID>
     <ID>EmptyFunctionBlock:ExerciseEntryScreen.kt$&lt;no name provided&gt;${}</ID>
     <ID>EmptyFunctionBlock:FirebaseService.kt$FirebaseService.&lt;no name provided&gt;${}</ID>
@@ -17,8 +14,8 @@
     <ID>ForbiddenComment:WorkoutScreenViewModel.kt$WorkoutScreenViewModel$// TODO: navigate to exercise progress</ID>
     <ID>ForbiddenComment:WorkoutScreenViewModel.kt$WorkoutScreenViewModel$// TODO: navigate to set progress</ID>
     <ID>ForbiddenComment:WorkoutScreenViewModel.kt$WorkoutScreenViewModel$// TODO: toggle timer</ID>
-    <ID>FunctionNaming:ExerciseEntryScreen.kt$@Composable fun ExEntryScreen( uiState: ExEntryUiState, actions: ExEntryActions, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:ExerciseEntryScreen.kt$@Composable fun NumberRow( state: NumberRowState, actions: NumberRowActions, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ExerciseEntryScreen.kt$@Composable fun ExEntryScreen(uiState: ExEntryUiState, actions: ExEntryActions, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:ExerciseEntryScreen.kt$@Composable fun NumberRow(state: NumberRowState, actions: NumberRowActions, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:ExerciseEntryScreen.kt$@Preview(showBackground = true) @Composable fun ExEntryScreenPreviewDeleteHidden()</ID>
     <ID>FunctionNaming:ExerciseEntryScreen.kt$@Preview(showBackground = true) @Composable fun ExEntryScreenPreviewDumbbell()</ID>
     <ID>FunctionNaming:ExerciseEntryScreen.kt$@Preview(showBackground = true) @Composable fun ExEntryScreenPreviewDuplicateExerciseError()</ID>
@@ -31,11 +28,11 @@
     <ID>FunctionNaming:ExerciseEntryScreen.kt$@Preview(showBackground = true, device = "id:pixel_4_xl") @Composable fun ExEntryScreenPreviewLargePhone412x915()</ID>
     <ID>FunctionNaming:ExerciseEntryScreen.kt$@Preview(showBackground = true, fontScale = 1.5f) @Composable fun ExEntryScreenPreviewFontScaleLarge()</ID>
     <ID>FunctionNaming:ExerciseEntryScreen.kt$@Preview(showBackground = true, widthDp = 250) @Composable fun ExEntryScreenPreviewNarrowWidth()</ID>
-    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetChip( exerciseSet: ExerciseSet, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetChip(exerciseSet: ExerciseSet, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetSubtitles(modifier: Modifier = Modifier)</ID>
-    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetsCard( exercise: Exercise, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetsListScreen( exercises: List&lt;Exercise&gt;, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable private fun ExerciseSetNumberCell( text: String, width: Dp, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetsCard(exercise: Exercise, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable fun ExerciseSetsListScreen(exercises: List&lt;Exercise&gt;, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Composable private fun ExerciseSetNumberCell(text: String, width: Dp, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Preview(showBackground = true) @Composable private fun ExercisesListScreenPreviewEmpty()</ID>
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Preview(showBackground = true) @Composable private fun ExercisesListScreenPreviewLargeWeights()</ID>
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Preview(showBackground = true) @Composable private fun ExercisesListScreenPreviewLongExerciseName()</ID>
@@ -45,7 +42,7 @@
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Preview(showBackground = true) @Composable private fun ExercisesListScreenPreviewThreeDigitWeights()</ID>
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Preview(showBackground = true, device = Devices.PIXEL_4) @Composable private fun ExercisesListScreenPreviewSmallPhone360x800()</ID>
     <ID>FunctionNaming:ExerciseSetsListComponents.kt$@Preview(showBackground = true, fontScale = 1.5f) @Composable private fun ExercisesListScreenPreviewFontScaleLarge()</ID>
-    <ID>FunctionNaming:ExercisesEntryActivity.kt$@Composable fun ExEntryFragmentContainer( pageIndex: Int, fragmentManager: FragmentManager, getFragment: (Int) -&gt; Fragment )</ID>
+    <ID>FunctionNaming:ExercisesEntryActivity.kt$@Composable fun ExEntryFragmentContainer(pageIndex: Int, fragmentManager: FragmentManager, getFragment: (Int) -&gt; Fragment)</ID>
     <ID>FunctionNaming:ExercisesEntryScreen.kt$@Composable fun ExercisesEntryScreen( uiState: ExercisesEntryUiState, onTabSelected: (Int) -&gt; Unit, pageContent: @Composable (Int) -&gt; Unit )</ID>
     <ID>FunctionNaming:ExercisesEntryScreen.kt$@Preview(showBackground = true) @Composable fun ExercisesEntryScreenPreviewMultipleExercises()</ID>
     <ID>FunctionNaming:ExercisesEntryScreen.kt$@Preview(showBackground = true) @Composable fun ExercisesEntryScreenPreviewOneExercise()</ID>
@@ -61,7 +58,7 @@
     <ID>FunctionNaming:GainzDropdown.kt$@Preview(showBackground = true) @Composable fun GainzDropdownPreviewDumbbell()</ID>
     <ID>FunctionNaming:GainzDropdown.kt$@Preview(showBackground = true) @Composable fun GainzDropdownPreviewNA()</ID>
     <ID>FunctionNaming:GainzDropdown.kt$@Preview(showBackground = true, widthDp = 150) @Composable fun GainzDropdownPreviewNarrowWidth()</ID>
-    <ID>FunctionNaming:GainzEdgeToEdgeBox.kt$@Composable fun GainzEdgeToEdgeBox( modifier: Modifier = Modifier, content: @Composable BoxScope.() -&gt; Unit )</ID>
+    <ID>FunctionNaming:GainzEdgeToEdgeBox.kt$@Composable fun GainzEdgeToEdgeBox(modifier: Modifier = Modifier, content: @Composable BoxScope.() -&gt; Unit)</ID>
     <ID>FunctionNaming:GainzOutlinedTextField.kt$@Composable fun GainzOutlinedTextField( state: GainzTextFieldState, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, singleLine: Boolean = true, textAlign: TextAlign = TextAlign.Center, keyboardOptions: KeyboardOptions = KeyboardOptions.Default )</ID>
     <ID>FunctionNaming:GainzOutlinedTextField.kt$@Composable private fun GainzTextFieldDecorationBox( isFloating: Boolean, label: String, safeFontFamily: FontFamily, textAlign: TextAlign, alignment: Alignment, innerTextField: @Composable () -&gt; Unit )</ID>
     <ID>FunctionNaming:GainzOutlinedTextField.kt$@Preview(showBackground = true) @Composable fun GainzOutlinedTextFieldEmptyPreview()</ID>
@@ -74,20 +71,20 @@
     <ID>FunctionNaming:GainzTopBar.kt$@Preview(showBackground = true) @Composable fun GainzTopBarPreviewTitleOnly()</ID>
     <ID>FunctionNaming:GainzTopBar.kt$@Preview(showBackground = true) @Composable fun GainzTopBarPreviewWithBack()</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Composable fun HowToVideosScreen( uiState: HowToVideosUiState, onVideoClick: (String) -&gt; Unit, playerContent: @Composable () -&gt; Unit, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:HowToVideosScreen.kt$@Composable fun VideoItemRow( item: HowToVideoUiItem, onClick: () -&gt; Unit )</ID>
-    <ID>FunctionNaming:HowToVideosScreen.kt$@Composable private fun YouTubeThumbnail( videoId: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:HowToVideosScreen.kt$@Composable fun VideoItemRow(item: HowToVideoUiItem, onClick: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:HowToVideosScreen.kt$@Composable private fun YouTubeThumbnail(videoId: String, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFF000000) @Composable private fun HowToVideosScreenPreviewEmpty()</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFF000000) @Composable private fun HowToVideosScreenPreviewLongTitles()</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFF000000) @Composable private fun HowToVideosScreenPreviewPlayerVisible()</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFF000000) @Composable private fun HowToVideosScreenPreviewWithResults()</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFF000000, fontScale = 1.5f) @Composable private fun HowToVideosScreenPreviewLargeFont()</ID>
     <ID>FunctionNaming:HowToVideosScreen.kt$@Preview(showBackground = true, backgroundColor = 0xFF000000, widthDp = 320, heightDp = 480) @Composable private fun HowToVideosScreenPreviewSmallPhone()</ID>
-    <ID>FunctionNaming:HowToVideosTopBar.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HowToVideosTopBar( state: HowToVideosTopBarState, actions: HowToVideosTopBarActions )</ID>
+    <ID>FunctionNaming:HowToVideosTopBar.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HowToVideosTopBar(state: HowToVideosTopBarState, actions: HowToVideosTopBarActions)</ID>
     <ID>FunctionNaming:HowToVideosTopBar.kt$@Preview @Composable fun HowToVideosTopBarLongTitle()</ID>
     <ID>FunctionNaming:HowToVideosTopBar.kt$@Preview @Composable fun HowToVideosTopBarNormal()</ID>
     <ID>FunctionNaming:HowToVideosTopBar.kt$@Preview @Composable fun HowToVideosTopBarSearchExpanded()</ID>
-    <ID>FunctionNaming:LoginScreen.kt$@Composable fun LoginScreen( state: LoginUiState, actions: LoginActions, loginImage: Bitmap? = null, signUpImage: Bitmap? = null )</ID>
-    <ID>FunctionNaming:LoginScreen.kt$@Composable private fun ActionButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:LoginScreen.kt$@Composable fun LoginScreen(state: LoginUiState, actions: LoginActions, loginImage: Bitmap? = null, signUpImage: Bitmap? = null)</ID>
+    <ID>FunctionNaming:LoginScreen.kt$@Composable private fun ActionButton(text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:LoginScreen.kt$@Composable private fun LoginInputField( state: LoginInputFieldState, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
     <ID>FunctionNaming:LoginScreen.kt$@Composable private fun LoginInputFieldsSection(state: LoginUiState, actions: LoginActions)</ID>
     <ID>FunctionNaming:LoginScreen.kt$@Composable private fun LoginLoadingOverlay()</ID>
@@ -98,7 +95,7 @@
     <ID>FunctionNaming:LoginScreen.kt$@Preview(showBackground = true) @Composable fun LoginScreenLoadingPreview()</ID>
     <ID>FunctionNaming:LoginScreen.kt$@Preview(showBackground = true) @Composable fun LoginScreenPreview()</ID>
     <ID>FunctionNaming:LoginScreen.kt$@Preview(showBackground = true) @Composable fun LoginScreenSignUpModePreview()</ID>
-    <ID>FunctionNaming:MainScreen.kt$@Composable fun MainScreen( uiState: MainUiState, actions: MainScreenActions = MainScreenActions() )</ID>
+    <ID>FunctionNaming:MainScreen.kt$@Composable fun MainScreen(uiState: MainUiState, actions: MainScreenActions = MainScreenActions())</ID>
     <ID>FunctionNaming:MainScreen.kt$@Preview(showBackground = true) @Composable fun MainScreenPreviewEmpty()</ID>
     <ID>FunctionNaming:MainScreen.kt$@Preview(showBackground = true) @Composable fun MainScreenPreviewResume()</ID>
     <ID>FunctionNaming:MainScreen.kt$@Preview(showBackground = true) @Composable fun MainScreenPreviewSettings()</ID>
@@ -111,31 +108,31 @@
     <ID>FunctionNaming:MainTopBar.kt$@Preview @Composable private fun MainTopBarPreviewSearchExpanded()</ID>
     <ID>FunctionNaming:MainTopBar.kt$@Preview @Composable private fun MainTopBarPreviewSettings()</ID>
     <ID>FunctionNaming:MainTopBar.kt$@Preview @Composable private fun MainTopBarPreviewWorkouts()</ID>
-    <ID>FunctionNaming:ResumeScreen.kt$@Composable fun ResumeScreen( uiState: ResumeUiState, onWorkoutClick: (String) -&gt; Unit )</ID>
+    <ID>FunctionNaming:ResumeScreen.kt$@Composable fun ResumeScreen(uiState: ResumeUiState, onWorkoutClick: (String) -&gt; Unit)</ID>
     <ID>FunctionNaming:ResumeScreen.kt$@Preview(showBackground = true) @Composable fun ResumeScreenPreviewEmpty()</ID>
     <ID>FunctionNaming:ResumeScreen.kt$@Preview(showBackground = true) @Composable fun ResumeScreenPreviewMultipleWorkouts()</ID>
     <ID>FunctionNaming:ResumeScreen.kt$@Preview(showBackground = true) @Composable fun ResumeScreenPreviewOneWorkout()</ID>
     <ID>FunctionNaming:ResumeScreen.kt$@PreviewFontScale @Composable fun ResumeScreenPreviewFontScaleLarge()</ID>
     <ID>FunctionNaming:ResumeScreen.kt$@PreviewScreenSizes @Composable fun ResumeScreenPreviewSmallPhone360x800()</ID>
-    <ID>FunctionNaming:SettingsScreen.kt$@Composable fun SettingsScreen( uiState: SettingsUiState, actions: SettingsScreenActions = SettingsScreenActions() )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable fun SettingsScreen(uiState: SettingsUiState, actions: SettingsScreenActions = SettingsScreenActions())</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Preview(showBackground = true) @Composable fun SettingsScreenPreviewEmailUnavailable()</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Preview(showBackground = true) @Composable fun SettingsScreenPreviewSignedIn()</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Preview(showBackground = true, fontScale = 1.5f) @Composable fun SettingsScreenPreviewLargeFont()</ID>
     <ID>FunctionNaming:SettingsScreen.kt$@Preview(showBackground = true, widthDp = 320, heightDp = 480) @Composable fun SettingsScreenPreviewSmallPhone()</ID>
     <ID>FunctionNaming:SharedWorkoutList.kt$@Composable fun SharedWorkoutList( titleResId: Int, workoutNames: List&lt;String&gt;, emptyStateTextResId: Int? = null, onWorkoutClick: (String) -&gt; Unit, onWorkoutLongClick: ((String) -&gt; Unit)? = null, buttonFontFamily: FontFamily = FontFamily.Default )</ID>
     <ID>FunctionNaming:StartWorkoutScreen.kt$@Composable fun WorkoutFragmentContainer()</ID>
-    <ID>FunctionNaming:StartWorkoutScreen.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun StartWorkoutScreen( uiState: StartWorkoutViewModelState, onTabSelected: (StartWorkoutTab) -&gt; Unit )</ID>
+    <ID>FunctionNaming:StartWorkoutScreen.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun StartWorkoutScreen(uiState: StartWorkoutViewModelState, onTabSelected: (StartWorkoutTab) -&gt; Unit)</ID>
     <ID>FunctionNaming:StartWorkoutScreen.kt$@Preview(showBackground = true) @Composable private fun StartWorkoutScreenPreviewExercisesSelected()</ID>
     <ID>FunctionNaming:StartWorkoutScreen.kt$@Preview(showBackground = true) @Composable private fun StartWorkoutScreenPreviewNoWarmups()</ID>
     <ID>FunctionNaming:StartWorkoutScreen.kt$@Preview(showBackground = true) @Composable private fun StartWorkoutScreenPreviewWithWarmups()</ID>
     <ID>FunctionNaming:StartWorkoutScreen.kt$@PreviewFontScale @Composable private fun StartWorkoutScreenPreviewLargeFont()</ID>
     <ID>FunctionNaming:StartWorkoutScreen.kt$@PreviewScreenSizes @Composable private fun StartWorkoutScreenPreviewSmallPhone()</ID>
     <ID>FunctionNaming:SummaryActivity.kt$SummaryActivity$@Composable private fun SummaryActivityContent( initialWorkoutName: String, initialMainButtonText: String, isUpdateMode: Boolean, workout: Workout? )</ID>
-    <ID>FunctionNaming:SummaryScreen.kt$@Composable fun ExerciseChipButton( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SummaryScreen.kt$@Composable fun ExerciseChipButton(text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:SummaryScreen.kt$@Composable fun NumericStepperField( value: String, onValueChange: (String) -&gt; Unit, onIncrement: () -&gt; Unit, onDecrement: () -&gt; Unit, canDecrement: Boolean, modifier: Modifier = Modifier, isFloat: Boolean = false )</ID>
     <ID>FunctionNaming:SummaryScreen.kt$@Composable fun SummaryCard(modifier: Modifier = Modifier, content: @Composable () -&gt; Unit)</ID>
-    <ID>FunctionNaming:SummaryScreen.kt$@Composable fun SummaryScreen( uiState: SummaryUiState, actions: SummaryScreenActions = SummaryScreenActions() )</ID>
-    <ID>FunctionNaming:SummaryScreen.kt$@Composable fun SummaryScreenContent( uiState: SummaryUiState, actions: SummaryScreenActions )</ID>
+    <ID>FunctionNaming:SummaryScreen.kt$@Composable fun SummaryScreen(uiState: SummaryUiState, actions: SummaryScreenActions = SummaryScreenActions())</ID>
+    <ID>FunctionNaming:SummaryScreen.kt$@Composable fun SummaryScreenContent(uiState: SummaryUiState, actions: SummaryScreenActions)</ID>
     <ID>FunctionNaming:SummaryScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SummaryToolbar(onBack: () -&gt; Unit)</ID>
     <ID>FunctionNaming:SummaryScreen.kt$@Preview(showBackground = true) @Composable private fun SummaryScreenPreviewDumbbellSelected()</ID>
     <ID>FunctionNaming:SummaryScreen.kt$@Preview(showBackground = true) @Composable private fun SummaryScreenPreviewDuplicateExerciseError()</ID>
@@ -157,7 +154,7 @@
     <ID>FunctionNaming:WarmupsListScreen.kt$@PreviewFontScale @Composable private fun WarmupsListScreenPreviewFontScaleLarge()</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Composable fun CustomToolbar(onBack: () -&gt; Unit, fontFamily: FontFamily)</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Composable fun FooterSection( modifier: Modifier = Modifier, isNameEmpty: Boolean, onCancel: () -&gt; Unit, onEnter: () -&gt; Unit, fontFamily: FontFamily )</ID>
-    <ID>FunctionNaming:WorkoutEntryScreen.kt$@Composable fun NumExercisesSection( state: NumExercisesState, actions: NumExercisesActions, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:WorkoutEntryScreen.kt$@Composable fun NumExercisesSection(state: NumExercisesState, actions: NumExercisesActions, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Composable fun WorkoutNameSection( modifier: Modifier = Modifier, workoutName: String, workoutNameError: String?, onWorkoutNameChanged: (String) -&gt; Unit, colorBg: Color )</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun WorkoutEntryScreen( workoutName: String, numberOfExercises: String, workoutNameErrorResId: Int?, numberOfExercisesErrorResId: Int?, actions: WorkoutEntryScreenActions = WorkoutEntryScreenActions() )</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Preview( showBackground = true, device = "spec:width=800dp,height=360dp,orientation=landscape", name = "Landscape" ) @Composable private fun WorkoutEntryScreenPreviewLandscape()</ID>
@@ -170,47 +167,46 @@
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Preview(showBackground = true, name = "Long Workout Name") @Composable private fun WorkoutEntryScreenPreviewLongWorkoutName()</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Preview(showBackground = true, name = "Min Exercise Count, Disabled Minus") @Composable private fun WorkoutEntryScreenPreviewMinExerciseCountDisabledMinus()</ID>
     <ID>FunctionNaming:WorkoutEntryScreen.kt$@Preview(showBackground = true, name = "With Name, Enter, 5 Exercises") @Composable private fun WorkoutEntryScreenPreviewWithNameEnterFiveExercises()</ID>
-    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutCard( modifier: Modifier = Modifier, content: @Composable () -&gt; Unit )</ID>
-    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutComposeScreen( uiState: WorkoutUiState, actions: WorkoutUiActions, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutEquipmentCanvas( weight: Float, equipment: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutCard(modifier: Modifier = Modifier, content: @Composable () -&gt; Unit)</ID>
+    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutComposeScreen(uiState: WorkoutUiState, actions: WorkoutUiActions, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutEquipmentCanvas(weight: Float, equipment: String, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutEquipmentTimer( weight: Float, equipment: String, timerText: String, onTimerClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutFooterControls( isFinishSetVisible: Boolean, isUpdateSetVisible: Boolean, isResumeWorkoutVisible: Boolean, onFinishSet: () -&gt; Unit, onUpdateSet: () -&gt; Unit, onResumeWorkout: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutNumberControl( state: WorkoutNumberControlState, actions: WorkoutNumberControlActions, modifier: Modifier = Modifier )</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutProgressHeader( title: String, setNumText: String, exerciseProgress: List&lt;WorkoutProgressUiItem&gt;, setProgress: List&lt;WorkoutProgressUiItem&gt;, onExerciseClick: (Int) -&gt; Unit, onSetClick: (Int) -&gt; Unit, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutProgressItem( item: WorkoutProgressUiItem, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutProgressRow( items: List&lt;WorkoutProgressUiItem&gt;, onClick: (Int) -&gt; Unit, modifier: Modifier = Modifier )</ID>
-    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutRepsWeightControls( uiState: WorkoutUiState, actions: WorkoutUiActions, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutProgressItem(item: WorkoutProgressUiItem, onClick: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutProgressRow(items: List&lt;WorkoutProgressUiItem&gt;, onClick: (Int) -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:WorkoutScreen.kt$@Composable fun WorkoutRepsWeightControls(uiState: WorkoutUiState, actions: WorkoutUiActions, modifier: Modifier = Modifier)</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Preview(showBackground = true) @Composable private fun WorkoutComposeScreenPreviewDefault()</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Preview(showBackground = true) @Composable private fun WorkoutComposeScreenPreviewLargeWeight()</ID>
     <ID>FunctionNaming:WorkoutScreen.kt$@Preview(showBackground = true) @Composable private fun WorkoutComposeScreenPreviewUpdateMode()</ID>
-    <ID>FunctionNaming:WorkoutsScreen.kt$@Composable fun WorkoutOptionsDialog( workoutName: String, onDismiss: () -&gt; Unit, onEdit: () -&gt; Unit, onDelete: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:WorkoutsScreen.kt$@Composable fun WorkoutOptionsDialog(workoutName: String, onDismiss: () -&gt; Unit, onEdit: () -&gt; Unit, onDelete: () -&gt; Unit)</ID>
     <ID>FunctionNaming:WorkoutsScreen.kt$@Composable fun WorkoutsScreen( workoutNames: List&lt;String&gt;, selectedWorkoutName: String?, actions: WorkoutsScreenActions = WorkoutsScreenActions() )</ID>
     <ID>FunctionNaming:WorkoutsScreen.kt$@Preview(showBackground = true) @Composable fun WorkoutsScreenDialogPreview()</ID>
     <ID>FunctionNaming:WorkoutsScreen.kt$@Preview(showBackground = true) @Composable fun WorkoutsScreenEmptyPreview()</ID>
     <ID>FunctionNaming:WorkoutsScreen.kt$@Preview(showBackground = true) @Composable fun WorkoutsScreenPopulatedPreview()</ID>
     <ID>FunctionParameterNaming:Misc.kt$Misc$`object`: Any?</ID>
     <ID>ImplicitDefaultLocale:YoutubeHowToVideosRepository.kt$YoutubeHowToVideosRepository$String.format("%02X", b)</ID>
-    <ID>LambdaParameterInRestartableEffect:ExercisesEntryScreen.kt$onTabSelected</ID>
-    <ID>LambdaParameterInRestartableEffect:StartWorkoutScreen.kt$onTabSelected</ID>
-    <ID>LongMethod:ExerciseEntryScreen.kt$@Composable fun ExEntryScreen( uiState: ExEntryUiState, actions: ExEntryActions, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ExerciseEntryScreen.kt$@Composable fun ExEntryScreen(uiState: ExEntryUiState, actions: ExEntryActions, modifier: Modifier = Modifier)</ID>
+    <ID>LongMethod:ExerciseEntryScreen.kt$@Composable fun NumberRow(state: NumberRowState, actions: NumberRowActions, modifier: Modifier = Modifier)</ID>
     <ID>LongMethod:ExercisesEntryViewModel.kt$ExercisesEntryViewModel$fun onExerciseSubmitted(index: Int)</ID>
     <ID>LongMethod:GainzOutlinedTextField.kt$@Composable fun GainzOutlinedTextField( state: GainzTextFieldState, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, singleLine: Boolean = true, textAlign: TextAlign = TextAlign.Center, keyboardOptions: KeyboardOptions = KeyboardOptions.Default )</ID>
     <ID>LongMethod:GainzTabRow.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun GainzTabRow( pagerState: PagerState, tabs: List&lt;GainzTabItem&gt;, modifier: Modifier = Modifier, scrollable: Boolean = false, onTabClick: ((Int) -&gt; Unit)? = null )</ID>
     <ID>LongMethod:GainzTopBar.kt$@Composable fun GainzTopBar( title: String, showBack: Boolean = false, onBackClick: () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {} )</ID>
-    <ID>LongMethod:HowToVideosTopBar.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HowToVideosTopBar( state: HowToVideosTopBarState, actions: HowToVideosTopBarActions )</ID>
+    <ID>LongMethod:HowToVideosTopBar.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HowToVideosTopBar(state: HowToVideosTopBarState, actions: HowToVideosTopBarActions)</ID>
     <ID>LongMethod:MainActivity.kt$MainActivity$@Composable override fun InnerContent()</ID>
-    <ID>LongMethod:MainScreen.kt$@Composable fun MainScreen( uiState: MainUiState, actions: MainScreenActions = MainScreenActions() )</ID>
+    <ID>LongMethod:MainScreen.kt$@Composable fun MainScreen(uiState: MainUiState, actions: MainScreenActions = MainScreenActions())</ID>
     <ID>LongMethod:MainTopBar.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun MainTopBar( selectedTab: MainTab, isSearchExpanded: Boolean, searchQuery: String, actions: MainTopBarActions = MainTopBarActions() )</ID>
-    <ID>LongMethod:SettingsScreen.kt$@Composable fun SettingsScreen( uiState: SettingsUiState, actions: SettingsScreenActions = SettingsScreenActions() )</ID>
+    <ID>LongMethod:SettingsScreen.kt$@Composable fun SettingsScreen(uiState: SettingsUiState, actions: SettingsScreenActions = SettingsScreenActions())</ID>
     <ID>LongMethod:SummaryActivity.kt$SummaryActivity$@Composable private fun SummaryActivityContent( initialWorkoutName: String, initialMainButtonText: String, isUpdateMode: Boolean, workout: Workout? )</ID>
     <ID>LongMethod:SummaryScreen.kt$@Composable fun NumericStepperField( value: String, onValueChange: (String) -&gt; Unit, onIncrement: () -&gt; Unit, onDecrement: () -&gt; Unit, canDecrement: Boolean, modifier: Modifier = Modifier, isFloat: Boolean = false )</ID>
-    <ID>LongMethod:SummaryScreen.kt$@Composable fun SummaryScreenContent( uiState: SummaryUiState, actions: SummaryScreenActions )</ID>
-    <ID>LongMethod:WorkoutEntryScreen.kt$@Composable fun NumExercisesSection( state: NumExercisesState, actions: NumExercisesActions, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SummaryScreen.kt$@Composable fun SummaryScreenContent(uiState: SummaryUiState, actions: SummaryScreenActions)</ID>
+    <ID>LongMethod:WorkoutEntryScreen.kt$@Composable fun NumExercisesSection(state: NumExercisesState, actions: NumExercisesActions, modifier: Modifier = Modifier)</ID>
     <ID>LongMethod:WorkoutEntryScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun WorkoutEntryScreen( workoutName: String, numberOfExercises: String, workoutNameErrorResId: Int?, numberOfExercisesErrorResId: Int?, actions: WorkoutEntryScreenActions = WorkoutEntryScreenActions() )</ID>
     <ID>LongMethod:WorkoutScreen.kt$@Composable fun WorkoutFooterControls( isFinishSetVisible: Boolean, isUpdateSetVisible: Boolean, isResumeWorkoutVisible: Boolean, onFinishSet: () -&gt; Unit, onUpdateSet: () -&gt; Unit, onResumeWorkout: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:WorkoutScreen.kt$@Composable fun WorkoutNumberControl( state: WorkoutNumberControlState, actions: WorkoutNumberControlActions, modifier: Modifier = Modifier )</ID>
-    <ID>LongMethod:WorkoutScreen.kt$@Composable fun WorkoutProgressItem( item: WorkoutProgressUiItem, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
-    <ID>LongParameterList:BuildExerciseUseCase.kt$BuildExerciseUseCase$( index: Int, name: String, equipment: String, sets: Int, reps: Int, weight: Float )</ID>
+    <ID>LongMethod:WorkoutScreen.kt$@Composable fun WorkoutProgressItem(item: WorkoutProgressUiItem, onClick: () -&gt; Unit, modifier: Modifier = Modifier)</ID>
+    <ID>LongParameterList:BuildExerciseUseCase.kt$BuildExerciseUseCase$(index: Int, name: String, equipment: String, sets: Int, reps: Int, weight: Float)</ID>
     <ID>LongParameterList:Exercise.kt$Exercise$( exerciseNumber: Int, name: String?, type: String?, equipment: String?, sets: Int, reps: Int, weight: Float, setsType: SetsType )</ID>
     <ID>LongParameterList:ExercisesEntryViewModel.kt$ExercisesEntryViewModel$( workoutName: String, numberOfExercises: Int, defaultReps: String, defaultSets: String, defaultWeight: String, defaultEquipment: String )</ID>
     <ID>LongParameterList:GainzButton.kt$( text: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, fontFamily: FontFamily = FontFamily.Default, onLongClick: (() -&gt; Unit)? = null )</ID>
@@ -336,64 +332,14 @@
     <ID>MatchingDeclarationName:WorkoutsScreen.kt$WorkoutsScreenActions</ID>
     <ID>MaxLineLength:CalculateNextExerciseWeightUseCaseTest.kt$CalculateNextExerciseWeightUseCaseTest$// Barbell target 100 x 10 x 3, actual all 100 x 15 → capped rep ratio 1.25, average 125, +10 = 135, rounded nearest 10 = 140.</ID>
     <ID>MaxLineLength:Exercise.kt$Exercise$"Exercise '$name' has invalid setIndex=$setIndex, sets=$sets, setsList.size=${setsList.size}, reps=$reps, weight=$weight, equipment=$equipment"</ID>
-    <ID>MaxLineLength:ExerciseEntryScreen.kt$.</ID>
-    <ID>MaxLineLength:ExerciseEntryScreen.kt$Text("+", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)</ID>
-    <ID>MaxLineLength:ExerciseEntryScreen.kt$Text("-", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)</ID>
-    <ID>MaxLineLength:ExercisesEntryViewModel.kt$ExercisesEntryViewModel$val (minWeight, _) = getEquipmentConfig(_state.value.exerciseInputs.getOrNull(index)?.selectedEquipment ?: ExerciseConst.BARBELL)</ID>
-    <ID>MaxLineLength:ExercisesEntryViewModel.kt$ExercisesEntryViewModel$val newEnteredCount = if (wasEntered) currentState.enteredExerciseCount - 1 else currentState.enteredExerciseCount</ID>
-    <ID>MaxLineLength:FirebaseLoginRepository.kt$FirebaseLoginRepository$if (continuation.isActive) continuation.resume(Result.failure(task.exception ?: Exception("Authentication failed")))</ID>
-    <ID>MaxLineLength:FirebaseLoginRepository.kt$FirebaseLoginRepository$if (continuation.isActive) continuation.resume(Result.failure(task.exception ?: Exception("Registration failed")))</ID>
-    <ID>MaxLineLength:GainzTabRow.kt$.</ID>
-    <ID>MaxLineLength:HowToVideosActivity.kt$HowToVideosActivity$Snackbar.make(v, event.message.asString(this@HowToVideosActivity), Snackbar.LENGTH_LONG).show()</ID>
-    <ID>MaxLineLength:HowToVideosScreen.kt$HowToVideoUiItem("1", "This is an extremely long title that should wrap to the next line or be handled gracefully in the UI without cutting off awkwardly.")</ID>
-    <ID>MaxLineLength:LoginActivity.kt$LoginActivity$if</ID>
-    <ID>MaxLineLength:MainTopBar.kt$keyboardActions = KeyboardActions(onSearch = { /* just dismiss keyboard or do nothing since filter is reactive */ })</ID>
-    <ID>MaxLineLength:RoomWorkoutRepository.kt$RoomWorkoutRepository$override suspend</ID>
-    <ID>MaxLineLength:SharedPreferencesSessionRepository.kt$SharedPreferencesSessionRepository$override suspend</ID>
-    <ID>MaxLineLength:StartWorkoutViewModelTest.kt$StartWorkoutViewModelTest$assertEquals(listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES), state.availableTabs)</ID>
     <ID>MaxLineLength:WorkoutController.kt$WorkoutController$"Exercise '${exercise.name}' has no sets. Cannot start workout. sets=${exercise.sets}, reps=${exercise.reps}, weight=${exercise.weight}, equipment=${exercise.equipment}"</ID>
-    <ID>MaxLineLength:WorkoutController.kt$WorkoutController$return (currMains!!.indexOf(currExercise) + 1).also { currMainInd = it - 1; /* Match Java side effect logic */ }</ID>
-    <ID>MaxLineLength:WorkoutFragment.kt$WorkoutFragment$is WorkoutController.WorkoutControllerEvent.UpdateProgressSets -&gt; updateProgressSets(event.numSets)</ID>
-    <ID>MaxLineLength:WorkoutFragment.kt$WorkoutFragment$setProgress = setProgress?.toProgressUiItems(updateEx?.getNumSets() ?: workoutController.currNumSets) ?: emptyList()</ID>
     <ID>MaxLineLength:WorkoutHelper.kt$WorkoutHelper.Companion$"$TABLE_SESSIONS ($TIMESTAMP integer not null, $WORKOUT_NAME text not null, $EXERCISE_NAME text not null, $SETS blob not null, PRIMARY KEY ($TIMESTAMP))"</ID>
-    <ID>MaxLineLength:WorkoutScreen.kt$drawRect(color = Color.Black, topLeft = Offset(startX, startY), size = Size(PLATE_WIDTH, r), style = Stroke(width = 2f))</ID>
-    <ID>MaxLineLength:WorkoutScreen.kt$keyboardOptions = KeyboardOptions(keyboardType = if (state.isDecimal) KeyboardType.Decimal else KeyboardType.Number)</ID>
     <ID>MayBeConst:WorkoutEntryScreen.kt$private val TextShadowBlurLarge = 5f</ID>
     <ID>MayBeConst:WorkoutEntryScreen.kt$private val TextShadowBlurSmall = 2f</ID>
     <ID>MayBeConst:WorkoutEntryScreen.kt$private val TextShadowOffset = 1f</ID>
-    <ID>ModifierClickableOrder:WorkoutScreen.kt$clickable(onClick = onClick)</ID>
-    <ID>ModifierMissing:ExercisesEntryActivity.kt$ExEntryFragmentContainer</ID>
-    <ID>ModifierMissing:ExercisesEntryScreen.kt$ExercisesEntryScreen</ID>
-    <ID>ModifierMissing:GainzTopBar.kt$GainzTopBar</ID>
-    <ID>ModifierMissing:HowToVideosScreen.kt$VideoItemRow</ID>
-    <ID>ModifierMissing:HowToVideosTopBar.kt$HowToVideosTopBar</ID>
-    <ID>ModifierMissing:LoginScreen.kt$LoginScreen</ID>
-    <ID>ModifierMissing:MainScreen.kt$MainScreen</ID>
-    <ID>ModifierMissing:MainTopBar.kt$MainTopBar</ID>
-    <ID>ModifierMissing:SettingsScreen.kt$SettingsScreen</ID>
-    <ID>ModifierMissing:SharedWorkoutList.kt$SharedWorkoutList</ID>
-    <ID>ModifierMissing:StartWorkoutScreen.kt$StartWorkoutScreen</ID>
-    <ID>ModifierMissing:StartWorkoutScreen.kt$WorkoutFragmentContainer</ID>
-    <ID>ModifierMissing:SummaryScreen.kt$SummaryScreenContent</ID>
-    <ID>ModifierMissing:SummaryScreen.kt$SummaryToolbar</ID>
-    <ID>ModifierMissing:WarmupsListScreen.kt$WarmupsListScreen</ID>
-    <ID>ModifierMissing:WorkoutEntryScreen.kt$CustomToolbar</ID>
-    <ID>ModifierMissing:WorkoutEntryScreen.kt$WorkoutEntryScreen</ID>
-    <ID>ModifierNotUsedAtRoot:ExerciseEntryScreen.kt$modifier = modifier .fillMaxWidth() .padding(RowPadding)</ID>
-    <ID>MultipleEmitters:LoginScreen.kt$LoginInputFieldsSection</ID>
     <ID>NestedBlockDepth:EquipmentView.kt$EquipmentView$fun setup(weight: Float, equipment: String?)</ID>
     <ID>NestedBlockDepth:Misc.kt$Misc$@JvmStatic fun extractSession(sessionShot: DataSnapshot): Session?</ID>
     <ID>NestedBlockDepth:YoutubeHowToVideosRepository.kt$YoutubeHowToVideosRepository$private fun parseYouTubeResponse(jsonString: String): List&lt;HowToVideo&gt;</ID>
-    <ID>NewLineAtEndOfFile:CalculateNextExerciseWeightUseCase.kt$ca.gainzassist.domain.usecase.workout.CalculateNextExerciseWeightUseCase.kt</ID>
-    <ID>NewLineAtEndOfFile:EquipmentView.kt$ca.gainzassist.feature.start_workout.presentation.component.EquipmentView.kt</ID>
-    <ID>NewLineAtEndOfFile:ExerciseEntryFragment.kt$ca.gainzassist.feature.exercises_entry.presentation.screen.ExerciseEntryFragment.kt</ID>
-    <ID>NewLineAtEndOfFile:MainActivity.kt$ca.gainzassist.feature.main.presentation.screen.MainActivity.kt</ID>
-    <ID>NewLineAtEndOfFile:MainTab.kt$ca.gainzassist.feature.main.presentation.screen.MainTab.kt</ID>
-    <ID>NewLineAtEndOfFile:ProgressStatus.kt$ca.gainzassist.ui.ProgressStatus.kt</ID>
-    <ID>NewLineAtEndOfFile:StartWorkoutTab.kt$ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutTab.kt</ID>
-    <ID>NewLineAtEndOfFile:WarmupsListScreen.kt$ca.gainzassist.feature.start_workout.presentation.screen.WarmupsListScreen.kt</ID>
-    <ID>NewLineAtEndOfFile:WorkoutEntryActivity.kt$ca.gainzassist.feature.workout_entry.presentation.screen.WorkoutEntryActivity.kt</ID>
-    <ID>NewLineAtEndOfFile:WorkoutScreenState.kt$ca.gainzassist.feature.start_workout.presentation.state.WorkoutScreenState.kt</ID>
     <ID>PackageNaming:BuildExerciseUseCase.kt$package ca.gainzassist.feature.exercises_entry.domain.usecase</ID>
     <ID>PackageNaming:BuildWorkoutFromExerciseEntriesUseCase.kt$package ca.gainzassist.feature.exercises_entry.domain.usecase</ID>
     <ID>PackageNaming:CheckDuplicateExerciseUseCase.kt$package ca.gainzassist.feature.exercises_entry.domain.usecase</ID>
@@ -438,62 +384,6 @@
     <ID>PackageNaming:WorkoutScreenViewModel.kt$package ca.gainzassist.feature.start_workout.presentation.viewmodel</ID>
     <ID>PackageNaming:WorkoutScreenViewModelTest.kt$package ca.gainzassist.feature.start_workout.presentation.viewmodel</ID>
     <ID>PackageNaming:YoutubeHowToVideosRepository.kt$package ca.gainzassist.feature.how_to_videos.data.repository</ID>
-    <ID>ParameterNaming:ExercisesEntryScreen.kt$onTabSelected</ID>
-    <ID>ParameterNaming:GainzDropdown.kt$onOptionSelected</ID>
-    <ID>ParameterNaming:StartWorkoutScreen.kt$onTabSelected</ID>
-    <ID>ParameterNaming:WorkoutEntryScreen.kt$onWorkoutNameChanged</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewDeleteHidden</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewDumbbell</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewDuplicateExerciseError</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewExistingExerciseUpdateMode</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewFontScaleLarge</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewLandscape</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewLargePhone412x915</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewLongExerciseName</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewMinWeightMinusHidden</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewNarrowWidth</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewNewExerciseDefaultBarbell</ID>
-    <ID>PreviewPublic:ExerciseEntryScreen.kt$ExEntryScreenPreviewSmallPhone360x800</ID>
-    <ID>PreviewPublic:ExercisesEntryScreen.kt$ExercisesEntryScreenPreviewLargeFont</ID>
-    <ID>PreviewPublic:ExercisesEntryScreen.kt$ExercisesEntryScreenPreviewMultipleExercises</ID>
-    <ID>PreviewPublic:ExercisesEntryScreen.kt$ExercisesEntryScreenPreviewOneExercise</ID>
-    <ID>PreviewPublic:ExercisesEntryScreen.kt$ExercisesEntryScreenPreviewSelectedLastExercise</ID>
-    <ID>PreviewPublic:ExercisesEntryScreen.kt$ExercisesEntryScreenPreviewSmallPhone</ID>
-    <ID>PreviewPublic:ExercisesEntryScreen.kt$ExercisesEntryScreenPreviewWithPlusTab</ID>
-    <ID>PreviewPublic:GainzDropdown.kt$GainzDropdownPreviewBarbell</ID>
-    <ID>PreviewPublic:GainzDropdown.kt$GainzDropdownPreviewDumbbell</ID>
-    <ID>PreviewPublic:GainzDropdown.kt$GainzDropdownPreviewNA</ID>
-    <ID>PreviewPublic:GainzDropdown.kt$GainzDropdownPreviewNarrowWidth</ID>
-    <ID>PreviewPublic:GainzOutlinedTextField.kt$GainzOutlinedTextFieldEmptyPreview</ID>
-    <ID>PreviewPublic:GainzOutlinedTextField.kt$GainzOutlinedTextFieldPreview</ID>
-    <ID>PreviewPublic:GainzTopBar.kt$GainzTopBarPreviewLongTitle</ID>
-    <ID>PreviewPublic:GainzTopBar.kt$GainzTopBarPreviewTitleOnly</ID>
-    <ID>PreviewPublic:GainzTopBar.kt$GainzTopBarPreviewWithBack</ID>
-    <ID>PreviewPublic:HowToVideosTopBar.kt$HowToVideosTopBarLongTitle</ID>
-    <ID>PreviewPublic:HowToVideosTopBar.kt$HowToVideosTopBarNormal</ID>
-    <ID>PreviewPublic:HowToVideosTopBar.kt$HowToVideosTopBarSearchExpanded</ID>
-    <ID>PreviewPublic:LoginScreen.kt$LoginScreenLoadingPreview</ID>
-    <ID>PreviewPublic:LoginScreen.kt$LoginScreenPreview</ID>
-    <ID>PreviewPublic:LoginScreen.kt$LoginScreenSignUpModePreview</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewEmpty</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewLargeFont</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewResume</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewSettings</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewSmallPhone</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewWorkoutDialog</ID>
-    <ID>PreviewPublic:MainScreen.kt$MainScreenPreviewWorkouts</ID>
-    <ID>PreviewPublic:ResumeScreen.kt$ResumeScreenPreviewEmpty</ID>
-    <ID>PreviewPublic:ResumeScreen.kt$ResumeScreenPreviewFontScaleLarge</ID>
-    <ID>PreviewPublic:ResumeScreen.kt$ResumeScreenPreviewMultipleWorkouts</ID>
-    <ID>PreviewPublic:ResumeScreen.kt$ResumeScreenPreviewOneWorkout</ID>
-    <ID>PreviewPublic:ResumeScreen.kt$ResumeScreenPreviewSmallPhone360x800</ID>
-    <ID>PreviewPublic:SettingsScreen.kt$SettingsScreenPreviewEmailUnavailable</ID>
-    <ID>PreviewPublic:SettingsScreen.kt$SettingsScreenPreviewLargeFont</ID>
-    <ID>PreviewPublic:SettingsScreen.kt$SettingsScreenPreviewSignedIn</ID>
-    <ID>PreviewPublic:SettingsScreen.kt$SettingsScreenPreviewSmallPhone</ID>
-    <ID>PreviewPublic:WorkoutsScreen.kt$WorkoutsScreenDialogPreview</ID>
-    <ID>PreviewPublic:WorkoutsScreen.kt$WorkoutsScreenEmptyPreview</ID>
-    <ID>PreviewPublic:WorkoutsScreen.kt$WorkoutsScreenPopulatedPreview</ID>
     <ID>PrintStackTrace:LoginActivity.kt$LoginActivity$ioe</ID>
     <ID>PrintStackTrace:Misc.kt$Misc$e</ID>
     <ID>PrintStackTrace:Misc.kt$Misc$ioe</ID>
