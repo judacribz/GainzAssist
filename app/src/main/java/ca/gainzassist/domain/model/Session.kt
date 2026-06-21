@@ -70,12 +70,6 @@ class Session {
         this.avgWeights.put(exercise.exerciseNumber, weight)
     }
 
-    fun remLastExercise() {
-        if (sessionExs.isNotEmpty()) {
-            this.sessionExs.removeAt(this.sessionExs.size - 1)
-        }
-    }
-
     fun toMap(): Map<String, Any?> {
         val exsMap = HashMap<String, Any?>()
         val sessionMap = HashMap<String, Any?>()

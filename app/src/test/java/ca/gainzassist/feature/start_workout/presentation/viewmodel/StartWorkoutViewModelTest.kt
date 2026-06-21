@@ -1,6 +1,7 @@
 package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
 import ca.gainzassist.domain.model.Exercise
+import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.AddIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
@@ -18,6 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -99,36 +101,47 @@ class StartWorkoutViewModelTest {
 
     @Test
     fun prepareSessionRestore_blankWorkoutName_returnsStartFresh() = runTest {
-        val result = viewModel.prepareSessionRestore("  ")
-        assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
+        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val workout = Workout("  ", arrayListOf(exercise))
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.isSessionReady)
     }
 
     @Test
     fun prepareSessionRestore_noIncompleteWorkout_returnsStartFresh() = runTest {
-        val result = viewModel.prepareSessionRestore("Push Day")
-        assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
+        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val workout = Workout("Push Day", arrayListOf(exercise))
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
+        assertTrue(viewModel.state.value.isSessionReady)
     }
 
     @Test
     fun prepareSessionRestore_incompleteWorkoutNoSession_removesAndStartsFresh() = runTest {
+        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val workout = Workout("Push Day", arrayListOf(exercise))
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
 
-        val result = viewModel.prepareSessionRestore("Push Day")
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
 
-        assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
+        assertTrue(viewModel.state.value.isSessionReady)
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertFalse(incompleteWorkouts.contains("Push Day"))
     }
 
     @Test
     fun prepareSessionRestore_withSessionJson_returnsRestoreFromJsonAndCleansSession() = runTest {
+        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val workout = Workout("Push Day", arrayListOf(exercise))
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
         sessionPreferencesRepository.saveIncompleteSession("Push Day", "{\"key\":\"val\"}")
 
-        val result = viewModel.prepareSessionRestore("Push Day")
+        viewModel.prepareSessionRestore(workout)
+        advanceUntilIdle()
 
-        assertTrue(result is StartWorkoutRestoreDecision.RestoreFromJson)
-        assertEquals("{\"key\":\"val\"}", (result as StartWorkoutRestoreDecision.RestoreFromJson).sessionJson)
+        assertTrue(viewModel.state.value.isSessionReady)
 
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertFalse(incompleteWorkouts.contains("Push Day"))

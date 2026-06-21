@@ -61,8 +61,11 @@ class WorkoutScreenViewModelTest {
 
     @Test
     fun getSessionProgress_returnsNullWhenNoProgressSaved() = runTest {
-        val progress = viewModel.getSessionProgress("My Workout")
-        assertNull(progress)
+        var loadedSnapshot: SessionProgressSnapshot? = SessionProgressSnapshot(emptyMap(), emptyMap())
+        viewModel.getSessionProgress("My Workout") {
+            loadedSnapshot = it
+        }
+        assertNull(loadedSnapshot)
     }
 
     @Test
@@ -92,7 +95,12 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        
+        var loadedSnapshotNullable: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress(workoutName) {
+            loadedSnapshotNullable = it
+        }
+        
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)
@@ -105,7 +113,11 @@ class WorkoutScreenViewModelTest {
         // Force invalid JSON string using the repository directly
         sessionPreferencesRepository.saveSessionProgress(workoutName, "invalid json string")
 
-        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        var loadedSnapshotNullable: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress(workoutName) {
+            loadedSnapshotNullable = it
+        }
+        
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         // Misc.readValue catches the exception and returns an empty map.
@@ -123,7 +135,12 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Null Test"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
+        
+        var loadedSnapshotNullable: SessionProgressSnapshot? = null
+        viewModel.getSessionProgress(workoutName) {
+            loadedSnapshotNullable = it
+        }
+        
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import ca.gainzassist.R
 import ca.gainzassist.core.constants.AccountConst.EMAIL
+import ca.gainzassist.core.constants.AccountConst.UID
 import ca.gainzassist.core.constants.ExerciseConst.INCOMPLETE_WORKOUTS
 import ca.gainzassist.core.constants.ExerciseConst.WORKOUT_EX_IND
 import ca.gainzassist.core.constants.ExerciseConst.WORKOUT_PROGRESS
@@ -19,6 +20,7 @@ object Preferences {
     fun setUserInfoPref(context: Context, email: String?, uid: String?) {
         getSharedPref(context, R.string.file_user_info).edit {
             putString(EMAIL, email)
+            putString(UID, uid)
         }
     }
 
