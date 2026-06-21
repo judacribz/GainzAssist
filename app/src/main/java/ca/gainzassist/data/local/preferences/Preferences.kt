@@ -13,9 +13,7 @@ import ca.gainzassist.core.constants.ExerciseConst.WORKOUT_PROGRESS
 object Preferences {
 
     @JvmStatic
-    fun getEmailPref(context: Context): String? {
-        return getSharedPref(context, R.string.file_user_info).getString(EMAIL, null)
-    }
+    fun getEmailPref(context: Context): String? = getSharedPref(context, R.string.file_user_info).getString(EMAIL, null)
 
     @JvmStatic
     fun setUserInfoPref(context: Context, email: String?, uid: String?) {
@@ -42,12 +40,10 @@ object Preferences {
     }
 
     @JvmStatic
-    fun getThemePref(context: Activity): String? {
-        return getSharedPref(
-            context,
-            R.string.file_settings_info
-        ).getString("THEME", null)
-    }
+    fun getThemePref(context: Activity): String? = getSharedPref(
+        context,
+        R.string.file_settings_info
+    ).getString("THEME", null)
 
     private fun addIncompleteWorkoutPref(context: Context, incompleteWorkouts: Set<String>) {
         getSharedPref(context, R.string.file_workout_info).edit {
@@ -56,12 +52,10 @@ object Preferences {
     }
 
     @JvmStatic
-    fun getIncompleteWorkouts(context: Context): MutableSet<String>? {
-        return getSharedPref(
-            context,
-            R.string.file_workout_info
-        ).getStringSet(INCOMPLETE_WORKOUTS, null)
-    }
+    fun getIncompleteWorkouts(context: Context): MutableSet<String>? = getSharedPref(
+        context,
+        R.string.file_workout_info
+    ).getStringSet(INCOMPLETE_WORKOUTS, null)
 
     @JvmStatic
     fun removeIncompleteWorkoutPref(context: Context, workoutName: String): Boolean {
@@ -85,12 +79,10 @@ object Preferences {
     }
 
     @JvmStatic
-    fun getIncompleteSessionPref(context: Context, workoutName: String): String? {
-        return getSharedPref(
-            context,
-            R.string.file_workout_info
-        ).getString(String.format(WORKOUT_EX_IND, workoutName), null)
-    }
+    fun getIncompleteSessionPref(context: Context, workoutName: String): String? = getSharedPref(
+        context,
+        R.string.file_workout_info
+    ).getString(String.format(WORKOUT_EX_IND, workoutName), null)
 
     @JvmStatic
     fun removeIncompleteSessionPref(context: Context, workoutName: String) {
@@ -107,12 +99,10 @@ object Preferences {
     }
 
     @JvmStatic
-    fun getSessionProgressPref(context: Context?, workoutName: String): String? {
-        return getSharedPref(
-            context!!,
-            R.string.file_workout_info
-        ).getString(String.format(WORKOUT_PROGRESS, workoutName), null)
-    }
+    fun getSessionProgressPref(context: Context?, workoutName: String): String? = getSharedPref(
+        context!!,
+        R.string.file_workout_info
+    ).getString(String.format(WORKOUT_PROGRESS, workoutName), null)
 
     @JvmStatic
     fun removeSessionProgressPref(context: Context?, workoutName: String) {
@@ -122,10 +112,8 @@ object Preferences {
     }
 
     @JvmStatic
-    fun getSharedPref(context: Context, fileId: Int): SharedPreferences {
-        return context.getSharedPreferences(
-            context.getString(fileId),
-            Context.MODE_PRIVATE
-        )
-    }
+    fun getSharedPref(context: Context, fileId: Int): SharedPreferences = context.getSharedPreferences(
+        context.getString(fileId),
+        Context.MODE_PRIVATE
+    )
 }

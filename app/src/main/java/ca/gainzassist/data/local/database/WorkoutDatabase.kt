@@ -32,13 +32,11 @@ abstract class WorkoutDatabase : RoomDatabase() {
         }
 
         @JvmStatic
-        fun getDatabase(context: Context): WorkoutDatabase {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: getDatabaseBuilder(context)
-                    .addCallback(sRoomDatabaseCallback)
-                    .build()
-                    .also { INSTANCE = it }
-            }
+        fun getDatabase(context: Context): WorkoutDatabase = INSTANCE ?: synchronized(this) {
+            INSTANCE ?: getDatabaseBuilder(context)
+                .addCallback(sRoomDatabaseCallback)
+                .build()
+                .also { INSTANCE = it }
         }
 
         private fun getDatabaseBuilder(context: Context) = Room.databaseBuilder(

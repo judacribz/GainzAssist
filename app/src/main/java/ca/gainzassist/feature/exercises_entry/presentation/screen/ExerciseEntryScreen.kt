@@ -224,7 +224,13 @@ fun ExEntryScreen(
                                 .clickable { actions.onDecrement() },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("-", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)
+                            Text(
+                                "-",
+                                color = colorText,
+                                fontSize = PlusMinusFontSize,
+                                fontFamily = staatliches,
+                                textAlign = TextAlign.Center
+                            )
                         }
                     } else {
                         Spacer(modifier = Modifier.weight(WeightButton))
@@ -257,7 +263,13 @@ fun ExEntryScreen(
                             .clickable(onClick = actions::onIncrement::invoke),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("+", color = colorText, fontSize = PlusMinusFontSize, fontFamily = staatliches, textAlign = TextAlign.Center)
+                        Text(
+                            "+",
+                            color = colorText,
+                            fontSize = PlusMinusFontSize,
+                            fontFamily = staatliches,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
@@ -311,7 +323,12 @@ fun ExEntryScreen(
             modifier = Modifier
                 .weight(WeightFooter)
                 .fillMaxWidth()
-                .padding(top = FooterTopPadding, bottom = FooterBottomPadding, start = FooterHorizontalPadding, end = FooterHorizontalPadding),
+                .padding(
+                    top = FooterTopPadding,
+                    bottom = FooterBottomPadding,
+                    start = FooterHorizontalPadding,
+                    end = FooterHorizontalPadding
+                ),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {

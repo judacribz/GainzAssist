@@ -45,9 +45,7 @@ class Workout : Parcelable {
         }
     }
 
-    fun getExerciseFromIndex(exIndex: Int): Exercise {
-        return exercises[exIndex]
-    }
+    fun getExerciseFromIndex(exIndex: Int): Exercise = exercises[exIndex]
 
     fun toMap(): Map<String, Any?> {
         val workout = HashMap<String, Any?>()

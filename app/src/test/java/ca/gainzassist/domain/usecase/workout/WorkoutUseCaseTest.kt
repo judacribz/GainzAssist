@@ -73,10 +73,10 @@ class WorkoutUseCaseTest {
     fun `saveWorkoutUseCase updates existing workout`() = runTest {
         val workout = Workout("Leg Day", null)
         addWorkoutUseCase(workout)
-        
+
         val retrieved = assertNotNullValue(getWorkoutByNameUseCase("Leg Day"))
         retrieved.name = "Leg Day Updated"
-        
+
         saveWorkoutUseCase(retrieved, isUpdate = true)
 
         assertNull(getWorkoutByNameUseCase("Leg Day"))
@@ -87,10 +87,10 @@ class WorkoutUseCaseTest {
     fun `updateWorkoutUseCase updates workout`() = runTest {
         val workout = Workout("Yoga", null)
         addWorkoutUseCase(workout)
-        
+
         val retrieved = assertNotNullValue(getWorkoutByNameUseCase("Yoga"))
         retrieved.name = "Advanced Yoga"
-        
+
         updateWorkoutUseCase(retrieved)
 
         assertEquals("Advanced Yoga", getWorkoutByNameUseCase("Advanced Yoga")?.name)
@@ -100,7 +100,7 @@ class WorkoutUseCaseTest {
     fun `deleteWorkoutUseCase removes workout by name`() = runTest {
         val workout = Workout("Short Workout", null)
         addWorkoutUseCase(workout)
-        
+
         deleteWorkoutUseCase("Short Workout")
 
         assertNull(getWorkoutByNameUseCase("Short Workout"))
@@ -110,11 +110,11 @@ class WorkoutUseCaseTest {
     fun `deleteAllWorkoutsUseCase clears repository`() = runTest {
         addWorkoutUseCase(Workout("W1", null))
         addWorkoutUseCase(Workout("W2", null))
-        
+
         assertEquals(2, observeWorkoutsUseCase().first().size)
-        
+
         deleteAllWorkoutsUseCase()
-        
+
         assertEquals(0, observeWorkoutsUseCase().first().size)
     }
 
@@ -123,13 +123,13 @@ class WorkoutUseCaseTest {
         val workout = Workout("Full Body", null)
         addWorkoutUseCase(workout)
         val savedWorkout = assertNotNullValue(getWorkoutByNameUseCase("Full Body"))
-        
+
         val exercise = Exercise().apply {
             name = "Squat"
             workoutId = savedWorkout.id
         }
         repository.insertExercise(exercise)
-        
+
         val retrieved = getWorkoutWithExercisesByNameUseCase("Full Body")
         assertNotNull(retrieved)
         assertEquals(1, retrieved?.exercises?.size)
@@ -141,11 +141,20 @@ class WorkoutUseCaseTest {
         val workout = Workout("W1", null)
         addWorkoutUseCase(workout)
         val savedWorkout = assertNotNullValue(getWorkoutByNameUseCase("W1"))
-        
-        repository.insertExercise(Exercise().apply { name = "Pushup"; workoutId = savedWorkout.id })
-        repository.insertExercise(Exercise().apply { name = "Pushup"; workoutId = savedWorkout.id })
-        repository.insertExercise(Exercise().apply { name = "Pullup"; workoutId = savedWorkout.id })
-        
+
+        repository.insertExercise(Exercise().apply {
+            name = "Pushup"
+            workoutId = savedWorkout.id
+        })
+        repository.insertExercise(Exercise().apply {
+            name = "Pushup"
+            workoutId = savedWorkout.id
+        })
+        repository.insertExercise(Exercise().apply {
+            name = "Pullup"
+            workoutId = savedWorkout.id
+        })
+
         val names = observeUniqueExerciseNamesUseCase().first()
         assertEquals(2, names.size)
         assertTrue(names.contains("Pushup"))
@@ -155,7 +164,7 @@ class WorkoutUseCaseTest {
     @Test
     fun `exerciseExistsUseCase validates names correctly`() {
         val existing = listOf("Bench Press", "Squat")
-        
+
         assertTrue(exerciseExistsUseCase(existing, "Bench Press"))
         assertTrue(exerciseExistsUseCase(existing, "bench press "))
         assertTrue(exerciseExistsUseCase(existing, "SQUAT"))

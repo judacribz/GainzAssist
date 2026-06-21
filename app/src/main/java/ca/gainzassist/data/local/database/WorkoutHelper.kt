@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.model.Workout
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -33,17 +32,14 @@ class WorkoutHelper(private val context: Context) :
         db.execSQL(CREATE_STATEMENT_SESSIONS)
     }
 
-    private fun getBlobFromExercises(exercises: ArrayList<Exercise>): ByteArray {
-        return gson.toJson(exercises).toByteArray()
-    }
+    private fun getBlobFromExercises(exercises: ArrayList<Exercise>): ByteArray = gson.toJson(exercises).toByteArray()
 
-    private fun getExercisesFromBlob(blob: ByteArray): ArrayList<Exercise> {
-        return gson.fromJson(String(blob), object : TypeToken<ArrayList<Exercise>>() {}.type)
-    }
+    private fun getExercisesFromBlob(blob: ByteArray): ArrayList<Exercise> = gson.fromJson(
+        String(blob),
+        object : TypeToken<ArrayList<Exercise>>() {}.type
+    )
 
-    fun exists(): Boolean {
-        return File(context.getDatabasePath(TABLE_WORKOUTS).toString()).exists()
-    }
+    fun exists(): Boolean = File(context.getDatabasePath(TABLE_WORKOUTS).toString()).exists()
 
     fun addWorkout(workout: Workout) {
         db = this.writableDatabase

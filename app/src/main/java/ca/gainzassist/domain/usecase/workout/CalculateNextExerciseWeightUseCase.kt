@@ -21,15 +21,12 @@ class CalculateNextExerciseWeightUseCase {
         if (
             targetWeight <= 0f ||
             targetReps <= 0 ||
-            expectedSets <= 0 ||
-            increment <= 0f
+            expectedSets <= 0
         ) {
             return max(minWeight, targetWeight)
         }
 
         val completedSets = finishedSets.take(expectedSets)
-
-
 
         val totalEquivalentWeight = completedSets.sumOf { set ->
             val repRatio = (set.reps.toFloat() / targetReps.toFloat())

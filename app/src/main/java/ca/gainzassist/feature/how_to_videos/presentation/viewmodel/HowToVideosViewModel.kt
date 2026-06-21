@@ -84,7 +84,9 @@ class HowToVideosViewModel(
                     videos = cached,
                     message = if (cached.isEmpty()) {
                         UiText.StringResource(R.string.msg_no_video_results)
-                    } else null
+                    } else {
+                        null
+                    }
                 )
             }
             return true
@@ -108,7 +110,9 @@ class HowToVideosViewModel(
                         isLoading = false,
                         message = if (uiItems.isEmpty()) {
                             UiText.StringResource(R.string.msg_no_video_results)
-                        } else null
+                        } else {
+                            null
+                        }
                     )
                 }
             } catch (e: Exception) {
@@ -123,8 +127,11 @@ class HowToVideosViewModel(
 
     private suspend fun handleSearchError(e: Exception) {
         val errorMsg = e.message.orEmpty()
-        val uiText = if (e.message != null) UiText.DynamicString(errorMsg)
-        else UiText.StringResource(R.string.err_youtube_load_failed)
+        val uiText = if (e.message != null) {
+            UiText.DynamicString(errorMsg)
+        } else {
+            UiText.StringResource(R.string.err_youtube_load_failed)
+        }
         _state.update {
             it.copy(
                 isLoading = false,

@@ -63,9 +63,9 @@ class StartWorkoutViewModelTest {
         val exercise = Exercise()
         exercise.name = "Squat"
         val workout = Workout("Leg Day", arrayListOf(exercise))
-        
+
         viewModel.initializeFromWorkout(workout)
-        
+
         val state = viewModel.state.value
         assertEquals("Leg Day", state.workoutName)
         assertEquals(StartWorkoutTab.WORKOUT, state.selectedTab)
@@ -89,7 +89,10 @@ class StartWorkoutViewModelTest {
         val warmups = listOf(stretching)
         viewModel.onWarmupsGenerated(warmups)
         val state = viewModel.state.value
-        assertEquals(listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES), state.availableTabs)
+        assertEquals(
+            listOf(StartWorkoutTab.WARMUPS, StartWorkoutTab.WORKOUT, StartWorkoutTab.EXERCISES),
+            state.availableTabs
+        )
         assertEquals(StartWorkoutTab.WORKOUT, state.selectedTab)
         assertEquals(warmups, state.warmups)
     }
@@ -109,9 +112,9 @@ class StartWorkoutViewModelTest {
     @Test
     fun prepareSessionRestore_incompleteWorkoutNoSession_removesAndStartsFresh() = runTest {
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
-        
+
         val result = viewModel.prepareSessionRestore("Push Day")
-        
+
         assertTrue(result is StartWorkoutRestoreDecision.StartFresh)
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertFalse(incompleteWorkouts.contains("Push Day"))
@@ -121,15 +124,15 @@ class StartWorkoutViewModelTest {
     fun prepareSessionRestore_withSessionJson_returnsRestoreFromJsonAndCleansSession() = runTest {
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
         sessionPreferencesRepository.saveIncompleteSession("Push Day", "{\"key\":\"val\"}")
-        
+
         val result = viewModel.prepareSessionRestore("Push Day")
-        
+
         assertTrue(result is StartWorkoutRestoreDecision.RestoreFromJson)
         assertEquals("{\"key\":\"val\"}", (result as StartWorkoutRestoreDecision.RestoreFromJson).sessionJson)
-        
+
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertFalse(incompleteWorkouts.contains("Push Day"))
-        
+
         val savedSession = sessionPreferencesRepository.getIncompleteSession("Push Day")
         assertEquals(null, savedSession)
     }
@@ -137,10 +140,10 @@ class StartWorkoutViewModelTest {
     @Test
     fun saveLeavingSession_nonEmptyJson_savesSessionAndIncompleteWorkout() = runTest {
         viewModel.saveLeavingSession("Push Day", "{\"key\":\"val\"}")
-        
+
         val savedSession = sessionPreferencesRepository.getIncompleteSession("Push Day")
         assertEquals("{\"key\":\"val\"}", savedSession)
-        
+
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertTrue(incompleteWorkouts.contains("Push Day"))
     }
@@ -148,10 +151,10 @@ class StartWorkoutViewModelTest {
     @Test
     fun saveLeavingSession_emptyJson_addsIncompleteWorkoutOnly() = runTest {
         viewModel.saveLeavingSession("Push Day", "")
-        
+
         val savedSession = sessionPreferencesRepository.getIncompleteSession("Push Day")
         assertEquals(null, savedSession)
-        
+
         val incompleteWorkouts = sessionPreferencesRepository.getIncompleteWorkoutNames()
         assertTrue(incompleteWorkouts.contains("Push Day"))
     }
@@ -162,12 +165,12 @@ class StartWorkoutViewModelTest {
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
         }
-        
+
         viewModel.onHowToVideosClicked()
-        
+
         assertEquals(1, events.size)
         assertTrue(events[0] is StartWorkoutViewModelEvent.OpenHowToVideos)
-        
+
         job.cancel()
     }
 
@@ -177,12 +180,12 @@ class StartWorkoutViewModelTest {
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
         }
-        
+
         viewModel.onBackClicked()
-        
+
         assertEquals(1, events.size)
         assertTrue(events[0] is StartWorkoutViewModelEvent.ExitWorkout)
-        
+
         job.cancel()
     }
 
@@ -192,12 +195,12 @@ class StartWorkoutViewModelTest {
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
             viewModel.events.toList(events)
         }
-        
+
         viewModel.onFinishWorkoutClicked()
-        
+
         assertEquals(1, events.size)
         assertTrue(events[0] is StartWorkoutViewModelEvent.FinishWorkout)
-        
+
         job.cancel()
     }
 

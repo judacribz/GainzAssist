@@ -84,7 +84,8 @@ class Exercise : Parcelable {
     var finSets = ArrayList<ExerciseSet>()
 
     enum class SetsType {
-        WARMUP_SET, MAIN_SET
+        WARMUP_SET,
+        MAIN_SET
     }
 
     @Ignore

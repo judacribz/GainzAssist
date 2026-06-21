@@ -7,18 +7,14 @@ class FakeUserPreferencesRepository : UserPreferencesRepository {
     var currentUid: String? = null
     var currentTheme: String? = null
 
-    override suspend fun getEmail(): String? {
-        return currentEmail
-    }
+    override suspend fun getEmail(): String? = currentEmail
 
     override suspend fun setUserInfo(email: String?, uid: String?) {
         currentEmail = email
         currentUid = uid
     }
 
-    override suspend fun getTheme(): String? {
-        return currentTheme
-    }
+    override suspend fun getTheme(): String? = currentTheme
 
     override suspend fun setTheme(themeName: String?) {
         currentTheme = themeName

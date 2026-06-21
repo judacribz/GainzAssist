@@ -34,14 +34,14 @@ class YoutubeHowToVideosRepository(
 
         val encodedQuery = java.net.URLEncoder.encode(queryKey, "UTF-8")
         val urlString = "https://www.googleapis.com/youtube/v3/search" +
-                "?part=snippet" +
-                "&fields=items(id/videoId,snippet/title)" +
-                "&maxResults=10" +
-                "&q=$encodedQuery" +
-                "&type=video" +
-                "&videoEmbeddable=true" +
-                "&safeSearch=moderate" +
-                "&key=${BuildConfig.GOOGLE_API_KEY}"
+            "?part=snippet" +
+            "&fields=items(id/videoId,snippet/title)" +
+            "&maxResults=10" +
+            "&q=$encodedQuery" +
+            "&type=video" +
+            "&videoEmbeddable=true" +
+            "&safeSearch=moderate" +
+            "&key=${BuildConfig.GOOGLE_API_KEY}"
 
         val jsonResponse = fetchYouTubeResponse(urlString)
         parseYouTubeResponse(jsonResponse)

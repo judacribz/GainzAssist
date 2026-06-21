@@ -7,11 +7,9 @@ class BuildWorkoutFromExerciseEntriesUseCase {
     operator fun invoke(
         workoutName: String,
         exercises: List<Exercise>
-    ): Workout {
-        return Workout().apply {
-            this.id = -1
-            this.name = workoutName
-            this.exercises = ArrayList(exercises)
-        }
+    ): Workout = Workout().apply {
+        this.id = -1
+        this.name = workoutName
+        this.exercises = ArrayList(exercises)
     }
 }

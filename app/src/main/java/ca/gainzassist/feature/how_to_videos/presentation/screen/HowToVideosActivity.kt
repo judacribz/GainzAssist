@@ -60,8 +60,11 @@ class HowToVideosActivity : GainzBaseActivity() {
                 viewModel.events.collectLatest { event ->
                     when (event) {
                         is HowToVideosViewModelEvent.ShowMessage -> {
-                            val v = window.decorView.rootView
-                            Snackbar.make(v, event.message.asString(this@HowToVideosActivity), Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(
+                                window.decorView.rootView,
+                                event.message.asString(this@HowToVideosActivity),
+                                Snackbar.LENGTH_LONG
+                            ).show()
                         }
                     }
                 }

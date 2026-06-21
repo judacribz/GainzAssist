@@ -1,8 +1,5 @@
 package ca.gainzassist.core.util
 
-import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import ca.gainzassist.core.constants.ExerciseConst.EXERCISES
 import ca.gainzassist.core.constants.ExerciseConst.SET_LIST
 import ca.gainzassist.domain.model.Exercise
@@ -94,9 +91,7 @@ object Misc {
     }
 
     @JvmStatic
-    fun readValue(childObj: Any?): Map<String, Any?> {
-        return readValue(writeValueAsString(childObj))
-    }
+    fun readValue(childObj: Any?): Map<String, Any?> = readValue(writeValueAsString(childObj))
 
     @JvmStatic
     fun writeValueAsString(`object`: Any?): String {

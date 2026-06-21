@@ -77,7 +77,7 @@ class WorkoutScreenViewModelTest {
 
         val savedJsonNullable = sessionPreferencesRepository.getSessionProgress(workoutName)
         val savedJson = assertNotNullValue(savedJsonNullable)
-        
+
         // Assert it contains expected legacy keys
         assertTrue(savedJson.contains("\"exercise progress\""))
         assertTrue(savedJson.contains("\"set progress\""))
@@ -107,7 +107,7 @@ class WorkoutScreenViewModelTest {
 
         val loadedSnapshotNullable = viewModel.getSessionProgress(workoutName)
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
-        
+
         // Misc.readValue catches the exception and returns an empty map.
         // SessionProgressMapper.fromLegacyMap(emptyMap) should return empty snapshot.
         assertTrue(loadedSnapshot.exerciseProgress.isEmpty())

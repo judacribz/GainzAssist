@@ -37,9 +37,7 @@ class FakeWorkoutRepository : WorkoutRepository {
         list.mapNotNull { it.name }.distinct()
     }
 
-    override suspend fun getWorkoutByName(name: String): Workout? {
-        return workouts.value.find { it.name == name }
-    }
+    override suspend fun getWorkoutByName(name: String): Workout? = workouts.value.find { it.name == name }
 
     override suspend fun getWorkoutWithExercisesByName(name: String): Workout? {
         val workout = getWorkoutByName(name) ?: return null

@@ -5,7 +5,5 @@ import ca.gainzassist.domain.repository.UserPreferencesRepository
 class GetUserEmailUseCase(
     private val userPreferencesRepository: UserPreferencesRepository
 ) {
-    suspend operator fun invoke(): String? {
-        return userPreferencesRepository.getEmail()
-    }
+    suspend operator fun invoke(): String? = userPreferencesRepository.getEmail()
 }

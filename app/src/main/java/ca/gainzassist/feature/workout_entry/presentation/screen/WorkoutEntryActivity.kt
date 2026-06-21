@@ -7,11 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ca.gainzassist.activities.base.GainzBaseActivity
+import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.feature.exercises_entry.presentation.screen.ExercisesEntryActivity
 import ca.gainzassist.feature.workout_entry.presentation.viewmodel.WorkoutEntryViewModel
 import ca.gainzassist.feature.workout_entry.presentation.viewmodel.WorkoutEntryViewModelEvent
-import ca.gainzassist.activities.base.GainzBaseActivity
-import ca.gainzassist.core.constants.ExerciseConst
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.max
 

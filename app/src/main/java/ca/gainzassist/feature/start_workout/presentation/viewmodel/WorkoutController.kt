@@ -34,7 +34,7 @@ object WorkoutController {
     private var currWorkout: Workout? = null
     private var currExercise: Exercise? = null
     private var currExerciseSet: ExerciseSet? = null
-    
+
     var currWeight = 0f
         private set
     var currMinWeight = MIN_WEIGHT
@@ -43,10 +43,10 @@ object WorkoutController {
 
     private var setIndex = -1
     private var exIndex = -1
-    
+
     var currReps = 0
         private set
-        
+
     private var numWarmups = 0
     private var numMains = 0
     private var currWarmups: ArrayList<Exercise>? = null
@@ -54,12 +54,12 @@ object WorkoutController {
 
     var currRestTime: Long = 0
         private set
-        
+
     var lockReps = false
         private set
     var lockWeight = false
         private set
-        
+
     var currSession: Session? = null
         private set
 
@@ -86,7 +86,7 @@ object WorkoutController {
 
         val sessionRestored = readValue(map[SESSION])
         val exsMap = readValue(sessionRestored[EXERCISES])
-        
+
         for ((exNum, value) in exsMap) {
             val exMap = readValue(value)
             val exercise = workout.getExerciseFromIndex(exNum.toInt())
@@ -188,7 +188,7 @@ object WorkoutController {
 
         addBBIncrementSets(ex, exerciseSets, state, weight)
         addBBRefinementSets(ex, exerciseSets, state, weight)
-        
+
         return exerciseSets
     }
 
@@ -290,7 +290,7 @@ object WorkoutController {
     fun finishCurrSet(): Boolean {
         checkSetSuccess()
         this.setIndex++
-        
+
         if (!isWarmup) {
             addCurrSet()
         }
@@ -319,11 +319,11 @@ object WorkoutController {
         resetLocks()
         this.setIndex = 0
         this.exIndex++
-        
+
         if (!isWarmup) {
             this.currSession!!.addExercise(this.currExercise!!)
         }
-        
+
         if (atEndOfExercises()) {
             resetIndices()
             return false
@@ -359,13 +359,9 @@ object WorkoutController {
         this.currExercise!!.addSet(this.currExerciseSet!!, genId = true)
     }
 
-    fun atEndOfSets(): Boolean {
-        return this.setIndex >= this.currExercise!!.getNumSets()
-    }
+    fun atEndOfSets(): Boolean = this.setIndex >= this.currExercise!!.getNumSets()
 
-    private fun atEndOfExercises(): Boolean {
-        return this.exIndex >= this.currWorkout!!.numExercises
-    }
+    private fun atEndOfExercises(): Boolean = this.exIndex >= this.currWorkout!!.numExercises
 
     private fun setCurrExercise(exercise: Exercise) {
         if (this.setIndex == -1) {
@@ -411,7 +407,9 @@ object WorkoutController {
             if (isWarmup) {
                 return currMainInd + 1
             }
-            return (currMains!!.indexOf(currExercise) + 1).also { currMainInd = it - 1; /* Match Java side effect logic */ }
+            return (currMains!!.indexOf(currExercise) + 1).also {
+                currMainInd = it - 1; /* Match Java side effect logic */
+            }
         }
 
     val currExName: String
@@ -441,9 +439,7 @@ object WorkoutController {
         }
     }
 
-    fun isMinReps(): Boolean {
-        return this.currReps == MIN_REPS
-    }
+    fun isMinReps(): Boolean = this.currReps == MIN_REPS
 
     private fun setCurrRestTime() {
         this.currRestTime = if (this.currExerciseSet!!.reps <= 6) HEAVY_REST_TIME else LIGHT_REST_TIME
@@ -466,9 +462,7 @@ object WorkoutController {
         this.currWeight = weight
     }
 
-    fun isMinWeight(): Boolean {
-        return this.currWeight <= this.currMinWeight
-    }
+    fun isMinWeight(): Boolean = this.currWeight <= this.currMinWeight
 
     val isWarmup: Boolean
         get() = WARMUP_SET == currExercise!!.setsType
@@ -503,5 +497,4 @@ object WorkoutController {
         }
         return exercise
     }
-
 }

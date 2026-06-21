@@ -71,7 +71,7 @@ fun ExercisesEntryScreen(
             .background(Color.White)
     ) {
         // HorizontalPager should only display real exercise tabs
-        // If the pager gets to the Add Tab index somehow, we can display empty content, 
+        // If the pager gets to the Add Tab index somehow, we can display empty content,
         // but typically the state updates and pushes a new tab before it renders.
         HorizontalPager(
             state = pagerState,

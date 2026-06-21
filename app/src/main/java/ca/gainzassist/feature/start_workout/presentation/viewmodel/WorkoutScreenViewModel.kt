@@ -2,15 +2,15 @@ package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ca.gainzassist.feature.start_workout.domain.usecase.FinishWorkoutSessionUseCase
-import ca.gainzassist.feature.start_workout.presentation.event.WorkoutScreenEvent
-import ca.gainzassist.feature.start_workout.presentation.state.WorkoutScreenState
 import ca.gainzassist.core.util.Misc
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.session.SessionProgressMapper
 import ca.gainzassist.domain.session.SessionProgressSnapshot
 import ca.gainzassist.domain.usecase.session.GetSessionProgressUseCase
 import ca.gainzassist.domain.usecase.session.SaveSessionProgressUseCase
+import ca.gainzassist.feature.start_workout.domain.usecase.FinishWorkoutSessionUseCase
+import ca.gainzassist.feature.start_workout.presentation.event.WorkoutScreenEvent
+import ca.gainzassist.feature.start_workout.presentation.state.WorkoutScreenState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

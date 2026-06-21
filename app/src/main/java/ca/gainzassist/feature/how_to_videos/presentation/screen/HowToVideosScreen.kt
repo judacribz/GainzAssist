@@ -44,13 +44,17 @@ fun HowToVideosScreen(
     playerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier
-        .fillMaxSize()
-        .background(Color.Black)) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
         if (uiState.isPlayerVisible) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+            ) {
                 playerContent()
             }
         }
@@ -172,7 +176,10 @@ private fun HowToVideosScreenPreviewLongTitles() {
     HowToVideosScreen(
         uiState = HowToVideosUiState(
             videos = listOf(
-                HowToVideoUiItem("1", "This is an extremely long title that should wrap to the next line or be handled gracefully in the UI without cutting off awkwardly."),
+                HowToVideoUiItem(
+                    "1",
+                    "This is an extremely long title that should wrap to the next line or be handled gracefully in the UI without cutting off awkwardly."
+                ),
             )
         ),
         onVideoClick = {},

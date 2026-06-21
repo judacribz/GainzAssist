@@ -1,6 +1,7 @@
 package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
 import android.util.SparseArray
+import androidx.core.util.size
 import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
 import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
@@ -9,7 +10,6 @@ import ca.gainzassist.ui.ProgressStatus.SELECTED
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
 import ca.gainzassist.ui.ProgressStatus.SUCCESS_SELECTED
 import ca.gainzassist.ui.ProgressStatus.UNSELECTED
-import androidx.core.util.size
 
 object WorkoutProgressMapper {
 

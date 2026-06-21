@@ -3,6 +3,7 @@ package ca.gainzassist.data.remote.firebase
 import android.app.Activity
 import android.content.Intent
 import android.util.SparseArray
+import androidx.core.util.size
 import ca.gainzassist.data.service.FirebaseService
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
@@ -14,7 +15,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.orhanobut.logger.Logger
-import androidx.core.util.size
 
 object Database {
 
@@ -33,7 +33,9 @@ object Database {
         firebaseUser = FirebaseAuth.getInstance().currentUser
         return if (firebaseUser != null) {
             firebaseDatabase.getReference(String.format(USER_PATH, firebaseUser!!.uid))
-        } else null
+        } else {
+            null
+        }
     }
 
     @JvmStatic

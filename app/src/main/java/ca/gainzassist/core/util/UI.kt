@@ -38,7 +38,6 @@ object UI {
         }
     }
 
-
     @JvmStatic
     fun setInitTheme(act: Activity) {
         val col = getThemePref(act)
@@ -63,24 +62,16 @@ object UI {
     }
 
     @JvmStatic
-    fun getTextString(spr: Spinner): String {
-        return spr.selectedItem.toString().lowercase(Locale.getDefault())
-    }
+    fun getTextString(spr: Spinner): String = spr.selectedItem.toString().lowercase(Locale.getDefault())
 
     @JvmStatic
-    fun getTextInt(tv: TextView): Int {
-        return getTextString(tv).toInt()
-    }
+    fun getTextInt(tv: TextView): Int = getTextString(tv).toInt()
 
     @JvmStatic
-    fun getTextFloat(et: EditText): Float {
-        return getTextString(et).toFloat()
-    }
+    fun getTextFloat(et: EditText): Float = getTextString(et).toFloat()
 
     @JvmStatic
-    fun getTextString(tv: TextView): String {
-        return tv.text.toString().trim { it <= ' ' }
-    }
+    fun getTextString(tv: TextView): String = tv.text.toString().trim { it <= ' ' }
 
     @JvmStatic
     fun validateForm(act: Activity, ets: Array<EditText>): Boolean {

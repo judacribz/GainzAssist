@@ -1,7 +1,5 @@
 package ca.gainzassist.feature.start_workout.presentation.screen
 
-import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
-
 import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.foundation.BorderStroke
@@ -56,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+import ca.gainzassist.feature.start_workout.presentation.state.WorkoutProgressUiItem
 import ca.gainzassist.ui.ProgressStatus
 import java.util.Locale
 import kotlin.math.min
@@ -78,7 +77,6 @@ data class WorkoutUiState(
     val isUpdateSetVisible: Boolean = false,
     val isResumeWorkoutVisible: Boolean = false
 )
-
 
 data class WorkoutUiActions(
     val onTimerClick: () -> Unit = {},
@@ -111,14 +109,14 @@ fun WorkoutComposeScreen(
     ) {
         WorkoutCard(modifier = Modifier.weight(5f).fillMaxWidth()) {
             WorkoutProgressHeader(
-            title = uiState.exerciseTitle,
-            setNumText = uiState.setNumText,
-            exerciseProgress = uiState.exerciseProgress,
-            setProgress = uiState.setProgress,
-            onExerciseClick = actions.onExerciseProgressClick,
-            onSetClick = actions.onSetProgressClick,
-            modifier = Modifier.fillMaxSize()
-        )
+                title = uiState.exerciseTitle,
+                setNumText = uiState.setNumText,
+                exerciseProgress = uiState.exerciseProgress,
+                setProgress = uiState.setProgress,
+                onExerciseClick = actions.onExerciseProgressClick,
+                onSetClick = actions.onSetProgressClick,
+                modifier = Modifier.fillMaxSize()
+            )
         }
         WorkoutEquipmentTimer(
             weight = uiState.currentWeight,
@@ -251,7 +249,7 @@ fun WorkoutProgressItem(
         ),
         radius = 60f
     )
-    
+
     val brush = when (item.status) {
         ProgressStatus.SUCCESS -> successBrush
         ProgressStatus.SUCCESS_SELECTED -> successSelectedBrush
@@ -313,13 +311,13 @@ fun WorkoutEquipmentTimer(
                 .clickable(onClick = onTimerClick)
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = timerText,
-                color = colorResource(R.color.colorAccent),
-                fontSize = 50.sp,
-                fontFamily = FontFamily(Font(R.font.staatliches)),
-                textAlign = TextAlign.Center
-            )
+                Text(
+                    text = timerText,
+                    color = colorResource(R.color.colorAccent),
+                    fontSize = 50.sp,
+                    fontFamily = FontFamily(Font(R.font.staatliches)),
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
@@ -333,14 +331,14 @@ fun WorkoutEquipmentCanvas(
 ) {
     val barbellName = stringResource(R.string.barbell).lowercase(Locale.getDefault())
     val eqLower = equipment.lowercase(Locale.getDefault())
-    
+
     Canvas(modifier = modifier.padding(8.dp)) {
         val width = size.width
         val height = size.height
-        
+
         // Prevent drawing crash during layout phase when size is too small
         if (width <= 0f || height <= 40f) return@Canvas
-        
+
         if (eqLower == barbellName) {
             drawBarbell(weight, width, height)
         }
@@ -354,13 +352,13 @@ private fun DrawScope.drawBarbell(
 ) {
     val barbellWeight = ((weight - 45f) / 2f * 10f).toInt()
     val diam45 = height - 20f
-    
+
     val weights = intArrayOf(450, 250, 100, 50, 25)
     val numWeights = IntArray(5)
-    
+
     val sleeveWidth = calculateSleeveWidth(barbellWeight, weights)
     val sleeveHeight = 16f
-    
+
     drawSleeve(height, sleeveWidth, sleeveHeight)
     drawPlates(barbellWeight, weights, numWeights, diam45, height)
     drawBarbellText(numWeights, weights, width, height)
@@ -398,13 +396,18 @@ private fun DrawScope.drawPlates(
         numWeights[j] = newWeight / weights[j]
         for (i in 0 until numWeights[j]) {
             if (j == 0 && i > 4) continue // Max 5 x 45 plates
-            
+
             val ratio = weights[j] / 450f
             val r = diam45 * (0.4f + 0.6f * ratio)
             val startY = (height - r) / 2f
-            
+
             drawRect(color = Color.Gray, topLeft = Offset(startX, startY), size = Size(PLATE_WIDTH, r))
-            drawRect(color = Color.Black, topLeft = Offset(startX, startY), size = Size(PLATE_WIDTH, r), style = Stroke(width = 2f))
+            drawRect(
+                color = Color.Black,
+                topLeft = Offset(startX, startY),
+                size = Size(PLATE_WIDTH, r),
+                style = Stroke(width = 2f)
+            )
             startX += PLATE_WIDTH
         }
         newWeight -= weights[j] * numWeights[j]
@@ -427,14 +430,14 @@ private fun DrawScope.drawBarbellText(
         isAntiAlias = true
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
-    
+
     val textSpacing = 60f
     var textY = (height - (distinctWeights * textSpacing)) / 2f + 45f
-    
+
     for (j in numWeights.indices) {
         if (numWeights[j] > 0) {
             val lbs = weights[j] / 10f
-            val label = "${numWeights[j]} x ${if(lbs % 1 == 0f) lbs.toInt().toString() else lbs.toString()} lbs"
+            val label = "${numWeights[j]} x ${if (lbs % 1 == 0f) lbs.toInt().toString() else lbs.toString()} lbs"
             drawIntoCanvas { canvas ->
                 canvas.nativeCanvas.drawText(label, width - 10f, textY, textPaint)
             }
@@ -523,7 +526,7 @@ fun WorkoutNumberControl(
                 }
             }
         }
-        
+
         Box(
             modifier = Modifier
                 .weight(2f)
@@ -550,7 +553,9 @@ fun WorkoutNumberControl(
                     textAlign = TextAlign.Center
                 ),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = if (state.isDecimal) KeyboardType.Decimal else KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = if (state.isDecimal) KeyboardType.Decimal else KeyboardType.Number
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { focusState ->
@@ -560,7 +565,7 @@ fun WorkoutNumberControl(
                     }
             )
         }
-        
+
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             IconButton(onClick = actions.onIncrease) {
                 Icon(
@@ -759,7 +764,6 @@ private fun WorkoutComposeScreenPreviewLargeWeight() {
         actions = WorkoutUiActions()
     )
 }
-
 
 @Composable
 fun WorkoutCard(

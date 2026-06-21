@@ -17,7 +17,11 @@ class FirebaseLoginRepository : LoginRepository {
                     if (task.isSuccessful) {
                         if (continuation.isActive) continuation.resume(Result.success(Unit))
                     } else {
-                        if (continuation.isActive) continuation.resume(Result.failure(task.exception ?: Exception("Authentication failed")))
+                        if (continuation.isActive) {
+                            continuation.resume(
+                                Result.failure(task.exception ?: Exception("Authentication failed"))
+                            )
+                        }
                     }
                 }
         }
@@ -29,7 +33,11 @@ class FirebaseLoginRepository : LoginRepository {
                     if (task.isSuccessful) {
                         if (continuation.isActive) continuation.resume(Result.success(Unit))
                     } else {
-                        if (continuation.isActive) continuation.resume(Result.failure(task.exception ?: Exception("Registration failed")))
+                        if (continuation.isActive) {
+                            continuation.resume(
+                                Result.failure(task.exception ?: Exception("Registration failed"))
+                            )
+                        }
                     }
                 }
         }

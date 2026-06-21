@@ -5,8 +5,8 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import ca.gainzassist.R
-import ca.gainzassist.feature.login.presentation.screen.LoginActivity
 import ca.gainzassist.data.service.FirebaseService
+import ca.gainzassist.feature.login.presentation.screen.LoginActivity
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.AuthCredential
@@ -32,8 +32,9 @@ object Authentication {
     @JvmStatic
     fun signIn(act: Activity, cred: AuthCredential) {
         mAuth.signInWithCredential(cred)
-            .addOnCompleteListener(act) { task -> handleOnComplete(act, task)
-        }
+            .addOnCompleteListener(act) { task ->
+                handleOnComplete(act, task)
+            }
     }
 
     private fun handleOnComplete(

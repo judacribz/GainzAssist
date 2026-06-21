@@ -98,11 +98,11 @@ fun MainScreen(
                 }
             }
         }
-        
+
         val tabs = MainTab.entries.map { tab ->
             GainzTabItem(title = tab.title)
         }
-        
+
         GainzTabRow(
             pagerState = pagerState,
             tabs = tabs
@@ -190,6 +190,3 @@ fun MainScreenPreviewLargeFont() {
         )
     )
 }
-
-
-

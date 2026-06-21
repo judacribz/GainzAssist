@@ -24,29 +24,21 @@ class RoomWorkoutRepository(
     private val setDao = database.setDao()
     private val sessionDao = database.sessionDao()
 
-    override fun observeWorkouts(): Flow<List<Workout>> {
-        return workoutDao.getAll().asFlow()
-    }
+    override fun observeWorkouts(): Flow<List<Workout>> = workoutDao.getAll().asFlow()
 
-    override fun observeWorkout(id: Long): Flow<Workout?> {
-        return workoutDao.get(id).asFlow()
-    }
+    override fun observeWorkout(id: Long): Flow<Workout?> = workoutDao.get(id).asFlow()
 
-    override fun observeExercisesForWorkout(workoutId: Long): Flow<List<Exercise>> {
-        return exerciseDao.getLiveFromWorkout(workoutId).asFlow()
-    }
+    override fun observeExercisesForWorkout(workoutId: Long): Flow<List<Exercise>> = exerciseDao.getLiveFromWorkout(
+        workoutId
+    ).asFlow()
 
-    override fun observeExercise(exerciseId: Long): Flow<Exercise?> {
-        return exerciseDao.getLive(exerciseId).asFlow()
-    }
+    override fun observeExercise(exerciseId: Long): Flow<Exercise?> = exerciseDao.getLive(exerciseId).asFlow()
 
-    override fun observeSetsForExercise(exerciseId: Long): Flow<List<ExerciseSet>> {
-        return setDao.getLiveFromExercise(exerciseId).asFlow()
-    }
+    override fun observeSetsForExercise(exerciseId: Long): Flow<List<ExerciseSet>> = setDao.getLiveFromExercise(
+        exerciseId
+    ).asFlow()
 
-    override fun observeUniqueExerciseNames(): Flow<List<String>> {
-        return exerciseDao.getAllUniqueNames().asFlow()
-    }
+    override fun observeUniqueExerciseNames(): Flow<List<String>> = exerciseDao.getAllUniqueNames().asFlow()
 
     override suspend fun getWorkoutByName(name: String): Workout? = withContext(dispatcherProvider.io) {
         workoutDao.getFromName(name)
@@ -67,7 +59,7 @@ class RoomWorkoutRepository(
     ) = withContext(dispatcherProvider.io) {
         val newId = workoutDao.insert(workout)
         workout.id = newId
-        
+
         val exercises = workout.exercises
         if (exercises.isNotEmpty()) {
             for (ex in exercises) {
@@ -75,7 +67,7 @@ class RoomWorkoutRepository(
             }
             insertExercises(exercises)
         }
-        
+
         if (syncToFirebase) {
             Database.addWorkoutFirebase(workout)
         }
@@ -83,7 +75,7 @@ class RoomWorkoutRepository(
 
     override suspend fun updateWorkout(workout: Workout) = withContext(dispatcherProvider.io) {
         workoutDao.update(workout)
-        
+
         val exercises = workout.exercises
         if (exercises.isNotEmpty()) {
             for (ex in exercises) {
@@ -138,7 +130,9 @@ class RoomWorkoutRepository(
         setDao.delete(exerciseSet)
     }
 
-    override suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean) = withContext(dispatcherProvider.io) {
+    override suspend fun insertCompletedSession(session: Session, syncToFirebase: Boolean) = withContext(
+        dispatcherProvider.io
+    ) {
         sessionDao.insert(session)
         for (exercise in session.sessionExs) {
             val finishedSets = exercise.getFinishedSetsList()

@@ -23,24 +23,20 @@ class CalculateNextExerciseWeightUseCaseTest {
         reps: Int,
         sets: Int,
         minWeight: Float
-    ): Exercise {
-        return Exercise().apply {
-            this.equipment = equipment
-            this.weight = weight
-            this.reps = reps
-            this.sets = sets
-            // The setter for equipment overrides minWeight, so we set it directly if needed or use the side-effect
-            // To ensure minWeight is set for the test, we'll manually override it again
-            this.minWeight = minWeight
-        }
+    ): Exercise = Exercise().apply {
+        this.equipment = equipment
+        this.weight = weight
+        this.reps = reps
+        this.sets = sets
+        // The setter for equipment overrides minWeight, so we set it directly if needed or use the side-effect
+        // To ensure minWeight is set for the test, we'll manually override it again
+        this.minWeight = minWeight
     }
 
-    private fun createFinishedSets(count: Int, reps: Int, weight: Float): List<ExerciseSet> {
-        return List(count) {
-            ExerciseSet().apply {
-                this.reps = reps
-                this.weight = weight
-            }
+    private fun createFinishedSets(count: Int, reps: Int, weight: Float): List<ExerciseSet> = List(count) {
+        ExerciseSet().apply {
+            this.reps = reps
+            this.weight = weight
         }
     }
 

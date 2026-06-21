@@ -15,16 +15,12 @@ object Calculations {
     }
 
     @JvmStatic
-    fun getOneRepMax(reps: Int, weight: Float): Float {
-        return weight * (BAECHELE_CONST * reps + 1)
-    }
+    fun getOneRepMax(reps: Int, weight: Float): Float = weight * (BAECHELE_CONST * reps + 1)
 
     @JvmStatic
-    fun dpToPix(context: Context, dp: Float): Float {
-        return TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp,
-            context.resources.displayMetrics
-        )
-    }
+    fun dpToPix(context: Context, dp: Float): Float = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        dp,
+        context.resources.displayMetrics
+    )
 }

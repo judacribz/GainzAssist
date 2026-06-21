@@ -42,14 +42,16 @@ class Session {
         this.workoutName = workout.name
     }
 
-    fun initTimestamp(timestamp: Long) { this.timestamp = if (timestamp == -1L) Date().time else timestamp }
+    fun initTimestamp(timestamp: Long) {
+        this.timestamp = if (timestamp == -1L) Date().time else timestamp
+    }
 
     fun addExercise(exercise: Exercise) {
         var weight = 0.0f
         val weightChange = exercise.weightChange
         val expectedReps = exercise.reps.toFloat()
         val finishedSets = exercise.getFinishedSetsList()
-        
+
         for (exerciseSet in finishedSets) {
             weight += exerciseSet.weight * exerciseSet.reps.toFloat() / if (expectedReps == 0f) 1f else expectedReps
         }
@@ -79,7 +81,7 @@ class Session {
         val sessionMap = HashMap<String, Any?>()
         sessionMap[ExerciseConst.WORKOUT_NAME] = workoutName
         sessionMap[ExerciseConst.WORKOUT_ID] = workoutId
-        
+
         for (ex in sessionExs) {
             exsMap[ex.exerciseNumber.toString()] = ex.setsToMap()
         }
