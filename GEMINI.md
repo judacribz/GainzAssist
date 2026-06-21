@@ -196,6 +196,8 @@ Override functions should be near the top of the class, directly under propertie
 
 Preview composables must be private.
 
+Always avoid trailing commas in Kotlin code (e.g., in parameter lists, data classes, or function calls).
+
 Composable files should be organized like this:
 
 ```text

@@ -2,6 +2,8 @@ package ca.gainzassist.feature.how_to_videos.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ca.gainzassist.R
+import ca.gainzassist.core.util.UiText
 import ca.gainzassist.feature.how_to_videos.domain.usecase.SearchHowToVideosUseCase
 import ca.gainzassist.feature.how_to_videos.presentation.screen.HowToVideoUiItem
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,12 +22,12 @@ data class HowToVideosViewModelState(
     val isSearchExpanded: Boolean = false,
     val searchQuery: String = "",
     val selectedVideoId: String? = null,
-    val message: String? = null,
+    val message: UiText? = null,
     val isLoading: Boolean = false
 )
 
 sealed interface HowToVideosViewModelEvent {
-    data class ShowMessage(val message: String) : HowToVideosViewModelEvent
+    data class ShowMessage(val message: UiText) : HowToVideosViewModelEvent
 }
 
 class HowToVideosViewModel(
@@ -52,28 +54,45 @@ class HowToVideosViewModel(
             executeSearch("how to $exerciseName")
         } else {
             viewModelScope.launch {
-                _events.emit(HowToVideosViewModelEvent.ShowMessage("Search for an exercise video."))
+                _events.emit(
+                    HowToVideosViewModelEvent.ShowMessage(
+                        UiText.StringResource(R.string.msg_search_exercise_video)
+                    )
+                )
             }
         }
     }
 
     fun executeSearch(query: String) {
         val queryKey = query.trim()
-        if (queryKey.isBlank() || queryKey == activeQuery) {
+        if ((queryKey.isBlank()) || (queryKey == activeQuery)) {
             return
         }
 
+        if (checkCache(queryKey)) {
+            return
+        }
+
+        performSearch(queryKey)
+    }
+
+    private fun checkCache(queryKey: String): Boolean {
         if (queryCache.containsKey(queryKey)) {
             val cached = queryCache[queryKey] ?: emptyList()
             _state.update {
                 it.copy(
                     videos = cached,
-                    message = if (cached.isEmpty()) "No video results" else null
+                    message = if (cached.isEmpty()) {
+                        UiText.StringResource(R.string.msg_no_video_results)
+                    } else null
                 )
             }
-            return
+            return true
         }
+        return false
+    }
 
+    private fun performSearch(queryKey: String) {
         activeQuery = queryKey
         _state.update { it.copy(isLoading = true, message = null) }
 
@@ -82,29 +101,37 @@ class HowToVideosViewModel(
                 val results = searchHowToVideosUseCase(queryKey)
                 val uiItems = results.map { HowToVideoUiItem(it.videoId, it.title) }
                 queryCache[queryKey] = uiItems
-                
+
                 _state.update {
                     it.copy(
                         videos = uiItems,
                         isLoading = false,
-                        message = if (uiItems.isEmpty()) "No video results" else null
+                        message = if (uiItems.isEmpty()) {
+                            UiText.StringResource(R.string.msg_no_video_results)
+                        } else null
                     )
                 }
             } catch (e: Exception) {
-                val errorMsg = e.message ?: "Unable to load YouTube videos. Check API key or network."
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        message = errorMsg
-                    )
-                }
-                _events.emit(HowToVideosViewModelEvent.ShowMessage(errorMsg))
+                handleSearchError(e)
             } finally {
                 if (activeQuery == queryKey) {
                     activeQuery = null
                 }
             }
         }
+    }
+
+    private suspend fun handleSearchError(e: Exception) {
+        val errorMsg = e.message.orEmpty()
+        val uiText = if (e.message != null) UiText.DynamicString(errorMsg)
+        else UiText.StringResource(R.string.err_youtube_load_failed)
+        _state.update {
+            it.copy(
+                isLoading = false,
+                message = uiText
+            )
+        }
+        _events.emit(HowToVideosViewModelEvent.ShowMessage(uiText))
     }
 
     fun onVideoClick(videoId: String) {

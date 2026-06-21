@@ -1,7 +1,6 @@
 package ca.gainzassist.feature.how_to_videos.presentation.screen
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.compose.foundation.layout.Column
@@ -17,9 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
 import ca.gainzassist.activities.base.GainzBaseActivity
-import ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutActivity.Companion.EXTRA_HOW_TO_VID
 import ca.gainzassist.feature.how_to_videos.presentation.viewmodel.HowToVideosViewModel
 import ca.gainzassist.feature.how_to_videos.presentation.viewmodel.HowToVideosViewModelEvent
+import ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutActivity.Companion.EXTRA_HOW_TO_VID
 import ca.gainzassist.ui.components.HowToVideosTopBar
 import ca.gainzassist.ui.components.HowToVideosTopBarActions
 import ca.gainzassist.ui.components.HowToVideosTopBarState
@@ -62,41 +61,51 @@ class HowToVideosActivity : GainzBaseActivity() {
                     when (event) {
                         is HowToVideosViewModelEvent.ShowMessage -> {
                             val v = window.decorView.rootView
-                            Snackbar.make(v, event.message, Snackbar.LENGTH_LONG).show()
+                            Snackbar.make(v, event.message.asString(this@HowToVideosActivity), Snackbar.LENGTH_LONG).show()
                         }
                     }
                 }
             }
         }
 
-        youTubePlayerView.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-            override fun onReady(youTubePlayer: YouTubePlayer) {
-                this@HowToVideosActivity.youTubePlayer = youTubePlayer
-                pendingVideoId?.let {
-                    youTubePlayer.loadVideo(it, 0f)
-                    pendingVideoId = null
+        youTubePlayerView.addYouTubePlayerListener(
+            object : AbstractYouTubePlayerListener() {
+                override fun onReady(youTubePlayer: YouTubePlayer) {
+                    this@HowToVideosActivity.youTubePlayer = youTubePlayer
+                    pendingVideoId?.let {
+                        youTubePlayer.loadVideo(it, 0f)
+                        pendingVideoId = null
+                    }
                 }
-            }
 
-            override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
-                super.onError(youTubePlayer, error)
-                val currentVideoId = viewModel.state.value.selectedVideoId
-                val v = window.decorView.rootView
-                if (currentVideoId != null) {
-                    Snackbar.make(v, "Unable to play this video", Snackbar.LENGTH_LONG)
-                        .setAction("Open in YouTube") {
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                "https://www.youtube.com/watch?v=$currentVideoId".toUri()
-                            )
-                            startActivity(intent)
-                        }
-                        .show()
-                } else {
-                    Snackbar.make(v, "Unable to play this video", Snackbar.LENGTH_SHORT).show()
+                override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                    super.onError(youTubePlayer, error)
+                    val currentVideoId = viewModel.state.value.selectedVideoId
+                    val v = window.decorView.rootView
+                    if (currentVideoId != null) {
+                        Snackbar.make(
+                            v,
+                            getString(R.string.err_unable_to_play_video),
+                            Snackbar.LENGTH_LONG
+                        )
+                            .setAction(getString(R.string.action_open_in_youtube)) {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    "https://www.youtube.com/watch?v=$currentVideoId".toUri()
+                                )
+                                startActivity(intent)
+                            }
+                            .show()
+                    } else {
+                        Snackbar.make(
+                            v,
+                            getString(R.string.err_unable_to_play_video),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
     @Composable
@@ -106,7 +115,7 @@ class HowToVideosActivity : GainzBaseActivity() {
         Column(Modifier.fillMaxSize()) {
             HowToVideosTopBar(
                 state = HowToVideosTopBarState(
-                    title = "How To ${state.exerciseName}",
+                    title = getString(R.string.title_how_to, state.exerciseName),
                     isSearchExpanded = state.isSearchExpanded,
                     searchQuery = state.searchQuery
                 ),
@@ -115,12 +124,12 @@ class HowToVideosActivity : GainzBaseActivity() {
                     onSearchSubmit = {
                         val query = state.searchQuery.trim()
                         if (query.isNotEmpty()) {
-                            viewModel.onSearchExpandedChanged(false)
+                            viewModel.onSearchExpandedChanged(expanded = false)
                             viewModel.executeSearch(query)
                         } else {
                             Snackbar.make(
                                 findViewById(android.R.id.content),
-                                "Please enter a search term",
+                                getString(R.string.err_enter_search_term),
                                 Snackbar.LENGTH_SHORT
                             ).show()
                         }
@@ -129,7 +138,7 @@ class HowToVideosActivity : GainzBaseActivity() {
                         viewModel.onSearchExpandedChanged(true)
                     },
                     onCloseSearchClick = {
-                        viewModel.onSearchExpandedChanged(false)
+                        viewModel.onSearchExpandedChanged(expanded = false)
                         viewModel.onSearchQueryChanged("")
                         viewModel.executeSearch(state.exerciseName)
                     },
@@ -141,7 +150,7 @@ class HowToVideosActivity : GainzBaseActivity() {
                 uiState = HowToVideosUiState(
                     videos = state.videos,
                     isPlayerVisible = state.isPlayerVisible,
-                    message = state.message
+                    message = state.message?.asString()
                 ),
                 onVideoClick = { onVideoClick(it) },
                 playerContent = {

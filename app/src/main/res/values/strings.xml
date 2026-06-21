@@ -106,4 +106,18 @@
     <string name="cd_add_workout">Add workout</string>
     <string name="cd_more_actions">More actions</string>
     <string name="logout">Logout</string>
+    <string name="err_no_exercises">Error: No exercises added.</string>
+    <string name="err_facebook_login_failed">Facebook Login failed</string>
+    <string name="err_google_login_failed">Google Sign-In failed</string>
+    <string name="err_auth_failed">Authentication failed. Please try again.</string>
+    <string name="msg_search_exercise_video">Search for an exercise video.</string>
+    <string name="msg_no_video_results">No video results</string>
+    <string name="err_youtube_load_failed">Unable to load YouTube videos. Check API key or network.</string>
+    <string name="err_login_failed">Login failed</string>
+    <string name="err_signup_failed">Sign up failed</string>
+    <string name="err_workout_name_required">Workout name is required.</string>
+    <string name="title_how_to">How To %s</string>
+    <string name="err_enter_search_term">Please enter a search term</string>
+    <string name="err_unable_to_play_video">Unable to play this video</string>
+    <string name="action_open_in_youtube">Open in YouTube</string>
 </resources>

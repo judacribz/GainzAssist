@@ -15,13 +15,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import ca.gainzassist.R
-import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModel
-import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModelEvent
 import ca.gainzassist.activities.base.GainzBaseActivity
 import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.data.local.preferences.Preferences
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
+import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModel
+import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModelEvent
+import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModelState
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -48,8 +49,8 @@ class SummaryActivity : GainzBaseActivity() {
         val sourceIntent = intent
         val w = IntentCompat.getParcelableExtra(
             /* in = */ sourceIntent,
-            /* name = */EXTRA_WORKOUT,
-            /* clazz = */Workout::class.java
+            /* name = */ EXTRA_WORKOUT,
+            /* clazz = */ Workout::class.java
         )
         workout = w
         val currentWorkout = w ?: return
@@ -100,8 +101,11 @@ class SummaryActivity : GainzBaseActivity() {
                         }
 
                         is SummaryViewModelEvent.Error -> {
-                            Toast.makeText(this@SummaryActivity, event.message, Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(
+                                /* context = */ this@SummaryActivity,
+                                /* text = */ event.message.asString(this@SummaryActivity),
+                                /* duration = */ Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
@@ -133,24 +137,36 @@ class SummaryActivity : GainzBaseActivity() {
     ): String = when (display.trim().lowercase()) {
         "barbell" -> ExerciseConst.BARBELL
         "dumbbell" -> ExerciseConst.DUMBBELL
-        "n/a", "na", "other" -> ExerciseConst.NA
         else -> ExerciseConst.NA
     }
 
     private fun equipmentModelToDisplay(model: String?, options: List<String>): String {
-        val fallback = options.firstOrNull() ?: "Barbell"
+        val fallback = options.firstOrNull() ?: ExerciseConst.BARBELL.replaceFirstChar {
+            it.uppercase()
+        }
         return when (model?.trim()?.lowercase()) {
-            ExerciseConst.BARBELL -> options.firstOrNull { it.equals("Barbell", ignoreCase = true) }
+            ExerciseConst.BARBELL -> options.find {
+                it.equals(
+                    ExerciseConst.BARBELL,
+                    ignoreCase = true
+                )
+            }
                 ?: fallback
 
-            ExerciseConst.DUMBBELL -> options.firstOrNull {
+            ExerciseConst.DUMBBELL -> options.find {
                 it.equals(
-                    "Dumbbell",
+                    ExerciseConst.DUMBBELL,
                     ignoreCase = true
                 )
             } ?: fallback
 
-            "n/a", "na" -> options.firstOrNull { it.equals("N/A", ignoreCase = true) } ?: fallback
+            ExerciseConst.NA.lowercase() -> options.find {
+                it.equals(
+                    ExerciseConst.NA,
+                    ignoreCase = true
+                )
+            } ?: fallback
+
             else -> fallback
         }
     }
@@ -161,7 +177,7 @@ class SummaryActivity : GainzBaseActivity() {
         selectedExerciseNumber: Int?
     ): Boolean {
         return exercises.any { exercise ->
-            exercise.exerciseNumber != selectedExerciseNumber &&
+            (exercise.exerciseNumber != selectedExerciseNumber) &&
                     exercise.name.equals(name, ignoreCase = true)
         }
     }
@@ -174,58 +190,42 @@ class SummaryActivity : GainzBaseActivity() {
         workout: Workout?
     ) {
         val state by summaryViewModel.state.collectAsStateWithLifecycle()
-
-        //val exercisesState =
         remember(state.exercises) { mutableStateListOf<Exercise>().apply { addAll(state.exercises) } }
+
         var workoutName by rememberSaveable { mutableStateOf(initialWorkoutName) }
         var exerciseName by rememberSaveable { mutableStateOf("") }
         var weight by rememberSaveable { mutableStateOf(getString(R.string.starting_weight)) }
         var reps by rememberSaveable { mutableStateOf(getString(R.string.starting_reps)) }
         var sets by rememberSaveable { mutableStateOf(getString(R.string.starting_sets)) }
-        var selectedEquipment by rememberSaveable { mutableStateOf("Barbell") }
+        val equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList()
+        var selectedEquipment by rememberSaveable {
+            mutableStateOf(equipmentOptions.firstOrNull().orEmpty())
+        }
         var selectedExerciseNumber by rememberSaveable { mutableStateOf<Int?>(null) }
-
         var workoutNameError by rememberSaveable { mutableStateOf<String?>(null) }
         var exerciseNameError by rememberSaveable { mutableStateOf<String?>(null) }
         var weightError by rememberSaveable { mutableStateOf<String?>(null) }
         var repsError by rememberSaveable { mutableStateOf<String?>(null) }
         var setsError by rememberSaveable { mutableStateOf<String?>(null) }
-
-        // Sync ViewModel error message
-        if (state.errorMessage != null && workoutNameError == null) {
-            workoutNameError = state.errorMessage
-        }
-
-        val minWeight = when (selectedEquipment) {
-            "Barbell" -> ExerciseConst.BB_MIN_WEIGHT
-            "Dumbbell" -> ExerciseConst.DB_MIN_WEIGHT
-            else -> ExerciseConst.MIN_WEIGHT
-        }
-
-        val uiState = SummaryUiState(
-            workoutName = state.workoutName,
-            exerciseName = exerciseName,
-            selectedEquipment = selectedEquipment,
-            equipmentOptions = resources.getStringArray(R.array.exerciseEquipment).toList(),
-            weight = weight,
-            reps = reps,
-            sets = sets,
-            exerciseNames = state.exercises.mapNotNull { it.name },
-            selectedExerciseName = state.exercises.find { it.exerciseNumber == selectedExerciseNumber }?.name,
-            showAddExerciseButton = selectedExerciseNumber == null,
-            showUpdateExerciseButton = selectedExerciseNumber != null,
-            mainWorkoutButtonText = initialMainButtonText,
-            workoutNameError = workoutNameError,
-            exerciseNameError = exerciseNameError,
-            weightError = weightError,
-            repsError = repsError,
-            setsError = setsError,
-            canDecrementWeight = (weight.toFloatOrNull() ?: 0f) > minWeight,
-            canDecrementReps = (reps.toIntOrNull() ?: 0) > MIN_INT,
-            canDecrementSets = (sets.toIntOrNull() ?: 0) > MIN_INT,
-            isSaving = state.isSaving,
-
+        val minWeight = getMinWeight(selectedEquipment)
+        val uiState = createSummaryUiState(
+            state = state,
+            input = ExerciseInput(exerciseName, weight, reps, sets, selectedEquipment, minWeight),
+            equipmentOptions = equipmentOptions,
+            selectedExerciseNumber = selectedExerciseNumber,
+            initialMainButtonText = initialMainButtonText,
+            errors = ExerciseErrors(
+                workoutNameError,
+                exerciseNameError,
+                weightError,
+                repsError,
+                setsError
             )
+        )
+
+        if ((state.errorMessage != null) && (workoutNameError == null)) {
+            workoutNameError = state.errorMessage?.asString()
+        }
 
         SummaryScreenContent(
             uiState = uiState,
@@ -236,29 +236,17 @@ class SummaryActivity : GainzBaseActivity() {
                     workoutNameError = null
                     summaryViewModel.initialize(workout, it, state.exercises)
                 },
-                onExerciseNameChanged = {
-                    exerciseName = it
-                    exerciseNameError = null
-                },
+                onExerciseNameChanged = { exerciseName = it; exerciseNameError = null },
                 onEquipmentSelected = { eq ->
                     selectedEquipment = eq
-                    val newMinWeight = when (eq) {
-                        "Barbell" -> ExerciseConst.BB_MIN_WEIGHT
-                        "Dumbbell" -> ExerciseConst.DB_MIN_WEIGHT
-                        else -> ExerciseConst.MIN_WEIGHT
-                    }
+                    val newMinWeight = getMinWeight(eq)
                     val currentWeight = weight.toFloatOrNull() ?: newMinWeight
-                    if (currentWeight < newMinWeight) {
-                        weight = newMinWeight.toString()
-                    }
+                    if (currentWeight < newMinWeight) weight = newMinWeight.toString()
                 },
                 onWeightChanged = {
-                    weight = it
-                    weightError = null
+                    weight = it; weightError = null
                     val newWeight = it.toFloatOrNull() ?: minWeight
-                    if (newWeight < minWeight) {
-                        weight = minWeight.toString()
-                    }
+                    if (newWeight < minWeight) weight = minWeight.toString()
                 },
                 onRepsChanged = { reps = it; repsError = null },
                 onSetsChanged = { sets = it; setsError = null },
@@ -287,163 +275,76 @@ class SummaryActivity : GainzBaseActivity() {
                     sets = max(current - MIN_INT, MIN_INT).toString()
                 },
                 onClearExercise = {
-                    exerciseName = ""
-                    exerciseNameError = null
+                    exerciseName = ""; exerciseNameError = null
                     reps = getString(R.string.starting_reps)
                     sets = getString(R.string.starting_sets)
                     weight = getString(R.string.starting_weight)
-                    selectedEquipment = "Barbell"
+                    selectedEquipment = equipmentOptions.firstOrNull().orEmpty()
                     selectedExerciseNumber = null
                 },
                 onAddExercise = {
-                    var isValid = true
-                    if (exerciseName.isBlank()) {
-                        exerciseNameError = getString(R.string.err_required); isValid = false
-                    }
-                    if (weight.isBlank()) {
-                        weightError = getString(R.string.err_required); isValid = false
-                    }
-                    if (reps.isBlank()) {
-                        repsError = getString(R.string.err_required); isValid = false
-                    }
-                    if (sets.isBlank()) {
-                        setsError = getString(R.string.err_required); isValid = false
-                    }
+                    val result = validateExercise(
+                        exerciseName, weight, reps, sets, state.exercises, null, minWeight
+                    )
+                    exerciseNameError = result.nameError
+                    weightError = result.weightError
+                    repsError = result.repsError
+                    setsError = result.setsError
 
-                    if (isValid) {
-                        if (exerciseNameExistsForOtherExercise(
-                                state.exercises,
-                                exerciseName,
-                                null
-                            )
-                        ) {
-                            exerciseNameError =
-                                getString(R.string.err_exercise_exists, exerciseName)
-                        } else {
-                            val finalReps = sanitizeReps(reps)
-                            val finalSets = sanitizeSets(sets)
-                            val finalWeight = sanitizeWeight(weight, minWeight)
-
-                            reps = finalReps.toString()
-                            sets = finalSets.toString()
-                            weight = formatWeight(finalWeight)
-
-                            val newExNumber = state.exercises.size
-                            val exercise = Exercise(
-                                newExNumber,
-                                exerciseName,
-                                "Strength",
-                                equipmentDisplayToModel(selectedEquipment),
-                                finalSets,
-                                finalReps,
-                                finalWeight,
-                                Exercise.SetsType.MAIN_SET
-                            ).apply { this.workoutId = this@SummaryActivity.workoutId }
-
-                            val updatedExercises =
-                                ArrayList(state.exercises).apply { add(exercise) }
-                            exercises = updatedExercises
-                            summaryViewModel.initialize(
-                                workout,
-                                state.workoutName,
-                                updatedExercises
-                            )
-
-                            exerciseName = ""
-                            exerciseNameError = null
-                            reps = getString(R.string.starting_reps)
-                            sets = getString(R.string.starting_sets)
-                            weight = getString(R.string.starting_weight)
-                            selectedEquipment = "Barbell"
-                            selectedExerciseNumber = null
-                        }
+                    if (result.isValid) {
+                        reps = result.sanitizedReps.toString()
+                        sets = result.sanitizedSets.toString()
+                        weight = formatWeight(result.sanitizedWeight)
+                        onAddExerciseAction(
+                            state, workout, exerciseName, selectedEquipment,
+                            result.sanitizedSets, result.sanitizedReps, result.sanitizedWeight
+                        )
+                        exerciseName = ""; exerciseNameError = null
+                        reps = getString(R.string.starting_reps)
+                        sets = getString(R.string.starting_sets)
+                        weight = getString(R.string.starting_weight)
+                        selectedEquipment = equipmentOptions.firstOrNull().orEmpty()
+                        selectedExerciseNumber = null
                     }
                 },
                 onUpdateExercise = {
-                    var isValid = true
-                    if (exerciseName.isBlank()) {
-                        exerciseNameError = getString(R.string.err_required); isValid = false
-                    }
-                    if (weight.isBlank()) {
-                        weightError = getString(R.string.err_required); isValid = false
-                    }
-                    if (reps.isBlank()) {
-                        repsError = getString(R.string.err_required); isValid = false
-                    }
-                    if (sets.isBlank()) {
-                        setsError = getString(R.string.err_required); isValid = false
-                    }
+                    val result = validateExercise(
+                        exerciseName, weight, reps, sets, state.exercises, selectedExerciseNumber, minWeight
+                    )
+                    exerciseNameError = result.nameError
+                    weightError = result.weightError
+                    repsError = result.repsError
+                    setsError = result.setsError
 
-                    if (isValid) {
-                        if (exerciseNameExistsForOtherExercise(
-                                state.exercises,
-                                exerciseName,
-                                selectedExerciseNumber
-                            )
-                        ) {
-                            exerciseNameError =
-                                getString(R.string.err_exercise_exists, exerciseName)
-                        } else {
-                            val finalReps = sanitizeReps(reps)
-                            val finalSets = sanitizeSets(sets)
-                            val finalWeight = sanitizeWeight(weight, minWeight)
-
-                            reps = finalReps.toString()
-                            sets = finalSets.toString()
-                            weight = formatWeight(finalWeight)
-
-                            val num = selectedExerciseNumber
-                            if (num != null) {
-                                val currentEx = state.exercises.find { it.exerciseNumber == num }
-                                val exercise = Exercise(
-                                    num,
-                                    exerciseName,
-                                    "Strength",
-                                    equipmentDisplayToModel(selectedEquipment),
-                                    finalSets,
-                                    finalReps,
-                                    finalWeight,
-                                    Exercise.SetsType.MAIN_SET
-                                ).apply {
-                                    this.workoutId = this@SummaryActivity.workoutId
-                                    this.id = currentEx?.id ?: -1
-                                }
-
-                                val updatedExercises = ArrayList(state.exercises).apply {
-                                    val indexInState = indexOfFirst { it.exerciseNumber == num }
-                                    if (indexInState != -1) this[indexInState] = exercise
-                                }
-                                exercises = updatedExercises
-                                summaryViewModel.initialize(
-                                    workout,
-                                    state.workoutName,
-                                    updatedExercises
-                                )
-
-                                exerciseName = ""
-                                exerciseNameError = null
-                                reps = getString(R.string.starting_reps)
-                                sets = getString(R.string.starting_sets)
-                                weight = getString(R.string.starting_weight)
-                                selectedEquipment = "Barbell"
-                                selectedExerciseNumber = null
-                            }
-                        }
+                    if (result.isValid && selectedExerciseNumber != null) {
+                        reps = result.sanitizedReps.toString()
+                        sets = result.sanitizedSets.toString()
+                        weight = formatWeight(result.sanitizedWeight)
+                        onUpdateExerciseAction(
+                            state, workout,
+                            ExerciseUpdateParams(
+                                exerciseName, selectedEquipment,
+                                result.sanitizedSets, result.sanitizedReps, result.sanitizedWeight
+                            ),
+                            selectedExerciseNumber!!
+                        )
+                        exerciseName = ""; exerciseNameError = null
+                        reps = getString(R.string.starting_reps)
+                        sets = getString(R.string.starting_sets)
+                        weight = getString(R.string.starting_weight)
+                        selectedEquipment = equipmentOptions.firstOrNull().orEmpty()
+                        selectedExerciseNumber = null
                     }
                 },
                 onExerciseClicked = { exName ->
-                    val clickedEx = state.exercises.find { it.name == exName }
-                    if (clickedEx != null) {
+                    state.exercises.find { it.name == exName }?.let { clickedEx ->
                         ex = clickedEx
                         exerciseName = clickedEx.name ?: ""
                         selectedExerciseNumber = clickedEx.exerciseNumber
                         sets = clickedEx.sets.toString()
                         reps = clickedEx.reps.toString()
                         weight = formatWeight(clickedEx.weight)
-                        selectedEquipment = equipmentModelToDisplay(
-                            clickedEx.equipment,
-                            resources.getStringArray(R.array.exerciseEquipment).toList()
-                        )
+                        selectedEquipment = equipmentModelToDisplay(clickedEx.equipment, equipmentOptions)
                     }
                 },
                 onDiscardWorkout = {
@@ -456,7 +357,7 @@ class SummaryActivity : GainzBaseActivity() {
                     } else if (state.exercises.isEmpty()) {
                         Toast.makeText(
                             this@SummaryActivity,
-                            "Error: No exercises added.",
+                            getString(R.string.err_no_exercises),
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
@@ -465,6 +366,156 @@ class SummaryActivity : GainzBaseActivity() {
                 }
             )
         )
+    }
+
+    private fun getMinWeight(equipment: String): Float = when (equipment.lowercase()) {
+        ExerciseConst.BARBELL -> ExerciseConst.BB_MIN_WEIGHT
+        ExerciseConst.DUMBBELL -> ExerciseConst.DB_MIN_WEIGHT
+        else -> ExerciseConst.MIN_WEIGHT
+    }
+
+    private data class ExerciseInput(
+        val name: String,
+        val weight: String,
+        val reps: String,
+        val sets: String,
+        val equipment: String,
+        val minWeight: Float
+    )
+
+    private data class ExerciseErrors(
+        val workoutNameError: String?,
+        val exerciseNameError: String?,
+        val weightError: String?,
+        val repsError: String?,
+        val setsError: String?
+    )
+
+    private fun createSummaryUiState(
+        state: SummaryViewModelState,
+        input: ExerciseInput,
+        equipmentOptions: List<String>,
+        selectedExerciseNumber: Int?,
+        initialMainButtonText: String,
+        errors: ExerciseErrors
+    ) = SummaryUiState(
+        workoutName = state.workoutName,
+        exerciseName = input.name,
+        selectedEquipment = input.equipment,
+        equipmentOptions = equipmentOptions,
+        weight = input.weight,
+        reps = input.reps,
+        sets = input.sets,
+        exerciseNames = state.exercises.mapNotNull { it.name },
+        selectedExerciseName = state.exercises.find { it.exerciseNumber == selectedExerciseNumber }?.name,
+        showAddExerciseButton = selectedExerciseNumber == null,
+        showUpdateExerciseButton = selectedExerciseNumber != null,
+        mainWorkoutButtonText = initialMainButtonText,
+        workoutNameError = errors.workoutNameError,
+        exerciseNameError = errors.exerciseNameError,
+        weightError = errors.weightError,
+        repsError = errors.repsError,
+        setsError = errors.setsError,
+        canDecrementWeight = (input.weight.toFloatOrNull() ?: 0f) > input.minWeight,
+        canDecrementReps = (input.reps.toIntOrNull() ?: 0) > MIN_INT,
+        canDecrementSets = (input.sets.toIntOrNull() ?: 0) > MIN_INT,
+        isSaving = state.isSaving,
+    )
+
+    private data class ExerciseValidationResult(
+        val isValid: Boolean,
+        val nameError: String? = null,
+        val weightError: String? = null,
+        val repsError: String? = null,
+        val setsError: String? = null,
+        val sanitizedReps: Int = 0,
+        val sanitizedSets: Int = 0,
+        val sanitizedWeight: Float = 0f
+    )
+
+    private fun validateExercise(
+        name: String,
+        weight: String,
+        reps: String,
+        sets: String,
+        currentExercises: List<Exercise>,
+        selectedExerciseNumber: Int?,
+        minWeight: Float
+    ): ExerciseValidationResult {
+        var nameErr: String? = null
+        var weightErr: String? = null
+        var repsErr: String? = null
+        var setsErr: String? = null
+
+        if (name.isBlank()) nameErr = getString(R.string.err_required)
+        if (weight.isBlank()) weightErr = getString(R.string.err_required)
+        if (reps.isBlank()) repsErr = getString(R.string.err_required)
+        if (sets.isBlank()) setsErr = getString(R.string.err_required)
+
+        if (nameErr != null || weightErr != null || repsErr != null || setsErr != null) {
+            return ExerciseValidationResult(isValid = false, nameErr, weightErr, repsErr, setsErr)
+        }
+
+        if (exerciseNameExistsForOtherExercise(currentExercises, name, selectedExerciseNumber)) {
+            return ExerciseValidationResult(false, nameError = getString(R.string.err_exercise_exists, name))
+        }
+
+        return ExerciseValidationResult(
+            isValid = true,
+            sanitizedReps = sanitizeReps(reps),
+            sanitizedSets = sanitizeSets(sets),
+            sanitizedWeight = sanitizeWeight(weight, minWeight)
+        )
+    }
+
+    private fun onAddExerciseAction(
+        state: SummaryViewModelState,
+        workout: Workout?,
+        name: String,
+        equipment: String,
+        sets: Int,
+        reps: Int,
+        weight: Float
+    ) {
+        val exercise = Exercise(
+            state.exercises.size, name, ExerciseConst.STRENGTH, equipmentDisplayToModel(equipment),
+            sets, reps, weight, Exercise.SetsType.MAIN_SET
+        ).apply { this.workoutId = this@SummaryActivity.workoutId }
+
+        val updatedExercises = ArrayList<Exercise>(state.exercises).apply { add(exercise) }
+        exercises = updatedExercises
+        summaryViewModel.initialize(workout, state.workoutName, updatedExercises)
+    }
+
+    private data class ExerciseUpdateParams(
+        val name: String,
+        val equipment: String,
+        val sets: Int,
+        val reps: Int,
+        val weight: Float
+    )
+
+    private fun onUpdateExerciseAction(
+        state: SummaryViewModelState,
+        workout: Workout?,
+        params: ExerciseUpdateParams,
+        selectedNumber: Int
+    ) {
+        val currentEx = state.exercises.find { it.exerciseNumber == selectedNumber }
+        val exercise = Exercise(
+            selectedNumber, params.name, ExerciseConst.STRENGTH, equipmentDisplayToModel(params.equipment),
+            params.sets, params.reps, params.weight, Exercise.SetsType.MAIN_SET
+        ).apply {
+            this.workoutId = this@SummaryActivity.workoutId
+            this.id = currentEx?.id ?: -1
+        }
+
+        val updatedExercises = ArrayList<Exercise>(state.exercises).apply {
+            val index = indexOfFirst { it.exerciseNumber == selectedNumber }
+            if (index != -1) this[index] = exercise
+        }
+        exercises = updatedExercises
+        summaryViewModel.initialize(workout, state.workoutName, updatedExercises)
     }
 
     companion object {
