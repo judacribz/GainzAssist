@@ -10,8 +10,8 @@ import ca.gainzassist.domain.usecase.workout.GetWorkoutWithExercisesByNameUseCas
 import ca.gainzassist.domain.usecase.workout.InsertCompletedSessionUseCase
 import ca.gainzassist.domain.usecase.workout.ObserveUniqueExerciseNamesUseCase
 import ca.gainzassist.domain.usecase.workout.ObserveWorkoutsUseCase
-import ca.gainzassist.domain.usecase.workout.SaveWorkoutUseCase
-import ca.gainzassist.domain.usecase.workout.UpdateWorkoutUseCase
+import ca.gainzassist.feature.summary.domain.usecase.SaveWorkoutUseCase
+import ca.gainzassist.feature.summary.domain.usecase.UpdateWorkoutUseCase
 import org.koin.dsl.module
 
 val workoutUseCaseModule = module {

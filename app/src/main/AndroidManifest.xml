@@ -14,7 +14,7 @@
 
         <!-- Login Activity -->
         <activity
-            android:name=".activities.authentication.login.view.LoginActivity"
+            android:name=".feature.login.presentation.screen.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -56,33 +56,33 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".activities.main.view.MainActivity"
+            android:name=".feature.main.presentation.screen.MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- HowToVideos Activity -->
         <activity
-            android:name=".activities.how_to_videos.view.HowToVideosActivity"
+            android:name=".feature.how_to_videos.presentation.screen.HowToVideosActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
             android:exported="false" />
 
         <!-- StartWorkout Activity -->
         <activity
-            android:name=".activities.start_workout.view.StartWorkoutActivity"
+            android:name=".feature.start_workout.presentation.screen.StartWorkoutActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
 
         <!-- Summary Activity -->
         <activity
-            android:name=".activities.add_workout.summary.view.SummaryActivity"
+            android:name=".feature.summary.presentation.screen.SummaryActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
-            android:name=".activities.add_workout.workout_entry.view.WorkoutEntryActivity"
+            android:name=".feature.workout_entry.presentation.screen.WorkoutEntryActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.add_workout.exercises_entry.view.ExercisesEntryActivity"
+            android:name=".feature.exercises_entry.presentation.screen.ExercisesEntryActivity"
             android:exported="false" />
 
         <service

@@ -1,6 +1,6 @@
 package ca.gainzassist.core.di
 
-import ca.gainzassist.activities.main.MainViewModel
+import ca.gainzassist.feature.main.presentation.viewmodel.MainViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

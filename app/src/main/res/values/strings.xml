@@ -17,6 +17,7 @@
     <string name="err_required_email_format">Email Format Required</string>
     <string name="err_required_password_min">Minimum 6 Characters Required</string>
     <string name="err_exercise_exists">%s exists</string>
+    <string name="err_must_be_positive_number">Must be a positive number</string>
     <!-- Success Msgs -->
     <string name="sign_up_success">Sign Up Success!</string>
     <!-- EditText Hints -->
