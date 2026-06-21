@@ -29,13 +29,15 @@ subprojects {
                     "ktlint_standard_binary-expression-wrapping" to "disabled",
                     "ktlint_standard_property-wrapping" to "disabled",
                     "ktlint_standard_parameter-list-wrapping" to "disabled",
+                    "ktlint_standard_argument-list-wrapping" to "disabled",
                     "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
                     "ktlint_standard_package-name" to "disabled",
                     "ktlint_standard_property-naming" to "disabled",
                     "ktlint_standard_comment-wrapping" to "disabled",
                     "ktlint_standard_wrapping" to "disabled",
                     "ktlint_standard_function-signature" to "disabled",
-                    "ktlint_standard_class-signature" to "disabled"
+                    "ktlint_standard_class-signature" to "disabled",
+                    "ktlint_standard_function-expression-body" to "disabled"
                 )
             )
         }
@@ -49,13 +51,15 @@ subprojects {
                     "ktlint_standard_binary-expression-wrapping" to "disabled",
                     "ktlint_standard_property-wrapping" to "disabled",
                     "ktlint_standard_parameter-list-wrapping" to "disabled",
+                    "ktlint_standard_argument-list-wrapping" to "disabled",
                     "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
                     "ktlint_standard_package-name" to "disabled",
                     "ktlint_standard_property-naming" to "disabled",
                     "ktlint_standard_comment-wrapping" to "disabled",
                     "ktlint_standard_wrapping" to "disabled",
                     "ktlint_standard_function-signature" to "disabled",
-                    "ktlint_standard_class-signature" to "disabled"
+                    "ktlint_standard_class-signature" to "disabled",
+                    "ktlint_standard_function-expression-body" to "disabled"
                 )
             )
         }

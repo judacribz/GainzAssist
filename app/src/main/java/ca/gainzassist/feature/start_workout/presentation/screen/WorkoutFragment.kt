@@ -32,9 +32,9 @@ import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.SUCCESS
 import com.orhanobut.logger.Logger
+import java.util.Locale
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Locale
 
 class WorkoutFragment : Fragment() {
 
@@ -106,7 +106,8 @@ class WorkoutFragment : Fragment() {
                 workoutController.events.collect { event ->
                     when (event) {
                         is WorkoutController.WorkoutControllerEvent.StartTimer -> startTimer(event.timeInMillis)
-                        is WorkoutController.WorkoutControllerEvent.UpdateProgressSets -> updateProgressSets(event.numSets)
+                        is WorkoutController.WorkoutControllerEvent.UpdateProgressSets ->
+                            updateProgressSets(event.numSets)
                         else -> {}
                     }
                 }
@@ -458,7 +459,9 @@ class WorkoutFragment : Fragment() {
             saveProgressMap()
             setProgress?.selectOneBased(ind)
             uiState = uiState.copy(
-                setProgress = setProgress?.toProgressUiItems(updateEx?.getNumSets() ?: workoutController.currNumSets) ?: emptyList()
+                setProgress = setProgress?.toProgressUiItems(
+                    updateEx?.getNumSets() ?: workoutController.currNumSets
+                ) ?: emptyList()
             )
             updateEx?.let { updateUI(it, ind - 1) }
         }
