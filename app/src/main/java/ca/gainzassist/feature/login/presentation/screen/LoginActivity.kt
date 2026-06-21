@@ -40,13 +40,15 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.orhanobut.logger.Logger
-import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
 import java.security.MessageDigest
 import java.util.UUID
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
+class LoginActivity :
+    GainzBaseActivity(),
+    FacebookCallback<LoginResult>,
     FirebaseAuth.AuthStateListener {
 
     private val loginViewModel: LoginViewModel by viewModel()
@@ -226,7 +228,10 @@ class LoginActivity : GainzBaseActivity(), FacebookCallback<LoginResult>,
                     context = this@LoginActivity
                 )
                 val credential = result.credential
-                if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                if (
+                    credential is CustomCredential &&
+                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                ) {
                     val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(
                         data = credential.data
                     )

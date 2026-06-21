@@ -35,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 private val EdgePadding = 0.dp
 private val IndicatorHeight = 2.dp
@@ -53,10 +53,7 @@ private const val ColorLerpMin = 0f
 private const val ColorLerpMax = 1f
 private const val FontWeightThreshold = 0.5f
 
-data class GainzTabItem(
-    val title: String,
-    val iconResId: Int? = null
-)
+data class GainzTabItem(val title: String, val iconResId: Int? = null)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -187,7 +184,13 @@ private fun GainzTabItems(
                         }
                     }
                 }
-                .padding(vertical = if (tab.iconResId != null && tab.title.isNotBlank()) TabPaddingVerticalIcon else TabPaddingVerticalNoIcon),
+                .padding(
+                    vertical = if (tab.iconResId != null && tab.title.isNotBlank()) {
+                        TabPaddingVerticalIcon
+                    } else {
+                        TabPaddingVerticalNoIcon
+                    }
+                ),
             contentAlignment = Alignment.Center
         ) {
             GainzTabItemContent(tab, distance, color)
