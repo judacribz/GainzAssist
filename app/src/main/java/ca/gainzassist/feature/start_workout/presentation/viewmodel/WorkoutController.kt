@@ -23,11 +23,11 @@ import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.model.Session
 import ca.gainzassist.domain.model.Workout
 import com.orhanobut.logger.Logger
+import kotlin.math.max
+import kotlin.math.min
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlin.math.max
-import kotlin.math.min
 
 object WorkoutController {
 
@@ -408,7 +408,7 @@ object WorkoutController {
                 return currMainInd + 1
             }
             return (currMains!!.indexOf(currExercise) + 1).also {
-                currMainInd = it - 1; /* Match Java side effect logic */
+                currMainInd = it - 1 /* Match Java side effect logic */
             }
         }
 

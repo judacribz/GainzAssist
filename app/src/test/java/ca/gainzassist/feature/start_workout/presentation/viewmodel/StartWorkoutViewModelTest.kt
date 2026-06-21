@@ -1,14 +1,12 @@
 package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
 import ca.gainzassist.domain.model.Exercise
-import ca.gainzassist.domain.model.ExerciseSet
 import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.domain.usecase.session.AddIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.GetIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteSessionUseCase
 import ca.gainzassist.domain.usecase.session.RemoveIncompleteWorkoutUseCase
 import ca.gainzassist.domain.usecase.session.SaveIncompleteSessionUseCase
-import ca.gainzassist.feature.start_workout.domain.model.StartWorkoutRestoreDecision
 import ca.gainzassist.feature.start_workout.domain.usecase.SaveIncompleteWorkoutUseCase
 import ca.gainzassist.feature.start_workout.domain.usecase.StartWorkoutSessionUseCase
 import ca.gainzassist.feature.start_workout.presentation.screen.StartWorkoutTab
@@ -101,7 +99,10 @@ class StartWorkoutViewModelTest {
 
     @Test
     fun prepareSessionRestore_blankWorkoutName_returnsStartFresh() = runTest {
-        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
         val workout = Workout("  ", arrayListOf(exercise))
         viewModel.prepareSessionRestore(workout)
         advanceUntilIdle()
@@ -110,7 +111,10 @@ class StartWorkoutViewModelTest {
 
     @Test
     fun prepareSessionRestore_noIncompleteWorkout_returnsStartFresh() = runTest {
-        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
         val workout = Workout("Push Day", arrayListOf(exercise))
         viewModel.prepareSessionRestore(workout)
         advanceUntilIdle()
@@ -119,7 +123,10 @@ class StartWorkoutViewModelTest {
 
     @Test
     fun prepareSessionRestore_incompleteWorkoutNoSession_removesAndStartsFresh() = runTest {
-        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
         val workout = Workout("Push Day", arrayListOf(exercise))
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
 
@@ -133,7 +140,10 @@ class StartWorkoutViewModelTest {
 
     @Test
     fun prepareSessionRestore_withSessionJson_returnsRestoreFromJsonAndCleansSession() = runTest {
-        val exercise = Exercise(1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL, 3, 5, 135f, Exercise.SetsType.MAIN_SET)
+        val exercise = Exercise(
+            1, "Squat", "Strength", ca.gainzassist.core.constants.ExerciseConst.BARBELL,
+            3, 5, 135f, Exercise.SetsType.MAIN_SET
+        )
         val workout = Workout("Push Day", arrayListOf(exercise))
         sessionPreferencesRepository.addIncompleteWorkout("Push Day")
         sessionPreferencesRepository.saveIncompleteSession("Push Day", "{\"key\":\"val\"}")

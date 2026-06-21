@@ -22,7 +22,6 @@ object Authentication {
     private val mAuth = FirebaseAuth.getInstance()
     private var userCreated = false
 
-    @JvmStatic
     fun signIn(act: Activity, cred: AuthCredential) {
         mAuth.signInWithCredential(cred)
             .addOnCompleteListener(act) { task ->
@@ -30,7 +29,6 @@ object Authentication {
             }
     }
 
-    @JvmStatic
     fun linkUser(act: Activity, cred: AuthCredential, currUser: FirebaseUser) {
         currUser.linkWithCredential(cred)
             .addOnCompleteListener(act) { task ->

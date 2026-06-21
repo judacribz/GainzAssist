@@ -19,7 +19,6 @@ object Misc {
 
     private val mapper = ObjectMapper()
 
-    @JvmStatic
     fun extractWorkout(workoutShot: DataSnapshot): Workout {
         val exercises = ArrayList<Exercise>()
         var exercise: Exercise?
@@ -43,7 +42,6 @@ object Misc {
         return workout
     }
 
-    @JvmStatic
     fun extractSession(sessionShot: DataSnapshot): Session? {
         val session = sessionShot.getValue(Session::class.java)
         if (session != null) {
@@ -76,7 +74,6 @@ object Misc {
         return session
     }
 
-    @JvmStatic
     fun exerciseToMap(exercises: ArrayList<Exercise>): Map<String, Any?> {
         val exs = HashMap<String, Any?>()
         for (exercise in exercises) {
@@ -85,15 +82,12 @@ object Misc {
         return exs
     }
 
-    @JvmStatic
     fun enablePrettyMapper() {
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
 
-    @JvmStatic
     fun readValue(childObj: Any?): Map<String, Any?> = readValue(writeValueAsString(childObj))
 
-    @JvmStatic
     fun writeValueAsString(`object`: Any?): String {
         var jsonStr = ""
         try {
@@ -104,7 +98,6 @@ object Misc {
         return jsonStr
     }
 
-    @JvmStatic
     fun readValue(childStr: String?): Map<String, Any?> {
         var childMap: Map<String, Any?> = HashMap()
         try {
@@ -116,14 +109,5 @@ object Misc {
             ioe.printStackTrace()
         }
         return childMap
-    }
-
-    @JvmStatic
-    fun shrinkTo(list: MutableList<*>?, newSize: Int) {
-        list?.let {
-            while (it.size > newSize) {
-                it.removeAt(it.size - 1)
-            }
-        }
     }
 }

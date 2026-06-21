@@ -1,6 +1,5 @@
 package ca.gainzassist.feature.start_workout.presentation.viewmodel
 
-import android.util.SparseArray
 import ca.gainzassist.ui.ProgressStatus
 import ca.gainzassist.ui.ProgressStatus.FAIL
 import ca.gainzassist.ui.ProgressStatus.FAIL_SELECTED
@@ -19,16 +18,16 @@ class WorkoutProgressMapperTest {
         val selectedIndex = 2
         val progress = WorkoutProgressMapper.setupProgress(count, selectedIndex)
 
-        assertEquals(UNSELECTED, progress.get(0))
-        assertEquals(SELECTED, progress.get(1))
-        assertEquals(UNSELECTED, progress.get(2))
+        assertEquals(UNSELECTED, progress[0])
+        assertEquals(SELECTED, progress[1])
+        assertEquals(UNSELECTED, progress[2])
     }
 
     @Test
     fun toProgressUiItems_returnsOneBasedNumbersAndCorrectStatuses() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, SUCCESS)
-        progress.put(1, SELECTED)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = SUCCESS
+        progress[1] = SELECTED
 
         val items = WorkoutProgressMapper.toProgressUiItems(progress, 2)
         assertEquals(2, items.size)
@@ -40,78 +39,78 @@ class WorkoutProgressMapperTest {
 
     @Test
     fun selectOneBased_convertsSuccessToSuccessSelected() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, SUCCESS)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = SUCCESS
 
         WorkoutProgressMapper.selectOneBased(progress, 1)
 
-        assertEquals(SUCCESS_SELECTED, progress.get(0))
+        assertEquals(SUCCESS_SELECTED, progress[0])
     }
 
     @Test
     fun selectOneBased_convertsFailToFailSelected() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, FAIL)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = FAIL
 
         WorkoutProgressMapper.selectOneBased(progress, 1)
 
-        assertEquals(FAIL_SELECTED, progress.get(0))
+        assertEquals(FAIL_SELECTED, progress[0])
     }
 
     @Test
     fun selectOneBased_selectingNewItemDeselectsOldSelectedToUnselected() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, SELECTED)
-        progress.put(1, UNSELECTED)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = SELECTED
+        progress[1] = UNSELECTED
 
         WorkoutProgressMapper.selectOneBased(progress, 2)
 
-        assertEquals(UNSELECTED, progress.get(0))
-        assertEquals(SELECTED, progress.get(1))
+        assertEquals(UNSELECTED, progress[0])
+        assertEquals(SELECTED, progress[1])
     }
 
     @Test
     fun selectOneBased_deselectsOldSuccessSelectedToSuccess() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, SUCCESS_SELECTED)
-        progress.put(1, UNSELECTED)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = SUCCESS_SELECTED
+        progress[1] = UNSELECTED
 
         WorkoutProgressMapper.selectOneBased(progress, 2)
 
-        assertEquals(SUCCESS, progress.get(0))
-        assertEquals(SELECTED, progress.get(1))
+        assertEquals(SUCCESS, progress[0])
+        assertEquals(SELECTED, progress[1])
     }
 
     @Test
     fun selectOneBased_deselectsOldFailSelectedToFail() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, FAIL_SELECTED)
-        progress.put(1, UNSELECTED)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = FAIL_SELECTED
+        progress[1] = UNSELECTED
 
         WorkoutProgressMapper.selectOneBased(progress, 2)
 
-        assertEquals(FAIL, progress.get(0))
-        assertEquals(SELECTED, progress.get(1))
+        assertEquals(FAIL, progress[0])
+        assertEquals(SELECTED, progress[1])
     }
 
     @Test
     fun setCurrentOneBased_marksPreviousItemSuccessOrFail() {
-        val progress = SparseArray<ProgressStatus>()
-        progress.put(0, SELECTED)
-        progress.put(1, UNSELECTED)
+        val progress = mutableMapOf<Int, ProgressStatus>()
+        progress[0] = SELECTED
+        progress[1] = UNSELECTED
 
         // Move from 1 to 2, marking 1 as success
         WorkoutProgressMapper.setCurrentOneBased(progress, 2, true)
 
-        assertEquals(SUCCESS, progress.get(0))
-        assertEquals(SELECTED, progress.get(1))
+        assertEquals(SUCCESS, progress[0])
+        assertEquals(SELECTED, progress[1])
 
         // Move from 2 to 3, marking 2 as fail
-        progress.put(2, UNSELECTED)
+        progress[2] = UNSELECTED
         WorkoutProgressMapper.setCurrentOneBased(progress, 3, false)
 
-        assertEquals(SUCCESS, progress.get(0))
-        assertEquals(FAIL, progress.get(1))
-        assertEquals(SELECTED, progress.get(2))
+        assertEquals(SUCCESS, progress[0])
+        assertEquals(FAIL, progress[1])
+        assertEquals(SELECTED, progress[2])
     }
 }

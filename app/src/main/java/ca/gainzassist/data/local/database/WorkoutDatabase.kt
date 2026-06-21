@@ -31,7 +31,6 @@ abstract class WorkoutDatabase : RoomDatabase() {
             /* no-op */
         }
 
-        @JvmStatic
         fun getDatabase(context: Context): WorkoutDatabase = INSTANCE ?: synchronized(this) {
             INSTANCE ?: getDatabaseBuilder(context)
                 .addCallback(sRoomDatabaseCallback)

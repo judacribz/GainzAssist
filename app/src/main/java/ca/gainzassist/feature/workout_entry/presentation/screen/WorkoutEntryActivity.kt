@@ -12,8 +12,8 @@ import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.feature.exercises_entry.presentation.screen.ExercisesEntryActivity
 import ca.gainzassist.feature.workout_entry.presentation.viewmodel.WorkoutEntryViewModel
 import ca.gainzassist.feature.workout_entry.presentation.viewmodel.WorkoutEntryViewModelEvent
-import org.koin.androidx.compose.koinViewModel
 import kotlin.math.max
+import org.koin.androidx.compose.koinViewModel
 
 class WorkoutEntryActivity : GainzBaseActivity() {
 

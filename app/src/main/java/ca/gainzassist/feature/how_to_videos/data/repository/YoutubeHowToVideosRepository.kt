@@ -7,16 +7,16 @@ import androidx.core.content.pm.PackageInfoCompat
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.feature.how_to_videos.domain.model.HowToVideo
 import ca.gainzassist.feature.how_to_videos.domain.repository.HowToVideosRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONException
-import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONException
+import org.json.JSONObject
 
 class YoutubeHowToVideosRepository(
     private val context: Context

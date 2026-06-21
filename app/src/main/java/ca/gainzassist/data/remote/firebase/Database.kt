@@ -38,19 +38,16 @@ object Database {
         }
     }
 
-    @JvmStatic
     fun getWorkoutsRef(): DatabaseReference? {
         userRef = getUserRef()
         return userRef?.child(WORKOUTS)
     }
 
-    @JvmStatic
     fun getWorkoutSessionsRef(): DatabaseReference? {
         userRef = getUserRef()
         return userRef?.child(SESSIONS)
     }
 
-    @JvmStatic
     fun setUserInfo(act: Activity) {
         firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {
@@ -85,7 +82,6 @@ object Database {
         }
     }
 
-    @JvmStatic
     fun addWorkoutFirebase(workout: Workout) {
         userWorkoutsRef = getWorkoutsRef()
         val workoutName = workout.name
@@ -98,14 +94,12 @@ object Database {
         }
     }
 
-    @JvmStatic
     fun addWorkoutSessionFirebase(session: Session) {
         val userWorkoutSessionsRef = getWorkoutSessionsRef()
         userWorkoutSessionsRef?.child(session.timestamp.toString())?.setValue(session.toMap())
         updateWorkoutWeights(session.workoutName!!, session.avgWeights)
     }
 
-    @JvmStatic
     fun updateWorkoutWeights(workoutName: String, newWeights: SparseArray<Float>) {
         userWorkoutsRef = getWorkoutsRef()
         if (userWorkoutsRef != null) {
@@ -120,7 +114,6 @@ object Database {
         }
     }
 
-    @JvmStatic
     fun deleteWorkoutFirebase(workoutName: String?) {
         userWorkoutsRef = getWorkoutsRef()
         if (workoutName != null) {

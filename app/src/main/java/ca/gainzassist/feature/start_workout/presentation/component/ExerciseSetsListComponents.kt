@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.ExerciseSet
-import java.util.Locale
 
 private const val BENCH_PRESS = "Bench Press"
 
@@ -187,7 +186,7 @@ fun ExerciseSetChip(
 ) {
     val setText = (exerciseSet.setNumber + 1).toString()
     val repsText = exerciseSet.reps.toString()
-    val weightText = String.format(Locale.getDefault(), "%.0f", exerciseSet.weight)
+    val weightText = String.format("%.0f", exerciseSet.weight)
 
     val columnWidth = numberColumnWidthDp(setText, repsText, weightText)
 

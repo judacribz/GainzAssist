@@ -10,7 +10,7 @@ import android.view.View
 import ca.gainzassist.R
 import java.util.Locale
 
-class EquipmentView @JvmOverloads constructor(
+class EquipmentView(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0

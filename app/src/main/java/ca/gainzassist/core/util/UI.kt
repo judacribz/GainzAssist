@@ -13,7 +13,6 @@ object UI {
 
     private var backPressedTwice = false
 
-    @JvmStatic
     fun handleBackButton(context: Context) {
         if (backPressedTwice) {
             context.startActivity(
@@ -28,7 +27,6 @@ object UI {
         }
     }
 
-    @JvmStatic
     fun setInitTheme(act: Activity) {
         val col = getThemePref(act)
         if (col != null) {

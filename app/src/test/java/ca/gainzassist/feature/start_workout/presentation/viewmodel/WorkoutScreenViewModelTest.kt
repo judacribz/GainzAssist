@@ -95,12 +95,12 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Push Day"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        
+
         var loadedSnapshotNullable: SessionProgressSnapshot? = null
         viewModel.getSessionProgress(workoutName) {
             loadedSnapshotNullable = it
         }
-        
+
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)
@@ -117,7 +117,7 @@ class WorkoutScreenViewModelTest {
         viewModel.getSessionProgress(workoutName) {
             loadedSnapshotNullable = it
         }
-        
+
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         // Misc.readValue catches the exception and returns an empty map.
@@ -135,12 +135,12 @@ class WorkoutScreenViewModelTest {
         val workoutName = "Null Test"
 
         viewModel.saveSessionProgress(workoutName, snapshot)
-        
+
         var loadedSnapshotNullable: SessionProgressSnapshot? = null
         viewModel.getSessionProgress(workoutName) {
             loadedSnapshotNullable = it
         }
-        
+
         val loadedSnapshot = assertNotNullValue(loadedSnapshotNullable)
 
         assertEquals(snapshot.exerciseProgress, loadedSnapshot.exerciseProgress)

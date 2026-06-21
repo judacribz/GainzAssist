@@ -20,8 +20,8 @@ class CalculateNextExerciseWeightUseCaseTest {
     private fun createExercise(
         equipment: String,
         weight: Float,
-        reps: Int,
-        sets: Int,
+        @Suppress("SameParameterValue") reps: Int,
+        @Suppress("SameParameterValue") sets: Int,
         minWeight: Float
     ): Exercise = Exercise().apply {
         this.equipment = equipment

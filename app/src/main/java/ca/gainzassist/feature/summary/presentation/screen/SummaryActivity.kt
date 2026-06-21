@@ -23,11 +23,11 @@ import ca.gainzassist.domain.model.Workout
 import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModel
 import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModelEvent
 import ca.gainzassist.feature.summary.presentation.viewmodel.SummaryViewModelState
+import java.util.Locale
+import kotlin.math.max
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Locale
-import kotlin.math.max
 
 enum class CallingActivity {
     WORKOUTS_LIST,
