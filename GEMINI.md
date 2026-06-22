@@ -200,6 +200,21 @@ Preview composables must be private.
 
 Always avoid trailing commas in Kotlin code (e.g., in parameter lists, data classes, or function calls).
 
+Prefer `runCatching` over `try-catch` when handling exceptions in a functional style or when assigning results.
+
+Important: In Coroutines, `runCatching` catches `CancellationException`. Always rethrow `CancellationException` in the `onFailure` or `getOrElse` block to ensure proper coroutine cancellation.
+
+Example:
+```kotlin
+val result = runCatching {
+    doSomething()
+}.getOrElse { throwable ->
+    if (throwable is CancellationException) throw throwable
+    // Handle other errors
+    defaultValue
+}
+```
+
 Composable files should be organized like this:
 
 ```text
