@@ -10,14 +10,13 @@ import androidx.compose.ui.res.stringResource
  * This is useful for passing localized text from ViewModels to the UI.
  */
 sealed class UiText {
+
     data class DynamicString(val value: String) : UiText()
-    class StringResource(
-        @param:StringRes val resId: Int,
-        vararg val args: Any
-    ) : UiText()
+    class StringResource(@param:StringRes val resId: Int, vararg val args: Any) : UiText()
 
     @Composable
     fun asString(): String = when (this) {
+
         is DynamicString -> value
         is StringResource -> {
             val resolvedArgs = args.map { arg ->

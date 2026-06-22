@@ -80,11 +80,7 @@ data class WorkoutUiActions(
     val onSetProgressClick: (Int) -> Unit = {}
 )
 
-data class WorkoutNumberControlState(
-    val value: String,
-    val isMin: Boolean,
-    val isDecimal: Boolean = false
-)
+data class WorkoutNumberControlState(val value: String, val isMin: Boolean, val isDecimal: Boolean = false)
 
 data class WorkoutNumberControlActions(
     val onValueChanged: (String) -> Unit,
@@ -99,6 +95,7 @@ fun WorkoutComposeScreen(
     actions: WorkoutUiActions,
     modifier: Modifier = Modifier
 ) {
+
     Column(
         modifier = modifier
             .fillMaxSize()

@@ -279,6 +279,7 @@ fun NumExercisesSection(
     actions: NumExercisesActions,
     modifier: Modifier = Modifier
 ) {
+
     Card(
         modifier = modifier
             .fillMaxWidth()

@@ -62,6 +62,7 @@ fun GainzTabRow(
     scrollable: Boolean = false,
     onTabClick: ((Int) -> Unit)? = null
 ) {
+
     val coroutineScope = rememberCoroutineScope()
 
     if (scrollable) {

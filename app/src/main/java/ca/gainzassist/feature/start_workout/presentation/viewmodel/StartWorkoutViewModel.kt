@@ -34,6 +34,7 @@ data class StartWorkoutViewModelState(
 )
 
 sealed interface StartWorkoutViewModelEvent {
+
     data object OpenHowToVideos : StartWorkoutViewModelEvent
     data object FinishWorkout : StartWorkoutViewModelEvent
     data object ExitWorkout : StartWorkoutViewModelEvent

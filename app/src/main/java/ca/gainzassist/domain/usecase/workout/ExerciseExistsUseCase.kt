@@ -1,6 +1,7 @@
 package ca.gainzassist.domain.usecase.workout
 
 class ExerciseExistsUseCase {
+
     operator fun invoke(
         existingExerciseNames: List<String>,
         exerciseName: String

@@ -55,6 +55,7 @@ data class ExercisesEntryViewModelState(
 )
 
 sealed interface ExercisesEntryViewModelEvent {
+
     data class GoToSummary(val workout: Workout) : ExercisesEntryViewModelEvent
     data class ExerciseDeleted(val index: Int) : ExercisesEntryViewModelEvent
 }

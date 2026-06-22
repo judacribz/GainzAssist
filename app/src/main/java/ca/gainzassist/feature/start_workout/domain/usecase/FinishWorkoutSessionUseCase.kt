@@ -12,6 +12,7 @@ class FinishWorkoutSessionUseCase(
     private val removeIncompleteSessionUseCase: RemoveIncompleteSessionUseCase,
     private val removeSessionProgressUseCase: RemoveSessionProgressUseCase
 ) {
+
     suspend operator fun invoke(workoutName: String, session: Session) {
         insertCompletedSessionUseCase(session, syncToFirebase = true)
 

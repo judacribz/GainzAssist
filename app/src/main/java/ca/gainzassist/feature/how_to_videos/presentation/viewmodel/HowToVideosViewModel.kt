@@ -27,12 +27,11 @@ data class HowToVideosViewModelState(
 )
 
 sealed interface HowToVideosViewModelEvent {
+
     data class ShowMessage(val message: UiText) : HowToVideosViewModelEvent
 }
 
-class HowToVideosViewModel(
-    private val searchHowToVideosUseCase: SearchHowToVideosUseCase
-) : ViewModel() {
+class HowToVideosViewModel(private val searchHowToVideosUseCase: SearchHowToVideosUseCase) : ViewModel() {
 
     private val _state = MutableStateFlow(HowToVideosViewModelState())
     val state: StateFlow<HowToVideosViewModelState> = _state.asStateFlow()

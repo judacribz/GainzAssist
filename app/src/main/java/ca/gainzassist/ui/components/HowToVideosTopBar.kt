@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -22,11 +23,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import ca.gainzassist.R
 
-data class HowToVideosTopBarState(
-    val title: String,
-    val isSearchExpanded: Boolean,
-    val searchQuery: String
-)
+data class HowToVideosTopBarState(val title: String, val isSearchExpanded: Boolean, val searchQuery: String)
 
 data class HowToVideosTopBarActions(
     val onSearchQueryChange: (String) -> Unit,
@@ -42,6 +39,7 @@ fun HowToVideosTopBar(
     state: HowToVideosTopBarState,
     actions: HowToVideosTopBarActions
 ) {
+
     if (state.isSearchExpanded) {
         TopAppBar(
             title = {
@@ -49,7 +47,7 @@ fun HowToVideosTopBar(
                     value = state.searchQuery,
                     onValueChange = actions.onSearchQueryChange,
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { androidx.compose.material3.Text("Search videos...", color = Color.Gray) },
+                    placeholder = { Text("Search videos...", color = Color.Gray) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { actions.onSearchSubmit() }),

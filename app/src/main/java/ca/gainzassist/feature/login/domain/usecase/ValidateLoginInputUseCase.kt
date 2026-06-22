@@ -9,6 +9,7 @@ sealed interface LoginValidationResult {
 }
 
 enum class EmailErrorType {
+
     EMPTY,
     INVALID_FORMAT
 }
@@ -19,7 +20,6 @@ enum class PasswordErrorType {
 }
 
 class ValidateLoginInputUseCase {
-    private val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
 
     operator fun invoke(email: String, password: String): LoginValidationResult {
         var emailError: EmailErrorType? = null
@@ -27,7 +27,7 @@ class ValidateLoginInputUseCase {
 
         if (email.isEmpty()) {
             emailError = EmailErrorType.EMPTY
-        } else if (!emailRegex.matches(email)) {
+        } else if (!EMAIL_REGEX.matches(email)) {
             emailError = EmailErrorType.INVALID_FORMAT
         }
 
@@ -42,5 +42,9 @@ class ValidateLoginInputUseCase {
         } else {
             LoginValidationResult.Failure(emailError, passwordError)
         }
+    }
+
+    companion object {
+        private val EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
     }
 }

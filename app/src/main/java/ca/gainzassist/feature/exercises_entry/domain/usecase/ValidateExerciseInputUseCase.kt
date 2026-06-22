@@ -5,12 +5,7 @@ enum class ValidationError {
 }
 
 sealed interface ValidateExerciseResult {
-    data class Success(
-        val name: String,
-        val weight: Float,
-        val reps: Int,
-        val sets: Int
-    ) : ValidateExerciseResult
+    data class Success(val name: String, val weight: Float, val reps: Int, val sets: Int) : ValidateExerciseResult
 
     data class Error(
         val nameError: ValidationError? = null,
@@ -21,6 +16,7 @@ sealed interface ValidateExerciseResult {
 }
 
 class ValidateExerciseInputUseCase {
+
     operator fun invoke(
         name: String,
         weightStr: String,

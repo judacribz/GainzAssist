@@ -22,15 +22,11 @@ data class WorkoutEntryViewModelState(
 )
 
 sealed interface WorkoutEntryViewModelEvent {
-    data class ContinueToExercises(
-        val workoutName: String,
-        val numberOfExercises: Int
-    ) : WorkoutEntryViewModelEvent
+
+    data class ContinueToExercises(val workoutName: String, val numberOfExercises: Int) : WorkoutEntryViewModelEvent
 }
 
-class WorkoutEntryViewModel(
-    private val validateWorkoutEntryUseCase: ValidateWorkoutEntryUseCase
-) : ViewModel() {
+class WorkoutEntryViewModel(private val validateWorkoutEntryUseCase: ValidateWorkoutEntryUseCase) : ViewModel() {
 
     private val _state = MutableStateFlow(WorkoutEntryViewModelState())
     val state: StateFlow<WorkoutEntryViewModelState> = _state.asStateFlow()

@@ -3,6 +3,7 @@ package ca.gainzassist.feature.exercises_entry.domain.usecase
 import ca.gainzassist.domain.model.Exercise
 
 class DeleteExerciseUseCase {
+
     operator fun invoke(
         exercises: List<Exercise>,
         index: Int

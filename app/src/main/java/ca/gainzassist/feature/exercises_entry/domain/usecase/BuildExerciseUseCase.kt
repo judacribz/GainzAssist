@@ -4,6 +4,7 @@ import ca.gainzassist.core.constants.ExerciseConst
 import ca.gainzassist.domain.model.Exercise
 
 class BuildExerciseUseCase {
+
     operator fun invoke(
         index: Int,
         name: String,

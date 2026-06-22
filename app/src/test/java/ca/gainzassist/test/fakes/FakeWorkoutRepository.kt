@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
 class FakeWorkoutRepository : WorkoutRepository {
+
     private val workouts = MutableStateFlow<List<Workout>>(emptyList())
     private val exercises = MutableStateFlow<List<Exercise>>(emptyList())
     private val sets = MutableStateFlow<List<ExerciseSet>>(emptyList())

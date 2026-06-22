@@ -19,7 +19,4 @@ data class WorkoutScreenState(
     val setProgress: List<WorkoutProgressUiItem> = emptyList()
 )
 
-data class WorkoutProgressUiItem(
-    val number: Int,
-    val status: ProgressStatus
-)
+data class WorkoutProgressUiItem(val number: Int, val status: ProgressStatus)

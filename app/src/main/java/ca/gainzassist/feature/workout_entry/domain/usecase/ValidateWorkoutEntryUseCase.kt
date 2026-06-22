@@ -8,6 +8,7 @@ sealed interface WorkoutEntryValidationResult {
 }
 
 class ValidateWorkoutEntryUseCase {
+
     operator fun invoke(numberOfExercises: String): WorkoutEntryValidationResult {
         val numEx = numberOfExercises.toIntOrNull()
         return if (numEx == null || numEx < ExerciseConst.MIN_INT) {

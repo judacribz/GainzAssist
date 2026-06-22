@@ -10,6 +10,7 @@ class StartWorkoutSessionUseCase(
     private val getIncompleteSessionUseCase: GetIncompleteSessionUseCase,
     private val removeIncompleteSessionUseCase: RemoveIncompleteSessionUseCase
 ) {
+
     suspend operator fun invoke(workoutName: String): StartWorkoutRestoreDecision {
         if (workoutName.isBlank()) {
             return StartWorkoutRestoreDecision.StartFresh

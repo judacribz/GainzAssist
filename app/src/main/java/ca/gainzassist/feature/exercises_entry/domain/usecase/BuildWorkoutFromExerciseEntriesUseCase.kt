@@ -4,6 +4,7 @@ import ca.gainzassist.domain.model.Exercise
 import ca.gainzassist.domain.model.Workout
 
 class BuildWorkoutFromExerciseEntriesUseCase {
+
     operator fun invoke(
         workoutName: String,
         exercises: List<Exercise>
