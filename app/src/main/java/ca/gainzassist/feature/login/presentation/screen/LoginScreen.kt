@@ -97,6 +97,7 @@ fun LoginScreen(
         .fillMaxSize()
         .background(Color(0xFF2C3E50))
 ) {
+
     Image(
         painter = painterResource(R.drawable.login_bg),
         contentDescription = null,

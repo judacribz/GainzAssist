@@ -3,6 +3,7 @@ package ca.gainzassist.test.fakes
 import ca.gainzassist.domain.repository.SessionPreferencesRepository
 
 class FakeSessionPreferencesRepository : SessionPreferencesRepository {
+
     private val incompleteWorkouts = mutableSetOf<String>()
     private val incompleteSessions = mutableMapOf<String, String>()
     private val sessionProgresses = mutableMapOf<String, String>()

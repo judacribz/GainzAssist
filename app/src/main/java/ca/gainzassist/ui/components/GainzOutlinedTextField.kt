@@ -67,6 +67,7 @@ fun GainzOutlinedTextField(
     textAlign: TextAlign = TextAlign.Center,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default
 ) {
+
     val safeFontFamily = if (androidx.compose.ui.platform.LocalInspectionMode.current) {
         FontFamily.Default
     } else {

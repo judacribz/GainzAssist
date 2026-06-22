@@ -24,13 +24,12 @@ data class SummaryViewModelState(
 )
 
 sealed interface SummaryViewModelEvent {
+
     data object Saved : SummaryViewModelEvent
     data class Error(val message: UiText) : SummaryViewModelEvent
 }
 
-class SummaryViewModel(
-    private val saveWorkoutUseCase: SaveWorkoutUseCase
-) : ViewModel() {
+class SummaryViewModel(private val saveWorkoutUseCase: SaveWorkoutUseCase) : ViewModel() {
 
     private val _state = MutableStateFlow(SummaryViewModelState())
     val state: StateFlow<SummaryViewModelState> = _state.asStateFlow()

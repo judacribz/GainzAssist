@@ -474,6 +474,7 @@ class SummaryActivity : GainzBaseActivity() {
         selectedExerciseNumber: Int?,
         minWeight: Float
     ): ExerciseValidationResult {
+
         var nameErr: String? = null
         var weightErr: String? = null
         var repsErr: String? = null
@@ -539,6 +540,7 @@ class SummaryActivity : GainzBaseActivity() {
         params: ExerciseUpdateParams,
         selectedNumber: Int
     ) {
+
         val currentEx = state.exercises.find { it.exerciseNumber == selectedNumber }
         val exercise = Exercise(
             selectedNumber,

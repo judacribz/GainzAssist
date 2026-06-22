@@ -3,6 +3,7 @@ package ca.gainzassist.test.fakes
 import ca.gainzassist.domain.repository.UserPreferencesRepository
 
 class FakeUserPreferencesRepository : UserPreferencesRepository {
+
     var currentEmail: String? = null
     var currentUid: String? = null
     var currentTheme: String? = null

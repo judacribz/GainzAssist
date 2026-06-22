@@ -75,6 +75,7 @@ object WorkoutController {
     val events: SharedFlow<WorkoutControllerEvent> = _events.asSharedFlow()
 
     fun setRetrievedWorkout(map: Map<String, Any?>, workout: Workout) {
+
         resetIndices()
         this.retrievedWorkout = map
         this.currWarmups = ArrayList()
@@ -168,6 +169,7 @@ object WorkoutController {
     )
 
     private fun genBBWarmups(ex: Exercise): ArrayList<ExerciseSet> {
+
         val exerciseSets = ArrayList<ExerciseSet>()
         val weight = ex.getAvgWeight()
         val state = BBWarmupState(

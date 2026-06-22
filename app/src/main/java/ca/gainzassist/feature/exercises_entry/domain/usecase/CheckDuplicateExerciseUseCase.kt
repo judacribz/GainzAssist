@@ -1,6 +1,7 @@
 package ca.gainzassist.feature.exercises_entry.domain.usecase
 
 class CheckDuplicateExerciseUseCase {
+
     operator fun invoke(
         exerciseName: String,
         skipIndex: Int,

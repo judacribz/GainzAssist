@@ -32,10 +32,7 @@ data class HowToVideosUiState(
     val message: String? = null
 )
 
-data class HowToVideoUiItem(
-    val videoId: String,
-    val title: String
-)
+data class HowToVideoUiItem(val videoId: String, val title: String)
 
 private const val HOW_TO_SQUAT = "How to Squat Properly"
 private const val SQUAT_MISTAKES = "Squat Mistakes to Avoid"
@@ -47,6 +44,7 @@ fun HowToVideosScreen(
     playerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     Column(
         modifier = modifier
             .fillMaxSize()

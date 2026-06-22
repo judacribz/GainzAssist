@@ -21,18 +21,9 @@ import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzTabItem
 import ca.gainzassist.ui.components.GainzTabRow
 
-data class ExercisesEntryUiState(
-    val selectedIndex: Int,
-    val tabs: List<ExerciseEntryTab>,
-    val numExercises: Int
-)
+data class ExercisesEntryUiState(val selectedIndex: Int, val tabs: List<ExerciseEntryTab>, val numExercises: Int)
 
-data class ExerciseEntryTab(
-    val index: Int,
-    val title: String,
-    val id: Long,
-    val isAddTab: Boolean = false
-)
+data class ExerciseEntryTab(val index: Int, val title: String, val id: Long, val isAddTab: Boolean = false)
 
 private const val WeightFull = 1f
 private const val EXERCISE_1 = "Exercise 1"
@@ -44,6 +35,7 @@ fun ExercisesEntryScreen(
     onTabSelected: (Int) -> Unit,
     pageContent: @Composable (Int) -> Unit
 ) {
+
     val safeInitialPage = uiState.selectedIndex
         .coerceIn(0, (uiState.numExercises - 1).coerceAtLeast(0))
 

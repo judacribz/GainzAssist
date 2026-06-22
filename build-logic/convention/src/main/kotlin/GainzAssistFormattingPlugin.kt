@@ -34,7 +34,6 @@ class GainzAssistFormattingPlugin : Plugin<Project> {
                             "ktlint_standard_multiline-expression-wrapping" to "disabled",
                             "ktlint_standard_binary-expression-wrapping" to "disabled",
                             "ktlint_standard_property-wrapping" to "disabled",
-                            "ktlint_standard_parameter-list-wrapping" to "disabled",
                             "ktlint_standard_argument-list-wrapping" to "disabled",
                             "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
                             "ktlint_standard_package-name" to "disabled",
@@ -46,6 +45,11 @@ class GainzAssistFormattingPlugin : Plugin<Project> {
                             "ktlint_standard_function-expression-body" to "disabled"
                         )
                     )
+                    replaceRegex(
+                        "Blank line after class opening brace",
+                        "(?m)^([ \\t]*(?:(?:public|private|protected|internal|abstract|open|sealed|data|value|inner|annotation)\\s+)*class[^{]*\\{)\\n(?!\\s*\\n)(?!\\s*\\})",
+                        "$1\n\n"
+                    )
                 }
                 kotlinGradle {
                     target("**/*.kts")
@@ -56,7 +60,6 @@ class GainzAssistFormattingPlugin : Plugin<Project> {
                             "ktlint_standard_multiline-expression-wrapping" to "disabled",
                             "ktlint_standard_binary-expression-wrapping" to "disabled",
                             "ktlint_standard_property-wrapping" to "disabled",
-                            "ktlint_standard_parameter-list-wrapping" to "disabled",
                             "ktlint_standard_argument-list-wrapping" to "disabled",
                             "ktlint_standard_no-empty-first-line-in-method-block" to "disabled",
                             "ktlint_standard_package-name" to "disabled",

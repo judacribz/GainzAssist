@@ -17,10 +17,7 @@ import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
 import ca.gainzassist.ui.components.GainzButton
 
-data class SettingsUiState(
-    val signedInText: String,
-    val versionText: String
-)
+data class SettingsUiState(val signedInText: String, val versionText: String)
 
 data class SettingsScreenActions(
     val onSignOutClick: () -> Unit = {},

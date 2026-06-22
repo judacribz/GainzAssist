@@ -9,16 +9,16 @@ import androidx.compose.ui.tooling.preview.PreviewFontScale
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import ca.gainzassist.R
 
-data class ResumeUiState(
-    val workoutNames: List<String>,
-    val isEmpty: Boolean = workoutNames.isEmpty()
-)
+data class ResumeUiState(val workoutNames: List<String>, val isEmpty: Boolean = workoutNames.isEmpty())
+
+private const val PREVIEW_CHEST_DAY = "Chest Day"
 
 @Composable
 fun ResumeScreen(
     uiState: ResumeUiState,
     onWorkoutClick: (String) -> Unit
 ) {
+
     val staatliches = FontFamily(Font(R.font.staatliches))
 
     SharedWorkoutList(
@@ -46,7 +46,7 @@ fun ResumeScreenPreviewEmpty() {
 fun ResumeScreenPreviewOneWorkout() {
     MaterialTheme {
         ResumeScreen(
-            uiState = ResumeUiState(workoutNames = listOf("Chest Day")),
+            uiState = ResumeUiState(workoutNames = listOf(PREVIEW_CHEST_DAY)),
             onWorkoutClick = {}
         )
     }
@@ -57,7 +57,7 @@ fun ResumeScreenPreviewOneWorkout() {
 fun ResumeScreenPreviewMultipleWorkouts() {
     MaterialTheme {
         ResumeScreen(
-            uiState = ResumeUiState(workoutNames = listOf("Chest Day", "Legs", "Back & Biceps")),
+            uiState = ResumeUiState(workoutNames = listOf(PREVIEW_CHEST_DAY, "Legs", "Back & Biceps")),
             onWorkoutClick = {}
         )
     }
@@ -68,7 +68,7 @@ fun ResumeScreenPreviewMultipleWorkouts() {
 fun ResumeScreenPreviewSmallPhone360x800() {
     MaterialTheme {
         ResumeScreen(
-            uiState = ResumeUiState(workoutNames = listOf("Chest Day", "Legs", "Back & Biceps")),
+            uiState = ResumeUiState(workoutNames = listOf(PREVIEW_CHEST_DAY, "Legs", "Back & Biceps")),
             onWorkoutClick = {}
         )
     }
@@ -79,7 +79,7 @@ fun ResumeScreenPreviewSmallPhone360x800() {
 fun ResumeScreenPreviewFontScaleLarge() {
     MaterialTheme {
         ResumeScreen(
-            uiState = ResumeUiState(workoutNames = listOf("Chest Day", "Legs")),
+            uiState = ResumeUiState(workoutNames = listOf(PREVIEW_CHEST_DAY, "Legs")),
             onWorkoutClick = {}
         )
     }

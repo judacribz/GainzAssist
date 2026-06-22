@@ -33,6 +33,7 @@ data class MainViewModelState(
 )
 
 sealed interface MainViewModelEvent {
+
     data class StartWorkout(val workout: Workout) : MainViewModelEvent
     data class EditWorkout(val workout: Workout) : MainViewModelEvent
     data object AddWorkout : MainViewModelEvent

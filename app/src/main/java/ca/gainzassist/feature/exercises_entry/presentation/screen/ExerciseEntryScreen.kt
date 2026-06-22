@@ -55,6 +55,7 @@ data class ExEntryUiState(
 )
 
 interface ExEntryActions {
+
     fun onExerciseNameChanged(name: String)
     fun onEquipmentSelected(equipment: String)
     fun onWeightChanged(weight: String)
@@ -205,6 +206,7 @@ fun ExEntryScreen(
                 actions: NumberRowActions,
                 modifier: Modifier = Modifier
             ) {
+
                 Row(
                     modifier = modifier
                         .fillMaxWidth()

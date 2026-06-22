@@ -7,6 +7,7 @@ class SaveIncompleteWorkoutUseCase(
     private val saveIncompleteSessionUseCase: SaveIncompleteSessionUseCase,
     private val addIncompleteWorkoutUseCase: AddIncompleteWorkoutUseCase
 ) {
+
     suspend operator fun invoke(workoutName: String, sessionJson: String) {
         if (sessionJson.isNotEmpty()) {
             saveIncompleteSessionUseCase(workoutName, sessionJson)

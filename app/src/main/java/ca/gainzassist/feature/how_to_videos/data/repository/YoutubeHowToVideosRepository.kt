@@ -13,16 +13,18 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 
 class YoutubeHowToVideosRepository(
-    private val context: Context
+    private val context: Context,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : HowToVideosRepository {
 
-    override suspend fun searchVideos(query: String): List<HowToVideo> = withContext(Dispatchers.IO) {
+    override suspend fun searchVideos(query: String): List<HowToVideo> = withContext(ioDispatcher) {
         val queryKey = query.trim()
         if (queryKey.isEmpty()) {
             return@withContext emptyList()
