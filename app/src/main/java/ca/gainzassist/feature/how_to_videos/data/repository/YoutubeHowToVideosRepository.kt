@@ -7,24 +7,23 @@ import androidx.core.content.pm.PackageInfoCompat
 import ca.gainzassist.BuildConfig
 import ca.gainzassist.feature.how_to_videos.domain.model.HowToVideo
 import ca.gainzassist.feature.how_to_videos.domain.repository.HowToVideosRepository
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
 import java.security.MessageDigest
-import kotlinx.coroutines.CoroutineDispatcher
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 
-class YoutubeHowToVideosRepository(
-    private val context: Context,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : HowToVideosRepository {
+class YoutubeHowToVideosRepository(private val context: Context) : HowToVideosRepository {
 
-    override suspend fun searchVideos(query: String): List<HowToVideo> = withContext(ioDispatcher) {
+    private val httpClient = HttpClient(OkHttp)
+
+    override suspend fun searchVideos(query: String): List<HowToVideo> = withContext(Dispatchers.IO) {
         val queryKey = query.trim()
         if (queryKey.isEmpty()) {
             return@withContext emptyList()
@@ -72,39 +71,22 @@ class YoutubeHowToVideosRepository(
         return ""
     }
 
-    private fun fetchYouTubeResponse(urlString: String): String {
-        var connection: HttpURLConnection? = null
-        var reader: BufferedReader? = null
-
+    private suspend fun fetchYouTubeResponse(urlString: String): String {
         try {
-            val url = URL(urlString)
-            connection = url.openConnection() as HttpURLConnection
-            connection.setRequestProperty("X-Android-Package", context.packageName)
-            connection.setRequestProperty("X-Android-Cert", getAppSha1())
-            connection.connect()
-
-            val responseCode = connection.responseCode
-            val stream =
-                if (responseCode in 200..299) connection.inputStream else connection.errorStream
-
-            if (stream == null) {
-                throw Exception(ERR_YOUTUBE_LOAD)
+            val response: HttpResponse = httpClient.get(urlString) {
+                header("X-Android-Package", context.packageName)
+                header("X-Android-Cert", getAppSha1())
             }
 
-            reader = BufferedReader(InputStreamReader(stream))
-            val buffer = StringBuilder()
-            var line: String?
-            while (reader.readLine().also { line = it } != null) {
-                buffer.append(line).append("\n")
-            }
+            val responseBody = response.bodyAsText()
+            val responseCode = response.status.value
 
             if (responseCode !in 200..299) {
-                val errorBody = buffer.toString()
                 val sanitizedUrl = urlString.replace(Regex("&key=[^&]*"), "&key=***")
-                Log.e("HowToVideosRepo", "Error $responseCode for $sanitizedUrl\nBody: $errorBody")
+                Log.e("HowToVideosRepo", "Error $responseCode for $sanitizedUrl\nBody: $responseBody")
 
-                val msg = if (errorBody.contains("quotaExceeded") ||
-                    errorBody.contains("dailyLimitExceeded")
+                val msg = if (responseBody.contains("quotaExceeded") ||
+                    responseBody.contains("dailyLimitExceeded")
                 ) {
                     "YouTube video search quota exceeded. Please try again later."
                 } else {
@@ -112,14 +94,17 @@ class YoutubeHowToVideosRepository(
                 }
                 throw Exception(msg)
             }
-            return buffer.toString()
-        } finally {
-            connection?.disconnect()
-            try {
-                reader?.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
+            return responseBody
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) {
+                throw e
             }
+            // Rethrow or wrap if it's already an expected Exception
+            if (e.message == ERR_YOUTUBE_LOAD || e.message?.contains("quotaExceeded") == true || e.message?.contains("dailyLimitExceeded") == true) {
+                throw e
+            }
+            Log.e("HowToVideosRepo", "Network Error: ${e.message}", e)
+            throw Exception(ERR_YOUTUBE_LOAD)
         }
     }
 

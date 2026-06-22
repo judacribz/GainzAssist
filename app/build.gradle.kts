@@ -154,6 +154,7 @@ dependencies {
     implementation(libs.bundles.google)
     implementation(libs.bundles.jackson)
     implementation(libs.bundles.koin)
+    implementation(libs.bundles.ktor)
     implementation(libs.bundles.room)
     implementation(libs.bundles.ui.logging)
 

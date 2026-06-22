@@ -30,6 +30,9 @@ room = "2.8.4"
 # DI
 koin = "4.2.2"
 
+# Network
+ktor = "3.1.1"
+
 # Facebook
 facebook-android-sdk = "18.2.3"
 facebook-rebound = "0.3.8"
@@ -128,6 +131,10 @@ android-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubepl
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
+# Ktor
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+
 # Jackson
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson-annotations" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson-core" }
@@ -217,6 +224,12 @@ jackson = [
 koin = [
     "koin-android",
     "koin-androidx-compose"
+]
+
+# Ktor
+ktor = [
+    "ktor-client-core",
+    "ktor-client-okhttp"
 ]
 
 # Room
