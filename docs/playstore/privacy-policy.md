@@ -1,6 +1,6 @@
 # Privacy Policy for GainzAssist
 
-**Last Updated:** [Insert Date]
+**Last Updated:** July 9, 2026
 
 ## 1. Introduction
 Welcome to GainzAssist. Your privacy is important to us. This Privacy Policy explains how we collect, use, and share your information when you use our workout tracking and exercise guidance application ("GainzAssist").
@@ -18,6 +18,8 @@ As the core purpose of GainzAssist is workout tracking and exercise guidance, we
 - Progress data over time.
 This data is synced and securely stored using Firebase Realtime Database to ensure your data is available across devices.
 
+### 2.3 Cookies and Similar Technologies
+The GainzAssist application (and integrated third-party services) stores, accesses, and collects information directly or indirectly on or from users’ devices, including by placing, accessing, or recognizing cookies or similar technology on users' devices or browsers. We use these technologies to support core features, authenticate users, and improve app functionality.
 ## 3. How We Use Your Information
 We use your data to:
 - Provide the core functionality of GainzAssist: tracking your workouts and providing exercise guidance.
