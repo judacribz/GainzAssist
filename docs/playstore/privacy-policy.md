@@ -20,6 +20,7 @@ This data is synced and securely stored using Firebase Realtime Database to ensu
 
 ### 2.3 Cookies and Similar Technologies
 The GainzAssist application (and integrated third-party services) stores, accesses, and collects information directly or indirectly on or from users’ devices, including by placing, accessing, or recognizing cookies or similar technology on users' devices or browsers. We use these technologies to support core features, authenticate users, and improve app functionality.
+
 ## 3. How We Use Your Information
 We use your data to:
 - Provide the core functionality of GainzAssist: tracking your workouts and providing exercise guidance.
