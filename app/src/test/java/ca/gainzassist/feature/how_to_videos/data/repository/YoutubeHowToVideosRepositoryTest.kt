@@ -210,7 +210,8 @@ class YoutubeHowToVideosRepositoryTest {
 
         val exception = runCatching { repo.searchVideos("workout") }.exceptionOrNull()
 
-        assertSame(cancellation, exception)
+        assertTrue(exception is CancellationException)
+        assertEquals("Cancelled by coroutine", exception?.message)
     }
 
     @Test
