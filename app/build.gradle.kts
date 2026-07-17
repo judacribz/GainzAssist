@@ -154,6 +154,8 @@ dependencies {
     implementation(libs.bundles.google)
     implementation(libs.bundles.jackson)
     implementation(libs.bundles.koin)
+    testImplementation(libs.ktor.client.mock)
+    testImplementation(libs.org.json)
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.room)
     implementation(libs.bundles.ui.logging)
@@ -181,6 +183,7 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.koin.test)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.ktor.client.mock)
 
     // Android Test
     androidTestImplementation(platform(libs.androidx.compose.bom))

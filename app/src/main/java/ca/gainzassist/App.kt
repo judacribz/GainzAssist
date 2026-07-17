@@ -8,6 +8,7 @@ import ca.gainzassist.core.di.dataModule
 import ca.gainzassist.core.di.domainModule
 import ca.gainzassist.core.di.loginModule
 import ca.gainzassist.core.di.mainViewModelModule
+import ca.gainzassist.core.di.networkModule
 import ca.gainzassist.core.di.preferencesDataModule
 import ca.gainzassist.core.di.presentationModule
 import ca.gainzassist.core.di.sessionSettingsUseCaseModule
@@ -30,6 +31,7 @@ class App : Application() {
             androidContext(this@App)
             modules(
                 coreModule,
+                networkModule,
                 dataModule,
                 preferencesDataModule,
                 domainModule,
