@@ -12,16 +12,17 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicReference
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.atomic.AtomicReference
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class YoutubeHowToVideosRepositoryTest {
@@ -63,12 +64,13 @@ class YoutubeHowToVideosRepositoryTest {
         override val certificateSha1: String = "1234"
     }
 
-    private val apiConfig = TestApiConfig()
-    private val signatureProvider = TestSignatureProvider()
+    private lateinit var apiConfig: TestApiConfig
+    private lateinit var signatureProvider: TestSignatureProvider
 
     @Before
     fun setUp() {
-        // No Android dependencies to set up
+        apiConfig = TestApiConfig()
+        signatureProvider = TestSignatureProvider()
     }
 
     private fun createRepository(engine: MockEngine): YoutubeHowToVideosRepository {
@@ -83,7 +85,7 @@ class YoutubeHowToVideosRepositoryTest {
     @Test
     fun `searchVideos with blank query returns empty list and performs no request`() = runTest {
         var requestMade = false
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             requestMade = true
             respond(validJson, HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
         }
@@ -99,7 +101,7 @@ class YoutubeHowToVideosRepositoryTest {
     fun `searchVideos with missing API key throws MissingApiKey exception`() = runTest {
         apiConfig.apiKey = "   "
         var requestMade = false
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             requestMade = true
             respond(validJson, HttpStatusCode.OK)
         }
@@ -113,7 +115,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with successful response parses correctly`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             respond(validJson, HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
         }
         val repo = createRepository(engine)
@@ -127,7 +129,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with empty successful response returns empty list`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             respond(emptyJson, HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
         }
         val repo = createRepository(engine)
@@ -139,7 +141,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with malformed JSON throws InvalidResponse exception`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             respond(malformedJson, HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
         }
         val repo = createRepository(engine)
@@ -151,7 +153,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with quotaExceeded response throws QuotaExceeded exception`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             respond("error quotaExceeded limit", HttpStatusCode.Forbidden)
         }
         val repo = createRepository(engine)
@@ -163,7 +165,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with dailyLimitExceeded response throws QuotaExceeded exception`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             respond("dailyLimitExceeded reached", HttpStatusCode.Forbidden)
         }
         val repo = createRepository(engine)
@@ -175,7 +177,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with generic non-success HTTP response throws RequestFailed exception`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             respond("Internal Server Error", HttpStatusCode.InternalServerError)
         }
         val repo = createRepository(engine)
@@ -188,7 +190,7 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with network failure throws Network exception`() = runTest {
-        val engine = MockEngine { request ->
+        val engine = MockEngine { _ ->
             throw IOException("Network offline")
         }
         val repo = createRepository(engine)
@@ -200,14 +202,15 @@ class YoutubeHowToVideosRepositoryTest {
 
     @Test
     fun `searchVideos with CancellationException propagates cancellation`() = runTest {
-        val engine = MockEngine { request ->
-            throw CancellationException("Cancelled by coroutine")
+        val cancellation = CancellationException("Cancelled by coroutine")
+        val engine = MockEngine { _ ->
+            throw cancellation
         }
         val repo = createRepository(engine)
 
         val exception = runCatching { repo.searchVideos("workout") }.exceptionOrNull()
 
-        assertTrue(exception is CancellationException)
+        assertSame(cancellation, exception)
     }
 
     @Test
@@ -234,5 +237,6 @@ class YoutubeHowToVideosRepositoryTest {
         assertEquals("secret-key-123", req.url.parameters["key"])
 
         assertEquals("ca.gainzassist.test", req.headers["X-Android-Package"])
+        assertEquals("1234", req.headers["X-Android-Cert"])
     }
 }
