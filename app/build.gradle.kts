@@ -192,7 +192,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 }
 
-val validateReleaseSecrets by tasks.registering {
+val validateReleaseSecrets = tasks.register("validateReleaseSecrets") {
     group = "verification"
     description = "Validates required release secrets before building a release artifact."
 

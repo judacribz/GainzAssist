@@ -154,6 +154,7 @@ dialogplus = { module = "com.orhanobut:dialogplus", version.ref = "dialogplus" }
 logger = { module = "com.orhanobut:logger", version.ref = "logger" }
 
 # Detekt Plugins
+#noinspection UnusedVersionCatalogEntry
 detekt-compose = { module = "io.nlopez.compose.rules:detekt", version.ref = "detekt-compose" }
 detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
 spotless-gradlePlugin = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotless" }
