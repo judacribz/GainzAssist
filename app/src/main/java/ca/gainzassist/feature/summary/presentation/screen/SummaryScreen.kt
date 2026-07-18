@@ -1,12 +1,11 @@
 package ca.gainzassist.feature.summary.presentation.screen
 
-import androidx.appcompat.R as appCompatR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -46,10 +46,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+import ca.gainzassist.ui.components.ExerciseSelectionButton
 import ca.gainzassist.ui.components.GainzButton
-import ca.gainzassist.ui.components.GainzDropdown
-import ca.gainzassist.ui.components.GainzOutlinedTextField
+import ca.gainzassist.ui.components.GainzFieldLabelOverlay
+import ca.gainzassist.ui.components.GainzMaterialDropdown
+import ca.gainzassist.ui.components.GainzMaterialOutlinedTextField
 import ca.gainzassist.ui.components.GainzTextFieldState
+import androidx.appcompat.R as appCompatR
 
 val StaatlichesFont = FontFamily(Font(R.font.staatliches))
 
@@ -106,17 +109,14 @@ private val CardElevation = 3.dp
 private val CardCornerRadius = 5.dp
 private val CardBorderWidth = 0.5.dp
 private val StepperCornerRadius = 20.dp
-private val StepperBorderWidth = 4.dp
+private val StepperBorderWidth = 1.dp
 private val StepperPadding = 4.dp
 private val IconButtonSize = 40.dp
 private val InputFontSize = 35.sp
 private val StepperInternalPadding = 4.dp
-private val ChipPadding = 2.dp
-private val ChipSize = 60.dp
-private val ChipCornerRadius = 10.dp
-private val ChipFontSize = 20.sp
 private val ScreenPadding = 4.dp
 private val SectionVerticalPadding = 4.dp
+private val MaterialFieldLabelClearance = 12.dp
 private val WorkoutNameHeight = 80.dp
 private val ExerciseNameHeight = 150.dp
 private val InputBottomPadding = 8.dp
@@ -128,7 +128,8 @@ private val ButtonHeight = 55.dp
 private val FooterButtonHeight = 60.dp
 private val ExercisesTitleFontSize = 18.sp
 private val ExercisesTitleBottomPadding = 4.dp
-private val ExerciseChipEndPadding = 4.dp
+private val ExerciseListItemSpacing = 8.dp
+private val ExerciseListHorizontalPadding = 4.dp
 private const val WeightFull = 1f
 private const val BENCH_PRESS = "Bench Press"
 
@@ -155,7 +156,7 @@ fun SummaryToolbar(onBack: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(
                     painter = painterResource(appCompatR.drawable.abc_ic_ab_back_material),
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.cd_back),
                     tint = colorResource(R.color.colorBg)
                 )
             }
@@ -202,299 +203,304 @@ fun NumericStepperField(
     onDecrement: () -> Unit,
     canDecrement: Boolean,
     modifier: Modifier = Modifier,
-    isFloat: Boolean = false
+    isFloat: Boolean = false,
+    label: String = ""
 ) {
-    Row(
-        modifier = modifier
-            .background(
-                color = colorResource(R.color.colorLightAccent),
-                shape = RoundedCornerShape(StepperCornerRadius)
-            )
-            .border(
-                width = StepperBorderWidth,
-                color = colorResource(R.color.blueDark),
-                shape = RoundedCornerShape(StepperCornerRadius)
-            )
-            .padding(StepperPadding),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onDecrement,
-            enabled = canDecrement,
-            modifier = Modifier.size(IconButtonSize)
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .background(
+                    color = colorResource(R.color.colorLightAccent),
+                    shape = RoundedCornerShape(StepperCornerRadius)
+                )
+                .border(
+                    width = StepperBorderWidth,
+                    color = colorResource(R.color.blueDark),
+                    shape = RoundedCornerShape(StepperCornerRadius)
+                )
+                .padding(StepperPadding),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (canDecrement) {
+            IconButton(
+                onClick = onDecrement,
+                enabled = canDecrement,
+                modifier = Modifier.size(IconButtonSize)
+            ) {
+                if (canDecrement) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_minus_dark),
+                        contentDescription = stringResource(R.string.cd_decrement),
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                textStyle = TextStyle(
+                    fontFamily = StaatlichesFont,
+                    fontSize = InputFontSize,
+                    color = colorResource(R.color.colorText),
+                    textAlign = TextAlign.Center
+                ),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = if (isFloat) {
+                        KeyboardType.Decimal
+                    } else {
+                        KeyboardType.Number
+                    }
+                ),
+                modifier = Modifier
+                    .weight(WeightFull)
+                    .padding(horizontal = StepperInternalPadding)
+            )
+
+            IconButton(
+                onClick = onIncrement,
+                modifier = Modifier.size(IconButtonSize)
+            ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_minus_dark),
-                    contentDescription = "Decrement",
+                    painter = painterResource(R.drawable.ic_plus_dark),
+                    contentDescription = stringResource(R.string.cd_increment),
                     tint = Color.Unspecified
                 )
             }
         }
-
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            textStyle = TextStyle(
-                fontFamily = StaatlichesFont,
-                fontSize = InputFontSize,
-                color = colorResource(R.color.colorText),
-                textAlign = TextAlign.Center
-            ),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = if (isFloat) {
-                    KeyboardType.Decimal
-                } else {
-                    KeyboardType.Number
-                }
-            ),
-            modifier = Modifier
-                .weight(WeightFull)
-                .padding(horizontal = StepperInternalPadding)
-        )
-
-        IconButton(
-            onClick = onIncrement,
-            modifier = Modifier.size(IconButtonSize)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_plus_dark),
-                contentDescription = "Increment",
-                tint = Color.Unspecified
-            )
-        }
+        GainzFieldLabelOverlay(label = label)
     }
 }
 
-@Composable
-fun ExerciseChipButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .padding(ChipPadding)
-            .size(ChipSize)
-            .background(
-                color = colorResource(R.color.blueDark),
-                shape = RoundedCornerShape(ChipCornerRadius)
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontFamily = StaatlichesFont,
-            fontSize = ChipFontSize
-        )
-    }
-}
 
 @Composable
 fun SummaryScreenContent(
     uiState: SummaryUiState,
     actions: SummaryScreenActions
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(ScreenPadding)
-            .verticalScroll(rememberScrollState())
-    ) {
-        SummaryToolbar(onBack = actions.onBack)
-
-        SummaryCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = SectionVerticalPadding)
-        ) {
-            GainzOutlinedTextField(
-                state = GainzTextFieldState(
-                    value = uiState.workoutName,
-                    label = stringResource(R.string.hint_workout_name),
-                    isError = uiState.workoutNameError != null,
-                    errorText = uiState.workoutNameError
-                ),
-                onValueChange = actions.onWorkoutNameChanged,
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            SummaryToolbar(onBack = actions.onBack)
+        },
+        bottomBar = {
+            Row(
                 modifier = Modifier
-                    .padding(CardPadding)
-                    .height(WorkoutNameHeight)
-            )
-        }
-
-        SummaryCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = SectionVerticalPadding)
-        ) {
-            Column(modifier = Modifier.padding(CardPadding)) {
-                GainzOutlinedTextField(
-                    state = GainzTextFieldState(
-                        value = uiState.exerciseName,
-                        label = stringResource(R.string.hint_exercise_name),
-                        isError = uiState.exerciseNameError != null,
-                        errorText = uiState.exerciseNameError
-                    ),
-                    onValueChange = actions.onExerciseNameChanged,
-                    singleLine = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(ExerciseNameHeight)
-                        .padding(bottom = InputBottomPadding)
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = RowVerticalPadding),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    NumericStepperField(
-                        value = uiState.weight,
-                        onValueChange = actions.onWeightChanged,
-                        onIncrement = actions.onIncrementWeight,
-                        onDecrement = actions.onDecrementWeight,
-                        canDecrement = uiState.canDecrementWeight,
-                        isFloat = true,
-                        modifier = Modifier
-                            .weight(WeightFull)
-                            .padding(end = ColumnEndPadding)
-                    )
-                    GainzDropdown(
-                        selectedValue = uiState.selectedEquipment,
-                        options = uiState.equipmentOptions,
-                        onOptionSelected = actions.onEquipmentSelected,
-                        modifier = Modifier
-                            .weight(WeightFull)
-                            .padding(start = ColumnStartPadding)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = RowVerticalPadding),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    NumericStepperField(
-                        value = uiState.sets,
-                        onValueChange = actions.onSetsChanged,
-                        onIncrement = actions.onIncrementSets,
-                        onDecrement = actions.onDecrementSets,
-                        canDecrement = uiState.canDecrementSets,
-                        modifier = Modifier
-                            .weight(WeightFull)
-                            .padding(end = ColumnEndPadding)
-                    )
-                    NumericStepperField(
-                        value = uiState.reps,
-                        onValueChange = actions.onRepsChanged,
-                        onIncrement = actions.onIncrementReps,
-                        onDecrement = actions.onDecrementReps,
-                        canDecrement = uiState.canDecrementReps,
-                        modifier = Modifier
-                            .weight(WeightFull)
-                            .padding(start = ColumnStartPadding)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = ButtonTopPadding),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    GainzButton(
-                        text = stringResource(R.string.clear),
-                        onClick = actions.onClearExercise,
-                        fontFamily = StaatlichesFont,
-                        modifier = Modifier
-                            .weight(WeightFull)
-                            .padding(end = ColumnEndPadding)
-                            .height(ButtonHeight)
-                    )
-
-                    if (uiState.showUpdateExerciseButton) {
-                        GainzButton(
-                            text = stringResource(R.string.update_exercise),
-                            onClick = actions.onUpdateExercise,
-                            fontFamily = StaatlichesFont,
-                            modifier = Modifier
-                                .weight(WeightFull)
-                                .padding(start = ColumnStartPadding)
-                                .height(ButtonHeight)
-                        )
-                    } else if (uiState.showAddExerciseButton) {
-                        GainzButton(
-                            text = stringResource(R.string.add_exercise),
-                            onClick = actions.onAddExercise,
-                            fontFamily = StaatlichesFont,
-                            modifier = Modifier
-                                .weight(WeightFull)
-                                .padding(start = ColumnStartPadding)
-                                .height(ButtonHeight)
-                        )
-                    }
-                }
-            }
-        }
-
-        SummaryCard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = SectionVerticalPadding)
-        ) {
-            Column(modifier = Modifier.padding(CardPadding)) {
-                Text(
-                    text = stringResource(R.string.exercises).uppercase(),
+                    .fillMaxWidth()
+                    .padding(ButtonTopPadding),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                GainzButton(
+                    text = stringResource(R.string.discard),
+                    onClick = actions.onDiscardWorkout,
                     fontFamily = StaatlichesFont,
-                    fontSize = ExercisesTitleFontSize,
-                    color = colorResource(R.color.colorBg),
-                    modifier = Modifier.padding(bottom = ExercisesTitleBottomPadding)
+                    modifier = Modifier
+                        .weight(WeightFull)
+                        .padding(end = ColumnEndPadding)
+                        .height(FooterButtonHeight)
                 )
-                LazyRow {
-                    items(uiState.exerciseNames) { name ->
-                        ExerciseChipButton(
-                            text = name,
-                            onClick = { actions.onExerciseClicked(name) },
-                            modifier = Modifier.padding(end = ExerciseChipEndPadding)
+                GainzButton(
+                    text = uiState.mainWorkoutButtonText,
+                    enabled = !uiState.isSaving,
+                    onClick = actions.onAddOrUpdateWorkout,
+                    fontFamily = StaatlichesFont,
+                    modifier = Modifier
+                        .weight(WeightFull)
+                        .padding(start = ColumnStartPadding)
+                        .height(FooterButtonHeight)
+                )
+            }
+        },
+        contentColor = colorResource(R.color.colorLightBg),
+        containerColor = colorResource(R.color.colorLightBg)
+    ) {
+        Column(
+            Modifier
+                .padding(it)
+                .padding(ScreenPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            SummaryCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = SectionVerticalPadding)
+            ) {
+                GainzMaterialOutlinedTextField(
+                    state = GainzTextFieldState(
+                        value = uiState.workoutName,
+                        label = stringResource(R.string.hint_workout_name),
+                        isError = uiState.workoutNameError != null,
+                        errorText = uiState.workoutNameError
+                    ),
+                    onValueChange = actions.onWorkoutNameChanged,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = CardPadding,
+                            top = MaterialFieldLabelClearance,
+                            end = CardPadding,
+                            bottom = CardPadding
                         )
+                        .height(WorkoutNameHeight)
+                )
+            }
+
+            SummaryCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = SectionVerticalPadding)
+            ) {
+                Column(
+                    modifier = Modifier.padding(
+                        start = CardPadding,
+                        top = MaterialFieldLabelClearance,
+                        end = CardPadding,
+                        bottom = CardPadding
+                    )
+                ) {
+                    GainzMaterialOutlinedTextField(
+                        state = GainzTextFieldState(
+                            value = uiState.exerciseName,
+                            label = stringResource(R.string.hint_exercise_name),
+                            isError = uiState.exerciseNameError != null,
+                            errorText = uiState.exerciseNameError
+                        ),
+                        onValueChange = actions.onExerciseNameChanged,
+                        singleLine = false,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(ExerciseNameHeight)
+                            .padding(bottom = InputBottomPadding)
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = RowVerticalPadding),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        NumericStepperField(
+                            value = uiState.weight,
+                            label = stringResource(R.string.hint_weight),
+                            onValueChange = actions.onWeightChanged,
+                            onIncrement = actions.onIncrementWeight,
+                            onDecrement = actions.onDecrementWeight,
+                            canDecrement = uiState.canDecrementWeight,
+                            isFloat = true,
+                            modifier = Modifier
+                                .weight(WeightFull)
+                                .padding(end = ColumnEndPadding)
+                        )
+                        GainzMaterialDropdown(
+                            selectedValue = uiState.selectedEquipment,
+                            label = stringResource(R.string.hint_equipment),
+                            options = uiState.equipmentOptions,
+                            onOptionSelected = actions.onEquipmentSelected,
+                            modifier = Modifier
+                                .weight(WeightFull)
+                                .padding(start = ColumnStartPadding)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = RowVerticalPadding),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        NumericStepperField(
+                            value = uiState.sets,
+                            label = stringResource(R.string.hint_sets),
+                            onValueChange = actions.onSetsChanged,
+                            onIncrement = actions.onIncrementSets,
+                            onDecrement = actions.onDecrementSets,
+                            canDecrement = uiState.canDecrementSets,
+                            modifier = Modifier
+                                .weight(WeightFull)
+                                .padding(end = ColumnEndPadding)
+                        )
+                        NumericStepperField(
+                            value = uiState.reps,
+                            label = stringResource(R.string.hint_reps),
+                            onValueChange = actions.onRepsChanged,
+                            onIncrement = actions.onIncrementReps,
+                            onDecrement = actions.onDecrementReps,
+                            canDecrement = uiState.canDecrementReps,
+                            modifier = Modifier
+                                .weight(WeightFull)
+                                .padding(start = ColumnStartPadding)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = ButtonTopPadding),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        GainzButton(
+                            text = stringResource(R.string.clear),
+                            onClick = actions.onClearExercise,
+                            fontFamily = StaatlichesFont,
+                            modifier = Modifier
+                                .weight(WeightFull)
+                                .padding(end = ColumnEndPadding)
+                                .height(ButtonHeight)
+                        )
+
+                        if (uiState.showUpdateExerciseButton) {
+                            GainzButton(
+                                text = stringResource(R.string.update_exercise),
+                                onClick = actions.onUpdateExercise,
+                                fontFamily = StaatlichesFont,
+                                modifier = Modifier
+                                    .weight(WeightFull)
+                                    .padding(start = ColumnStartPadding)
+                                    .height(ButtonHeight)
+                            )
+                        } else if (uiState.showAddExerciseButton) {
+                            GainzButton(
+                                text = stringResource(R.string.add_exercise),
+                                onClick = actions.onAddExercise,
+                                fontFamily = StaatlichesFont,
+                                modifier = Modifier
+                                    .weight(WeightFull)
+                                    .padding(start = ColumnStartPadding)
+                                    .height(ButtonHeight)
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.weight(WeightFull))
+            SummaryCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = SectionVerticalPadding)
+            ) {
+                Column(modifier = Modifier.padding(CardPadding)) {
+                    Text(
+                        text = stringResource(R.string.exercises).uppercase(),
+                        fontFamily = StaatlichesFont,
+                        fontSize = ExercisesTitleFontSize,
+                        color = colorResource(R.color.colorBg),
+                        modifier = Modifier.padding(bottom = ExercisesTitleBottomPadding)
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(ExerciseListItemSpacing),
+                        contentPadding = PaddingValues(horizontal = ExerciseListHorizontalPadding)
+                    ) {
+                        items(uiState.exerciseNames) { name ->
+                            ExerciseSelectionButton(
+                                text = name,
+                                onClick = { actions.onExerciseClicked(name) }
+                            )
+                        }
+                    }
+                }
+            }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = ButtonTopPadding),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            GainzButton(
-                text = stringResource(R.string.discard),
-                onClick = actions.onDiscardWorkout,
-                fontFamily = StaatlichesFont,
-                modifier = Modifier
-                    .weight(WeightFull)
-                    .padding(end = ColumnEndPadding)
-                    .height(FooterButtonHeight)
-            )
-            GainzButton(
-                text = uiState.mainWorkoutButtonText,
-                enabled = !uiState.isSaving,
-                onClick = actions.onAddOrUpdateWorkout,
-                fontFamily = StaatlichesFont,
-                modifier = Modifier
-                    .weight(WeightFull)
-                    .padding(start = ColumnStartPadding)
-                    .height(FooterButtonHeight)
-            )
+            Spacer(modifier = Modifier.weight(WeightFull))
         }
     }
 }

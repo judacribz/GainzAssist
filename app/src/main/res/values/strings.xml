@@ -69,6 +69,10 @@
     <string name="file_user_info">user_info.file</string>
     <string name="file_workout_info">workout_info.file</string>
     <string name="file_settings_info">settings_info.file</string>
+    <string name="hint_weight">WEIGHT</string>
+    <string name="hint_reps">REPS</string>
+    <string name="hint_sets">SETS</string>
+    <string name="hint_equipment">EQUIPMENT</string>
     <string name="equipment">Equipment</string>
     <string name="update">update</string>
     <string name="workout_list">Workout List</string>
@@ -96,6 +100,8 @@
     <string name="dumbbell">Dumbbell</string>
     <string name="n_a">N/A</string>
     <string name="cd_back">Back</string>
+    <string name="cd_decrement">Decrease value</string>
+    <string name="cd_increment">Increase value</string>
     <string name="cd_add">Add</string>
     <string name="err_browser_unavailable">Browser not available</string>
     <string name="err_mail_unavailable">Mail app not available</string>
