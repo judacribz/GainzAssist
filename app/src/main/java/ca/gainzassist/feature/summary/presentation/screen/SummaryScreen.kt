@@ -1,12 +1,11 @@
 package ca.gainzassist.feature.summary.presentation.screen
 
-import androidx.appcompat.R as appCompatR
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,10 +45,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ca.gainzassist.R
+import ca.gainzassist.ui.components.ExerciseSelectionButton
 import ca.gainzassist.ui.components.GainzButton
-import ca.gainzassist.ui.components.GainzDropdown
-import ca.gainzassist.ui.components.GainzOutlinedTextField
+import ca.gainzassist.ui.components.GainzFieldLabelOverlay
+import ca.gainzassist.ui.components.GainzMaterialDropdown
+import ca.gainzassist.ui.components.GainzMaterialOutlinedTextField
 import ca.gainzassist.ui.components.GainzTextFieldState
+import androidx.appcompat.R as appCompatR
 
 val StaatlichesFont = FontFamily(Font(R.font.staatliches))
 
@@ -106,15 +108,11 @@ private val CardElevation = 3.dp
 private val CardCornerRadius = 5.dp
 private val CardBorderWidth = 0.5.dp
 private val StepperCornerRadius = 20.dp
-private val StepperBorderWidth = 4.dp
+private val StepperBorderWidth = 1.dp
 private val StepperPadding = 4.dp
 private val IconButtonSize = 40.dp
 private val InputFontSize = 35.sp
 private val StepperInternalPadding = 4.dp
-private val ChipPadding = 2.dp
-private val ChipSize = 60.dp
-private val ChipCornerRadius = 10.dp
-private val ChipFontSize = 20.sp
 private val ScreenPadding = 4.dp
 private val SectionVerticalPadding = 4.dp
 private val WorkoutNameHeight = 80.dp
@@ -128,7 +126,8 @@ private val ButtonHeight = 55.dp
 private val FooterButtonHeight = 60.dp
 private val ExercisesTitleFontSize = 18.sp
 private val ExercisesTitleBottomPadding = 4.dp
-private val ExerciseChipEndPadding = 4.dp
+private val ExerciseListItemSpacing = 8.dp
+private val ExerciseListHorizontalPadding = 4.dp
 private const val WeightFull = 1f
 private const val BENCH_PRESS = "Bench Press"
 
@@ -155,7 +154,7 @@ fun SummaryToolbar(onBack: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(
                     painter = painterResource(appCompatR.drawable.abc_ic_ab_back_material),
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.cd_back),
                     tint = colorResource(R.color.colorBg)
                 )
             }
@@ -202,10 +201,12 @@ fun NumericStepperField(
     onDecrement: () -> Unit,
     canDecrement: Boolean,
     modifier: Modifier = Modifier,
-    isFloat: Boolean = false
+    isFloat: Boolean = false,
+    label: String = ""
 ) {
-    Row(
-        modifier = modifier
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
             .background(
                 color = colorResource(R.color.colorLightAccent),
                 shape = RoundedCornerShape(StepperCornerRadius)
@@ -226,7 +227,7 @@ fun NumericStepperField(
             if (canDecrement) {
                 Icon(
                     painter = painterResource(R.drawable.ic_minus_dark),
-                    contentDescription = "Decrement",
+                    contentDescription = stringResource(R.string.cd_decrement),
                     tint = Color.Unspecified
                 )
             }
@@ -260,38 +261,15 @@ fun NumericStepperField(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_plus_dark),
-                contentDescription = "Increment",
+                contentDescription = stringResource(R.string.cd_increment),
                 tint = Color.Unspecified
             )
         }
     }
+    GainzFieldLabelOverlay(label = label)
+}
 }
 
-@Composable
-fun ExerciseChipButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .padding(ChipPadding)
-            .size(ChipSize)
-            .background(
-                color = colorResource(R.color.blueDark),
-                shape = RoundedCornerShape(ChipCornerRadius)
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontFamily = StaatlichesFont,
-            fontSize = ChipFontSize
-        )
-    }
-}
 
 @Composable
 fun SummaryScreenContent(
@@ -301,7 +279,7 @@ fun SummaryScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(colorResource(R.color.colorLightBg))
             .padding(ScreenPadding)
             .verticalScroll(rememberScrollState())
     ) {
@@ -312,7 +290,7 @@ fun SummaryScreenContent(
                 .fillMaxWidth()
                 .padding(vertical = SectionVerticalPadding)
         ) {
-            GainzOutlinedTextField(
+            GainzMaterialOutlinedTextField(
                 state = GainzTextFieldState(
                     value = uiState.workoutName,
                     label = stringResource(R.string.hint_workout_name),
@@ -321,6 +299,7 @@ fun SummaryScreenContent(
                 ),
                 onValueChange = actions.onWorkoutNameChanged,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(CardPadding)
                     .height(WorkoutNameHeight)
             )
@@ -332,7 +311,7 @@ fun SummaryScreenContent(
                 .padding(vertical = SectionVerticalPadding)
         ) {
             Column(modifier = Modifier.padding(CardPadding)) {
-                GainzOutlinedTextField(
+                GainzMaterialOutlinedTextField(
                     state = GainzTextFieldState(
                         value = uiState.exerciseName,
                         label = stringResource(R.string.hint_exercise_name),
@@ -355,6 +334,7 @@ fun SummaryScreenContent(
                 ) {
                     NumericStepperField(
                         value = uiState.weight,
+                        label = stringResource(R.string.hint_weight),
                         onValueChange = actions.onWeightChanged,
                         onIncrement = actions.onIncrementWeight,
                         onDecrement = actions.onDecrementWeight,
@@ -364,8 +344,9 @@ fun SummaryScreenContent(
                             .weight(WeightFull)
                             .padding(end = ColumnEndPadding)
                     )
-                    GainzDropdown(
+                    GainzMaterialDropdown(
                         selectedValue = uiState.selectedEquipment,
+                        label = stringResource(R.string.hint_equipment),
                         options = uiState.equipmentOptions,
                         onOptionSelected = actions.onEquipmentSelected,
                         modifier = Modifier
@@ -382,6 +363,7 @@ fun SummaryScreenContent(
                 ) {
                     NumericStepperField(
                         value = uiState.sets,
+                        label = stringResource(R.string.hint_sets),
                         onValueChange = actions.onSetsChanged,
                         onIncrement = actions.onIncrementSets,
                         onDecrement = actions.onDecrementSets,
@@ -392,6 +374,7 @@ fun SummaryScreenContent(
                     )
                     NumericStepperField(
                         value = uiState.reps,
+                        label = stringResource(R.string.hint_reps),
                         onValueChange = actions.onRepsChanged,
                         onIncrement = actions.onIncrementReps,
                         onDecrement = actions.onDecrementReps,
@@ -456,12 +439,14 @@ fun SummaryScreenContent(
                     color = colorResource(R.color.colorBg),
                     modifier = Modifier.padding(bottom = ExercisesTitleBottomPadding)
                 )
-                LazyRow {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(ExerciseListItemSpacing),
+                    contentPadding = PaddingValues(horizontal = ExerciseListHorizontalPadding)
+                ) {
                     items(uiState.exerciseNames) { name ->
-                        ExerciseChipButton(
+                        ExerciseSelectionButton(
                             text = name,
-                            onClick = { actions.onExerciseClicked(name) },
-                            modifier = Modifier.padding(end = ExerciseChipEndPadding)
+                            onClick = { actions.onExerciseClicked(name) }
                         )
                     }
                 }
