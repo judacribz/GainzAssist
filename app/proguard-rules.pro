@@ -2,16 +2,13 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
-# Keep metadata/annotations used by Room, Parceler, Firebase, and generated code
+# Keep metadata/annotations used by Room, Firebase, and generated code
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
-# Parceler - scoped to app models only
--keep @org.parceler.Parcel class ca.gainzassist.domain.model.** { *; }
--keep class ca.gainzassist.domain.model.**$$Parcelable { *; }
--keep class ca.gainzassist.domain.model.**$$Parcelable$Creator { *; }
+# Keep regular Android Parcelable implementations
 -keepnames class * implements android.os.Parcelable
 
-# Room-backed domain models also used by Parceler/Firebase map interop
+# Room-backed domain models also used by Firebase map interop
 -keep class ca.gainzassist.domain.model.** { *; }
 
 # Firebase service and Firebase helpers

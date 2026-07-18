@@ -38,7 +38,7 @@ val hasReleaseSigningConfig = storeFileValue != null &&
 configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
     //noinspection GradleDependency
-    compileSdk = 36
+    compileSdk = 37
 
     buildFeatures {
         buildConfig = true
@@ -192,7 +192,7 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 }
 
-val validateReleaseSecrets by tasks.registering {
+val validateReleaseSecrets = tasks.register("validateReleaseSecrets") {
     group = "verification"
     description = "Validates required release secrets before building a release artifact."
 
