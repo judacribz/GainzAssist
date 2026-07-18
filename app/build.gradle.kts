@@ -38,7 +38,7 @@ val hasReleaseSigningConfig = storeFileValue != null &&
 configure<com.android.build.api.dsl.ApplicationExtension> {
     namespace = "ca.gainzassist"
     //noinspection GradleDependency
-    compileSdk = 36
+    compileSdk = 37
 
     buildFeatures {
         buildConfig = true

@@ -1,16 +1,16 @@
 [versions]
-compose-bom = "2026.06.00"
+compose-bom = "2026.06.01"
 activity-compose = "1.13.0"
 
 # Android / Kotlin / Google Plugins
-android-gradle-plugin = "9.2.1"
+android-gradle-plugin = "9.3.0"
 google-services = "4.5.0"
-spotless = "8.7.0"
+spotless = "8.8.0"
 secrets-gradle-plugin = "2.0.1"
-kotlin = "2.4.0"
-ksp = "2.3.6"
+kotlin = "2.4.10"
+ksp = "2.3.10"
 detekt = "1.23.8"
-detekt-compose = "0.6.2"
+detekt-compose = "0.6.3"
 
 # AndroidX
 appcompat = "1.7.1"
@@ -19,26 +19,26 @@ recyclerview = "1.4.0"
 constraintlayout = "2.2.1"
 cardview = "1.0.0"
 viewpager = "1.1.0"
-core-ktx = "1.15.0"
+core-ktx = "1.19.0"
 activity-ktx = "1.13.0"
 fragment-ktx = "1.8.9"
 
 # Architecture Components (AndroidX)
-lifecycle = "2.10.0"
+lifecycle = "2.11.0"
 room = "2.8.4"
 
 # DI
 koin = "4.2.2"
 
 # Network
-ktor = "3.1.1"
+ktor = "3.5.1"
 
 # Facebook
-facebook-android-sdk = "18.2.3"
+facebook-android-sdk = "18.3.0"
 facebook-rebound = "0.3.8"
 
 # Firebase (Modern versions)
-firebase-bom = "34.15.0"
+firebase-bom = "34.16.0"
 firebase-crashlytics-plugin = "3.0.7"
 
 # Google
@@ -48,16 +48,13 @@ googleid = "1.2.0"
 gson = "2.14.0"
 youtube-api = "v3-rev20260430-2.0.0"
 android-youtube-player = "13.0.0"
-glide = "5.0.7"
+glide = "5.0.9"
 guava = "33.6.0-android"
 
 # Jackson
 jackson-annotations = "2.22"
-jackson-core = "2.22.0"
-jackson-databind = "2.22.0"
-
-# Parceler
-parceler = "1.1.13"
+jackson-core = "2.22.1"
+jackson-databind = "2.22.1"
 
 # UI / Logging
 autofittextview = "0.2.1"
@@ -69,7 +66,7 @@ junit = "4.13.2"
 androidx-junit = "1.3.0"
 espresso-core = "3.7.0"
 kotlinx-coroutines-test = "1.11.0"
-org-json = "20231013"
+org-json = "20260522"
 
 
 [libraries]
@@ -144,10 +141,6 @@ org-json = { module = "org.json:json", version.ref = "org-json" }
 jackson-annotations = { module = "com.fasterxml.jackson.core:jackson-annotations", version.ref = "jackson-annotations" }
 jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson-core" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
-
-# Parceler
-parceler = { module = "org.parceler:parceler", version.ref = "parceler" }
-parceler-api = { module = "org.parceler:parceler-api", version.ref = "parceler" }
 
 # Testing
 androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
@@ -259,7 +252,6 @@ android-application = { id = "com.android.application", version.ref = "android-g
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets-gradle-plugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
